@@ -1,7 +1,7 @@
 __pycache__/
 *.py[cod]
 *.log
-.venv/
+.venv311/
 library/*
 crawl.py
 *.pdf

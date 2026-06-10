@@ -6,7 +6,9 @@ import sys
 from pathlib import Path
 
 import streamlit as st
-
+import faulthandler
+f = open("crash.log", "w")
+faulthandler.enable(file=f, all_threads=True)
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
@@ -198,8 +200,10 @@ else:
                 )
                 st.rerun()
             except Exception as exc:  # noqa: BLE001 - show user-facing failure
+                import traceback
                 st.error(f"重建失败：{exc}")
-                
+                st.code(traceback.format_exc())
+    
 
     with search_col:
         query = st.text_input("搜索问题或关键词")

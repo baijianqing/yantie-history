@@ -41,7 +41,55 @@ class IndexStats:
             "embedding_model": self.embedding_model,
             "embedding_dimensions": self.embedding_dimensions,
         }
+import math
+import numpy as np
 
+def validate_batch(ids, documents, embeddings, metadatas):
+    assert len(ids) == len(documents) == len(embeddings) == len(metadatas)
+
+    # 1. 检查 id
+    for i, x in enumerate(ids):
+        assert isinstance(x, str), f"id 不是字符串: {i}, {type(x)}"
+        assert x.strip(), f"id 为空: {i}"
+
+    assert len(ids) == len(set(ids)), "同一个 batch 内 ids 有重复"
+
+    # 2. 检查 document
+    for i, doc in enumerate(documents):
+        assert isinstance(doc, str), f"document 不是字符串: {i}, {type(doc)}"
+        assert doc.strip(), f"document 为空: {i}"
+        assert "\x00" not in doc, f"document 含有空字符 \\x00: {i}"
+
+    # 3. 检查 embedding
+    dims = set()
+
+    for i, emb in enumerate(embeddings):
+        assert emb is not None, f"embedding 是 None: {i}"
+
+        if isinstance(emb, np.ndarray):
+            emb = emb.tolist()
+
+        assert isinstance(emb, list), f"embedding 不是 list: {i}, {type(emb)}"
+        assert len(emb) > 0, f"embedding 为空: {i}"
+
+        dims.add(len(emb))
+
+        for j, v in enumerate(emb):
+            assert isinstance(v, (int, float)), f"embedding 非数字: {i}-{j}, {type(v)}"
+            assert math.isfinite(v), f"embedding 有 NaN/Inf: {i}-{j}, {v}"
+
+    assert len(dims) == 1, f"embedding 维度不一致: {dims}"
+
+    # 4. 检查 metadata
+    for i, meta in enumerate(metadatas):
+        assert isinstance(meta, dict), f"metadata 不是 dict: {i}, {type(meta)}"
+
+        for k, v in meta.items():
+            assert isinstance(k, str), f"metadata key 不是字符串: {i}, {k}, {type(k)}"
+
+            assert isinstance(v, (str, int, float, bool)) or v is None, (
+                f"metadata value 类型非法: {i}, key={k}, value={v}, type={type(v)}"
+            )
 
 @dataclass(frozen=True)
 class SearchResult:
@@ -175,12 +223,17 @@ class RetrievalService:
             embeddings = self.embedding_provider.embed(documents)
             dimensions = len(embeddings[0]) if embeddings else None
             self._ensure_collection_compatible(collection, dimensions)
+            metadatas = [chunk_metadata(chunk) for chunk in batch]
+            validate_batch(ids, documents, embeddings, metadatas)
+            embeddings_np = np.asarray(embeddings, dtype=np.float32)
+            
             collection.upsert(
                 ids=ids,
                 documents=documents,
-                embeddings=embeddings,
-                metadatas=[chunk_metadata(chunk) for chunk in batch],
-            )
+                embeddings=embeddings_np,
+                metadatas=metadatas
+            	)
+            
             self._update_collection_metadata(collection, dimensions)
             indexed_ids.extend(ids)
             if progress_callback:
