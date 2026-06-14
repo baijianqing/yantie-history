@@ -186,6 +186,11 @@ class KnowledgeRepository:
             ).fetchall()
         return [self.get(row["id"]) for row in rows]
 
+    def delete(self, item_id: str) -> None:
+        self.get(item_id)
+        with connect(self.database_path) as connection:
+            connection.execute("DELETE FROM knowledge_items WHERE id = ?", (item_id,))
+
 
 class ChunkRepository:
     def __init__(self, database_path: Path | None = None):
@@ -257,6 +262,17 @@ class ChunkRepository:
                 "UPDATE chunks SET embedding_id = ? WHERE id = ?",
                 [(chunk_id, chunk_id) for chunk_id in chunk_ids],
             )
+
+    def clear_embedding_ids_by_knowledge_item(self, item_id: str) -> None:
+        with connect(self.database_path) as connection:
+            connection.execute(
+                "UPDATE chunks SET embedding_id = NULL WHERE knowledge_item_id = ?",
+                (item_id,),
+            )
+
+    def clear_all_embedding_ids(self) -> None:
+        with connect(self.database_path) as connection:
+            connection.execute("UPDATE chunks SET embedding_id = NULL")
 
     def count_by_knowledge_item(self, item_id: str) -> int:
         with connect(self.database_path) as connection:

@@ -85,11 +85,13 @@ class OllamaEmbeddingProvider:
         model: str = "bge-m3",
         timeout: float = 300,
         batch_size: int = 8,
+        num_gpu: int | None = 0,
     ):
         self.base_url = base_url.rstrip("/")
         self.model = model
         self.timeout = timeout
         self.batch_size = max(1, batch_size)
+        self.num_gpu = num_gpu
         self.name = f"ollama-{model}"
         self._dimensions: int | None = None
 
@@ -111,6 +113,8 @@ class OllamaEmbeddingProvider:
             "model": self.model,
             "input": texts,
         }
+        if self.num_gpu is not None:
+            payload["options"] = {"num_gpu": self.num_gpu}
         response = self._post_json("/api/embed", payload)
         embeddings = parse_ollama_embeddings(response)
         if len(embeddings) != len(texts):
@@ -153,7 +157,7 @@ class OllamaEmbeddingProvider:
         except TimeoutError as exc:
             raise EmbeddingProviderError(
                 f"Ollama embedding request timed out after {self.timeout} seconds "
-                f"(model={self.model}, batch_size={self.batch_size}). "
+                f"(model={self.model}, batch_size={self.batch_size}, num_gpu={self.num_gpu}). "
                 "Try lowering OLLAMA_EMBED_BATCH_SIZE or increasing OLLAMA_EMBED_TIMEOUT."
             ) from exc
         except json.JSONDecodeError as exc:
@@ -186,5 +190,6 @@ def make_embedding_provider(settings: Settings | None = None) -> EmbeddingProvid
             model=settings.ollama_embed_model,
             timeout=settings.ollama_embed_timeout,
             batch_size=settings.ollama_embed_batch_size,
+            num_gpu=settings.ollama_embed_num_gpu,
         )
     raise ConfigurationError(f"Unsupported EMBEDDING_PROVIDER: {settings.embedding_provider}")

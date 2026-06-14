@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import json
+import time
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Any, Callable
 
 import chromadb
@@ -19,7 +19,7 @@ from metaos.workspace.paths import WorkspacePaths, ensure_workspace
 
 
 COLLECTION_NAME = "metaos_chunks"
-DEFAULT_UPSERT_BATCH_SIZE = 16
+DEFAULT_UPSERT_BATCH_SIZE = 128
 ProgressCallback = Callable[[int, int], None]
 
 
@@ -30,7 +30,27 @@ class IndexStats:
     embedding_provider: str
     embedding_model: str
     embedding_dimensions: int | None
+    target_chunks: int = 0
+    skipped_chunks: int = 0
+    deleted_index_entries: int = 0
+    force_rebuild: bool = False
     collection_name: str = COLLECTION_NAME
+    embed_seconds: float = 0.0
+    upsert_seconds: float = 0.0
+    metadata_seconds: float = 0.0
+    total_index_seconds: float = 0.0
+    batch_count: int = 0
+    embed_batch_count: int = 0
+    upsert_batch_count: int = 0
+    avg_batch_size: float = 0.0
+    avg_embed_batch_size: float = 0.0
+    avg_upsert_batch_size: float = 0.0
+    chunks_per_second: float = 0.0
+    embed_seconds_per_chunk: float = 0.0
+    upsert_seconds_per_chunk: float = 0.0
+    embedding_batch_size: int | None = None
+    embedding_num_gpu: int | None = None
+    chroma_upsert_batch_size: int | None = None
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -40,56 +60,28 @@ class IndexStats:
             "embedding_provider": self.embedding_provider,
             "embedding_model": self.embedding_model,
             "embedding_dimensions": self.embedding_dimensions,
+            "target_chunks": self.target_chunks,
+            "skipped_chunks": self.skipped_chunks,
+            "deleted_index_entries": self.deleted_index_entries,
+            "force_rebuild": self.force_rebuild,
+            "embed_seconds": self.embed_seconds,
+            "upsert_seconds": self.upsert_seconds,
+            "metadata_seconds": self.metadata_seconds,
+            "total_index_seconds": self.total_index_seconds,
+            "batch_count": self.batch_count,
+            "embed_batch_count": self.embed_batch_count,
+            "upsert_batch_count": self.upsert_batch_count,
+            "avg_batch_size": self.avg_batch_size,
+            "avg_embed_batch_size": self.avg_embed_batch_size,
+            "avg_upsert_batch_size": self.avg_upsert_batch_size,
+            "chunks_per_second": self.chunks_per_second,
+            "embed_seconds_per_chunk": self.embed_seconds_per_chunk,
+            "upsert_seconds_per_chunk": self.upsert_seconds_per_chunk,
+            "embedding_batch_size": self.embedding_batch_size,
+            "embedding_num_gpu": self.embedding_num_gpu,
+            "chroma_upsert_batch_size": self.chroma_upsert_batch_size,
         }
-import math
-import numpy as np
 
-def validate_batch(ids, documents, embeddings, metadatas):
-    assert len(ids) == len(documents) == len(embeddings) == len(metadatas)
-
-    # 1. 检查 id
-    for i, x in enumerate(ids):
-        assert isinstance(x, str), f"id 不是字符串: {i}, {type(x)}"
-        assert x.strip(), f"id 为空: {i}"
-
-    assert len(ids) == len(set(ids)), "同一个 batch 内 ids 有重复"
-
-    # 2. 检查 document
-    for i, doc in enumerate(documents):
-        assert isinstance(doc, str), f"document 不是字符串: {i}, {type(doc)}"
-        assert doc.strip(), f"document 为空: {i}"
-        assert "\x00" not in doc, f"document 含有空字符 \\x00: {i}"
-
-    # 3. 检查 embedding
-    dims = set()
-
-    for i, emb in enumerate(embeddings):
-        assert emb is not None, f"embedding 是 None: {i}"
-
-        if isinstance(emb, np.ndarray):
-            emb = emb.tolist()
-
-        assert isinstance(emb, list), f"embedding 不是 list: {i}, {type(emb)}"
-        assert len(emb) > 0, f"embedding 为空: {i}"
-
-        dims.add(len(emb))
-
-        for j, v in enumerate(emb):
-            assert isinstance(v, (int, float)), f"embedding 非数字: {i}-{j}, {type(v)}"
-            assert math.isfinite(v), f"embedding 有 NaN/Inf: {i}-{j}, {v}"
-
-    assert len(dims) == 1, f"embedding 维度不一致: {dims}"
-
-    # 4. 检查 metadata
-    for i, meta in enumerate(metadatas):
-        assert isinstance(meta, dict), f"metadata 不是 dict: {i}, {type(meta)}"
-
-        for k, v in meta.items():
-            assert isinstance(k, str), f"metadata key 不是字符串: {i}, {k}, {type(k)}"
-
-            assert isinstance(v, (str, int, float, bool)) or v is None, (
-                f"metadata value 类型非法: {i}, key={k}, value={v}, type={type(v)}"
-            )
 
 @dataclass(frozen=True)
 class SearchResult:
@@ -128,6 +120,7 @@ class RetrievalService:
         self.paths = paths or ensure_workspace()
         self.embedding_provider = embedding_provider or make_embedding_provider()
         settings = get_settings()
+        self._ensure_chroma_version(settings.chroma_required_version)
         self.upsert_batch_size = max(
             1,
             min(settings.chroma_upsert_batch_size, DEFAULT_UPSERT_BATCH_SIZE),
@@ -141,23 +134,92 @@ class RetrievalService:
             settings=Settings(anonymized_telemetry=False),
         )
 
+    def _ensure_chroma_version(self, required_version: str) -> None:
+        current_version = getattr(chromadb, "__version__", "unknown")
+        if required_version and current_version != required_version:
+            raise EmbeddingProviderError(
+                "ChromaDB 版本不匹配。"
+                f"当前版本是 {current_version}，要求版本是 {required_version}。"
+                "请使用 .venv311 运行索引、检索和 RAG。"
+            )
+
     def index_knowledge_item(
         self,
         item_id: str,
         progress_callback: ProgressCallback | None = None,
+        *,
+        force_rebuild: bool = False,
     ) -> IndexStats:
         self.knowledge_repository.get(item_id)
         chunks = self.chunk_repository.list_by_knowledge_item(item_id, limit=100000)
         collection = self.collection()
         if int(collection.count()) > 0:
             self._ensure_collection_compatible(collection, self._ensure_provider_dimensions())
-        self._delete_knowledge_item(collection, item_id)
-        return self._index_chunks(chunks, collection, progress_callback=progress_callback)
+        current_chunk_ids = {chunk.id for chunk in chunks}
+        if force_rebuild:
+            deleted_entries = self._delete_knowledge_item(collection, item_id, ignore_errors=False)
+            self.chunk_repository.clear_embedding_ids_by_knowledge_item(item_id)
+            already_indexed_ids: set[str] = set()
+        else:
+            already_indexed_ids = self._indexed_chunk_ids(collection, item_id=item_id)
+            stale_ids = sorted(already_indexed_ids - current_chunk_ids)
+            deleted_entries = self._delete_chunk_ids(collection, stale_ids, ignore_errors=False)
+            already_indexed_ids.difference_update(stale_ids)
+            if already_indexed_ids:
+                self.chunk_repository.update_embedding_ids(sorted(already_indexed_ids))
 
-    def rebuild_all(self, progress_callback: ProgressCallback | None = None) -> IndexStats:
-        self.reset_collection()
+        chunks_to_index = [chunk for chunk in chunks if chunk.id not in already_indexed_ids]
+        return self._index_chunks(
+            chunks_to_index,
+            collection,
+            progress_callback=progress_callback,
+            progress_offset=len(already_indexed_ids),
+            progress_total=len(chunks),
+            skipped_chunks=len(already_indexed_ids),
+            deleted_index_entries=deleted_entries,
+            force_rebuild=force_rebuild,
+        )
+
+    def rebuild_all(
+        self,
+        progress_callback: ProgressCallback | None = None,
+        *,
+        force_rebuild: bool = False,
+    ) -> IndexStats:
         chunks = self.chunk_repository.list_all(limit=100000)
-        return self._index_chunks(chunks, self.collection(), progress_callback=progress_callback)
+        if force_rebuild:
+            deleted_entries = int(self.collection().count())
+            self.reset_collection()
+            self.chunk_repository.clear_all_embedding_ids()
+            collection = self.collection()
+            already_indexed_ids: set[str] = set()
+        else:
+            collection = self.collection()
+            if int(collection.count()) > 0:
+                self._ensure_collection_compatible(collection, self._ensure_provider_dimensions())
+            current_chunk_ids = {chunk.id for chunk in chunks}
+            already_indexed_ids = self._indexed_chunk_ids(collection)
+            stale_ids = sorted(already_indexed_ids - current_chunk_ids)
+            deleted_entries = self._delete_chunk_ids(collection, stale_ids, ignore_errors=False)
+            already_indexed_ids.difference_update(stale_ids)
+            if already_indexed_ids:
+                self.chunk_repository.update_embedding_ids(sorted(already_indexed_ids))
+
+        chunks_to_index = [chunk for chunk in chunks if chunk.id not in already_indexed_ids]
+        return self._index_chunks(
+            chunks_to_index,
+            collection,
+            progress_callback=progress_callback,
+            progress_offset=len(already_indexed_ids),
+            progress_total=len(chunks),
+            skipped_chunks=len(already_indexed_ids),
+            deleted_index_entries=deleted_entries,
+            force_rebuild=force_rebuild,
+        )
+
+    def delete_knowledge_item(self, item_id: str) -> int:
+        collection = self.collection()
+        return self._delete_knowledge_item(collection, item_id, ignore_errors=False)
 
     def search(self, query: str, top_k: int = 5) -> list[SearchResult]:
         query = query.strip()
@@ -181,6 +243,7 @@ class RetrievalService:
         return int(self.collection().count())
 
     def embedding_status(self) -> dict[str, Any]:
+        settings = get_settings()
         collection = self.collection()
         return {
             "embedding_provider": self.embedding_provider.name,
@@ -188,7 +251,10 @@ class RetrievalService:
             "embedding_dimensions": self.embedding_provider.dimensions,
             "embedding_batch_size": getattr(self.embedding_provider, "batch_size", None),
             "embedding_timeout": getattr(self.embedding_provider, "timeout", None),
+            "embedding_num_gpu": getattr(self.embedding_provider, "num_gpu", None),
             "chroma_upsert_batch_size": self.upsert_batch_size,
+            "index_job_timeout_seconds": settings.index_job_timeout_seconds,
+            "rebuild_index_job_timeout_seconds": settings.rebuild_index_job_timeout_seconds,
             "collection_name": COLLECTION_NAME,
             "collection_count": int(collection.count()),
             "collection_metadata": dict(collection.metadata or {}),
@@ -211,48 +277,190 @@ class RetrievalService:
         chunks: list[Chunk],
         collection,
         progress_callback: ProgressCallback | None = None,
+        *,
+        progress_offset: int = 0,
+        progress_total: int | None = None,
+        skipped_chunks: int = 0,
+        deleted_index_entries: int = 0,
+        force_rebuild: bool = False,
     ) -> IndexStats:
         indexed_ids: list[str] = []
         total = len(chunks)
+        progress_target = total if progress_total is None else progress_total
+        total_start = time.perf_counter()
+        embed_seconds = 0.0
+        upsert_seconds = 0.0
+        metadata_seconds = 0.0
+        embed_batch_count = 0
+        upsert_batch_count = 0
+        embed_item_count = 0
+        upsert_item_count = 0
+        dimensions: int | None = None
+        embed_batch_size = max(
+            1,
+            int(getattr(self.embedding_provider, "batch_size", self.upsert_batch_size) or 1),
+        )
+        pending_ids: list[str] = []
+        pending_documents: list[str] = []
+        pending_embeddings: list[list[float]] = []
+        pending_metadatas: list[dict[str, str | int]] = []
+
+        def flush_upserts(*, force: bool = False) -> None:
+            nonlocal metadata_seconds
+            nonlocal upsert_seconds
+            nonlocal upsert_batch_count
+            nonlocal upsert_item_count
+
+            while pending_ids and (force or len(pending_ids) >= self.upsert_batch_size):
+                take = min(len(pending_ids), self.upsert_batch_size)
+                ids = pending_ids[:take]
+                documents = pending_documents[:take]
+                embeddings = pending_embeddings[:take]
+                metadatas = pending_metadatas[:take]
+
+                self._ensure_collection_compatible(collection, dimensions)
+                upsert_start = time.perf_counter()
+                collection.upsert(
+                    ids=ids,
+                    documents=documents,
+                    embeddings=embeddings,
+                    metadatas=metadatas,
+                )
+                upsert_seconds += time.perf_counter() - upsert_start
+                upsert_batch_count += 1
+                upsert_item_count += len(ids)
+
+                metadata_start = time.perf_counter()
+                self._update_collection_metadata(collection, dimensions)
+                self.chunk_repository.update_embedding_ids(ids)
+                metadata_seconds += time.perf_counter() - metadata_start
+
+                indexed_ids.extend(ids)
+                del pending_ids[:take]
+                del pending_documents[:take]
+                del pending_embeddings[:take]
+                del pending_metadatas[:take]
+
+                if progress_callback:
+                    progress_callback(progress_offset + len(indexed_ids), progress_target)
+
+                if force:
+                    continue
+
         if progress_callback:
-            progress_callback(0, total)
-        for start in range(0, total, self.upsert_batch_size):
-            batch = chunks[start : start + self.upsert_batch_size]
+            progress_callback(progress_offset, progress_target)
+        for start in range(0, total, embed_batch_size):
+            batch = chunks[start : start + embed_batch_size]
+            embed_batch_count += 1
+            embed_item_count += len(batch)
+            metadata_start = time.perf_counter()
             ids = [chunk.id for chunk in batch]
             documents = [chunk.text for chunk in batch]
-            embeddings = self.embedding_provider.embed(documents)
-            dimensions = len(embeddings[0]) if embeddings else None
-            self._ensure_collection_compatible(collection, dimensions)
             metadatas = [chunk_metadata(chunk) for chunk in batch]
-            validate_batch(ids, documents, embeddings, metadatas)
-            embeddings_np = np.asarray(embeddings, dtype=np.float32)
-            
-            collection.upsert(
-                ids=ids,
-                documents=documents,
-                embeddings=embeddings_np,
-                metadatas=metadatas
-            	)
-            
-            self._update_collection_metadata(collection, dimensions)
-            indexed_ids.extend(ids)
-            if progress_callback:
-                progress_callback(len(indexed_ids), total)
+            metadata_seconds += time.perf_counter() - metadata_start
 
-        self.chunk_repository.update_embedding_ids(indexed_ids)
+            embed_start = time.perf_counter()
+            embeddings = self.embedding_provider.embed(documents)
+            embed_seconds += time.perf_counter() - embed_start
+
+            dimensions = len(embeddings[0]) if embeddings else dimensions
+            pending_ids.extend(ids)
+            pending_documents.extend(documents)
+            pending_embeddings.extend(embeddings)
+            pending_metadatas.extend(metadatas)
+            flush_upserts()
+
+        flush_upserts(force=True)
+
+        total_index_seconds = time.perf_counter() - total_start
+        indexed_count = len(indexed_ids)
         return IndexStats(
-            indexed_chunks=len(indexed_ids),
+            indexed_chunks=indexed_count,
             collection_count=int(collection.count()),
             embedding_provider=self.embedding_provider.name,
             embedding_model=self.embedding_provider.model,
             embedding_dimensions=self.embedding_provider.dimensions,
+            target_chunks=progress_target,
+            skipped_chunks=skipped_chunks,
+            deleted_index_entries=deleted_index_entries,
+            force_rebuild=force_rebuild,
+            embed_seconds=round(embed_seconds, 3),
+            upsert_seconds=round(upsert_seconds, 3),
+            metadata_seconds=round(metadata_seconds, 3),
+            total_index_seconds=round(total_index_seconds, 3),
+            batch_count=upsert_batch_count,
+            embed_batch_count=embed_batch_count,
+            upsert_batch_count=upsert_batch_count,
+            avg_batch_size=round(upsert_item_count / upsert_batch_count, 2)
+            if upsert_batch_count
+            else 0.0,
+            avg_embed_batch_size=round(embed_item_count / embed_batch_count, 2)
+            if embed_batch_count
+            else 0.0,
+            avg_upsert_batch_size=round(upsert_item_count / upsert_batch_count, 2)
+            if upsert_batch_count
+            else 0.0,
+            chunks_per_second=round(indexed_count / total_index_seconds, 4)
+            if total_index_seconds > 0
+            else 0.0,
+            embed_seconds_per_chunk=round(embed_seconds / indexed_count, 4)
+            if indexed_count
+            else 0.0,
+            upsert_seconds_per_chunk=round(upsert_seconds / indexed_count, 4)
+            if indexed_count
+            else 0.0,
+            embedding_batch_size=getattr(self.embedding_provider, "batch_size", None),
+            embedding_num_gpu=getattr(self.embedding_provider, "num_gpu", None),
+            chroma_upsert_batch_size=self.upsert_batch_size,
         )
 
-    def _delete_knowledge_item(self, collection, item_id: str) -> None:
+    def _indexed_chunk_ids(self, collection, *, item_id: str | None = None) -> set[str]:
+        count = int(collection.count())
+        if count <= 0:
+            return set()
+        kwargs: dict[str, Any] = {"limit": count}
+        if item_id:
+            kwargs["where"] = {"knowledge_item_id": item_id}
+        result = self._collection_get(collection, **kwargs)
+        return {str(chunk_id) for chunk_id in result.get("ids", [])}
+
+    def _collection_get(self, collection, **kwargs) -> dict[str, Any]:
+        try:
+            return collection.get(include=[], **kwargs)
+        except (TypeError, ValueError):
+            return collection.get(include=["metadatas"], **kwargs)
+
+    def _delete_chunk_ids(
+        self,
+        collection,
+        chunk_ids: list[str],
+        *,
+        ignore_errors: bool = True,
+    ) -> int:
+        if not chunk_ids:
+            return 0
+        deleted = 0
+        try:
+            for start in range(0, len(chunk_ids), self.upsert_batch_size):
+                batch = chunk_ids[start : start + self.upsert_batch_size]
+                collection.delete(ids=batch)
+                deleted += len(batch)
+            return deleted
+        except Exception:
+            if not ignore_errors:
+                raise
+            return deleted
+
+    def _delete_knowledge_item(self, collection, item_id: str, *, ignore_errors: bool = True) -> int:
+        before_count = int(collection.count())
         try:
             collection.delete(where={"knowledge_item_id": item_id})
+            after_count = int(collection.count())
+            return max(0, before_count - after_count)
         except Exception:
-            return
+            if not ignore_errors:
+                raise
+            return 0
 
     def collection_metadata(
         self,
@@ -280,6 +488,21 @@ class RetrievalService:
             return
         metadata = collection.metadata or {}
         expected = self.collection_metadata(dimensions)
+        provider_model_mismatches = []
+        for key in ("embedding_provider", "embedding_model"):
+            if str(metadata.get(key, "")) != str(expected[key]):
+                provider_model_mismatches.append(
+                    f"{key}: existing={metadata.get(key)!r}, current={expected[key]!r}"
+                )
+        existing_dimensions = metadata.get("embedding_dimensions")
+        if (
+            not provider_model_mismatches
+            and dimensions is not None
+            and str(existing_dimensions) in {"", "0", "None"}
+        ):
+            self._update_collection_metadata(collection, dimensions)
+            return
+
         mismatches = []
         for key in ("embedding_provider", "embedding_model", "embedding_dimensions"):
             if str(metadata.get(key, "")) != str(expected[key]):

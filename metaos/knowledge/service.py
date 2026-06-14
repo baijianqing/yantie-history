@@ -19,8 +19,24 @@ CATEGORY_KEYWORDS: dict[KnowledgeCategory, tuple[str, ...]] = {
     KnowledgeCategory.product: ("产品", "需求", "体验", "路线图", "功能", "用户反馈"),
     KnowledgeCategory.technology: ("技术", "架构", "工程", "系统", "服务", "接口", "自动化"),
     KnowledgeCategory.investment: ("投资", "估值", "融资", "资本", "回报", "行业研究"),
-    KnowledgeCategory.philosophy: ("哲学", "孔子", "庄子", "康德", "尼采", "苏格拉底", "道德经"),
-    KnowledgeCategory.history: ("历史", "文明", "战争", "朝代", "帝国", "制度"),
+    KnowledgeCategory.philosophy: (
+        "哲学",
+        "孔子",
+        "庄子",
+        "康德",
+        "尼采",
+        "苏格拉底",
+        "道德经",
+        "鬼谷子",
+        "黄帝内经",
+        "黄帝四经",
+        "阴符经",
+        "易经",
+        "周易",
+        "理想国",
+        "柏拉图",
+    ),
+    KnowledgeCategory.history: ("历史", "文明", "战争", "朝代", "帝国", "制度", "资治通鉴"),
     KnowledgeCategory.economics: ("经济", "货币", "通胀", "价格", "供需", "市场"),
     KnowledgeCategory.computer_science: ("计算机", "算法", "数据库", "编程", "python", "代码", "软件"),
     KnowledgeCategory.mathematics: ("数学", "概率", "统计", "代数", "几何", "微积分"),
@@ -31,7 +47,7 @@ def plain_lines(text: str) -> list[str]:
     lines: list[str] = []
     for line in text.splitlines():
         stripped = line.strip()
-        if not stripped or stripped.startswith("#"):
+        if not stripped or stripped.startswith("#") or stripped.startswith("<!-- metaos:page="):
             continue
         lines.append(stripped)
     return lines

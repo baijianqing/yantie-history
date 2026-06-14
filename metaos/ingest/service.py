@@ -16,6 +16,14 @@ DOCUMENT_MIME_TYPES = {
     ".md": "text/markdown",
     ".markdown": "text/markdown",
     ".txt": "text/plain",
+    ".pdf": "application/pdf",
+    ".png": "image/png",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".bmp": "image/bmp",
+    ".tif": "image/tiff",
+    ".tiff": "image/tiff",
+    ".webp": "image/webp",
 }
 
 

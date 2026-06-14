@@ -39,10 +39,14 @@ class AssetKind(str, Enum):
 
 class JobType(str, Enum):
     ingest_document = "ingest_document"
+    pdf_route = "pdf_route"
+    ocr_document = "ocr_document"
+    rebuild_chunks = "rebuild_chunks"
     ingest_video = "ingest_video"
     transcribe_audio = "transcribe_audio"
     summarize_knowledge = "summarize_knowledge"
     index_knowledge = "index_knowledge"
+    rebuild_index = "rebuild_index"
     answer_question = "answer_question"
     extract_opportunities = "extract_opportunities"
     sync_github = "sync_github"

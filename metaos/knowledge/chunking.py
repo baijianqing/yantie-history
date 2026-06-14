@@ -14,6 +14,8 @@ ChunkerVersion = Literal["v1", "v2"]
 DEFAULT_CHUNKER_VERSION: ChunkerVersion = "v2"
 
 HEADING_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*#*\s*$")
+PAGE_MARKER_RE = re.compile(r"^\s*<!--\s*metaos:page=(\d+)\s*-->\s*$")
+PAGE_HEADING_RE = re.compile(r"^第\s*(\d+)\s*页$")
 CODE_FENCE_RE = re.compile(r"^\s*(`{3,}|~{3,})")
 CJK_RE = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]+")
 LATIN_RE = re.compile(r"[A-Za-z0-9_]+")
@@ -38,6 +40,13 @@ class MarkdownBlock:
     kind: str
     text: str
     splittable: bool = True
+    page: int | None = None
+
+
+@dataclass(frozen=True)
+class ChunkCandidate:
+    text: str
+    page: int | None = None
 
 
 @dataclass(frozen=True)
@@ -58,6 +67,20 @@ def normalize_chunk_text(text: str) -> str:
 def normalize_heading(text: str) -> str:
     text = re.sub(r"\s+", " ", text).strip()
     return text[:120]
+
+
+def parse_page_marker(line: str) -> int | None:
+    match = PAGE_MARKER_RE.match(line.strip())
+    return int(match.group(1)) if match else None
+
+
+def parse_page_heading(heading: str) -> int | None:
+    match = PAGE_HEADING_RE.match(heading.strip())
+    return int(match.group(1)) if match else None
+
+
+def page_marker(page: int) -> str:
+    return f"<!-- metaos:page={page} -->"
 
 
 def estimate_tokens(text: str) -> int:
@@ -121,6 +144,10 @@ def split_into_sections(document: ParsedDocument) -> list[DocumentSection]:
         heading = normalize_heading(match.group(2))
         if not heading:
             current_lines.append(line)
+            continue
+        page = parse_page_heading(heading)
+        if page is not None:
+            current_lines.append(page_marker(page))
             continue
 
         flush_current()
@@ -192,16 +219,24 @@ def split_markdown_blocks(text: str) -> list[MarkdownBlock]:
     lines = text.splitlines()
     blocks: list[MarkdownBlock] = []
     paragraph: list[str] = []
+    current_page: int | None = None
     index = 0
 
     def flush_paragraph() -> None:
         block_text = normalize_chunk_text("\n".join(paragraph))
         if block_text:
-            blocks.append(MarkdownBlock("paragraph", block_text, True))
+            blocks.append(MarkdownBlock("paragraph", block_text, True, current_page))
         paragraph.clear()
 
     while index < len(lines):
         line = lines[index]
+        page = parse_page_marker(line)
+        if page is not None:
+            flush_paragraph()
+            current_page = page
+            index += 1
+            continue
+
         fence = detect_fence(line)
         if fence:
             flush_paragraph()
@@ -215,7 +250,7 @@ def split_markdown_blocks(text: str) -> list[MarkdownBlock]:
                     index += 1
                     break
                 index += 1
-            blocks.append(MarkdownBlock("code", "\n".join(code_lines).strip(), False))
+            blocks.append(MarkdownBlock("code", "\n".join(code_lines).strip(), False, current_page))
             continue
 
         if is_table_row(line) and index + 1 < len(lines) and is_table_separator(lines[index + 1]):
@@ -225,7 +260,7 @@ def split_markdown_blocks(text: str) -> list[MarkdownBlock]:
             while index < len(lines) and is_table_row(lines[index]):
                 table_lines.append(lines[index])
                 index += 1
-            blocks.append(MarkdownBlock("table", "\n".join(table_lines).strip(), False))
+            blocks.append(MarkdownBlock("table", "\n".join(table_lines).strip(), False, current_page))
             continue
 
         if not line.strip():
@@ -265,6 +300,13 @@ def chunk_text_from_blocks(
         return ""
     context = heading_context(heading_path, settings.inject_heading_context)
     return f"{context}\n\n{body}" if context else body
+
+
+def first_page_from_blocks(blocks: list[MarkdownBlock]) -> int | None:
+    for block in blocks:
+        if block.page is not None:
+            return block.page
+    return None
 
 
 def find_token_limited_end(text: str, start: int, token_limit: int) -> int:
@@ -348,7 +390,7 @@ def expand_oversized_block(
     if estimate_tokens(block.text) <= content_token_limit or not block.splittable:
         return [block]
     return [
-        MarkdownBlock(block.kind, piece, block.splittable)
+        MarkdownBlock(block.kind, piece, block.splittable, block.page)
         for piece in split_text_by_token_limit(block.text, content_token_limit, overlap_tokens)
     ]
 
@@ -367,7 +409,7 @@ def trailing_overlap_blocks(blocks: list[MarkdownBlock], settings: ChunkerV2Sett
             if not selected and block.splittable:
                 tail = tail_text_by_tokens(block.text, settings.overlap_tokens)
                 if tail:
-                    selected.append(MarkdownBlock(block.kind, tail, block.splittable))
+                    selected.append(MarkdownBlock(block.kind, tail, block.splittable, block.page))
             break
         selected.append(block)
         total += block_tokens
@@ -380,7 +422,7 @@ def split_blocks_v2(
     blocks: list[MarkdownBlock],
     heading_path: list[str],
     settings: ChunkerV2Settings,
-) -> list[str]:
+) -> list[ChunkCandidate]:
     context_tokens = estimate_tokens(heading_context(heading_path, settings.inject_heading_context))
     content_token_limit = max(200, settings.max_tokens - context_tokens - 2)
     expanded_blocks: list[MarkdownBlock] = []
@@ -389,7 +431,7 @@ def split_blocks_v2(
             expand_oversized_block(block, content_token_limit, settings.overlap_tokens)
         )
 
-    chunk_texts: list[str] = []
+    chunk_texts: list[ChunkCandidate] = []
     current: list[MarkdownBlock] = []
     added_since_flush = False
 
@@ -397,7 +439,7 @@ def split_blocks_v2(
         nonlocal current, added_since_flush
         chunk_text = chunk_text_from_blocks(heading_path, current, settings)
         if chunk_text:
-            chunk_texts.append(chunk_text)
+            chunk_texts.append(ChunkCandidate(chunk_text, first_page_from_blocks(current)))
         current = trailing_overlap_blocks(current, settings)
         added_since_flush = False
 
@@ -407,7 +449,7 @@ def split_blocks_v2(
                 flush_current()
             chunk_text = chunk_text_from_blocks(heading_path, [block], settings)
             if chunk_text:
-                chunk_texts.append(chunk_text)
+                chunk_texts.append(ChunkCandidate(chunk_text, block.page))
             current = trailing_overlap_blocks([block], settings)
             added_since_flush = False
             continue
@@ -431,7 +473,7 @@ def split_blocks_v2(
     if current and added_since_flush:
         chunk_text = chunk_text_from_blocks(heading_path, current, settings)
         if chunk_text:
-            chunk_texts.append(chunk_text)
+            chunk_texts.append(ChunkCandidate(chunk_text, first_page_from_blocks(current)))
 
     return chunk_texts
 
@@ -475,7 +517,7 @@ def build_chunks_v2(
     ordinal = 0
     for section in split_into_sections(document):
         blocks = split_markdown_blocks(section.text) if is_markdown else split_plain_blocks(section.text)
-        for chunk_text in split_blocks_v2(blocks, section.heading_path, settings):
+        for candidate in split_blocks_v2(blocks, section.heading_path, settings):
             ordinal += 1
             chunks.append(
                 make_chunk(
@@ -484,7 +526,8 @@ def build_chunks_v2(
                     asset=asset,
                     heading_path=section.heading_path,
                     ordinal=ordinal,
-                    chunk_text=chunk_text,
+                    chunk_text=candidate.text,
+                    page=candidate.page,
                 )
             )
     return chunks
@@ -498,6 +541,7 @@ def make_chunk(
     heading_path: list[str],
     ordinal: int,
     chunk_text: str,
+    page: int | None = None,
 ) -> Chunk:
     return Chunk(
         knowledge_item_id=knowledge_item_id,
@@ -509,6 +553,7 @@ def make_chunk(
             source_id=source.id,
             asset_id=asset.id,
             file_path=asset.path,
+            page=page,
             excerpt=chunk_text[:160],
         ),
     )
