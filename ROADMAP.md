@@ -204,3 +204,9 @@
 - Added a vector retrieval adapter that converts existing Chroma/Ollama `RetrievalService.search` results into Alpha `SearchCandidate` objects with citation back-links and metadata filters.
 - Dense vector results can now enter RRF fusion through the same evidence candidate path as full-text results.
 - Test command: `python -m pytest test/test_vector_search.py`.
+
+## A5-SEARCH-004 status
+
+- Added `hybrid_search` as the Alpha evidence retrieval entrypoint for full-text, vector, metadata-filtered, RRF-fused results.
+- Research execution can now consume one fused `EvidenceCandidate` list while preserving per-channel ranks, scores, and citation back-links.
+- Test command: `python -m pytest test/test_hybrid_search.py`.

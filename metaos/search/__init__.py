@@ -11,6 +11,7 @@ from metaos.search.full_text import (
     FullTextSearchResult,
     full_text_search,
 )
+from metaos.search.hybrid import hybrid_search
 from metaos.search.vector import (
     VectorRetrievalService,
     search_result_to_candidate,
@@ -25,6 +26,7 @@ __all__ = [
     "SearchCandidate",
     "VectorRetrievalService",
     "full_text_search",
+    "hybrid_search",
     "rrf_fuse",
     "search_result_to_candidate",
     "vector_search",

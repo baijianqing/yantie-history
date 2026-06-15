@@ -323,3 +323,17 @@
 - Test command: `python -m pytest test/test_vector_search.py`.
 - Rollback: remove `metaos/search/vector.py`, its exports, and `test/test_vector_search.py`.
 - Documentation update: this task entry plus `ROADMAP.md` status note.
+
+## A5-SEARCH-004: Hybrid evidence search entrypoint
+
+- Value: give research execution one stable Alpha entrypoint for full-text, dense vector, metadata-filtered, RRF-fused evidence retrieval.
+- Dependencies: A5-SEARCH-001, A5-SEARCH-002, A5-SEARCH-003.
+- Allowed changes: `metaos/search` orchestration code, one focused search test file, and task/roadmap documentation.
+- Forbidden changes: embedding generation, Chroma index mutation, RQ workers, RAG prompting, public database schemas, root configuration, and `pyproject.toml`.
+- Input: natural language query, optional `Chunk` sequence, optional vector retrieval service, optional metadata filters, and `top_k`.
+- Output: fused `EvidenceCandidate` objects with channel ranks, channel scores, citation back-links, and deterministic RRF ordering.
+- Interface: `hybrid_search(query, chunks=(), vector_retrieval=None, filters=None, top_k=5, full_text_top_k=None, vector_top_k=None)`.
+- Acceptance: hybrid search fuses full-text and vector hits, supports full-text-only mode, preserves citations, applies filters, and skips empty queries without side effects.
+- Test command: `python -m pytest test/test_hybrid_search.py`.
+- Rollback: remove `metaos/search/hybrid.py`, its exports, and `test/test_hybrid_search.py`.
+- Documentation update: this task entry plus `ROADMAP.md` status note.
