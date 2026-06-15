@@ -667,6 +667,13 @@ A9-AUDIT-001 实现说明：
 - `source_research_ids`
 - `source_review_id`
 
+A11-CHAN-001 实现说明：
+
+- 宰相今日简报位于 `metaos/chancellor/schemas.py`。
+- `ChancellorBriefing` 输出 `today_focus`、`deferred_items`、`ignored_items`、`cognitive_traps`、`source_research_ids` 与 `source_review_id`。
+- `generate_chancellor_briefing(...)` 结合当前 `Intent`、`CurrentRole`、`AttentionBudget`、`DailyReview`、`ResearchAnswer` 和 `MinistryReport` 生成规则型简报。
+- 今日重点优先来自意图、研究行动和三部建议；暂缓事项来自未完成复盘和“不行动”原因；忽略事项来自角色 forbidden focus 和空推荐部；认知陷阱标记未引用推断、零预算和强行推荐风险。
+
 ## 内容工坊
 
 ### EpisodeSpec

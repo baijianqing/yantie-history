@@ -471,6 +471,13 @@ A10-MIN-001 implementation note:
 }
 ```
 
+A11-CHAN-001 implementation note:
+
+- Chancellor briefing support is implemented in `metaos/chancellor/schemas.py`.
+- `generate_chancellor_briefing(...)` combines current `Intent`, optional `CurrentRole`, `AttentionBudget`, optional `DailyReview`, `ResearchAnswer` items, and `MinistryReport` items.
+- The output includes today focus, deferred items, ignored items, cognitive trap reminders, source research ids, and source review id.
+- The `/alpha/chancellor/daily/jobs` HTTP endpoint remains a target API contract for a later wiring task.
+
 ## 目标 API：内容工坊
 
 ### `POST /alpha/workshop/episodes/jobs`
