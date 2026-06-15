@@ -403,6 +403,14 @@ A6-COMPILER-002 implementation note:
 }
 ```
 
+A7-RESEARCH-002 implementation note:
+
+- Research answer drafting is implemented in `metaos/research/answer.py`.
+- `ResearchAnswer` separates facts, model inferences, disputed views, personal reflections, actions, no-action reason, and citations.
+- Each `AnswerStatement` carries `source_status=cited|uncited`.
+- `draft_research_answer(...)` creates a ledger `Action` when `action_title` is provided, or requires/sets `no_action_reason` when no action is proposed.
+- This task does not perform censorate audit; audited final answer gating remains a later task.
+
 ## 目标 API：御史台
 
 ### `POST /alpha/audit/research/{task_id}/jobs`

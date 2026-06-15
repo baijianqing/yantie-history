@@ -571,6 +571,14 @@ A7-RESEARCH-001 实现说明：
 - `citations`
 - `audit_report_id`
 
+A7-RESEARCH-002 实现说明：
+
+- 带引用回答草案位于 `metaos/research/answer.py`。
+- `ResearchAnswer` 将输出分为 `fact_statements`、`model_inferences`、`disputed_views`、`personal_reflections`、`actions`、`no_action_reason` 和 `citations`。
+- `AnswerStatement.source_status` 显式标记 `cited` 或 `uncited`，无来源推断不会伪装成事实。
+- `draft_research_answer(...)` 可生成 ledger `Action(source_type=research_answer)`；若没有行动，则必须给出 `no_action_reason`。
+- 当前任务不执行御史台审计，`audit_report_id` 保持可选。
+
 ## 御史台
 
 ### AuditReport
