@@ -407,3 +407,17 @@
 - Test command: `python -m pytest test/test_alpha_search_api.py`.
 - Rollback: remove `/alpha/search` route/request schema and `test/test_alpha_search_api.py`.
 - Documentation update: this task entry, `ROADMAP.md`, and `API_CONTRACTS.md`.
+
+## A6-COMPILER-003: Alpha research compile API
+
+- Value: expose runtime ThemeSpec/ResearchPlan compilation through the documented HTTP API.
+- Dependencies: A6-COMPILER-002 and existing FastAPI app wiring.
+- Allowed changes: `metaos/app/api.py`, one focused compiler API test file, and task/API/roadmap documentation.
+- Forbidden changes: compiler schema changes, provider prompt policy, search/research execution internals, RQ workers, database migrations, root configuration, and `pyproject.toml`.
+- Input: JSON body matching `CompileResearchRequest`.
+- Output: schema-valid `ResearchCompilation` JSON with task, operator, ThemeSpec, evidence requirements, scope, and plan.
+- Interface: `POST /alpha/research/compile`.
+- Acceptance: endpoint uses the same runtime compiler path for different themes, returns structured compilation payloads, and maps invalid provider output to HTTP 400.
+- Test command: `python -m pytest test/test_alpha_research_compile_api.py`.
+- Rollback: remove `/alpha/research/compile` route/helper and `test/test_alpha_research_compile_api.py`.
+- Documentation update: this task entry, `ROADMAP.md`, and `API_CONTRACTS.md`.

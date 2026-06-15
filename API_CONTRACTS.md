@@ -367,7 +367,9 @@ A6-COMPILER-002 implementation note:
 - `CompileResearchRequest` is converted into a prompt payload with allowed operators and required output contracts.
 - Provider output is converted into `ResearchCompilation` and validated by Pydantic schemas.
 - The five required themes compile through the same `IssueCompiler.compile(...)` code path; theme differences live in `ThemeSpec` data.
-- The `/alpha/research/compile` HTTP endpoint remains a target API contract for a later wiring task.
+- The `/alpha/research/compile` HTTP endpoint is implemented in `metaos/app/api.py`.
+- It runs the same `IssueCompiler.compile(...)` path and returns schema-validated `ResearchCompilation` JSON.
+- Invalid structured provider output is rejected with HTTP 400.
 
 ## 目标 API：研究执行器
 

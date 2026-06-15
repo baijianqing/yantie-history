@@ -240,3 +240,9 @@
 - Added `POST /alpha/search` to expose hybrid full-text/vector/RRF evidence retrieval through FastAPI with metadata filters and citation back-links.
 - The endpoint supports `include_vector=false` so tests and lightweight calls can run full-text-only without constructing vector retrieval.
 - Test command: `python -m pytest test/test_alpha_search_api.py`.
+
+## A6-COMPILER-003 status
+
+- Added `POST /alpha/research/compile` to expose runtime IssueCompiler output through FastAPI.
+- The endpoint returns schema-validated `ResearchCompilation` JSON and rejects invalid provider output with HTTP 400.
+- Test command: `python -m pytest test/test_alpha_research_compile_api.py`.

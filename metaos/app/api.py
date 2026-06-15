@@ -14,6 +14,7 @@ from metaos.core.errors import (
     UnsupportedDocumentError,
     WorkspaceError,
 )
+from metaos.compiler import CompileResearchRequest, IssueCompiler, LLMCompilerProvider
 from metaos.ingest.service import IngestService
 from metaos.knowledge.deletion import KnowledgeDeletionService
 from metaos.retrieval.service import RetrievalService
@@ -84,6 +85,10 @@ def knowledge_deletion_service() -> KnowledgeDeletionService:
 
 def sovereignty_repo() -> SovereigntyRepository:
     return SovereigntyRepository()
+
+
+def issue_compiler() -> IssueCompiler:
+    return IssueCompiler(LLMCompilerProvider())
 
 
 def as_json(value) -> dict:
@@ -354,6 +359,14 @@ def alpha_search(request: AlphaSearchRequest) -> list[dict]:
     except (ConfigurationError, EmbeddingProviderError) as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     return [result.model_dump(mode="json") for result in results]
+
+
+@app.post("/alpha/research/compile")
+def compile_alpha_research(request: CompileResearchRequest) -> dict:
+    try:
+        return issue_compiler().compile(request).model_dump(mode="json")
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
 @app.post("/rag/answer/jobs")
