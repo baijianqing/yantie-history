@@ -310,3 +310,16 @@
 - 回滚方式：回退端到端 glue code 和测试 fixture。
 - 文档更新：更新 `ROADMAP.md` 完成状态。
 
+## A5-SEARCH-003: Vector retrieval adapter
+
+- Value: make the Alpha search channel use the existing Chroma/Ollama retrieval service as a first-class dense vector source instead of relying on test-only mock candidates.
+- Dependencies: A5-SEARCH-001, A5-SEARCH-002, existing `metaos.retrieval.service.RetrievalService.search`.
+- Allowed changes: `metaos/search` adapter code, one focused search test file, and task/roadmap documentation.
+- Forbidden changes: Chroma rebuild behavior, embedding provider configuration, RQ workers, RAG answer behavior, root configuration, migrations, and `pyproject.toml`.
+- Input: natural language query, a retrieval service implementing `search(query, top_k)`, optional metadata filters, and `top_k`.
+- Output: `SearchCandidate` objects with vector score, citation back-links, metadata, and RRF-compatible fields.
+- Interface: `vector_search(query, retrieval, filters=None, top_k=5)` and `search_result_to_candidate(result)`.
+- Acceptance: vector results preserve source/asset/file citations, obey metadata filters, skip empty queries, and feed `rrf_fuse` without losing citations.
+- Test command: `python -m pytest test/test_vector_search.py`.
+- Rollback: remove `metaos/search/vector.py`, its exports, and `test/test_vector_search.py`.
+- Documentation update: this task entry plus `ROADMAP.md` status note.

@@ -11,6 +11,11 @@ from metaos.search.full_text import (
     FullTextSearchResult,
     full_text_search,
 )
+from metaos.search.vector import (
+    VectorRetrievalService,
+    search_result_to_candidate,
+    vector_search,
+)
 
 __all__ = [
     "DEFAULT_RRF_K",
@@ -18,6 +23,9 @@ __all__ = [
     "FullTextSearchFilters",
     "FullTextSearchResult",
     "SearchCandidate",
+    "VectorRetrievalService",
     "full_text_search",
     "rrf_fuse",
+    "search_result_to_candidate",
+    "vector_search",
 ]

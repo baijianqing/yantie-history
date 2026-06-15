@@ -198,3 +198,9 @@
 - The closure test verifies that new themes are data-driven through ThemeSpec and do not require topic-specific Python branches, re-chunking, or index rebuilds.
 - Remaining outer orchestration such as durable HTTP/RQ job wiring and weekly report packaging stays in the documented API contracts and should be implemented as separate narrow tasks.
 - Test command: `python -m pytest test/test_alpha_end_to_end.py`.
+
+## A5-SEARCH-003 status
+
+- Added a vector retrieval adapter that converts existing Chroma/Ollama `RetrievalService.search` results into Alpha `SearchCandidate` objects with citation back-links and metadata filters.
+- Dense vector results can now enter RRF fusion through the same evidence candidate path as full-text results.
+- Test command: `python -m pytest test/test_vector_search.py`.
