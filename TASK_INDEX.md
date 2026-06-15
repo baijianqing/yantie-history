@@ -16,7 +16,7 @@
 - 回滚方式：删除本任务新增文档。
 - 文档更新：本任务即文档更新。
 
-## A1-SOV-001：用户主权 Schema
+## A1-SOV-001：用户主权数据模式
 
 - 价值：让意图成为最高约束。
 - 依赖：阶段0人工审查通过。
@@ -44,7 +44,7 @@
 - 回滚方式：回退主权 repository 和测试；数据库新增表可保留为空或由迁移回滚。
 - 文档更新：同步更新 `TECHNICAL_ARCHITECTURE.md` 存储表族。
 
-## A1-SOV-003：用户主权 API
+## A1-SOV-003：用户主权接口
 
 - 价值：为 UI 和后续研究任务提供意图入口。
 - 依赖：A1-SOV-002。
@@ -58,7 +58,7 @@
 - 回滚方式：回退 API 路由和测试。
 - 文档更新：同步更新 `API_CONTRACTS.md`。
 
-## A2-LEDGER-001：每日账本 Schema
+## A2-LEDGER-001：每日账本数据模式
 
 - 价值：为行动和复盘建立事实账。
 - 依赖：A1-SOV-001。
@@ -86,7 +86,7 @@
 - 回滚方式：回退采集器和测试。
 - 文档更新：更新 `API_CONTRACTS.md` 采集接口说明。
 
-## A2-LEDGER-003：DailySummary 生成
+## A2-LEDGER-003：每日总结生成
 
 - 价值：把每日事实、判断、反思和行动汇总为后续视频和周报输入。
 - 依赖：A2-LEDGER-001、A2-LEDGER-002。
@@ -100,7 +100,7 @@
 - 回滚方式：回退 summary 服务和测试。
 - 文档更新：更新 `DOMAIN_MODEL.md`。
 
-## A3-WORKSHOP-001：EpisodeSpec Schema 与审核状态
+## A3-WORKSHOP-001：视频规格数据模式与审核状态
 
 - 价值：建立每日总结到视频的结构化入口。
 - 依赖：A2-LEDGER-003。
@@ -128,7 +128,7 @@
 - 回滚方式：回退 workshop 服务和测试；删除生成的临时导出。
 - 文档更新：更新 `API_CONTRACTS.md`。
 
-## A4-KB-001：稳定文档版本与 Chunk ID
+## A4-KB-001：稳定文档版本与知识块标识符
 
 - 价值：保证新主题不重切块、不重建索引。
 - 依赖：阶段0审查。
@@ -170,7 +170,49 @@
 - 回滚方式：回退融合模块和测试。
 - 文档更新：更新 `API_CONTRACTS.md`。
 
-## A6-COMPILER-001：议题编译 Schema
+## A5-SEARCH-003：向量检索适配器
+
+- 价值：让 Alpha 搜索通道把现有 Chroma/Ollama 检索服务作为正式的稠密向量来源，而不是依赖测试专用的模拟候选证据。
+- 依赖：A5-SEARCH-001、A5-SEARCH-002、现有 `metaos.retrieval.service.RetrievalService.search`。
+- 允许修改范围：`metaos/search` 适配器代码、一个聚焦的搜索测试文件、任务和路线图文档。
+- 禁止修改范围：Chroma 重建行为、embedding provider 配置、RQ worker、RAG 回答行为、根配置、迁移和 `pyproject.toml`。
+- 输入：自然语言查询、实现 `search(query, top_k)` 的检索服务、可选元数据过滤条件和 `top_k`。
+- 输出：带向量分数、引用回链、元数据和 RRF 兼容字段的 `SearchCandidate` 对象。
+- 接口：`vector_search(query, retrieval, filters=None, top_k=5)` 和 `search_result_to_candidate(result)`。
+- 验收标准：向量结果保留 source/asset/file 引用，遵守元数据过滤，跳过空查询，并且进入 `rrf_fuse` 时不丢失引用。
+- 测试命令：`python -m pytest test/test_vector_search.py`。
+- 回滚方式：删除 `metaos/search/vector.py`、相关导出和 `test/test_vector_search.py`。
+- 文档更新：本任务条目和 `ROADMAP.md` 状态说明。
+
+## A5-SEARCH-004：混合证据检索入口
+
+- 价值：为研究执行提供一个稳定的 Alpha 检索入口，统一全文、稠密向量、元数据过滤和 RRF 融合后的证据结果。
+- 依赖：A5-SEARCH-001、A5-SEARCH-002、A5-SEARCH-003。
+- 允许修改范围：`metaos/search` 编排代码、一个聚焦的搜索测试文件、任务和路线图文档。
+- 禁止修改范围：embedding 生成、Chroma 索引写入、RQ worker、RAG prompt、公开数据库 schema、根配置和 `pyproject.toml`。
+- 输入：自然语言查询、可选 `Chunk` 序列、可选向量检索服务、可选元数据过滤条件和 `top_k`。
+- 输出：融合后的 `EvidenceCandidate` 对象，包含通道排名、通道分数、引用回链和确定性的 RRF 排序。
+- 接口：`hybrid_search(query, chunks=(), vector_retrieval=None, filters=None, top_k=5, full_text_top_k=None, vector_top_k=None)`。
+- 验收标准：混合检索融合全文和向量命中，支持仅全文模式，保留引用，应用过滤条件，并且空查询无副作用。
+- 测试命令：`python -m pytest test/test_hybrid_search.py`。
+- 回滚方式：删除 `metaos/search/hybrid.py`、相关导出和 `test/test_hybrid_search.py`。
+- 文档更新：本任务条目和 `ROADMAP.md` 状态说明。
+
+## A5-SEARCH-005：Alpha 搜索接口
+
+- 价值：通过已记录的 HTTP API 暴露 Alpha 混合证据检索路径。
+- 依赖：A5-SEARCH-004 和现有 FastAPI app 接线。
+- 允许修改范围：`metaos/app/api.py`、一个聚焦的 API 测试文件、任务/API/路线图文档。
+- 禁止修改范围：搜索排序内部逻辑、Chroma 索引写入、RQ worker、数据库迁移、Streamlit UI、根配置和 `pyproject.toml`。
+- 输入：包含 `query`、`top_k`、可选 `filters`、可选通道 top-k 值和 `include_vector` 的 JSON body。
+- 输出：JSON 格式的 `EvidenceCandidate` 列表，包含引用回链、通道排名、通道分数和融合分数。
+- 接口：`POST /alpha/search`。
+- 验收标准：接口拒绝空查询，返回带引用的全文/向量融合证据候选，支持元数据过滤，并且可以在不构造向量检索的情况下只走全文检索。
+- 测试命令：`python -m pytest test/test_alpha_search_api.py`。
+- 回滚方式：删除 `/alpha/search` 路由、请求 schema 和 `test/test_alpha_search_api.py`。
+- 文档更新：本任务条目、`ROADMAP.md` 和 `API_CONTRACTS.md`。
+
+## A6-COMPILER-001：议题编译数据模式
 
 - 价值：把问题转换为可执行研究契约。
 - 依赖：A1-SOV-001。
@@ -197,6 +239,20 @@
 - 测试命令：`python -m pytest test/test_issue_compiler.py`。
 - 回滚方式：回退 compiler 服务和测试。
 - 文档更新：更新 `API_CONTRACTS.md`。
+
+## A6-COMPILER-003：Alpha 研究编译接口
+
+- 价值：通过已记录的 HTTP API 暴露运行时 `ThemeSpec` 和 `ResearchPlan` 编译能力。
+- 依赖：A6-COMPILER-002 和现有 FastAPI app 接线。
+- 允许修改范围：`metaos/app/api.py`、一个聚焦的编译器 API 测试文件、任务/API/路线图文档。
+- 禁止修改范围：编译器 schema 变更、provider prompt 策略、搜索/研究执行内部逻辑、RQ worker、数据库迁移、根配置和 `pyproject.toml`。
+- 输入：匹配 `CompileResearchRequest` 的 JSON body。
+- 输出：schema 合法的 `ResearchCompilation` JSON，包含 task、operator、ThemeSpec、证据需求、范围和计划。
+- 接口：`POST /alpha/research/compile`。
+- 验收标准：接口对不同主题复用同一运行时编译路径，返回结构化编译结果，并把无效 provider 输出映射为 HTTP 400。
+- 测试命令：`python -m pytest test/test_alpha_research_compile_api.py`。
+- 回滚方式：删除 `/alpha/research/compile` 路由/helper 和 `test/test_alpha_research_compile_api.py`。
+- 文档更新：本任务条目、`ROADMAP.md` 和 `API_CONTRACTS.md`。
 
 ## A7-RESEARCH-001：证据矩阵与研究执行器
 
@@ -225,6 +281,34 @@
 - 测试命令：`python -m pytest test/test_research_answer.py`。
 - 回滚方式：回退回答服务和测试。
 - 文档更新：更新 `API_CONTRACTS.md`。
+
+## A7-RESEARCH-003：研究候选证据召回服务
+
+- 价值：把研究执行从手工提供候选证据推进为按计划召回，并在构建证据矩阵前按证据需求标注候选证据。
+- 依赖：A6-COMPILER-002、A5-SEARCH-004、A7-RESEARCH-001。
+- 允许修改范围：`metaos/research` 服务代码、一个聚焦的研究测试文件、任务和路线图文档。
+- 禁止修改范围：搜索内部逻辑、御史台规则、答案起草策略、推荐/宰相行为、根配置、迁移和 `pyproject.toml`。
+- 输入：`ResearchCompilation`、证据搜索 callable 和 `top_k_per_query`。
+- 输出：召回的 `EvidenceCandidate` 对象，以及包含证据矩阵的 `ResearchExecutionDraft`。
+- 接口：`retrieve_research_candidates(compilation, search, top_k_per_query=5)` 和 `execute_research_plan(compilation, search, top_k_per_query=5)`。
+- 验收标准：候选证据按证据需求召回，标注需求 ID、类型、查询和立场，完成去重，保留引用，并生成支持/反驳矩阵行。
+- 测试命令：`python -m pytest test/test_research_service.py`。
+- 回滚方式：删除 `metaos/research/service.py`、相关导出和 `test/test_research_service.py`。
+- 文档更新：本任务条目和 `ROADMAP.md` 状态说明。
+
+## A7-RESEARCH-004：研究执行轨迹
+
+- 价值：通过记录进度事件、检索运行、采纳候选 ID 和执行版本，让研究执行可审计、可展示。
+- 依赖：A7-RESEARCH-003。
+- 允许修改范围：`metaos/research` 轨迹 schema/服务代码、一个聚焦的研究测试文件、任务和路线图文档。
+- 禁止修改范围：搜索排序、御史台规则、答案起草、RQ 队列行为、API 路由、根配置、迁移和 `pyproject.toml`。
+- 输入：`ResearchCompilation`、证据搜索 callable 和 `top_k_per_query`。
+- 输出：包含 `ResearchProgressEvent`、`ResearchRetrievalRun`、召回候选和 `ResearchExecutionDraft` 的 `ResearchExecutionReport`。
+- 接口：`execute_research_plan_with_trace(compilation, search, top_k_per_query=5)` 和 `retrieve_research_candidates_with_trace(...)`。
+- 验收标准：报告记录执行版本、确定性进度阶段、每个查询的召回数量、采纳候选 ID，并与旧执行入口生成相同证据矩阵。
+- 测试命令：`python -m pytest test/test_research_service.py`。
+- 回滚方式：删除轨迹 schema/导出，并把 `execute_research_plan` 恢复为直接构建证据矩阵。
+- 文档更新：本任务条目和 `ROADMAP.md` 状态说明。
 
 ## A8-KB-002：实体、事件、主张和证据链接
 
@@ -282,6 +366,48 @@
 - 回滚方式：回退 ministries 模块和测试。
 - 文档更新：更新 `API_CONTRACTS.md`。
 
+## A11-OPS-001：任务重试元数据
+
+- 价值：在接入重试按钮或自动重新入队前，为 Alpha worker 提供已测试的重试状态转换和审计轨迹。
+- 依赖：现有 `JobRepository` 和 `Job` schema。
+- 允许修改范围：`metaos/workspace/jobs.py`、一个聚焦的 job repository 测试文件、任务和路线图文档。
+- 禁止修改范围：数据库 schema 迁移、RQ 队列分发行为、任务 worker 实现、Streamlit UI、API 路由、根配置和 `pyproject.toml`。
+- 输入：失败 job id 和可选重试消息。
+- 输出：同一个 job 被重置为 `pending`，progress 为 `0`，error 被清空，并在 `result.retry_history` 中记录失败/重试时间和之前的 error/message。
+- 接口：`JobRepository.retry_failed(job_id, message="Retry queued")`。
+- 验收标准：只有失败任务可以重试，重试历史只追加，保留上一次失败信息，并保留原 job payload/result 数据。
+- 测试命令：`python -m pytest test/test_job_repository_retry.py`。
+- 回滚方式：删除 `retry_failed`、`RETRY_HISTORY_KEY` 和 `test/test_job_repository_retry.py`。
+- 文档更新：本任务条目和 `ROADMAP.md` 状态说明。
+
+## A11-OPS-002：RQ 重试入队
+
+- 价值：把失败任务的重试元数据转化为真实的 RQ 重新入队路径，并复用原 job id 和任务类型。
+- 依赖：A11-OPS-001 和现有 RQ 队列 helper。
+- 允许修改范围：`metaos/tasks/queueing.py`、一个聚焦的 queueing retry 测试文件、任务和路线图文档。
+- 禁止修改范围：任务 worker 实现、数据库 schema 迁移、Streamlit UI、API 路由、根配置和 `pyproject.toml`。
+- 输入：失败 job id。
+- 输出：同一个 job 被重置为 `pending`，由 `JobRepository` 记录重试历史，并通过原任务路径/队列映射执行 RQ 入队。
+- 接口：`enqueue_retry_job(job_id)` 和 `retry_dispatch_for_job(job)`。
+- 验收标准：重试复用同一个 job id，把支持的 job 类型映射到正确队列和任务，拒绝非失败或不支持的任务且不入队，并保留重试历史。
+- 测试命令：`python -m pytest test/test_queueing_retry.py`。
+- 回滚方式：删除 `enqueue_retry_job`、`retry_dispatch_for_job` 和 `test/test_queueing_retry.py`。
+- 文档更新：本任务条目和 `ROADMAP.md` 状态说明。
+
+## A11-OPS-003：任务重试接口
+
+- 价值：通过 HTTP 暴露已测试的失败任务重试路径，让操作员和 UI 可以触发重试。
+- 依赖：A11-OPS-002 和现有 FastAPI job 路由。
+- 允许修改范围：`metaos/app/api.py`、一个聚焦的 retry API 测试文件、任务/API/路线图文档。
+- 禁止修改范围：队列分发映射、任务 worker 实现、数据库 schema 迁移、Streamlit UI、根配置和 `pyproject.toml`。
+- 输入：`POST /jobs/{job_id}/retry` 中的失败 job id。
+- 输出：重新入队后的 `Job` JSON，保留原 id 和重试历史。
+- 接口：`POST /jobs/{job_id}/retry`。
+- 验收标准：路由返回重新入队后的 job，把不存在的 job 映射为 404，把无效重试状态和 Redis 入队失败映射为 400，并且测试不依赖真实 Redis。
+- 测试命令：`python -m pytest test/test_job_retry_api.py`。
+- 回滚方式：删除 `/jobs/{job_id}/retry` 路由/import 和 `test/test_job_retry_api.py`。
+- 文档更新：本任务条目、`ROADMAP.md` 和 `API_CONTRACTS.md`。
+
 ## A11-CHAN-001：宰相今日简报
 
 - 价值：把意图、预算、研究和复盘合成为今日重点。
@@ -323,129 +449,3 @@
 - 测试命令：`python -m pytest test/test_alpha_end_to_end.py`。
 - 回滚方式：回退端到端 glue code 和测试 fixture。
 - 文档更新：更新 `ROADMAP.md` 完成状态。
-
-## A5-SEARCH-003: Vector retrieval adapter
-
-- Value: make the Alpha search channel use the existing Chroma/Ollama retrieval service as a first-class dense vector source instead of relying on test-only mock candidates.
-- Dependencies: A5-SEARCH-001, A5-SEARCH-002, existing `metaos.retrieval.service.RetrievalService.search`.
-- Allowed changes: `metaos/search` adapter code, one focused search test file, and task/roadmap documentation.
-- Forbidden changes: Chroma rebuild behavior, embedding provider configuration, RQ workers, RAG answer behavior, root configuration, migrations, and `pyproject.toml`.
-- Input: natural language query, a retrieval service implementing `search(query, top_k)`, optional metadata filters, and `top_k`.
-- Output: `SearchCandidate` objects with vector score, citation back-links, metadata, and RRF-compatible fields.
-- Interface: `vector_search(query, retrieval, filters=None, top_k=5)` and `search_result_to_candidate(result)`.
-- Acceptance: vector results preserve source/asset/file citations, obey metadata filters, skip empty queries, and feed `rrf_fuse` without losing citations.
-- Test command: `python -m pytest test/test_vector_search.py`.
-- Rollback: remove `metaos/search/vector.py`, its exports, and `test/test_vector_search.py`.
-- Documentation update: this task entry plus `ROADMAP.md` status note.
-
-## A5-SEARCH-004: Hybrid evidence search entrypoint
-
-- Value: give research execution one stable Alpha entrypoint for full-text, dense vector, metadata-filtered, RRF-fused evidence retrieval.
-- Dependencies: A5-SEARCH-001, A5-SEARCH-002, A5-SEARCH-003.
-- Allowed changes: `metaos/search` orchestration code, one focused search test file, and task/roadmap documentation.
-- Forbidden changes: embedding generation, Chroma index mutation, RQ workers, RAG prompting, public database schemas, root configuration, and `pyproject.toml`.
-- Input: natural language query, optional `Chunk` sequence, optional vector retrieval service, optional metadata filters, and `top_k`.
-- Output: fused `EvidenceCandidate` objects with channel ranks, channel scores, citation back-links, and deterministic RRF ordering.
-- Interface: `hybrid_search(query, chunks=(), vector_retrieval=None, filters=None, top_k=5, full_text_top_k=None, vector_top_k=None)`.
-- Acceptance: hybrid search fuses full-text and vector hits, supports full-text-only mode, preserves citations, applies filters, and skips empty queries without side effects.
-- Test command: `python -m pytest test/test_hybrid_search.py`.
-- Rollback: remove `metaos/search/hybrid.py`, its exports, and `test/test_hybrid_search.py`.
-- Documentation update: this task entry plus `ROADMAP.md` status note.
-
-## A7-RESEARCH-003: Research candidate recall service
-
-- Value: move research execution from manually supplied candidates toward plan-driven recall that tags evidence by requirement before matrix construction.
-- Dependencies: A6-COMPILER-002, A5-SEARCH-004, A7-RESEARCH-001.
-- Allowed changes: `metaos/research` service code, one focused research test file, and task/roadmap documentation.
-- Forbidden changes: search internals, Censorate rules, answer drafting policy, ministry/chancellor behavior, root configuration, migrations, and `pyproject.toml`.
-- Input: `ResearchCompilation`, an evidence search callable, and `top_k_per_query`.
-- Output: recalled `EvidenceCandidate` objects plus `ResearchExecutionDraft` evidence matrix.
-- Interface: `retrieve_research_candidates(compilation, search, top_k_per_query=5)` and `execute_research_plan(compilation, search, top_k_per_query=5)`.
-- Acceptance: candidates are recalled per evidence requirement, tagged with requirement id/type/query/stance, deduplicated, preserve citations, and produce support/counter matrix rows.
-- Test command: `python -m pytest test/test_research_service.py`.
-- Rollback: remove `metaos/research/service.py`, its exports, and `test/test_research_service.py`.
-- Documentation update: this task entry plus `ROADMAP.md` status note.
-
-## A7-RESEARCH-004: Research execution trace
-
-- Value: make research execution auditable and displayable by recording progress events, retrieval runs, accepted candidate ids, and execution version.
-- Dependencies: A7-RESEARCH-003.
-- Allowed changes: `metaos/research` trace schemas/service code, one focused research test file, and task/roadmap documentation.
-- Forbidden changes: search ranking, Censorate rules, answer drafting, RQ queue behavior, API routes, root configuration, migrations, and `pyproject.toml`.
-- Input: `ResearchCompilation`, an evidence search callable, and `top_k_per_query`.
-- Output: `ResearchExecutionReport` with `ResearchProgressEvent`, `ResearchRetrievalRun`, recalled candidates, and `ResearchExecutionDraft`.
-- Interface: `execute_research_plan_with_trace(compilation, search, top_k_per_query=5)` and `retrieve_research_candidates_with_trace(...)`.
-- Acceptance: the report records execution version, deterministic progress stages, per-query retrieval counts, accepted candidate ids, and the same evidence matrix as the legacy execution entrypoint.
-- Test command: `python -m pytest test/test_research_service.py`.
-- Rollback: remove trace schemas/exports and restore `execute_research_plan` to direct matrix construction.
-- Documentation update: this task entry plus `ROADMAP.md` status note.
-
-## A11-OPS-001: Job retry metadata
-
-- Value: give Alpha workers a tested retry state transition and audit trail before wiring retry buttons or automatic re-enqueue.
-- Dependencies: existing `JobRepository` and `Job` schema.
-- Allowed changes: `metaos/workspace/jobs.py`, one focused job repository test file, and task/roadmap documentation.
-- Forbidden changes: database schema migrations, RQ queue dispatch behavior, task worker implementations, Streamlit UI, API routes, root configuration, and `pyproject.toml`.
-- Input: failed job id and optional retry message.
-- Output: the same job reset to `pending`, progress `0`, cleared error, and `result.retry_history` entry with failed/retried timestamps and prior error/message.
-- Interface: `JobRepository.retry_failed(job_id, message="Retry queued")`.
-- Acceptance: only failed jobs can be retried, retry history is append-only, prior failure information is preserved, and existing job payload/result data is retained.
-- Test command: `python -m pytest test/test_job_repository_retry.py`.
-- Rollback: remove `retry_failed`, `RETRY_HISTORY_KEY`, and `test/test_job_repository_retry.py`.
-- Documentation update: this task entry plus `ROADMAP.md` status note.
-
-## A11-OPS-002: RQ retry enqueue
-
-- Value: turn failed-job retry metadata into an actual RQ re-enqueue path using the original job id and task type.
-- Dependencies: A11-OPS-001 and existing RQ queue helpers.
-- Allowed changes: `metaos/tasks/queueing.py`, one focused queueing retry test file, and task/roadmap documentation.
-- Forbidden changes: task worker implementations, database schema migrations, Streamlit UI, API routes, root configuration, and `pyproject.toml`.
-- Input: failed job id.
-- Output: the same job reset to `pending`, retry history recorded by `JobRepository`, and an RQ enqueue call using the original task path/queue mapping.
-- Interface: `enqueue_retry_job(job_id)` and `retry_dispatch_for_job(job)`.
-- Acceptance: retry uses the same job id, maps supported job types to the correct queue/task, rejects non-failed or unsupported jobs without enqueueing, and preserves retry history.
-- Test command: `python -m pytest test/test_queueing_retry.py`.
-- Rollback: remove `enqueue_retry_job`, `retry_dispatch_for_job`, and `test/test_queueing_retry.py`.
-- Documentation update: this task entry plus `ROADMAP.md` status note.
-
-## A5-SEARCH-005: Alpha search API
-
-- Value: expose the Alpha hybrid evidence retrieval path through the documented HTTP API.
-- Dependencies: A5-SEARCH-004 and existing FastAPI app wiring.
-- Allowed changes: `metaos/app/api.py`, one focused API test file, and task/API/roadmap documentation.
-- Forbidden changes: search ranking internals, Chroma index mutation, RQ workers, database migrations, Streamlit UI, root configuration, and `pyproject.toml`.
-- Input: JSON body with `query`, `top_k`, optional `filters`, optional channel top-k values, and `include_vector`.
-- Output: JSON `EvidenceCandidate` list with citation back-links, channel ranks, channel scores, and fused scores.
-- Interface: `POST /alpha/search`.
-- Acceptance: endpoint rejects empty queries, returns fused full-text/vector evidence candidates with citations, supports metadata filtering, and can run full-text-only without constructing vector retrieval.
-- Test command: `python -m pytest test/test_alpha_search_api.py`.
-- Rollback: remove `/alpha/search` route/request schema and `test/test_alpha_search_api.py`.
-- Documentation update: this task entry, `ROADMAP.md`, and `API_CONTRACTS.md`.
-
-## A6-COMPILER-003: Alpha research compile API
-
-- Value: expose runtime ThemeSpec/ResearchPlan compilation through the documented HTTP API.
-- Dependencies: A6-COMPILER-002 and existing FastAPI app wiring.
-- Allowed changes: `metaos/app/api.py`, one focused compiler API test file, and task/API/roadmap documentation.
-- Forbidden changes: compiler schema changes, provider prompt policy, search/research execution internals, RQ workers, database migrations, root configuration, and `pyproject.toml`.
-- Input: JSON body matching `CompileResearchRequest`.
-- Output: schema-valid `ResearchCompilation` JSON with task, operator, ThemeSpec, evidence requirements, scope, and plan.
-- Interface: `POST /alpha/research/compile`.
-- Acceptance: endpoint uses the same runtime compiler path for different themes, returns structured compilation payloads, and maps invalid provider output to HTTP 400.
-- Test command: `python -m pytest test/test_alpha_research_compile_api.py`.
-- Rollback: remove `/alpha/research/compile` route/helper and `test/test_alpha_research_compile_api.py`.
-- Documentation update: this task entry, `ROADMAP.md`, and `API_CONTRACTS.md`.
-
-## A11-OPS-003: Job retry API
-
-- Value: expose the tested failed-job retry path through HTTP so operators and UI can trigger retries.
-- Dependencies: A11-OPS-002 and existing FastAPI job routes.
-- Allowed changes: `metaos/app/api.py`, one focused retry API test file, and task/API/roadmap documentation.
-- Forbidden changes: queue dispatch mapping, task worker implementations, database schema migrations, Streamlit UI, root configuration, and `pyproject.toml`.
-- Input: failed job id in `POST /jobs/{job_id}/retry`.
-- Output: the requeued `Job` JSON with preserved id and retry history.
-- Interface: `POST /jobs/{job_id}/retry`.
-- Acceptance: route returns requeued jobs, maps missing jobs to 404, maps invalid retry state and Redis enqueue failures to 400, and does not require live Redis in tests.
-- Test command: `python -m pytest test/test_job_retry_api.py`.
-- Rollback: remove `/jobs/{job_id}/retry` route/import and `test/test_job_retry_api.py`.
-- Documentation update: this task entry, `ROADMAP.md`, and `API_CONTRACTS.md`.

@@ -192,63 +192,65 @@
 
 - 季度意图 -> 今日重点 -> 研究/开发 -> 证据与结论 -> 行动 -> 每日复盘 -> 视频 -> 每周报告可运行。
 
-## A11-CLOSE-001 status
+## 已完成任务状态
 
-- Added a service-level Alpha closure regression test that runs the chain from sovereignty records to runtime issue compilation, standardized knowledge, full-text plus dense-channel RRF retrieval, evidence matrix construction, cited answer drafting, Censorate audits, limited ministry reports, Chancellor briefing, DailySummary, reviewable EpisodeSpec, human approval, and MP4 export.
-- The closure test verifies that new themes are data-driven through ThemeSpec and do not require topic-specific Python branches, re-chunking, or index rebuilds.
-- Remaining outer orchestration such as durable HTTP/RQ job wiring and weekly report packaging stays in the documented API contracts and should be implemented as separate narrow tasks.
-- Test command: `python -m pytest test/test_alpha_end_to_end.py`.
+### A5-SEARCH-003：向量检索适配器
 
-## A5-SEARCH-003 status
+- 已新增向量检索适配器，把现有 Chroma/Ollama `RetrievalService.search` 结果转换为 Alpha `SearchCandidate`，并保留引用回链和元数据过滤能力。
+- 稠密向量结果现在可以和全文检索结果进入同一条 RRF 融合链路。
+- 测试命令：`python -m pytest test/test_vector_search.py`。
 
-- Added a vector retrieval adapter that converts existing Chroma/Ollama `RetrievalService.search` results into Alpha `SearchCandidate` objects with citation back-links and metadata filters.
-- Dense vector results can now enter RRF fusion through the same evidence candidate path as full-text results.
-- Test command: `python -m pytest test/test_vector_search.py`.
+### A5-SEARCH-004：混合证据检索入口
 
-## A5-SEARCH-004 status
+- 已新增 `hybrid_search`，作为 Alpha 证据检索的统一入口，支持全文、向量、元数据过滤和 RRF 融合。
+- 研究执行器现在可以消费统一的 `EvidenceCandidate` 列表，同时保留各检索通道的排名、分数和引用回链。
+- 测试命令：`python -m pytest test/test_hybrid_search.py`。
 
-- Added `hybrid_search` as the Alpha evidence retrieval entrypoint for full-text, vector, metadata-filtered, RRF-fused results.
-- Research execution can now consume one fused `EvidenceCandidate` list while preserving per-channel ranks, scores, and citation back-links.
-- Test command: `python -m pytest test/test_hybrid_search.py`.
+### A5-SEARCH-005：Alpha 搜索接口
 
-## A7-RESEARCH-003 status
+- 已新增 `POST /alpha/search`，通过 FastAPI 暴露全文、向量和 RRF 融合后的证据检索结果，并支持元数据过滤和引用回链。
+- 接口支持 `include_vector=false`，测试和轻量调用可以在不构造向量检索的情况下只走全文检索。
+- 测试命令：`python -m pytest test/test_alpha_search_api.py`。
 
-- Added plan-driven candidate recall for `ResearchCompilation`, tagging candidates with requirement id, requirement type, query, and inferred support/counter stance before evidence matrix construction.
-- Research execution now has a service entrypoint that can call hybrid search and return a `ResearchExecutionDraft` instead of requiring pre-tagged candidates.
-- Test command: `python -m pytest test/test_research_service.py`.
+### A6-COMPILER-003：Alpha 研究编译接口
 
-## A7-RESEARCH-004 status
+- 已新增 `POST /alpha/research/compile`，通过 FastAPI 暴露运行时 IssueCompiler 输出。
+- 接口返回通过 schema 校验的 `ResearchCompilation` JSON，并把无效 provider 输出映射为 HTTP 400。
+- 测试命令：`python -m pytest test/test_alpha_research_compile_api.py`。
 
-- Added `ResearchExecutionReport` with execution version, retrieval runs, progress events, recalled candidates, and evidence matrix output.
-- Research execution now has structured data for progress display, logs, and later RQ/API job persistence without changing answer drafting or audit policy.
-- Test command: `python -m pytest test/test_research_service.py`.
+### A7-RESEARCH-003：研究候选证据召回服务
 
-## A11-OPS-001 status
+- 已新增面向 `ResearchCompilation` 的计划驱动候选召回，在证据矩阵构建前为候选证据标记需求 ID、需求类型、查询和支持/反驳立场。
+- 研究执行器现在可以调用混合检索并返回 `ResearchExecutionDraft`，不再要求调用方预先标注候选证据。
+- 测试命令：`python -m pytest test/test_research_service.py`。
 
-- Added `JobRepository.retry_failed` to reset failed jobs to pending while appending an auditable `result.retry_history` entry.
-- This provides the tested retry-state foundation for later RQ/API re-enqueue wiring without changing worker behavior in this task.
-- Test command: `python -m pytest test/test_job_repository_retry.py`.
+### A7-RESEARCH-004：研究执行轨迹
 
-## A11-OPS-002 status
+- 已新增 `ResearchExecutionReport`，记录执行版本、检索运行记录、进度事件、召回候选和证据矩阵输出。
+- 研究执行现在具备面向进度展示、日志和后续 RQ/API 持久化的结构化数据，同时不改变答案起草和审计策略。
+- 测试命令：`python -m pytest test/test_research_service.py`。
 
-- Added `enqueue_retry_job` to requeue supported failed jobs through the original RQ task path while keeping the same job id and retry history.
-- Retry dispatch is covered for RAG, OCR PDF-page retries, unsupported job types, and non-failed jobs without requiring a live Redis instance in tests.
-- Test command: `python -m pytest test/test_queueing_retry.py`.
+### A11-OPS-001：任务重试元数据
 
-## A5-SEARCH-005 status
+- 已新增 `JobRepository.retry_failed`，可把失败任务重置为 pending，并追加可审计的 `result.retry_history` 记录。
+- 这为后续 RQ/API 重新入队提供了已测试的重试状态基础，不改变当前 worker 行为。
+- 测试命令：`python -m pytest test/test_job_repository_retry.py`。
 
-- Added `POST /alpha/search` to expose hybrid full-text/vector/RRF evidence retrieval through FastAPI with metadata filters and citation back-links.
-- The endpoint supports `include_vector=false` so tests and lightweight calls can run full-text-only without constructing vector retrieval.
-- Test command: `python -m pytest test/test_alpha_search_api.py`.
+### A11-OPS-002：RQ 重试入队
 
-## A6-COMPILER-003 status
+- 已新增 `enqueue_retry_job`，可通过原始 RQ 任务路径重新入队支持重试的失败任务，同时保留原 job id 和重试历史。
+- 重试分发已覆盖 RAG、OCR PDF 分页重试、不支持的任务类型和非失败任务，并且测试不依赖真实 Redis。
+- 测试命令：`python -m pytest test/test_queueing_retry.py`。
 
-- Added `POST /alpha/research/compile` to expose runtime IssueCompiler output through FastAPI.
-- The endpoint returns schema-validated `ResearchCompilation` JSON and rejects invalid provider output with HTTP 400.
-- Test command: `python -m pytest test/test_alpha_research_compile_api.py`.
+### A11-OPS-003：任务重试接口
 
-## A11-OPS-003 status
+- 已新增 `POST /jobs/{job_id}/retry`，通过 FastAPI 暴露失败任务重试能力。
+- 路由把不存在的任务映射为 404，把无效重试状态或 Redis 入队失败映射为 400。
+- 测试命令：`python -m pytest test/test_job_retry_api.py`。
 
-- Added `POST /jobs/{job_id}/retry` to expose failed-job retry through FastAPI.
-- The route maps missing jobs to 404 and invalid retry state or Redis enqueue failure to 400.
-- Test command: `python -m pytest test/test_job_retry_api.py`.
+### A11-CLOSE-001：完整闭环验收
+
+- 已新增服务级 Alpha 闭环回归测试，覆盖从主权记录、运行时议题编译、标准化知识、全文与向量 RRF 检索、证据矩阵、带引用答案、御史台审计、有限推荐、宰相简报、DailySummary、可审核 EpisodeSpec、人工批准到 MP4 导出的完整链路。
+- 闭环测试确认新主题由 `ThemeSpec` 数据驱动，不需要新增主题专用 Python 分支、重新分块或重建索引。
+- 持久化 HTTP/RQ 编排、周报打包等外围能力仍保留在 API 契约中，后续应作为独立窄任务实现。
+- 测试命令：`python -m pytest test/test_alpha_end_to_end.py`。
