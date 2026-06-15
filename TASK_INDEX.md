@@ -421,3 +421,17 @@
 - Test command: `python -m pytest test/test_alpha_research_compile_api.py`.
 - Rollback: remove `/alpha/research/compile` route/helper and `test/test_alpha_research_compile_api.py`.
 - Documentation update: this task entry, `ROADMAP.md`, and `API_CONTRACTS.md`.
+
+## A11-OPS-003: Job retry API
+
+- Value: expose the tested failed-job retry path through HTTP so operators and UI can trigger retries.
+- Dependencies: A11-OPS-002 and existing FastAPI job routes.
+- Allowed changes: `metaos/app/api.py`, one focused retry API test file, and task/API/roadmap documentation.
+- Forbidden changes: queue dispatch mapping, task worker implementations, database schema migrations, Streamlit UI, root configuration, and `pyproject.toml`.
+- Input: failed job id in `POST /jobs/{job_id}/retry`.
+- Output: the requeued `Job` JSON with preserved id and retry history.
+- Interface: `POST /jobs/{job_id}/retry`.
+- Acceptance: route returns requeued jobs, maps missing jobs to 404, maps invalid retry state and Redis enqueue failures to 400, and does not require live Redis in tests.
+- Test command: `python -m pytest test/test_job_retry_api.py`.
+- Rollback: remove `/jobs/{job_id}/retry` route/import and `test/test_job_retry_api.py`.
+- Documentation update: this task entry, `ROADMAP.md`, and `API_CONTRACTS.md`.

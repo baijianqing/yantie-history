@@ -36,6 +36,7 @@ from metaos.tasks.queueing import (
     enqueue_rag_answer,
     enqueue_rebuild_chunks,
     enqueue_rebuild_index,
+    enqueue_retry_job,
 )
 from metaos.workspace.catalog import ChunkRepository, KnowledgeRepository
 from metaos.workspace.jobs import JobRepository
@@ -216,6 +217,16 @@ def get_job(job_id: str) -> dict:
         return job_repo().get(job_id).model_dump(mode="json")
     except JobNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@app.post("/jobs/{job_id}/retry")
+def retry_job(job_id: str) -> dict:
+    try:
+        return enqueue_retry_job(job_id).model_dump(mode="json")
+    except JobNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except (ConfigurationError, ValueError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
 @app.post("/jobs/demo")

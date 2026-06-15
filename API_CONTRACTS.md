@@ -56,6 +56,16 @@
 
 用途：读取任务状态。
 
+### `POST /jobs/{job_id}/retry`
+
+Purpose: retry a failed job through its original RQ queue and task path.
+
+Response: `Job` JSON with `status=pending`, preserved `id`, and `result.retry_history`.
+
+Errors:
+- `404` when the job id does not exist.
+- `400` when the job is not failed, the job type cannot be retried, or Redis enqueue fails.
+
 ### `POST /ingest/documents`
 
 用途：上传文件并提交入库任务。

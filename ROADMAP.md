@@ -246,3 +246,9 @@
 - Added `POST /alpha/research/compile` to expose runtime IssueCompiler output through FastAPI.
 - The endpoint returns schema-validated `ResearchCompilation` JSON and rejects invalid provider output with HTTP 400.
 - Test command: `python -m pytest test/test_alpha_research_compile_api.py`.
+
+## A11-OPS-003 status
+
+- Added `POST /jobs/{job_id}/retry` to expose failed-job retry through FastAPI.
+- The route maps missing jobs to 404 and invalid retry state or Redis enqueue failure to 400.
+- Test command: `python -m pytest test/test_job_retry_api.py`.
