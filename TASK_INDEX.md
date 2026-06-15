@@ -337,3 +337,17 @@
 - Test command: `python -m pytest test/test_hybrid_search.py`.
 - Rollback: remove `metaos/search/hybrid.py`, its exports, and `test/test_hybrid_search.py`.
 - Documentation update: this task entry plus `ROADMAP.md` status note.
+
+## A7-RESEARCH-003: Research candidate recall service
+
+- Value: move research execution from manually supplied candidates toward plan-driven recall that tags evidence by requirement before matrix construction.
+- Dependencies: A6-COMPILER-002, A5-SEARCH-004, A7-RESEARCH-001.
+- Allowed changes: `metaos/research` service code, one focused research test file, and task/roadmap documentation.
+- Forbidden changes: search internals, Censorate rules, answer drafting policy, ministry/chancellor behavior, root configuration, migrations, and `pyproject.toml`.
+- Input: `ResearchCompilation`, an evidence search callable, and `top_k_per_query`.
+- Output: recalled `EvidenceCandidate` objects plus `ResearchExecutionDraft` evidence matrix.
+- Interface: `retrieve_research_candidates(compilation, search, top_k_per_query=5)` and `execute_research_plan(compilation, search, top_k_per_query=5)`.
+- Acceptance: candidates are recalled per evidence requirement, tagged with requirement id/type/query/stance, deduplicated, preserve citations, and produce support/counter matrix rows.
+- Test command: `python -m pytest test/test_research_service.py`.
+- Rollback: remove `metaos/research/service.py`, its exports, and `test/test_research_service.py`.
+- Documentation update: this task entry plus `ROADMAP.md` status note.

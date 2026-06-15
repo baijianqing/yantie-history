@@ -210,3 +210,9 @@
 - Added `hybrid_search` as the Alpha evidence retrieval entrypoint for full-text, vector, metadata-filtered, RRF-fused results.
 - Research execution can now consume one fused `EvidenceCandidate` list while preserving per-channel ranks, scores, and citation back-links.
 - Test command: `python -m pytest test/test_hybrid_search.py`.
+
+## A7-RESEARCH-003 status
+
+- Added plan-driven candidate recall for `ResearchCompilation`, tagging candidates with requirement id, requirement type, query, and inferred support/counter stance before evidence matrix construction.
+- Research execution now has a service entrypoint that can call hybrid search and return a `ResearchExecutionDraft` instead of requiring pre-tagged candidates.
+- Test command: `python -m pytest test/test_research_service.py`.
