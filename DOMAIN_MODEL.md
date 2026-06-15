@@ -636,6 +636,19 @@ Alpha citation 必须支持：
 - `actions`
 - `citations`
 - `review_status`
+- `reviewer_id`
+- `reviewed_at`
+- `review_notes`
+- `created_at`
+- `updated_at`
+
+A3-WORKSHOP-001 实现说明：
+
+- 内容工坊 Schema 位于 `metaos/workshop/schemas.py`。
+- 已实现 `EpisodeSpec` 与 `EpisodeReviewStatus`。
+- `review_status=approved`、`changes_requested`、`rejected` 属于终态审核状态，必须提供 `reviewer_id` 和 `reviewed_at`。
+- `assert_episode_can_export(episode)` 作为正式视频导出的 Schema 级门禁：只有 `approved` 的 Episode 才允许导出。
+- 当前任务只定义 Episode 规格和审核状态，不生成脚本、旁白、字幕、图卡或 MP4。
 
 ### VideoExport
 
