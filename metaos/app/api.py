@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import date, datetime
+from pathlib import Path
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from pydantic import BaseModel, Field
@@ -47,7 +48,14 @@ from metaos.tasks.queueing import (
 from metaos.workspace.catalog import ChunkRepository, KnowledgeRepository
 from metaos.workspace.jobs import JobRepository
 from metaos.workspace.paths import ensure_workspace
-from metaos.workshop import EpisodeReviewStatus, EpisodeSpec, VideoExport, episode_from_daily_summary, review_episode
+from metaos.workshop import (
+    EpisodeReviewStatus,
+    EpisodeSpec,
+    VideoExport,
+    episode_from_daily_summary,
+    generate_episode_assets,
+    review_episode,
+)
 
 
 app = FastAPI(title="MetaOS Lite", version=__version__)
@@ -106,6 +114,11 @@ class AlphaEpisodeReviewRequest(BaseModel):
     reviewer_id: str | None = None
     reviewed_at: datetime | None = None
     review_notes: str = ""
+
+
+class AlphaEpisodeAssetsRequest(BaseModel):
+    episode: EpisodeSpec
+    output_dir: Path | None = None
 
 
 class ActiveStateRequest(BaseModel):
@@ -504,6 +517,18 @@ def review_alpha_episode(episode_id: str, request: AlphaEpisodeReviewRequest) ->
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     return episode.model_dump(mode="json")
+
+
+@app.post("/alpha/workshop/episodes/{episode_id}/assets")
+def create_alpha_episode_assets(episode_id: str, request: AlphaEpisodeAssetsRequest) -> dict:
+    if request.episode.id != episode_id:
+        raise HTTPException(status_code=400, detail="episode_id must match request episode id.")
+    output_dir = request.output_dir or ensure_workspace().exports / "episodes"
+    try:
+        assets = generate_episode_assets(request.episode, output_dir)
+    except OSError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return assets.model_dump(mode="json")
 
 
 @app.post("/rag/answer/jobs")

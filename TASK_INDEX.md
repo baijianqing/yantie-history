@@ -156,6 +156,20 @@
 - 回滚方式：删除 `/alpha/workshop/episodes/{episode_id}/review` 路由、请求 schema、测试断言和文档条目。
 - 文档更新：`API_CONTRACTS.md` 和 `ROADMAP.md` 记录同步审核 API 状态。
 
+## A3-WORKSHOP-005：Episode 资产同步 API
+
+- 价值：让可审核视频资产通过结构化 HTTP 请求生成，补齐 EpisodeSpec 到脚本、旁白、字幕、图卡和 Remotion props 的可调用入口。
+- 依赖：A3-WORKSHOP-002、A3-WORKSHOP-003 和现有 FastAPI app 接线。
+- 允许修改范围：`metaos/app/api.py`、一个聚焦的 workshop API 测试文件、任务/API/路线图文档。
+- 禁止修改范围：人工审核规则、FFmpeg 渲染、数据库持久化、RQ worker、检索、根配置、`.vscode/` 和 `pyproject.toml`。
+- 输入：路径 `episode_id`、`EpisodeSpec`、可选 `output_dir`。
+- 输出：schema 合法的 `WorkshopAssetBundle` JSON 和本地资产文件。
+- 接口：`POST /alpha/workshop/episodes/{episode_id}/assets`。
+- 验收标准：路径 ID 必须匹配请求体 Episode ID；接口写出脚本、旁白、字幕、图卡和 Remotion props；未传 `output_dir` 时使用 workspace exports；接口不渲染 MP4。
+- 测试命令：`python -m pytest test/test_alpha_workshop_api.py`。
+- 回滚方式：删除 `/alpha/workshop/episodes/{episode_id}/assets` 路由、请求 schema、测试断言和文档条目。
+- 文档更新：`API_CONTRACTS.md` 和 `ROADMAP.md` 记录同步资产 API 状态。
+
 ## A4-KB-001：稳定文档版本与知识块标识符
 
 - 价值：保证新主题不重切块、不重建索引。

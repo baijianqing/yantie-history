@@ -206,6 +206,12 @@
 - 接口要求路径 ID 与提交的 Episode ID 一致，并复用终态审核必须具备 reviewer 元数据的 schema 门禁。
 - 测试命令：`python -m pytest test/test_alpha_workshop_api.py`。
 
+### A3-WORKSHOP-005：Episode 资产同步 API
+
+- 已新增 `POST /alpha/workshop/episodes/{episode_id}/assets`，通过 FastAPI 暴露同步可审核资产生成入口。
+- 接口写出脚本、旁白文本、SRT 字幕、图卡 JSON 和 Remotion props，并返回 `WorkshopAssetBundle` JSON；MP4 渲染仍由后续独立接口处理。
+- 测试命令：`python -m pytest test/test_alpha_workshop_api.py`。
+
 ### A5-SEARCH-003：向量检索适配器
 
 - 已新增向量检索适配器，把现有 Chroma/Ollama `RetrievalService.search` 结果转换为 Alpha `SearchCandidate`，并保留引用回链和元数据过滤能力。

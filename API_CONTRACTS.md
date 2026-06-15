@@ -634,6 +634,34 @@ A11-WEEKLY-002 implementation note:
 
 从 `DailySummary` 生成 `EpisodeSpec`。
 
+### `POST /alpha/workshop/episodes/{episode_id}/assets`
+
+同步生成可审核视频资产。
+
+请求：
+
+```json
+{
+  "episode": {},
+  "output_dir": "library/exports/episodes"
+}
+```
+
+响应：
+
+```json
+{
+  "id": "assets_...",
+  "episode_spec_id": "episode_...",
+  "output_dir": "library/exports/episodes/episode_...",
+  "script_path": ".../script.md",
+  "voiceover_path": ".../voiceover.txt",
+  "subtitle_path": ".../subtitles.srt",
+  "cards_path": ".../cards.json",
+  "remotion_props_path": ".../remotion_props.json"
+}
+```
+
 ### `POST /alpha/workshop/episodes/{episode_id}/render/jobs`
 
 提交视频渲染任务。
@@ -690,3 +718,10 @@ A3-WORKSHOP-004 implementation note:
 - The endpoint requires the path `episode_id` to match the submitted `EpisodeSpec.id`, then calls `review_episode(...)`.
 - Terminal review states still require reviewer metadata through the `EpisodeSpec` schema.
 - The endpoint returns the reviewed `EpisodeSpec` JSON payload and does not persist records or create a durable RQ job.
+
+A3-WORKSHOP-005 implementation note:
+
+- `POST /alpha/workshop/episodes/{episode_id}/assets` is implemented as a synchronous schema-validated API in `metaos/app/api.py`.
+- The endpoint requires the path `episode_id` to match the submitted `EpisodeSpec.id`, then calls `generate_episode_assets(...)`.
+- When `output_dir` is omitted, assets are written below the workspace exports directory.
+- The endpoint returns a `WorkshopAssetBundle` JSON payload and does not review the episode, render MP4, persist records, or create a durable RQ job.

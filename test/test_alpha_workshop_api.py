@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import unittest
+import tempfile
 from datetime import date, datetime, timezone
 from pathlib import Path
 
@@ -149,6 +150,55 @@ class AlphaWorkshopApiTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertIn("reviewer_id", response.json()["detail"])
+
+    def test_episode_assets_endpoint_writes_reviewable_files(self) -> None:
+        episode = EpisodeSpec(
+            id="episode_1",
+            daily_summary_id="summary_1",
+            title="Daily Build Review",
+            angle="Turn the day into a verifiable account",
+            facts=["Tests passed"],
+            judgments=["Scope stayed narrow"],
+            reflections=["Evidence stayed explicit"],
+            actions=["Commit the task"],
+        )
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output_dir = Path(temp_dir) / "assets"
+            response = self.client.post(
+                "/alpha/workshop/episodes/episode_1/assets",
+                json={
+                    "episode": episode.model_dump(mode="json"),
+                    "output_dir": str(output_dir),
+                },
+            )
+
+            self.assertEqual(response.status_code, 200)
+            payload = response.json()
+            self.assertEqual(payload["episode_spec_id"], "episode_1")
+            self.assertTrue(Path(payload["script_path"]).exists())
+            self.assertTrue(Path(payload["voiceover_path"]).exists())
+            self.assertTrue(Path(payload["subtitle_path"]).exists())
+            self.assertTrue(Path(payload["cards_path"]).exists())
+            self.assertTrue(Path(payload["remotion_props_path"]).exists())
+            self.assertIn("Daily Build Review", Path(payload["script_path"]).read_text(encoding="utf-8"))
+            self.assertIn("Tests passed", Path(payload["voiceover_path"]).read_text(encoding="utf-8"))
+
+    def test_episode_assets_endpoint_rejects_path_body_mismatch(self) -> None:
+        episode = EpisodeSpec(
+            id="episode_1",
+            daily_summary_id="summary_1",
+            title="Daily Build Review",
+            angle="Review gate",
+        )
+
+        response = self.client.post(
+            "/alpha/workshop/episodes/episode_other/assets",
+            json={"episode": episode.model_dump(mode="json")},
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("episode_id", response.json()["detail"])
 
 
 if __name__ == "__main__":
