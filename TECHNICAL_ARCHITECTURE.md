@@ -156,6 +156,13 @@ A5-SEARCH-001 实现说明：
 - `FullTextSearchResult` 返回 `chunk_id`、`knowledge_item_id`、文本、heading、ordinal、score 和原始 `Citation`。
 - 当前任务不改 `metaos/retrieval/service.py` 的 Chroma 向量检索，也不做 RRF；融合由 A5-SEARCH-002 接入。
 
+A9-AUDIT-002 实现说明：
+
+- 御史台质量审计扩展位于 `metaos/censorate/audit.py`。
+- `audit_research_quality(compilation, execution, attention_budget, retrieval_cost_minutes, retrieval_channels)` 检查反证缺口、证据完整性、确认偏误风险和研究成本。
+- 证据缺口和超预算进入 `required_fixes`，单通道检索等偏误风险进入 `residual_risks`。
+- 当前任务不修改检索底层实现，也不改变研究回答生成逻辑。
+
 ## 研究执行架构
 
 研究执行器应作为独立业务模块和 Worker 任务实现，不应塞进现有单轮 `rag.service`。

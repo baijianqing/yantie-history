@@ -7,6 +7,7 @@ from metaos.censorate.audit import (
     CitationAuditItem,
     ScopeAuditItem,
     audit_research_answer,
+    audit_research_quality,
 )
 
 __all__ = [
@@ -16,4 +17,5 @@ __all__ = [
     "CitationAuditItem",
     "ScopeAuditItem",
     "audit_research_answer",
+    "audit_research_quality",
 ]

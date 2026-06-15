@@ -8,9 +8,11 @@ from enum import Enum
 
 from pydantic import BaseModel, Field, field_validator
 
-from metaos.compiler import ResearchScope
+from metaos.compiler import ResearchCompilation, ResearchScope
 from metaos.core.schemas import Citation, new_id, utc_now
+from metaos.research import EvidenceAssessment
 from metaos.research import ResearchAnswer, ResearchExecutionDraft, SourceStatus
+from metaos.sovereignty import AttentionBudget
 
 
 class AuditStatus(str, Enum):
@@ -98,6 +100,90 @@ def audit_research_answer(
         scope_checks=scope_checks,
         required_fixes=required_fixes,
     )
+
+
+def audit_research_quality(
+    compilation: ResearchCompilation,
+    execution: ResearchExecutionDraft,
+    *,
+    attention_budget: AttentionBudget | None = None,
+    retrieval_cost_minutes: int = 0,
+    retrieval_channels: list[str] | None = None,
+) -> AuditReport:
+    counterevidence_checks = counterevidence_quality_checks(execution)
+    completeness_checks = completeness_quality_checks(execution)
+    bias_checks = bias_quality_checks(compilation, execution, retrieval_channels or [])
+    cost_checks = cost_quality_checks(attention_budget, retrieval_cost_minutes)
+    required_fixes = [*counterevidence_checks, *completeness_checks, *cost_checks]
+    status = quality_status(required_fixes, bias_checks)
+    return AuditReport(
+        task_id=compilation.research_task.id,
+        status=status,
+        counterevidence_checks=counterevidence_checks,
+        completeness_checks=completeness_checks,
+        bias_checks=bias_checks,
+        cost_checks=cost_checks,
+        required_fixes=required_fixes,
+        residual_risks=bias_checks if status == AuditStatus.passed_with_risk else [],
+    )
+
+
+def counterevidence_quality_checks(execution: ResearchExecutionDraft) -> list[str]:
+    checks: list[str] = []
+    for row in execution.evidence_matrix:
+        if row.assessment == EvidenceAssessment.counterevidence_required:
+            checks.append(f"{row.requirement_id}: required counterevidence is missing")
+        elif any("counterevidence required" in item for item in row.missing_evidence):
+            checks.append(f"{row.requirement_id}: required counterevidence is missing")
+    return checks
+
+
+def completeness_quality_checks(execution: ResearchExecutionDraft) -> list[str]:
+    checks: list[str] = []
+    for row in execution.evidence_matrix:
+        if row.assessment == EvidenceAssessment.missing_evidence:
+            checks.extend(row.missing_evidence)
+    return checks
+
+
+def bias_quality_checks(
+    compilation: ResearchCompilation,
+    execution: ResearchExecutionDraft,
+    retrieval_channels: list[str],
+) -> list[str]:
+    checks: list[str] = []
+    if len(set(retrieval_channels)) < 2:
+        checks.append("retrieval used fewer than two channels; confirmation bias risk remains")
+    requires_counter = any(
+        requirement.counterevidence_required
+        for requirement in compilation.evidence_requirements
+    )
+    has_counter = any(row.counter_evidence for row in execution.evidence_matrix)
+    if requires_counter and not has_counter:
+        checks.append("no counterevidence candidates were observed for a counterevidence-required task")
+    return checks
+
+
+def cost_quality_checks(
+    attention_budget: AttentionBudget | None,
+    retrieval_cost_minutes: int,
+) -> list[str]:
+    if attention_budget is None:
+        return []
+    allowed = attention_budget.research_minutes or attention_budget.total_minutes
+    if retrieval_cost_minutes > allowed:
+        return [
+            f"research cost {retrieval_cost_minutes} minutes exceeds attention budget {allowed} minutes"
+        ]
+    return []
+
+
+def quality_status(required_fixes: list[str], bias_checks: list[str]) -> AuditStatus:
+    if required_fixes:
+        return AuditStatus.requires_revision
+    if bias_checks:
+        return AuditStatus.passed_with_risk
+    return AuditStatus.passed
 
 
 def audit_citations(
