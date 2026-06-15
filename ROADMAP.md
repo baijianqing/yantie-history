@@ -200,6 +200,12 @@
 - 接口保留事实、判断、反思、行动和引用，并把资产生成、审核、渲染和持久化 RQ 编排留给后续独立任务。
 - 测试命令：`python -m pytest test/test_alpha_workshop_api.py`。
 
+### A3-WORKSHOP-004：Episode 审核同步 API
+
+- 已新增 `PATCH /alpha/workshop/episodes/{episode_id}/review`，通过 FastAPI 暴露同步人工审核入口。
+- 接口要求路径 ID 与提交的 Episode ID 一致，并复用终态审核必须具备 reviewer 元数据的 schema 门禁。
+- 测试命令：`python -m pytest test/test_alpha_workshop_api.py`。
+
 ### A5-SEARCH-003：向量检索适配器
 
 - 已新增向量检索适配器，把现有 Chroma/Ollama `RetrievalService.search` 结果转换为 Alpha `SearchCandidate`，并保留引用回链和元数据过滤能力。

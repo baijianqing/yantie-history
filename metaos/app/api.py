@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, datetime
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from pydantic import BaseModel, Field
@@ -47,7 +47,7 @@ from metaos.tasks.queueing import (
 from metaos.workspace.catalog import ChunkRepository, KnowledgeRepository
 from metaos.workspace.jobs import JobRepository
 from metaos.workspace.paths import ensure_workspace
-from metaos.workshop import VideoExport, episode_from_daily_summary
+from metaos.workshop import EpisodeReviewStatus, EpisodeSpec, VideoExport, episode_from_daily_summary, review_episode
 
 
 app = FastAPI(title="MetaOS Lite", version=__version__)
@@ -98,6 +98,14 @@ class AlphaEpisodeRequest(BaseModel):
     daily_summary: DailySummary
     title: str | None = None
     angle: str = "Daily cognitive review"
+
+
+class AlphaEpisodeReviewRequest(BaseModel):
+    episode: EpisodeSpec
+    status: EpisodeReviewStatus
+    reviewer_id: str | None = None
+    reviewed_at: datetime | None = None
+    review_notes: str = ""
 
 
 class ActiveStateRequest(BaseModel):
@@ -475,6 +483,23 @@ def create_alpha_episode(request: AlphaEpisodeRequest) -> dict:
             request.daily_summary,
             title=request.title,
             angle=request.angle,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return episode.model_dump(mode="json")
+
+
+@app.patch("/alpha/workshop/episodes/{episode_id}/review")
+def review_alpha_episode(episode_id: str, request: AlphaEpisodeReviewRequest) -> dict:
+    if request.episode.id != episode_id:
+        raise HTTPException(status_code=400, detail="episode_id must match request episode id.")
+    try:
+        episode = review_episode(
+            request.episode,
+            status=request.status,
+            reviewer_id=request.reviewer_id,
+            reviewed_at=request.reviewed_at,
+            review_notes=request.review_notes,
         )
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc

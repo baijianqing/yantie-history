@@ -142,6 +142,20 @@
 - 回滚方式：删除 `/alpha/workshop/episodes` 路由、请求 schema、测试文件和文档条目。
 - 文档更新：`API_CONTRACTS.md` 和 `ROADMAP.md` 记录同步 API 接线状态。
 
+## A3-WORKSHOP-004：Episode 审核同步 API
+
+- 价值：让人工审核结果通过结构化 HTTP 请求写回 EpisodeSpec，为后续正式 MP4 导出提供门禁状态。
+- 依赖：A3-WORKSHOP-001、A3-WORKSHOP-003 和现有 FastAPI app 接线。
+- 允许修改范围：`metaos/app/api.py`、一个聚焦的 workshop API 测试文件、任务/API/路线图文档。
+- 禁止修改范围：资产落盘、FFmpeg 渲染、数据库持久化、RQ worker、检索、根配置、`.vscode/` 和 `pyproject.toml`。
+- 输入：路径 `episode_id`、`EpisodeSpec`、审核 `status`、可选 `reviewer_id`、`reviewed_at` 和 `review_notes`。
+- 输出：schema 合法的已审核 `EpisodeSpec` JSON。
+- 接口：`PATCH /alpha/workshop/episodes/{episode_id}/review`。
+- 验收标准：路径 ID 必须匹配请求体 Episode ID；approved/rejected/changes_requested 等终态审核必须具备 reviewer 元数据；接口返回更新后的审核状态。
+- 测试命令：`python -m pytest test/test_alpha_workshop_api.py`。
+- 回滚方式：删除 `/alpha/workshop/episodes/{episode_id}/review` 路由、请求 schema、测试断言和文档条目。
+- 文档更新：`API_CONTRACTS.md` 和 `ROADMAP.md` 记录同步审核 API 状态。
+
 ## A4-KB-001：稳定文档版本与知识块标识符
 
 - 价值：保证新主题不重切块、不重建索引。

@@ -642,6 +642,30 @@ A11-WEEKLY-002 implementation note:
 
 人工审核 Episode。
 
+请求：
+
+```json
+{
+  "episode": {},
+  "status": "approved",
+  "reviewer_id": "human_reviewer",
+  "reviewed_at": "2026-06-16T10:00:00Z",
+  "review_notes": "Approved for export"
+}
+```
+
+响应：
+
+```json
+{
+  "id": "episode_...",
+  "review_status": "approved",
+  "reviewer_id": "human_reviewer",
+  "reviewed_at": "2026-06-16T10:00:00Z",
+  "review_notes": "Approved for export"
+}
+```
+
 ### `GET /alpha/workshop/video-exports/{export_id}`
 
 读取 MP4 导出结果。
@@ -659,3 +683,10 @@ A3-WORKSHOP-003 implementation note:
 - `POST /alpha/workshop/episodes` is implemented as a synchronous schema-validated API in `metaos/app/api.py`.
 - The endpoint calls `episode_from_daily_summary(...)` with caller-provided `DailySummary`, optional title, and optional angle.
 - The endpoint returns a draft `EpisodeSpec` JSON payload and does not generate assets, render MP4, persist records, or create a durable RQ job.
+
+A3-WORKSHOP-004 implementation note:
+
+- `PATCH /alpha/workshop/episodes/{episode_id}/review` is implemented as a synchronous schema-validated API in `metaos/app/api.py`.
+- The endpoint requires the path `episode_id` to match the submitted `EpisodeSpec.id`, then calls `review_episode(...)`.
+- Terminal review states still require reviewer metadata through the `EpisodeSpec` schema.
+- The endpoint returns the reviewed `EpisodeSpec` JSON payload and does not persist records or create a durable RQ job.
