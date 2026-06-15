@@ -414,6 +414,14 @@ Alpha citation 必须支持：
 - `depends_on`
 - `weak_support`
 
+A8-KB-002 实现说明：
+
+- 结构化知识底座首版位于 `metaos/knowledge/foundation.py`。
+- 已实现 `Entity`、`EntityAlias`、`Event`、`Claim`、`EvidenceLink`、`KnowledgeSummary` 与 `KnowledgeFoundation`。
+- `extract_knowledge_foundation(standardized_document)` 从标准化 chunks 中解析显式标注行：`Entity:`、`Alias:`、`Event:`、`Claim:`、`Summary:`。
+- 事件、主张、摘要和证据链接都会保留原始 chunk 的 `Citation`，满足回链原文要求。
+- 当前任务不引入 NER、指代消解、微调或 PyTorch Model Worker；后续必须由评测结果驱动升级。
+
 ## 议题编译
 
 ### ResearchTask
