@@ -160,3 +160,61 @@ def enqueue_rag_answer(question: str, top_k: int = 5) -> Job:
         task_path=TASK_RAG_ANSWER,
         payload={"question": question, "top_k": top_k},
     )
+
+
+def enqueue_retry_job(job_id: str) -> Job:
+    repo = JobRepository()
+    job = repo.get(job_id)
+    queue_name, task_path, timeout = retry_dispatch_for_job(job)
+    retried = repo.retry_failed(job_id)
+    try:
+        queue = rq_queue(queue_name)
+        queue.enqueue_call(
+            func=task_path,
+            args=(retried.id,),
+            timeout=timeout,
+            result_ttl=24 * 60 * 60,
+            failure_ttl=7 * 24 * 60 * 60,
+            job_id=retried.id,
+            description=f"retry:{retried.type.value}:{retried.id}",
+        )
+    except RedisError as exc:
+        repo.update(
+            retried.id,
+            status=JobStatus.failed,
+            progress=1,
+            message="Retry enqueue failed",
+            error=f"Cannot connect to Redis: {exc}",
+        )
+        raise ConfigurationError(
+            f"Cannot connect to Redis: {get_settings().redis_url}. Start Redis before retrying jobs."
+        ) from exc
+    return repo.update(retried.id, message=f"Requeued: {queue_name.value}")
+
+
+def retry_dispatch_for_job(job: Job) -> tuple[QueueName, str, int]:
+    settings = get_settings()
+    if job.type == JobType.ingest_document:
+        return QueueName.ingest, TASK_INGEST_DOCUMENT, DEFAULT_TIMEOUT_SECONDS
+    if job.type == JobType.rebuild_chunks:
+        return QueueName.ingest, TASK_REBUILD_CHUNKS, DEFAULT_TIMEOUT_SECONDS
+    if job.type == JobType.pdf_route:
+        return QueueName.ingest, TASK_PDF_ROUTE, 2 * 60 * 60
+    if job.type == JobType.ocr_document:
+        task_path = TASK_OCR_PDF_PAGES if job.payload.get("plan_path") else TASK_OCR_DOCUMENT
+        return QueueName.ocr, task_path, 2 * 60 * 60
+    if job.type == JobType.index_knowledge:
+        return (
+            QueueName.index,
+            TASK_INDEX_KNOWLEDGE,
+            configured_timeout(settings.index_job_timeout_seconds),
+        )
+    if job.type == JobType.rebuild_index:
+        return (
+            QueueName.index,
+            TASK_REBUILD_INDEX,
+            configured_timeout(settings.rebuild_index_job_timeout_seconds),
+        )
+    if job.type == JobType.answer_question:
+        return QueueName.rag, TASK_RAG_ANSWER, DEFAULT_TIMEOUT_SECONDS
+    raise ValueError(f"job type cannot be retried: {job.type.value}")

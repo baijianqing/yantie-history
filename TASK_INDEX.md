@@ -379,3 +379,17 @@
 - Test command: `python -m pytest test/test_job_repository_retry.py`.
 - Rollback: remove `retry_failed`, `RETRY_HISTORY_KEY`, and `test/test_job_repository_retry.py`.
 - Documentation update: this task entry plus `ROADMAP.md` status note.
+
+## A11-OPS-002: RQ retry enqueue
+
+- Value: turn failed-job retry metadata into an actual RQ re-enqueue path using the original job id and task type.
+- Dependencies: A11-OPS-001 and existing RQ queue helpers.
+- Allowed changes: `metaos/tasks/queueing.py`, one focused queueing retry test file, and task/roadmap documentation.
+- Forbidden changes: task worker implementations, database schema migrations, Streamlit UI, API routes, root configuration, and `pyproject.toml`.
+- Input: failed job id.
+- Output: the same job reset to `pending`, retry history recorded by `JobRepository`, and an RQ enqueue call using the original task path/queue mapping.
+- Interface: `enqueue_retry_job(job_id)` and `retry_dispatch_for_job(job)`.
+- Acceptance: retry uses the same job id, maps supported job types to the correct queue/task, rejects non-failed or unsupported jobs without enqueueing, and preserves retry history.
+- Test command: `python -m pytest test/test_queueing_retry.py`.
+- Rollback: remove `enqueue_retry_job`, `retry_dispatch_for_job`, and `test/test_queueing_retry.py`.
+- Documentation update: this task entry plus `ROADMAP.md` status note.

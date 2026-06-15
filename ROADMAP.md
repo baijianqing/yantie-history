@@ -228,3 +228,9 @@
 - Added `JobRepository.retry_failed` to reset failed jobs to pending while appending an auditable `result.retry_history` entry.
 - This provides the tested retry-state foundation for later RQ/API re-enqueue wiring without changing worker behavior in this task.
 - Test command: `python -m pytest test/test_job_repository_retry.py`.
+
+## A11-OPS-002 status
+
+- Added `enqueue_retry_job` to requeue supported failed jobs through the original RQ task path while keeping the same job id and retry history.
+- Retry dispatch is covered for RAG, OCR PDF-page retries, unsupported job types, and non-failed jobs without requiring a live Redis instance in tests.
+- Test command: `python -m pytest test/test_queueing_retry.py`.
