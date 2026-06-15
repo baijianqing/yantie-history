@@ -8,6 +8,7 @@ from datetime import datetime
 from pathlib import Path
 
 from metaos.core.schemas import utc_now
+from metaos.ledger import DailySummary
 from metaos.workshop.schemas import (
     EpisodeReviewStatus,
     EpisodeSpec,
@@ -16,6 +17,24 @@ from metaos.workshop.schemas import (
     WorkshopAssetBundle,
     assert_episode_can_export,
 )
+
+
+def episode_from_daily_summary(
+    summary: DailySummary,
+    *,
+    title: str | None = None,
+    angle: str = "Daily cognitive review",
+) -> EpisodeSpec:
+    return EpisodeSpec(
+        daily_summary_id=summary.id,
+        title=title or f"Daily Review {summary.date.isoformat()}",
+        angle=angle,
+        facts=summary_lines(summary.fact_summary),
+        judgments=summary_lines(summary.judgment_summary),
+        reflections=summary_lines(summary.reflection_summary),
+        actions=summary_lines(summary.action_summary),
+        citations=summary.citations,
+    )
 
 
 def generate_episode_assets(episode: EpisodeSpec, output_dir: Path) -> WorkshopAssetBundle:
@@ -211,3 +230,16 @@ def format_srt_time(total_seconds: int) -> str:
     hours, remainder = divmod(total_seconds, 3600)
     minutes, seconds = divmod(remainder, 60)
     return f"{hours:02}:{minutes:02}:{seconds:02},000"
+
+
+def summary_lines(value: str) -> list[str]:
+    lines: list[str] = []
+    for raw_line in value.splitlines():
+        line = raw_line.strip()
+        if not line:
+            continue
+        if line.startswith("- "):
+            line = line[2:].strip()
+        if line:
+            lines.append(line)
+    return lines

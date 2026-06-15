@@ -192,3 +192,9 @@
 
 - 季度意图 -> 今日重点 -> 研究/开发 -> 证据与结论 -> 行动 -> 每日复盘 -> 视频 -> 每周报告可运行。
 
+## A11-CLOSE-001 status
+
+- Added a service-level Alpha closure regression test that runs the chain from sovereignty records to runtime issue compilation, standardized knowledge, full-text plus dense-channel RRF retrieval, evidence matrix construction, cited answer drafting, Censorate audits, limited ministry reports, Chancellor briefing, DailySummary, reviewable EpisodeSpec, human approval, and MP4 export.
+- The closure test verifies that new themes are data-driven through ThemeSpec and do not require topic-specific Python branches, re-chunking, or index rebuilds.
+- Remaining outer orchestration such as durable HTTP/RQ job wiring and weekly report packaging stays in the documented API contracts and should be implemented as separate narrow tasks.
+- Test command: `python -m pytest test/test_alpha_end_to_end.py`.
