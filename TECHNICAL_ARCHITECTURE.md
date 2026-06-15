@@ -148,6 +148,14 @@ RRF 基础规则：
 - `k` 初始值建议 60。
 - RRF 参数必须进入 `retrieval_run` 记录。
 
+A5-SEARCH-001 实现说明：
+
+- 全文检索位于 `metaos/search/full_text.py`。
+- `full_text_search(query, chunks, filters, top_k)` 使用 SQLite FTS5 为传入 `Chunk` 建立临时全文索引。
+- `FullTextSearchFilters` 支持 `knowledge_item_id`、`source_id`、`asset_id`、`file_path` 元数据过滤。
+- `FullTextSearchResult` 返回 `chunk_id`、`knowledge_item_id`、文本、heading、ordinal、score 和原始 `Citation`。
+- 当前任务不改 `metaos/retrieval/service.py` 的 Chroma 向量检索，也不做 RRF；融合由 A5-SEARCH-002 接入。
+
 ## 研究执行架构
 
 研究执行器应作为独立业务模块和 Worker 任务实现，不应塞进现有单轮 `rag.service`。
