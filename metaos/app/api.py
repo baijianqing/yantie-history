@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel
 from fastapi import FastAPI, File, HTTPException, UploadFile
+from pydantic import BaseModel
 
 from metaos import __version__
 from metaos.core.errors import (
@@ -17,6 +17,16 @@ from metaos.core.errors import (
 from metaos.ingest.service import IngestService
 from metaos.knowledge.deletion import KnowledgeDeletionService
 from metaos.retrieval.service import RetrievalService
+from metaos.sovereignty import (
+    AttentionBudget,
+    CognitiveConstitution,
+    CurrentRole,
+    Intent,
+    IntentStatus,
+    NotToDoItem,
+    SovereigntyRecordNotFoundError,
+    SovereigntyRepository,
+)
 from metaos.tasks.monitoring import runtime_status
 from metaos.tasks.pipeline import enqueue_document_pipeline
 from metaos.tasks.queueing import (
@@ -36,6 +46,10 @@ app = FastAPI(title="MetaOS Lite", version=__version__)
 class RagAnswerRequest(BaseModel):
     question: str
     top_k: int = 5
+
+
+class ActiveStateRequest(BaseModel):
+    active: bool
 
 
 def job_repo() -> JobRepository:
@@ -58,6 +72,14 @@ def knowledge_deletion_service() -> KnowledgeDeletionService:
     return KnowledgeDeletionService()
 
 
+def sovereignty_repo() -> SovereigntyRepository:
+    return SovereigntyRepository()
+
+
+def as_json(value) -> dict:
+    return value.model_dump(mode="json")
+
+
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok", "version": __version__}
@@ -71,6 +93,101 @@ def workspace() -> dict[str, str]:
 @app.get("/runtime/status")
 def get_runtime_status() -> dict:
     return runtime_status()
+
+
+@app.post("/alpha/constitution")
+def upsert_cognitive_constitution(request: CognitiveConstitution) -> dict:
+    return as_json(sovereignty_repo().constitutions.add(request))
+
+
+@app.get("/alpha/constitution")
+def list_cognitive_constitutions(limit: int = 50) -> list[dict]:
+    return [as_json(item) for item in sovereignty_repo().constitutions.list(limit=limit)]
+
+
+@app.post("/alpha/intents")
+def create_intent(request: Intent) -> dict:
+    repo = sovereignty_repo().intents
+    repo.add(request)
+    if request.status == IntentStatus.active:
+        return as_json(repo.update_active(request.id))
+    return as_json(repo.get(request.id))
+
+
+@app.get("/alpha/intents")
+def list_intents(limit: int = 50) -> list[dict]:
+    return [as_json(item) for item in sovereignty_repo().intents.list(limit=limit)]
+
+
+@app.get("/alpha/intents/active")
+def list_active_intents(limit: int = 50) -> list[dict]:
+    return [
+        as_json(item)
+        for item in sovereignty_repo().intents.list(
+            limit=limit,
+            status=IntentStatus.active,
+        )
+    ]
+
+
+@app.post("/alpha/intents/{intent_id}/activate")
+def activate_intent(intent_id: str) -> dict:
+    try:
+        return as_json(sovereignty_repo().intents.update_active(intent_id))
+    except SovereigntyRecordNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@app.post("/alpha/current-role")
+def set_current_role(request: CurrentRole) -> dict:
+    repo = sovereignty_repo().roles
+    repo.add(request)
+    return as_json(repo.update_active(request.id))
+
+
+@app.get("/alpha/current-role")
+def list_current_roles(limit: int = 50) -> list[dict]:
+    return [
+        as_json(item)
+        for item in sovereignty_repo().roles.list(
+            limit=limit,
+            active_only=True,
+        )
+    ]
+
+
+@app.post("/alpha/attention-budgets")
+def create_attention_budget(request: AttentionBudget) -> dict:
+    return as_json(sovereignty_repo().attention_budgets.add(request))
+
+
+@app.get("/alpha/attention-budgets")
+def list_attention_budgets(limit: int = 50) -> list[dict]:
+    return [as_json(item) for item in sovereignty_repo().attention_budgets.list(limit=limit)]
+
+
+@app.post("/alpha/not-to-do")
+def create_not_to_do_item(request: NotToDoItem) -> dict:
+    return as_json(sovereignty_repo().not_to_do.add(request))
+
+
+@app.get("/alpha/not-to-do")
+def list_not_to_do_items(limit: int = 50, active: bool | None = None) -> list[dict]:
+    return [
+        as_json(item)
+        for item in sovereignty_repo().not_to_do.list(
+            limit=limit,
+            active=active,
+        )
+    ]
+
+
+@app.patch("/alpha/not-to-do/{item_id}/active")
+def update_not_to_do_active_state(item_id: str, request: ActiveStateRequest) -> dict:
+    try:
+        return as_json(sovereignty_repo().not_to_do.update_active(item_id, active=request.active))
+    except SovereigntyRecordNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
 
 
 @app.get("/jobs")
