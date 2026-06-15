@@ -223,6 +223,14 @@ A1-SOV-003 implementation note:
 
 提交 Markdown 变更采集任务。
 
+A2-LEDGER-002 implementation note:
+
+- Collector-level support is implemented in `metaos/ledger/collectors.py`.
+- `GitCommitCollectionPayload` accepts `repo_path`, `date_from`, `date_to`, and optional `related_intent_id`.
+- `MarkdownChangeCollectionPayload` accepts `markdown_dir`, `date_from`, `date_to`, optional `related_intent_id`, and Markdown extensions.
+- `collect_git_commits(...)` and `collect_markdown_changes(...)` return `WorkEvent` lists.
+- This task does not expose background jobs or write ledger records yet; the `/alpha/work-events/collect/*/jobs` endpoints remain target API contracts for a later task.
+
 ### `POST /alpha/decisions`
 
 记录决策。

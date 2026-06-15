@@ -1,5 +1,11 @@
 """Daily cognitive ledger contracts for MetaOS Alpha."""
 
+from metaos.ledger.collectors import (
+    GitCommitCollectionPayload,
+    MarkdownChangeCollectionPayload,
+    collect_git_commits,
+    collect_markdown_changes,
+)
 from metaos.ledger.schemas import (
     Action,
     ActionSourceType,
@@ -29,8 +35,11 @@ __all__ = [
     "DailySummary",
     "Decision",
     "DecisionReversibility",
+    "GitCommitCollectionPayload",
+    "MarkdownChangeCollectionPayload",
     "WorkEvent",
     "WorkEventSource",
     "WorkEventType",
+    "collect_git_commits",
+    "collect_markdown_changes",
 ]
-
