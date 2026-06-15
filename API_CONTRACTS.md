@@ -470,6 +470,24 @@ A10-MIN-001 implementation note:
 
 生成今日简报。
 
+### `POST /alpha/chancellor/daily-briefings`
+
+同步生成今日简报。
+
+请求：
+
+```json
+{
+  "date": "2026-06-16",
+  "intent": {},
+  "role": {},
+  "attention_budget": {},
+  "daily_review": {},
+  "research_answers": [],
+  "ministry_reports": []
+}
+```
+
 ### `GET /alpha/chancellor/briefings/{briefing_id}`
 
 读取宰相简报。
@@ -531,6 +549,12 @@ A11-CHAN-001 implementation note:
 - `generate_chancellor_briefing(...)` combines current `Intent`, optional `CurrentRole`, `AttentionBudget`, optional `DailyReview`, `ResearchAnswer` items, and `MinistryReport` items.
 - The output includes today focus, deferred items, ignored items, cognitive trap reminders, source research ids, and source review id.
 - The `/alpha/chancellor/daily/jobs` HTTP endpoint remains a target API contract for a later wiring task.
+
+A11-CHAN-002 implementation note:
+
+- `POST /alpha/chancellor/daily-briefings` is implemented as a synchronous schema-validated API in `metaos/app/api.py`.
+- The endpoint calls `generate_chancellor_briefing(...)` with caller-provided structured records and returns a `ChancellorBriefing` JSON payload.
+- The endpoint does not create a durable RQ job or persist briefings; durable job orchestration remains a later task.
 
 A11-WEEKLY-002 implementation note:
 

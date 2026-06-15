@@ -8,7 +8,7 @@ from fastapi import FastAPI, File, HTTPException, UploadFile
 from pydantic import BaseModel, Field
 
 from metaos import __version__
-from metaos.chancellor import ChancellorBriefing, generate_weekly_report
+from metaos.chancellor import ChancellorBriefing, generate_chancellor_briefing, generate_weekly_report
 from metaos.core.errors import (
     ConfigurationError,
     EmbeddingProviderError,
@@ -20,7 +20,8 @@ from metaos.core.errors import (
 from metaos.compiler import CompileResearchRequest, IssueCompiler, LLMCompilerProvider
 from metaos.ingest.service import IngestService
 from metaos.knowledge.deletion import KnowledgeDeletionService
-from metaos.ledger import DailySummary
+from metaos.ledger import DailyReview, DailySummary
+from metaos.ministries import MinistryReport
 from metaos.research import ResearchAnswer
 from metaos.retrieval.service import RetrievalService
 from metaos.search import hybrid_search
@@ -74,6 +75,16 @@ class AlphaWeeklyReportRequest(BaseModel):
     briefings: list[ChancellorBriefing] = Field(default_factory=list)
     research_answers: list[ResearchAnswer] = Field(default_factory=list)
     video_exports: list[VideoExport] = Field(default_factory=list)
+
+
+class AlphaChancellorBriefingRequest(BaseModel):
+    date: date
+    intent: Intent
+    attention_budget: AttentionBudget
+    role: CurrentRole | None = None
+    daily_review: DailyReview | None = None
+    research_answers: list[ResearchAnswer] = Field(default_factory=list)
+    ministry_reports: list[MinistryReport] = Field(default_factory=list)
 
 
 class ActiveStateRequest(BaseModel):
@@ -394,6 +405,23 @@ def compile_alpha_research(request: CompileResearchRequest) -> dict:
         return issue_compiler().compile(request).model_dump(mode="json")
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.post("/alpha/chancellor/daily-briefings")
+def create_alpha_chancellor_briefing(request: AlphaChancellorBriefingRequest) -> dict:
+    try:
+        briefing = generate_chancellor_briefing(
+            request.date,
+            intent=request.intent,
+            role=request.role,
+            attention_budget=request.attention_budget,
+            daily_review=request.daily_review,
+            research_answers=request.research_answers,
+            ministry_reports=request.ministry_reports,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return briefing.model_dump(mode="json")
 
 
 @app.post("/alpha/chancellor/weekly-reports")

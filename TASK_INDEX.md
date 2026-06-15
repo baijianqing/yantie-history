@@ -422,6 +422,20 @@
 - 回滚方式：回退 chancellor 模块和测试。
 - 文档更新：更新 `DOMAIN_MODEL.md`、`API_CONTRACTS.md`。
 
+## A11-CHAN-002：宰相今日简报同步 API
+
+- 价值：让 UI、操作员或后续 Worker 能通过结构化 HTTP 请求生成今日重点、暂缓、忽略和认知陷阱提醒。
+- 依赖：A11-CHAN-001 和现有 FastAPI app 接线。
+- 允许修改范围：`metaos/app/api.py`、一个聚焦的 chancellor API 测试文件、任务/API/路线图文档。
+- 禁止修改范围：宰相聚合规则、数据库持久化、RQ worker、检索、视频渲染、根配置、`.vscode/` 和 `pyproject.toml`。
+- 输入：`date`、`Intent`、`AttentionBudget`、可选 `CurrentRole`、`DailyReview`、`ResearchAnswer`、`MinistryReport` 列表。
+- 输出：schema 合法的 `ChancellorBriefing` JSON。
+- 接口：`POST /alpha/chancellor/daily-briefings`。
+- 验收标准：接口返回今日重点、暂缓事项、忽略事项、认知陷阱和来源 ID；无效 payload 返回 FastAPI/Pydantic 校验错误；请求和响应均通过 schema 校验。
+- 测试命令：`python -m pytest test/test_alpha_chancellor_api.py`。
+- 回滚方式：删除 `/alpha/chancellor/daily-briefings` 路由、请求 schema、测试文件和文档条目。
+- 文档更新：`API_CONTRACTS.md` 和 `ROADMAP.md` 记录同步 API 接线状态。
+
 ## A11-WEEKLY-001：周报打包
 
 - 价值：把 Alpha 闭环沉淀为结构化周报，汇总与 Intent 相关的证据、行动、风险、认知陷阱和视频导出。

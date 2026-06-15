@@ -248,6 +248,12 @@
 - 路由把不存在的任务映射为 404，把无效重试状态或 Redis 入队失败映射为 400。
 - 测试命令：`python -m pytest test/test_job_retry_api.py`。
 
+### A11-CHAN-002：宰相今日简报同步 API
+
+- 已新增 `POST /alpha/chancellor/daily-briefings`，通过 FastAPI 暴露同步今日简报生成入口。
+- 接口返回 schema 合法的 `ChancellorBriefing` JSON，并保留 `/alpha/chancellor/daily/jobs` 作为后续持久化 RQ 编排入口。
+- 测试命令：`python -m pytest test/test_alpha_chancellor_api.py`。
+
 ### A11-WEEKLY-001：周报打包
 
 - 已新增 `WeeklyReport` 和 `generate_weekly_report(...)`，把周内 DailySummary、ResearchAnswer、ChancellorBriefing 和 VideoExport 聚合为结构化周报。
