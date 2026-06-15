@@ -20,6 +20,10 @@ CJK_RE = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]")
 LATIN_RE = re.compile(r"[A-Za-z0-9_]+")
 
 
+class OllamaEmbeddingTimeoutError(EmbeddingProviderError):
+    """Raised when an Ollama embedding request exceeds the configured timeout."""
+
+
 class EmbeddingProvider(Protocol):
     name: str
     model: str
@@ -115,7 +119,16 @@ class OllamaEmbeddingProvider:
         }
         if self.num_gpu is not None:
             payload["options"] = {"num_gpu": self.num_gpu}
-        response = self._post_json("/api/embed", payload)
+        try:
+            response = self._post_json("/api/embed", payload, request_batch_size=len(texts))
+        except OllamaEmbeddingTimeoutError:
+            if len(texts) <= 1:
+                raise
+            midpoint = max(1, len(texts) // 2)
+            return [
+                *self._embed_batch(texts[:midpoint]),
+                *self._embed_batch(texts[midpoint:]),
+            ]
         embeddings = parse_ollama_embeddings(response)
         if len(embeddings) != len(texts):
             raise EmbeddingProviderError(
@@ -132,7 +145,13 @@ class OllamaEmbeddingProvider:
         self._dimensions = dimensions_value
         return embeddings
 
-    def _post_json(self, path: str, payload: dict[str, Any]) -> dict[str, Any]:
+    def _post_json(
+        self,
+        path: str,
+        payload: dict[str, Any],
+        *,
+        request_batch_size: int,
+    ) -> dict[str, Any]:
         url = f"{self.base_url}{path}"
         body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
         request = Request(
@@ -155,10 +174,12 @@ class OllamaEmbeddingProvider:
                 "Make sure Ollama is running and bge-m3 is installed."
             ) from exc
         except TimeoutError as exc:
-            raise EmbeddingProviderError(
+            raise OllamaEmbeddingTimeoutError(
                 f"Ollama embedding request timed out after {self.timeout} seconds "
-                f"(model={self.model}, batch_size={self.batch_size}, num_gpu={self.num_gpu}). "
-                "Try lowering OLLAMA_EMBED_BATCH_SIZE or increasing OLLAMA_EMBED_TIMEOUT."
+                f"(model={self.model}, attempted_batch_size={request_batch_size}, "
+                f"configured_batch_size={self.batch_size}, num_gpu={self.num_gpu}). "
+                "The worker will split timed-out batches automatically; if this keeps "
+                "happening, lower OLLAMA_EMBED_BATCH_SIZE or increase OLLAMA_EMBED_TIMEOUT."
             ) from exc
         except json.JSONDecodeError as exc:
             raise EmbeddingProviderError("Ollama returned invalid JSON.") from exc
