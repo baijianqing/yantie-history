@@ -14,11 +14,25 @@ from metaos.compiler.schemas import (
     ResearchTimeRange,
     ThemeSpec,
 )
+from metaos.compiler.service import (
+    PROMPT_VERSION,
+    CompileResearchRequest,
+    CompilerModelProvider,
+    IssueCompiler,
+    LLMCompilerProvider,
+    build_research_compilation,
+    compiler_payload,
+)
 
 __all__ = [
     "CognitiveOperator",
+    "CompileResearchRequest",
+    "CompilerModelProvider",
     "EvidenceRequirement",
     "EvidenceRequirementType",
+    "IssueCompiler",
+    "LLMCompilerProvider",
+    "PROMPT_VERSION",
     "ResearchCompilation",
     "ResearchDepth",
     "ResearchPlan",
@@ -28,4 +42,6 @@ __all__ = [
     "ResearchTaskStatus",
     "ResearchTimeRange",
     "ThemeSpec",
+    "build_research_compilation",
+    "compiler_payload",
 ]
