@@ -323,7 +323,9 @@ A5-SEARCH-002 implementation note:
 - `SearchCandidate` is the channel-neutral input contract for vector, full-text, and future rerank candidates.
 - `rrf_fuse({"vector": [...], "full_text": [...]}, filters, top_k, k)` applies metadata filters before fusion, computes reciprocal-rank scores, and returns `EvidenceCandidate` results.
 - `EvidenceCandidate` preserves `citation`, `channel_ranks`, and `channel_scores`.
-- The `/alpha/search` HTTP endpoint remains a target API contract for a later wiring task.
+- The `/alpha/search` HTTP endpoint is implemented in `metaos/app/api.py`.
+- It returns fused `EvidenceCandidate` payloads from current chunks, optional dense vector retrieval, metadata filters, and RRF ranking.
+- It can disable the vector channel with `include_vector=false` for deterministic full-text-only calls.
 
 ## 目标 API：议题编译器
 

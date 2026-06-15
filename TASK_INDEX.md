@@ -393,3 +393,17 @@
 - Test command: `python -m pytest test/test_queueing_retry.py`.
 - Rollback: remove `enqueue_retry_job`, `retry_dispatch_for_job`, and `test/test_queueing_retry.py`.
 - Documentation update: this task entry plus `ROADMAP.md` status note.
+
+## A5-SEARCH-005: Alpha search API
+
+- Value: expose the Alpha hybrid evidence retrieval path through the documented HTTP API.
+- Dependencies: A5-SEARCH-004 and existing FastAPI app wiring.
+- Allowed changes: `metaos/app/api.py`, one focused API test file, and task/API/roadmap documentation.
+- Forbidden changes: search ranking internals, Chroma index mutation, RQ workers, database migrations, Streamlit UI, root configuration, and `pyproject.toml`.
+- Input: JSON body with `query`, `top_k`, optional `filters`, optional channel top-k values, and `include_vector`.
+- Output: JSON `EvidenceCandidate` list with citation back-links, channel ranks, channel scores, and fused scores.
+- Interface: `POST /alpha/search`.
+- Acceptance: endpoint rejects empty queries, returns fused full-text/vector evidence candidates with citations, supports metadata filtering, and can run full-text-only without constructing vector retrieval.
+- Test command: `python -m pytest test/test_alpha_search_api.py`.
+- Rollback: remove `/alpha/search` route/request schema and `test/test_alpha_search_api.py`.
+- Documentation update: this task entry, `ROADMAP.md`, and `API_CONTRACTS.md`.

@@ -17,6 +17,7 @@ from metaos.core.errors import (
 from metaos.ingest.service import IngestService
 from metaos.knowledge.deletion import KnowledgeDeletionService
 from metaos.retrieval.service import RetrievalService
+from metaos.search import hybrid_search
 from metaos.sovereignty import (
     AttentionBudget,
     CognitiveConstitution,
@@ -46,6 +47,15 @@ app = FastAPI(title="MetaOS Lite", version=__version__)
 class RagAnswerRequest(BaseModel):
     question: str
     top_k: int = 5
+
+
+class AlphaSearchRequest(BaseModel):
+    query: str
+    top_k: int = 5
+    full_text_top_k: int | None = None
+    vector_top_k: int | None = None
+    filters: dict[str, str] | None = None
+    include_vector: bool = True
 
 
 class ActiveStateRequest(BaseModel):
@@ -324,6 +334,26 @@ def search(q: str, top_k: int = 5) -> list[dict]:
         return [result.as_dict() for result in retrieval_service().search(q, top_k=top_k)]
     except (ConfigurationError, EmbeddingProviderError) as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.post("/alpha/search")
+def alpha_search(request: AlphaSearchRequest) -> list[dict]:
+    if not request.query.strip():
+        raise HTTPException(status_code=400, detail="Search query cannot be empty.")
+    vector_retrieval = retrieval_service() if request.include_vector else None
+    try:
+        results = hybrid_search(
+            request.query,
+            chunks=chunk_repo().list_all(limit=10000),
+            vector_retrieval=vector_retrieval,
+            filters=request.filters,
+            top_k=request.top_k,
+            full_text_top_k=request.full_text_top_k,
+            vector_top_k=request.vector_top_k,
+        )
+    except (ConfigurationError, EmbeddingProviderError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return [result.model_dump(mode="json") for result in results]
 
 
 @app.post("/rag/answer/jobs")

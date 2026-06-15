@@ -234,3 +234,9 @@
 - Added `enqueue_retry_job` to requeue supported failed jobs through the original RQ task path while keeping the same job id and retry history.
 - Retry dispatch is covered for RAG, OCR PDF-page retries, unsupported job types, and non-failed jobs without requiring a live Redis instance in tests.
 - Test command: `python -m pytest test/test_queueing_retry.py`.
+
+## A5-SEARCH-005 status
+
+- Added `POST /alpha/search` to expose hybrid full-text/vector/RRF evidence retrieval through FastAPI with metadata filters and citation back-links.
+- The endpoint supports `include_vector=false` so tests and lightweight calls can run full-text-only without constructing vector retrieval.
+- Test command: `python -m pytest test/test_alpha_search_api.py`.
