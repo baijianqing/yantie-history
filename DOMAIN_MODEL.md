@@ -612,6 +612,13 @@ A7-RESEARCH-002 实现说明：
 - `requires_revision`
 - `failed`
 
+A9-AUDIT-001 实现说明：
+
+- 御史台引用与范围审计位于 `metaos/censorate/audit.py`。
+- 已实现 `AuditReport`、`CitationAuditItem`、`ScopeAuditItem`、`AuditStatus` 与 `audit_research_answer(...)`。
+- 审计会标记无引用陈述、引用不在证据矩阵中的陈述、来源超出 `ResearchScope.included_sources` 或命中 `excluded_sources` 的引用。
+- 当前任务不检查反证完整性、确认偏误或研究成本；这些由 A9-AUDIT-002 实现。
+
 ## 推荐与宰相
 
 ### MinistryReport
