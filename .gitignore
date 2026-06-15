@@ -1,9 +1,10 @@
-__pycache__/
-*.py[cod]
-*.log
 .venv311/
 .venv_ocr/
 .venv_ocr_gpu/
 library/*
-crawl.py
 *.pdf
+*.log
+__pycache__/
+*.py[cod]
+crawl.py
+.vscode/
