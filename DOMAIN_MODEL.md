@@ -548,6 +548,14 @@ A6-COMPILER-001 实现说明：
 - `missing_evidence`
 - `assessment`
 
+A7-RESEARCH-001 实现说明：
+
+- 研究执行器首版位于 `metaos/research/executor.py`。
+- `build_evidence_matrix(compilation, candidates)` 接收 `ResearchCompilation` 与检索候选，输出 `ResearchExecutionDraft`。
+- `EvidenceMatrixRow` 按 `EvidenceRequirement` 聚合 supporting evidence、counter evidence、missing evidence 和 assessment。
+- 当前实现能检测支持证据数量不足和缺失反证；候选引用通过 `EvidenceCandidate.citation` 保留。
+- 当前任务不生成最终 `ResearchAnswer`，不做御史台审计，不创建 ledger action。
+
 ### ResearchAnswer
 
 字段：
