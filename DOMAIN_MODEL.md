@@ -512,6 +512,14 @@ Alpha citation 必须支持：
 - `stop_conditions`
 - `prompt_version`
 
+A6-COMPILER-001 实现说明：
+
+- 议题编译 Schema 位于 `metaos/compiler/schemas.py`。
+- 已实现 `ResearchTask`、`CognitiveOperator`、`ThemeSpec`、`EvidenceRequirement`、`ResearchScope`、`ResearchPlan` 与 `ResearchCompilation`。
+- `CognitiveOperator` 包含 `fact_lookup`、`enumerate_pattern`、`compare`、`causal_analysis`、`decision_support`、`reflection`、`recommend`。
+- `ThemeSpec` 保持运行时数据契约；“功高震主”“小人得志陷害忠良”“听信谗言”“功成身退”“角色转换失败”均可作为 `ThemeSpec` 实例表达，不需要新增 Python 分支。
+- 当前任务不调用 LLM，不生成真实研究计划，不执行检索。
+
 ## 研究执行
 
 ### EvidenceCandidate
