@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-import unittest
+import shutil
 import tempfile
+import unittest
 from datetime import date, datetime, timezone
 from pathlib import Path
 
@@ -10,7 +11,13 @@ from fastapi.testclient import TestClient
 from metaos.app.api import app
 from metaos.core.schemas import Citation
 from metaos.ledger import DailySummary
-from metaos.workshop import EpisodeSpec
+from metaos.workshop import (
+    EpisodeReviewStatus,
+    EpisodeSpec,
+    VideoRenderStatus,
+    generate_episode_assets,
+    review_episode,
+)
 
 
 class AlphaWorkshopApiTests(unittest.TestCase):
@@ -199,6 +206,97 @@ class AlphaWorkshopApiTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertIn("episode_id", response.json()["detail"])
+
+    def test_episode_render_endpoint_returns_failed_export_for_unapproved_episode(self) -> None:
+        episode = EpisodeSpec(
+            id="episode_1",
+            daily_summary_id="summary_1",
+            title="Daily Build Review",
+            angle="Review gate",
+            facts=["Tests passed"],
+        )
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            assets = generate_episode_assets(episode, root / "assets")
+            response = self.client.post(
+                "/alpha/workshop/episodes/episode_1/render",
+                json={
+                    "episode": episode.model_dump(mode="json"),
+                    "assets": assets.model_dump(mode="json"),
+                    "output_dir": str(root / "exports"),
+                },
+            )
+
+            self.assertEqual(response.status_code, 200)
+            payload = response.json()
+            self.assertEqual(payload["episode_spec_id"], "episode_1")
+            self.assertEqual(payload["render_status"], VideoRenderStatus.failed.value)
+            self.assertIsNone(payload["mp4_path"])
+            self.assertIn("approved", payload["error"])
+
+    def test_episode_render_endpoint_rejects_asset_episode_mismatch(self) -> None:
+        episode = EpisodeSpec(
+            id="episode_1",
+            daily_summary_id="summary_1",
+            title="Daily Build Review",
+            angle="Review gate",
+            facts=["Tests passed"],
+        )
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            assets = generate_episode_assets(episode, root / "assets")
+            asset_payload = assets.model_dump(mode="json")
+            asset_payload["episode_spec_id"] = "episode_other"
+
+            response = self.client.post(
+                "/alpha/workshop/episodes/episode_1/render",
+                json={
+                    "episode": episode.model_dump(mode="json"),
+                    "assets": asset_payload,
+                    "output_dir": str(root / "exports"),
+                },
+            )
+
+            self.assertEqual(response.status_code, 400)
+            self.assertIn("assets episode_spec_id", response.json()["detail"])
+
+    @unittest.skipIf(shutil.which("ffmpeg") is None, "ffmpeg is required for MP4 render API test")
+    def test_episode_render_endpoint_creates_mp4_for_approved_episode(self) -> None:
+        episode = review_episode(
+            EpisodeSpec(
+                id="episode_1",
+                daily_summary_id="summary_1",
+                title="Daily Build Review",
+                angle="Review gate",
+                facts=["Tests passed"],
+            ),
+            status=EpisodeReviewStatus.approved,
+            reviewer_id="reviewer",
+            reviewed_at=datetime(2026, 6, 16, 10, tzinfo=timezone.utc),
+            review_notes="Approved for export",
+        )
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            assets = generate_episode_assets(episode, root / "assets")
+            response = self.client.post(
+                "/alpha/workshop/episodes/episode_1/render",
+                json={
+                    "episode": episode.model_dump(mode="json"),
+                    "assets": assets.model_dump(mode="json"),
+                    "output_dir": str(root / "exports"),
+                },
+            )
+
+            self.assertEqual(response.status_code, 200)
+            payload = response.json()
+            self.assertEqual(payload["render_status"], VideoRenderStatus.succeeded.value)
+            self.assertIsNotNone(payload["mp4_path"])
+            mp4_path = Path(payload["mp4_path"])
+            self.assertTrue(mp4_path.exists())
+            self.assertGreater(mp4_path.stat().st_size, 0)
 
 
 if __name__ == "__main__":

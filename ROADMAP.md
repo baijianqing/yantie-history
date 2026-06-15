@@ -212,6 +212,13 @@
 - 接口写出脚本、旁白文本、SRT 字幕、图卡 JSON 和 Remotion props，并返回 `WorkshopAssetBundle` JSON；MP4 渲染仍由后续独立接口处理。
 - 测试命令：`python -m pytest test/test_alpha_workshop_api.py`。
 
+### A3-WORKSHOP-006：Episode MP4 同步渲染 API
+
+- 已新增 `POST /alpha/workshop/episodes/{episode_id}/render`，通过 FastAPI 暴露同步 MP4 渲染入口。
+- 接口要求路径 ID 同时匹配 `EpisodeSpec.id` 和 `WorkshopAssetBundle.episode_spec_id`，并复用审核后才能正式导出的领域门禁。
+- 接口返回 `VideoExport` JSON；持久化 RQ 渲染 job 仍由后续独立任务处理。
+- 测试命令：`python -m pytest test/test_alpha_workshop_api.py test/test_workshop_render.py`。
+
 ### A5-SEARCH-003：向量检索适配器
 
 - 已新增向量检索适配器，把现有 Chroma/Ollama `RetrievalService.search` 结果转换为 Alpha `SearchCandidate`，并保留引用回链和元数据过滤能力。

@@ -662,6 +662,36 @@ A11-WEEKLY-002 implementation note:
 }
 ```
 
+### `POST /alpha/workshop/episodes/{episode_id}/render`
+
+同步渲染已审核 Episode 的 MP4。
+
+请求：
+```json
+{
+  "episode": {},
+  "assets": {},
+  "output_dir": "library/exports/videos"
+}
+```
+
+响应：
+```json
+{
+  "id": "export_...",
+  "episode_spec_id": "episode_...",
+  "script_path": ".../script.md",
+  "voiceover_path": ".../voiceover.txt",
+  "subtitle_path": ".../subtitles.srt",
+  "cards_path": ".../cards.json",
+  "remotion_props_path": ".../remotion_props.json",
+  "mp4_path": ".../episode_....mp4",
+  "render_status": "succeeded",
+  "review_record_id": "human_reviewer",
+  "error": null
+}
+```
+
 ### `POST /alpha/workshop/episodes/{episode_id}/render/jobs`
 
 提交视频渲染任务。
@@ -725,3 +755,11 @@ A3-WORKSHOP-005 implementation note:
 - The endpoint requires the path `episode_id` to match the submitted `EpisodeSpec.id`, then calls `generate_episode_assets(...)`.
 - When `output_dir` is omitted, assets are written below the workspace exports directory.
 - The endpoint returns a `WorkshopAssetBundle` JSON payload and does not review the episode, render MP4, persist records, or create a durable RQ job.
+
+A3-WORKSHOP-006 implementation note:
+
+- `POST /alpha/workshop/episodes/{episode_id}/render` is implemented as a synchronous schema-validated API in `metaos/app/api.py`.
+- The endpoint requires the path `episode_id` to match both the submitted `EpisodeSpec.id` and `WorkshopAssetBundle.episode_spec_id`.
+- The endpoint calls `render_episode_video(...)` and writes MP4 output below the workspace exports directory when `output_dir` is omitted.
+- Unapproved episodes return a `VideoExport` with `render_status=failed` and no `mp4_path`, preserving the final export review gate.
+- The endpoint returns a `VideoExport` JSON payload and does not persist records or create a durable RQ job.

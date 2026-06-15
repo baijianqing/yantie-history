@@ -52,8 +52,10 @@ from metaos.workshop import (
     EpisodeReviewStatus,
     EpisodeSpec,
     VideoExport,
+    WorkshopAssetBundle,
     episode_from_daily_summary,
     generate_episode_assets,
+    render_episode_video,
     review_episode,
 )
 
@@ -118,6 +120,12 @@ class AlphaEpisodeReviewRequest(BaseModel):
 
 class AlphaEpisodeAssetsRequest(BaseModel):
     episode: EpisodeSpec
+    output_dir: Path | None = None
+
+
+class AlphaEpisodeRenderRequest(BaseModel):
+    episode: EpisodeSpec
+    assets: WorkshopAssetBundle
     output_dir: Path | None = None
 
 
@@ -529,6 +537,20 @@ def create_alpha_episode_assets(episode_id: str, request: AlphaEpisodeAssetsRequ
     except OSError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     return assets.model_dump(mode="json")
+
+
+@app.post("/alpha/workshop/episodes/{episode_id}/render")
+def render_alpha_episode_video(episode_id: str, request: AlphaEpisodeRenderRequest) -> dict:
+    if request.episode.id != episode_id:
+        raise HTTPException(status_code=400, detail="episode_id must match request episode id.")
+    if request.assets.episode_spec_id != episode_id:
+        raise HTTPException(status_code=400, detail="assets episode_spec_id must match request episode id.")
+    output_dir = request.output_dir or ensure_workspace().exports / "videos"
+    try:
+        export = render_episode_video(request.episode, request.assets, output_dir)
+    except OSError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return export.model_dump(mode="json")
 
 
 @app.post("/rag/answer/jobs")
