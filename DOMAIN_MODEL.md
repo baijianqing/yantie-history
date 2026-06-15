@@ -674,6 +674,35 @@ A11-CHAN-001 实现说明：
 - `generate_chancellor_briefing(...)` 结合当前 `Intent`、`CurrentRole`、`AttentionBudget`、`DailyReview`、`ResearchAnswer` 和 `MinistryReport` 生成规则型简报。
 - 今日重点优先来自意图、研究行动和三部建议；暂缓事项来自未完成复盘和“不行动”原因；忽略事项来自角色 forbidden focus 和空推荐部；认知陷阱标记未引用推断、零预算和强行推荐风险。
 
+### WeeklyReport
+
+字段：
+
+- `id`
+- `week_start`
+- `week_end`
+- `intent_id`
+- `daily_summary_ids`
+- `briefing_ids`
+- `research_answer_ids`
+- `video_export_ids`
+- `completed_actions`
+- `pending_actions`
+- `evidence_highlights`
+- `disputed_or_risk_items`
+- `cognitive_traps`
+- `content_exports`
+- `next_week_focus`
+- `created_at`
+
+A11-WEEKLY-001 实现说明：
+
+- 周报打包位于 `metaos/chancellor/schemas.py`。
+- `generate_weekly_report(...)` 只聚合闭区间周内的 `DailySummary`、`ChancellorBriefing`、`ResearchAnswer` 和 `VideoExport`。
+- 行动归类依赖结构化 `ActionStatus`：`done` 进入已完成行动，`proposed`、`accepted`、`in_progress` 进入待处理行动。
+- 事实亮点来自每日事实摘要和研究事实陈述；争议、失败视频导出和“不行动”原因进入风险项。
+- 成功 MP4 导出以路径形式进入 `content_exports`，用于后续周报展示或人工审核。
+
 ## 内容工坊
 
 ### EpisodeSpec

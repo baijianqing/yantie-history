@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from metaos.censorate import AuditStatus, audit_research_answer, audit_research_quality
-from metaos.chancellor import generate_chancellor_briefing
+from metaos.chancellor import generate_chancellor_briefing, generate_weekly_report
 from metaos.compiler import CompileResearchRequest, IssueCompiler, PROMPT_VERSION
 from metaos.core.schemas import Asset, AssetKind, Chunk, Citation, Source, SourceType
 from metaos.documents.service import ParsedDocument
@@ -336,6 +336,23 @@ class AlphaEndToEndTests(unittest.TestCase):
             self.assertIn("generic news feed", briefing.ignored_items)
             self.assertEqual(briefing.source_research_ids, [answer.id])
             self.assertEqual(briefing.source_review_id, review.id)
+
+            weekly_report = generate_weekly_report(
+                date(2026, 6, 15),
+                date(2026, 6, 21),
+                intent=intent,
+                daily_summaries=[summary],
+                briefings=[briefing],
+                research_answers=[answer],
+                video_exports=[export],
+            )
+            self.assertEqual(weekly_report.intent_id, intent.id)
+            self.assertEqual(weekly_report.daily_summary_ids, [summary.id])
+            self.assertEqual(weekly_report.briefing_ids, [briefing.id])
+            self.assertEqual(weekly_report.research_answer_ids, [answer.id])
+            self.assertEqual(weekly_report.video_export_ids, [export.id])
+            self.assertIn(answer.actions[0].title, weekly_report.pending_actions)
+            self.assertIn(export.mp4_path.as_posix(), weekly_report.content_exports)
 
     def fixture_document(self, root: Path) -> tuple[Source, Asset, ParsedDocument]:
         path = root / "alpha-evidence.md"

@@ -296,6 +296,20 @@
 - 回滚方式：回退 chancellor 模块和测试。
 - 文档更新：更新 `DOMAIN_MODEL.md`、`API_CONTRACTS.md`。
 
+## A11-WEEKLY-001：周报打包
+
+- 价值：把 Alpha 闭环沉淀为结构化周报，汇总与 Intent 相关的证据、行动、风险、认知陷阱和视频导出。
+- 依赖：A2-LEDGER-003、A3-WORKSHOP-002、A7-RESEARCH-002、A11-CHAN-001。
+- 允许修改范围：`metaos/chancellor` 周报 schema/service、一个聚焦周报测试、任务和领域模型文档。
+- 禁止修改范围：检索排序、视频渲染、RQ worker 行为、迁移、根配置、`.vscode/`、`pyproject.toml`。
+- 输入：`Intent`、周内 `DailySummary`、`ChancellorBriefing`、`ResearchAnswer`、`VideoExport`。
+- 输出：`WeeklyReport`，包含来源 ID、已完成行动、待处理行动、证据亮点、风险、认知陷阱、内容导出和下周重点。
+- 接口：`generate_weekly_report(week_start, week_end, *, intent, daily_summaries=None, briefings=None, research_answers=None, video_exports=None)`。
+- 验收标准：只纳入闭区间周内记录；行动按结构化 `ActionStatus` 归类；成功 MP4 可回链；失败导出和不行动原因进入风险；非法周范围被拒绝。
+- 测试命令：`python -m pytest test/test_weekly_report.py`。
+- 回滚方式：删除 `WeeklyReport`、`generate_weekly_report`、导出项、`test/test_weekly_report.py` 和本文档条目。
+- 文档更新：`DOMAIN_MODEL.md` 记录新的周报契约。
+
 ## A11-CLOSE-001：完整闭环验收
 
 - 价值：确认 Alpha 从季度意图到周报闭环可运行。
