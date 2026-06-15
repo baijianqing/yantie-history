@@ -120,6 +120,13 @@ A1-SOV-002 实现说明：
 - 当前阶段不引入 Alembic，不修改 `metaos/workspace/database.py`，以降低对现有 RAG、Streamlit、RQ 和知识库数据的影响。
 - Repository 已提供 `add/get/list`，并为 `Intent`、`CurrentRole`、`NotToDoItem` 提供 `update_active`。
 
+A4-KB-001 实现说明：
+
+- 知识底座标准化先作为 `metaos/knowledge/versioning.py` 的纯函数模块存在。
+- `DocumentVersion`、`StableChunk` 和 `StandardizedDocument` 暂不写入 SQLite 表，不改变当前 `knowledge_items` / `chunks` 表结构。
+- 稳定 chunk id 使用文档 stable id、heading path、chunk 文本、重复出现序号、chunker version 和 index version 计算；不绑定 `document_version_id`，因此同一文档的局部内容变化不会强制所有 chunk 重新编号。
+- 后续增量入库任务再把该标准化层接入持久化、索引版本记录和 Chroma 增量更新。
+
 ## 检索架构
 
 目标检索流程：

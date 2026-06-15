@@ -291,6 +291,14 @@ A2-LEDGER-003 实现说明：
 - `section_path`
 - `position`
 
+A4-KB-001 实现说明：
+
+- 文档版本与稳定 Chunk ID 标准化位于 `metaos/knowledge/versioning.py`。
+- `DocumentVersion` 记录 `stable_id`、`source_stable_id`、内容与结构哈希、parser/chunker/index 版本。
+- `StableChunk` 记录稳定 `id`、`document_version_id`、父块、前后块、token 估算、section path、position 和原文 `Citation`。
+- `standardize_document(source, asset, document)` 复用现有 chunker 输出文本块，但重新计算稳定 ID；相同文档重复标准化得到相同 ID，局部内容变化只改变相关 chunk 的稳定 ID。
+- 当前任务不替换现有 `KnowledgeService.create_from_document`、不删除旧 chunks、不重建 Chroma 索引。
+
 ### Entity
 
 字段：
