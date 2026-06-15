@@ -436,6 +436,20 @@
 - 回滚方式：删除 `WeeklyReport`、`generate_weekly_report`、导出项、`test/test_weekly_report.py` 和本文档条目。
 - 文档更新：`DOMAIN_MODEL.md` 记录新的周报契约。
 
+## A11-WEEKLY-002：周报同步 API
+
+- 价值：让 UI、操作员或后续 Worker 能通过结构化 HTTP 请求生成周报闭环产物。
+- 依赖：A11-WEEKLY-001 和现有 FastAPI app 接线。
+- 允许修改范围：`metaos/app/api.py`、一个聚焦的 weekly report API 测试文件、任务/API/路线图文档。
+- 禁止修改范围：周报聚合规则、数据库持久化、RQ worker、检索、视频渲染、根配置、`.vscode/` 和 `pyproject.toml`。
+- 输入：`week_start`、`week_end`、`Intent`、可选 `DailySummary`、`ChancellorBriefing`、`ResearchAnswer`、`VideoExport` 列表。
+- 输出：schema 合法的 `WeeklyReport` JSON。
+- 接口：`POST /alpha/chancellor/weekly-reports`。
+- 验收标准：接口返回带来源 ID、证据亮点、待处理行动和 MP4 回链的周报；非法周范围返回 HTTP 400；请求和响应均通过 Pydantic schema 校验。
+- 测试命令：`python -m pytest test/test_alpha_weekly_report_api.py`。
+- 回滚方式：删除 `/alpha/chancellor/weekly-reports` 路由、请求 schema、测试文件和文档条目。
+- 文档更新：`API_CONTRACTS.md` 和 `ROADMAP.md` 记录同步 API 接线状态。
+
 ## A11-CLOSE-001：完整闭环验收
 
 - 价值：确认 Alpha 从季度意图到周报闭环可运行。

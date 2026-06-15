@@ -248,9 +248,21 @@
 - 路由把不存在的任务映射为 404，把无效重试状态或 Redis 入队失败映射为 400。
 - 测试命令：`python -m pytest test/test_job_retry_api.py`。
 
+### A11-WEEKLY-001：周报打包
+
+- 已新增 `WeeklyReport` 和 `generate_weekly_report(...)`，把周内 DailySummary、ResearchAnswer、ChancellorBriefing 和 VideoExport 聚合为结构化周报。
+- 闭环测试现在覆盖每日复盘、视频导出到周报来源回链。
+- 测试命令：`python -m pytest test/test_weekly_report.py test/test_alpha_end_to_end.py`。
+
+### A11-WEEKLY-002：周报同步 API
+
+- 已新增 `POST /alpha/chancellor/weekly-reports`，通过 FastAPI 暴露同步周报生成入口。
+- 接口返回 schema 合法的 `WeeklyReport` JSON，并把非法周范围映射为 HTTP 400；持久化 RQ job 编排仍作为后续独立任务处理。
+- 测试命令：`python -m pytest test/test_alpha_weekly_report_api.py`。
+
 ### A11-CLOSE-001：完整闭环验收
 
 - 已新增服务级 Alpha 闭环回归测试，覆盖从主权记录、运行时议题编译、标准化知识、全文与向量 RRF 检索、证据矩阵、带引用答案、御史台审计、有限推荐、宰相简报、DailySummary、可审核 EpisodeSpec、人工批准到 MP4 导出的完整链路。
 - 闭环测试确认新主题由 `ThemeSpec` 数据驱动，不需要新增主题专用 Python 分支、重新分块或重建索引。
-- 持久化 HTTP/RQ 编排、周报打包等外围能力仍保留在 API 契约中，后续应作为独立窄任务实现。
+- 持久化 HTTP/RQ 编排等外围能力仍保留在 API 契约中，后续应作为独立窄任务实现。
 - 测试命令：`python -m pytest test/test_alpha_end_to_end.py`。

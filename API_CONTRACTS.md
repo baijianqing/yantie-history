@@ -485,12 +485,59 @@ A10-MIN-001 implementation note:
 }
 ```
 
+### `POST /alpha/chancellor/weekly-reports`
+
+同步生成周报打包结果。
+
+请求：
+
+```json
+{
+  "week_start": "2026-06-15",
+  "week_end": "2026-06-21",
+  "intent": {},
+  "daily_summaries": [],
+  "briefings": [],
+  "research_answers": [],
+  "video_exports": []
+}
+```
+
+响应：
+
+```json
+{
+  "id": "weekly_...",
+  "week_start": "2026-06-15",
+  "week_end": "2026-06-21",
+  "intent_id": "intent_alpha",
+  "daily_summary_ids": [],
+  "briefing_ids": [],
+  "research_answer_ids": [],
+  "video_export_ids": [],
+  "completed_actions": [],
+  "pending_actions": [],
+  "evidence_highlights": [],
+  "disputed_or_risk_items": [],
+  "cognitive_traps": [],
+  "content_exports": [],
+  "next_week_focus": []
+}
+```
+
 A11-CHAN-001 implementation note:
 
 - Chancellor briefing support is implemented in `metaos/chancellor/schemas.py`.
 - `generate_chancellor_briefing(...)` combines current `Intent`, optional `CurrentRole`, `AttentionBudget`, optional `DailyReview`, `ResearchAnswer` items, and `MinistryReport` items.
 - The output includes today focus, deferred items, ignored items, cognitive trap reminders, source research ids, and source review id.
 - The `/alpha/chancellor/daily/jobs` HTTP endpoint remains a target API contract for a later wiring task.
+
+A11-WEEKLY-002 implementation note:
+
+- `POST /alpha/chancellor/weekly-reports` is implemented as a synchronous schema-validated API in `metaos/app/api.py`.
+- The endpoint calls `generate_weekly_report(...)` with caller-provided structured records and returns a `WeeklyReport` JSON payload.
+- Invalid week ranges are mapped to HTTP 400.
+- The endpoint does not create a durable RQ job or persist reports; durable job orchestration remains a later task.
 
 ## 目标 API：内容工坊
 

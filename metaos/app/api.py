@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
+from datetime import date
+
 from fastapi import FastAPI, File, HTTPException, UploadFile
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from metaos import __version__
+from metaos.chancellor import ChancellorBriefing, generate_weekly_report
 from metaos.core.errors import (
     ConfigurationError,
     EmbeddingProviderError,
@@ -17,6 +20,8 @@ from metaos.core.errors import (
 from metaos.compiler import CompileResearchRequest, IssueCompiler, LLMCompilerProvider
 from metaos.ingest.service import IngestService
 from metaos.knowledge.deletion import KnowledgeDeletionService
+from metaos.ledger import DailySummary
+from metaos.research import ResearchAnswer
 from metaos.retrieval.service import RetrievalService
 from metaos.search import hybrid_search
 from metaos.sovereignty import (
@@ -41,6 +46,7 @@ from metaos.tasks.queueing import (
 from metaos.workspace.catalog import ChunkRepository, KnowledgeRepository
 from metaos.workspace.jobs import JobRepository
 from metaos.workspace.paths import ensure_workspace
+from metaos.workshop import VideoExport
 
 
 app = FastAPI(title="MetaOS Lite", version=__version__)
@@ -58,6 +64,16 @@ class AlphaSearchRequest(BaseModel):
     vector_top_k: int | None = None
     filters: dict[str, str] | None = None
     include_vector: bool = True
+
+
+class AlphaWeeklyReportRequest(BaseModel):
+    week_start: date
+    week_end: date
+    intent: Intent
+    daily_summaries: list[DailySummary] = Field(default_factory=list)
+    briefings: list[ChancellorBriefing] = Field(default_factory=list)
+    research_answers: list[ResearchAnswer] = Field(default_factory=list)
+    video_exports: list[VideoExport] = Field(default_factory=list)
 
 
 class ActiveStateRequest(BaseModel):
@@ -378,6 +394,23 @@ def compile_alpha_research(request: CompileResearchRequest) -> dict:
         return issue_compiler().compile(request).model_dump(mode="json")
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.post("/alpha/chancellor/weekly-reports")
+def create_alpha_weekly_report(request: AlphaWeeklyReportRequest) -> dict:
+    try:
+        report = generate_weekly_report(
+            request.week_start,
+            request.week_end,
+            intent=request.intent,
+            daily_summaries=request.daily_summaries,
+            briefings=request.briefings,
+            research_answers=request.research_answers,
+            video_exports=request.video_exports,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return report.model_dump(mode="json")
 
 
 @app.post("/rag/answer/jobs")
