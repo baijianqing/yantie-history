@@ -366,6 +366,20 @@
 - 回滚方式：回退 ministries 模块和测试。
 - 文档更新：更新 `API_CONTRACTS.md`。
 
+## A10-MIN-002：三部推荐同步 API
+
+- 价值：让 UI、操作员或后续 Worker 能通过结构化 HTTP 请求生成受限三部推荐。
+- 依赖：A10-MIN-001 和现有 FastAPI app 接线。
+- 允许修改范围：`metaos/app/api.py`、一个聚焦的 ministries API 测试文件、任务/API/路线图文档。
+- 禁止修改范围：推荐排序规则、数据库持久化、RQ worker、检索、宰相、视频渲染、根配置、`.vscode/` 和 `pyproject.toml`。
+- 输入：`date`、`Intent`、`AttentionBudget`、`RecommendationCandidate` 列表。
+- 输出：三个 schema 合法的 `MinistryReport` JSON。
+- 接口：`POST /alpha/ministries/daily-reports`。
+- 验收标准：接口遵守每部最多 3 条、整体最多 5 条、Intent/预算过滤和空部“今日无事上奏”；无效候选 payload 返回 FastAPI/Pydantic 校验错误。
+- 测试命令：`python -m pytest test/test_alpha_ministries_api.py`。
+- 回滚方式：删除 `/alpha/ministries/daily-reports` 路由、请求 schema、测试文件和文档条目。
+- 文档更新：`API_CONTRACTS.md` 和 `ROADMAP.md` 记录同步 API 接线状态。
+
 ## A11-OPS-001：任务重试元数据
 
 - 价值：在接入重试按钮或自动重新入队前，为 Alpha worker 提供已测试的重试状态转换和审计轨迹。

@@ -21,7 +21,7 @@ from metaos.compiler import CompileResearchRequest, IssueCompiler, LLMCompilerPr
 from metaos.ingest.service import IngestService
 from metaos.knowledge.deletion import KnowledgeDeletionService
 from metaos.ledger import DailyReview, DailySummary
-from metaos.ministries import MinistryReport
+from metaos.ministries import MinistryReport, RecommendationCandidate, generate_ministry_reports
 from metaos.research import ResearchAnswer
 from metaos.retrieval.service import RetrievalService
 from metaos.search import hybrid_search
@@ -85,6 +85,13 @@ class AlphaChancellorBriefingRequest(BaseModel):
     daily_review: DailyReview | None = None
     research_answers: list[ResearchAnswer] = Field(default_factory=list)
     ministry_reports: list[MinistryReport] = Field(default_factory=list)
+
+
+class AlphaMinistryReportsRequest(BaseModel):
+    date: date
+    intent: Intent
+    attention_budget: AttentionBudget
+    candidates: list[RecommendationCandidate] = Field(default_factory=list)
 
 
 class ActiveStateRequest(BaseModel):
@@ -405,6 +412,20 @@ def compile_alpha_research(request: CompileResearchRequest) -> dict:
         return issue_compiler().compile(request).model_dump(mode="json")
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.post("/alpha/ministries/daily-reports")
+def create_alpha_ministry_reports(request: AlphaMinistryReportsRequest) -> list[dict]:
+    try:
+        reports = generate_ministry_reports(
+            request.date,
+            intent=request.intent,
+            attention_budget=request.attention_budget,
+            candidates=request.candidates,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return [report.model_dump(mode="json") for report in reports]
 
 
 @app.post("/alpha/chancellor/daily-briefings")

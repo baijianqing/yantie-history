@@ -230,6 +230,13 @@
 - 研究执行现在具备面向进度展示、日志和后续 RQ/API 持久化的结构化数据，同时不改变答案起草和审计策略。
 - 测试命令：`python -m pytest test/test_research_service.py`。
 
+### A10-MIN-002：三部推荐同步 API
+
+- 已新增 `POST /alpha/ministries/daily-reports`，通过 FastAPI 暴露同步三部推荐生成入口。
+- 接口返回三个 schema 合法的 `MinistryReport` JSON，复用每部最多 3 条、整体最多 5 条、Intent/预算过滤和空部“今日无事上奏”规则。
+- 持久化 RQ job 编排仍作为后续独立任务处理。
+- 测试命令：`python -m pytest test/test_alpha_ministries_api.py`。
+
 ### A11-OPS-001：任务重试元数据
 
 - 已新增 `JobRepository.retry_failed`，可把失败任务重置为 pending，并追加可审计的 `result.retry_history` 记录。
