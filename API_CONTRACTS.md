@@ -600,6 +600,36 @@ A11-WEEKLY-002 implementation note:
 
 ## 目标 API：内容工坊
 
+### `POST /alpha/workshop/episodes`
+
+同步从 `DailySummary` 生成 `EpisodeSpec`。
+
+请求：
+
+```json
+{
+  "daily_summary": {},
+  "title": "Daily Build Review",
+  "angle": "Turn the day into a verifiable account"
+}
+```
+
+响应：
+
+```json
+{
+  "id": "episode_...",
+  "daily_summary_id": "summary_1",
+  "title": "Daily Build Review",
+  "angle": "Turn the day into a verifiable account",
+  "facts": [],
+  "judgments": [],
+  "reflections": [],
+  "actions": [],
+  "review_status": "draft"
+}
+```
+
 ### `POST /alpha/workshop/episodes/jobs`
 
 从 `DailySummary` 生成 `EpisodeSpec`。
@@ -623,3 +653,9 @@ A3-WORKSHOP-002 implementation note:
 - `review_episode(...)` records structured human review state on `EpisodeSpec`.
 - `render_episode_video(...)` returns a `VideoExport` with `render_status=succeeded` and `mp4_path`, or `render_status=failed` and `error`.
 - The HTTP endpoints above remain target API contracts for a later API/RQ wiring task.
+
+A3-WORKSHOP-003 implementation note:
+
+- `POST /alpha/workshop/episodes` is implemented as a synchronous schema-validated API in `metaos/app/api.py`.
+- The endpoint calls `episode_from_daily_summary(...)` with caller-provided `DailySummary`, optional title, and optional angle.
+- The endpoint returns a draft `EpisodeSpec` JSON payload and does not generate assets, render MP4, persist records, or create a durable RQ job.

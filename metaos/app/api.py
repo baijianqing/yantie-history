@@ -47,7 +47,7 @@ from metaos.tasks.queueing import (
 from metaos.workspace.catalog import ChunkRepository, KnowledgeRepository
 from metaos.workspace.jobs import JobRepository
 from metaos.workspace.paths import ensure_workspace
-from metaos.workshop import VideoExport
+from metaos.workshop import VideoExport, episode_from_daily_summary
 
 
 app = FastAPI(title="MetaOS Lite", version=__version__)
@@ -92,6 +92,12 @@ class AlphaMinistryReportsRequest(BaseModel):
     intent: Intent
     attention_budget: AttentionBudget
     candidates: list[RecommendationCandidate] = Field(default_factory=list)
+
+
+class AlphaEpisodeRequest(BaseModel):
+    daily_summary: DailySummary
+    title: str | None = None
+    angle: str = "Daily cognitive review"
 
 
 class ActiveStateRequest(BaseModel):
@@ -460,6 +466,19 @@ def create_alpha_weekly_report(request: AlphaWeeklyReportRequest) -> dict:
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     return report.model_dump(mode="json")
+
+
+@app.post("/alpha/workshop/episodes")
+def create_alpha_episode(request: AlphaEpisodeRequest) -> dict:
+    try:
+        episode = episode_from_daily_summary(
+            request.daily_summary,
+            title=request.title,
+            angle=request.angle,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return episode.model_dump(mode="json")
 
 
 @app.post("/rag/answer/jobs")

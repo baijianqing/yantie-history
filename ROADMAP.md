@@ -194,6 +194,12 @@
 
 ## 已完成任务状态
 
+### A3-WORKSHOP-003：EpisodeSpec 同步 API
+
+- 已新增 `POST /alpha/workshop/episodes`，通过 FastAPI 把结构化 `DailySummary` 转换为草稿 `EpisodeSpec`。
+- 接口保留事实、判断、反思、行动和引用，并把资产生成、审核、渲染和持久化 RQ 编排留给后续独立任务。
+- 测试命令：`python -m pytest test/test_alpha_workshop_api.py`。
+
 ### A5-SEARCH-003：向量检索适配器
 
 - 已新增向量检索适配器，把现有 Chroma/Ollama `RetrievalService.search` 结果转换为 Alpha `SearchCandidate`，并保留引用回链和元数据过滤能力。

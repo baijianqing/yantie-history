@@ -128,6 +128,20 @@
 - 回滚方式：回退 workshop 服务和测试；删除生成的临时导出。
 - 文档更新：更新 `API_CONTRACTS.md`。
 
+## A3-WORKSHOP-003：EpisodeSpec 同步 API
+
+- 价值：让 UI、操作员或后续 Worker 能通过结构化 HTTP 请求把 DailySummary 转为可审核 EpisodeSpec。
+- 依赖：A3-WORKSHOP-001、A2-LEDGER-003 和现有 FastAPI app 接线。
+- 允许修改范围：`metaos/app/api.py`、一个聚焦的 workshop API 测试文件、任务/API/路线图文档。
+- 禁止修改范围：资产落盘、FFmpeg 渲染、审核规则、数据库持久化、RQ worker、检索、根配置、`.vscode/` 和 `pyproject.toml`。
+- 输入：`DailySummary`、可选 `title`、可选 `angle`。
+- 输出：schema 合法的草稿 `EpisodeSpec` JSON。
+- 接口：`POST /alpha/workshop/episodes`。
+- 验收标准：接口从事实、判断、反思和行动摘要生成 EpisodeSpec 列表字段，保留引用，默认草稿审核状态；无效 DailySummary payload 返回 FastAPI/Pydantic 校验错误。
+- 测试命令：`python -m pytest test/test_alpha_workshop_api.py`。
+- 回滚方式：删除 `/alpha/workshop/episodes` 路由、请求 schema、测试文件和文档条目。
+- 文档更新：`API_CONTRACTS.md` 和 `ROADMAP.md` 记录同步 API 接线状态。
+
 ## A4-KB-001：稳定文档版本与知识块标识符
 
 - 价值：保证新主题不重切块、不重建索引。
