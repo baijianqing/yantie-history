@@ -317,6 +317,14 @@ A2-LEDGER-002 implementation note:
 }
 ```
 
+A5-SEARCH-002 implementation note:
+
+- RRF fusion support is implemented in `metaos/search/fusion.py`.
+- `SearchCandidate` is the channel-neutral input contract for vector, full-text, and future rerank candidates.
+- `rrf_fuse({"vector": [...], "full_text": [...]}, filters, top_k, k)` applies metadata filters before fusion, computes reciprocal-rank scores, and returns `EvidenceCandidate` results.
+- `EvidenceCandidate` preserves `citation`, `channel_ranks`, and `channel_scores`.
+- The `/alpha/search` HTTP endpoint remains a target API contract for a later wiring task.
+
 ## 目标 API：议题编译器
 
 ### `POST /alpha/research/compile`
