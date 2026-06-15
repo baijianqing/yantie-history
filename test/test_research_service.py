@@ -17,7 +17,10 @@ from metaos.compiler import (
 from metaos.core.schemas import Citation
 from metaos.research import (
     EvidenceAssessment,
+    RESEARCH_EXECUTION_VERSION,
+    ResearchProgressStage,
     execute_research_plan,
+    execute_research_plan_with_trace,
     retrieve_research_candidates,
 )
 from metaos.search import EvidenceCandidate
@@ -93,6 +96,44 @@ class ResearchServiceTests(unittest.TestCase):
         self.assertEqual(decision_row.counter_evidence[0].metadata["stance"], "counter")
         self.assertEqual(decision_row.supporting_evidence[0].citation.source_id, "src_alpha")
         self.assertTrue(all(top_k == 3 for _, top_k in search.calls))
+
+    def test_execute_research_plan_with_trace_records_progress_and_retrieval_runs(self) -> None:
+        compilation = self.compilation()
+        search = FakeEvidenceSearch()
+
+        report = execute_research_plan_with_trace(compilation, search, top_k_per_query=4)
+
+        self.assertEqual(report.task_id, compilation.research_task.id)
+        self.assertEqual(report.execution_version, RESEARCH_EXECUTION_VERSION)
+        self.assertEqual(report.execution.task_id, compilation.research_task.id)
+        self.assertEqual([candidate.chunk_id for candidate in report.candidates], [
+            "chunk_support",
+            "chunk_counter",
+            "chunk_fact",
+        ])
+        self.assertEqual(len(report.retrieval_runs), 2)
+        decision_run = report.retrieval_runs[0]
+        self.assertEqual(decision_run.execution_version, RESEARCH_EXECUTION_VERSION)
+        self.assertEqual(decision_run.requirement_id, "req_decision")
+        self.assertEqual(decision_run.requirement_type, "decision_criterion")
+        self.assertEqual(decision_run.top_k, 4)
+        self.assertEqual(decision_run.returned_count, 3)
+        self.assertEqual(decision_run.accepted_count, 2)
+        self.assertEqual(decision_run.candidate_ids, ["chunk_support", "chunk_counter"])
+        self.assertEqual(
+            [event.stage for event in report.progress_events],
+            [
+                ResearchProgressStage.planned,
+                ResearchProgressStage.retrieving,
+                ResearchProgressStage.retrieving,
+                ResearchProgressStage.matrix_built,
+                ResearchProgressStage.completed,
+            ],
+        )
+        self.assertEqual(report.progress_events[0].progress, 0.0)
+        self.assertEqual(report.progress_events[-1].progress, 1.0)
+        self.assertEqual(report.progress_events[1].requirement_id, "req_decision")
+        self.assertEqual(report.model_dump(mode="json")["execution_version"], RESEARCH_EXECUTION_VERSION)
 
     def test_retrieve_research_candidates_preserves_explicit_requirement_metadata(self) -> None:
         compilation = self.compilation()

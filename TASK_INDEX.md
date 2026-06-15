@@ -351,3 +351,17 @@
 - Test command: `python -m pytest test/test_research_service.py`.
 - Rollback: remove `metaos/research/service.py`, its exports, and `test/test_research_service.py`.
 - Documentation update: this task entry plus `ROADMAP.md` status note.
+
+## A7-RESEARCH-004: Research execution trace
+
+- Value: make research execution auditable and displayable by recording progress events, retrieval runs, accepted candidate ids, and execution version.
+- Dependencies: A7-RESEARCH-003.
+- Allowed changes: `metaos/research` trace schemas/service code, one focused research test file, and task/roadmap documentation.
+- Forbidden changes: search ranking, Censorate rules, answer drafting, RQ queue behavior, API routes, root configuration, migrations, and `pyproject.toml`.
+- Input: `ResearchCompilation`, an evidence search callable, and `top_k_per_query`.
+- Output: `ResearchExecutionReport` with `ResearchProgressEvent`, `ResearchRetrievalRun`, recalled candidates, and `ResearchExecutionDraft`.
+- Interface: `execute_research_plan_with_trace(compilation, search, top_k_per_query=5)` and `retrieve_research_candidates_with_trace(...)`.
+- Acceptance: the report records execution version, deterministic progress stages, per-query retrieval counts, accepted candidate ids, and the same evidence matrix as the legacy execution entrypoint.
+- Test command: `python -m pytest test/test_research_service.py`.
+- Rollback: remove trace schemas/exports and restore `execute_research_plan` to direct matrix construction.
+- Documentation update: this task entry plus `ROADMAP.md` status note.

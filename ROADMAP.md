@@ -216,3 +216,9 @@
 - Added plan-driven candidate recall for `ResearchCompilation`, tagging candidates with requirement id, requirement type, query, and inferred support/counter stance before evidence matrix construction.
 - Research execution now has a service entrypoint that can call hybrid search and return a `ResearchExecutionDraft` instead of requiring pre-tagged candidates.
 - Test command: `python -m pytest test/test_research_service.py`.
+
+## A7-RESEARCH-004 status
+
+- Added `ResearchExecutionReport` with execution version, retrieval runs, progress events, recalled candidates, and evidence matrix output.
+- Research execution now has structured data for progress display, logs, and later RQ/API job persistence without changing answer drafting or audit policy.
+- Test command: `python -m pytest test/test_research_service.py`.
