@@ -365,3 +365,17 @@
 - Test command: `python -m pytest test/test_research_service.py`.
 - Rollback: remove trace schemas/exports and restore `execute_research_plan` to direct matrix construction.
 - Documentation update: this task entry plus `ROADMAP.md` status note.
+
+## A11-OPS-001: Job retry metadata
+
+- Value: give Alpha workers a tested retry state transition and audit trail before wiring retry buttons or automatic re-enqueue.
+- Dependencies: existing `JobRepository` and `Job` schema.
+- Allowed changes: `metaos/workspace/jobs.py`, one focused job repository test file, and task/roadmap documentation.
+- Forbidden changes: database schema migrations, RQ queue dispatch behavior, task worker implementations, Streamlit UI, API routes, root configuration, and `pyproject.toml`.
+- Input: failed job id and optional retry message.
+- Output: the same job reset to `pending`, progress `0`, cleared error, and `result.retry_history` entry with failed/retried timestamps and prior error/message.
+- Interface: `JobRepository.retry_failed(job_id, message="Retry queued")`.
+- Acceptance: only failed jobs can be retried, retry history is append-only, prior failure information is preserved, and existing job payload/result data is retained.
+- Test command: `python -m pytest test/test_job_repository_retry.py`.
+- Rollback: remove `retry_failed`, `RETRY_HISTORY_KEY`, and `test/test_job_repository_retry.py`.
+- Documentation update: this task entry plus `ROADMAP.md` status note.

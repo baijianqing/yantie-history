@@ -222,3 +222,9 @@
 - Added `ResearchExecutionReport` with execution version, retrieval runs, progress events, recalled candidates, and evidence matrix output.
 - Research execution now has structured data for progress display, logs, and later RQ/API job persistence without changing answer drafting or audit policy.
 - Test command: `python -m pytest test/test_research_service.py`.
+
+## A11-OPS-001 status
+
+- Added `JobRepository.retry_failed` to reset failed jobs to pending while appending an auditable `result.retry_history` entry.
+- This provides the tested retry-state foundation for later RQ/API re-enqueue wiring without changing worker behavior in this task.
+- Test command: `python -m pytest test/test_job_repository_retry.py`.

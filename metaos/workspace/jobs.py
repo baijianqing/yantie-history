@@ -12,6 +12,9 @@ from metaos.core.schemas import Job, JobStatus, JobType, new_id
 from metaos.workspace.database import connect, initialize_database
 
 
+RETRY_HISTORY_KEY = "retry_history"
+
+
 def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
 
@@ -120,6 +123,32 @@ class JobRepository:
                 ),
             )
         return self.get(job_id)
+
+    def retry_failed(self, job_id: str, *, message: str = "Retry queued") -> Job:
+        current = self.get(job_id)
+        if current.status != JobStatus.failed:
+            raise ValueError("only failed jobs can be retried")
+        result = dict(current.result)
+        history = list(result.get(RETRY_HISTORY_KEY) or [])
+        retried_at = _now_iso()
+        history.append(
+            {
+                "attempt": len(history) + 1,
+                "failed_at": current.updated_at.isoformat(),
+                "retried_at": retried_at,
+                "error": current.error,
+                "message": current.message,
+            }
+        )
+        result[RETRY_HISTORY_KEY] = history
+        return self.update(
+            job_id,
+            status=JobStatus.pending,
+            progress=0,
+            message=message,
+            error="",
+            result=result,
+        )
 
 
 def main() -> None:
