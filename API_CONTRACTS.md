@@ -443,6 +443,13 @@ A7-RESEARCH-002 implementation note:
 - 总数最多 5 条。
 - 可以为空，并给出“今日无事上奏”。
 
+A10-MIN-001 implementation note:
+
+- Limited ministry recommendation contracts are implemented in `metaos/ministries/schemas.py`.
+- Alpha ministries are restricted to `technology`, `cognition`, and `business`.
+- `generate_ministry_reports(...)` filters candidates by current `Intent`, obeys `AttentionBudget`, caps each ministry at 3 items, caps all items at 5, and returns `empty_reason="今日无事上奏"` for empty ministries.
+- The `/alpha/ministries/daily/jobs` HTTP endpoint remains a target API contract for a later wiring task.
+
 ## 目标 API：宰相
 
 ### `POST /alpha/chancellor/daily/jobs`
