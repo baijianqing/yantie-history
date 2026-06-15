@@ -22,6 +22,7 @@ from metaos.ledger.schemas import (
     WorkEventSource,
     WorkEventType,
 )
+from metaos.ledger.summary import generate_daily_summary
 
 __all__ = [
     "Action",
@@ -42,4 +43,5 @@ __all__ = [
     "WorkEventType",
     "collect_git_commits",
     "collect_markdown_changes",
+    "generate_daily_summary",
 ]

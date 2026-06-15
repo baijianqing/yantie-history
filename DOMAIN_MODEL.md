@@ -240,7 +240,14 @@ A2-LEDGER-001 实现说明：
 - `WorkEvent.source` 使用 `manual`、`git_commit`、`markdown_change`、`research_task`、`system`。
 - `Action.status` 使用 `proposed`、`accepted`、`in_progress`、`done`、`canceled`、`no_action`。
 - `DailySummary` 显式区分 `fact_summary`、`judgment_summary`、`reflection_summary`、`action_summary`。
-- 当前任务只定义 Schema，不实现 Git/Markdown 采集、持久化或 DailySummary 生成逻辑。
+- A2-LEDGER-001 只定义 Schema，不实现 Git/Markdown 采集、持久化或 DailySummary 生成逻辑。
+
+A2-LEDGER-003 实现说明：
+
+- `DailySummary` 生成逻辑位于 `metaos/ledger/summary.py`。
+- `generate_daily_summary(summary_date, review, work_events, decisions, actions)` 以同一天的账本记录为输入，返回通过 Schema 校验的 `DailySummary`。
+- 生成结果保持事实、判断、反思、行动四类边界：`WorkEvent` 进入事实摘要，`Decision` 进入判断摘要，`DailyReview.reflections` 和 `lessons` 进入反思摘要，`Action` 与完成/遗漏项进入行动摘要。
+- 当前实现为规则聚合，不调用模型，不写入数据库，不触发视频渲染。
 
 ## 知识底座
 
