@@ -456,3 +456,11 @@ A2-LEDGER-002 implementation note:
 ### `GET /alpha/workshop/video-exports/{export_id}`
 
 读取 MP4 导出结果。
+
+A3-WORKSHOP-002 implementation note:
+
+- Workshop service-level support is implemented in `metaos/workshop/service.py`.
+- `generate_episode_assets(...)` writes script, voiceover text, SRT subtitles, visual card JSON, and Remotion props JSON for human review.
+- `review_episode(...)` records structured human review state on `EpisodeSpec`.
+- `render_episode_video(...)` returns a `VideoExport` with `render_status=succeeded` and `mp4_path`, or `render_status=failed` and `error`.
+- The HTTP endpoints above remain target API contracts for a later API/RQ wiring task.

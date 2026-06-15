@@ -660,6 +660,18 @@ A3-WORKSHOP-001 实现说明：
 - `voiceover_path`
 - `subtitle_path`
 - `cards_path`
+- `remotion_props_path`
 - `mp4_path`
 - `render_status`
 - `review_record_id`
+- `error`
+- `created_at`
+- `updated_at`
+
+A3-WORKSHOP-002 实现说明：
+
+- 内容工坊资产生成与本地渲染入口位于 `metaos/workshop/service.py`。
+- `generate_episode_assets(episode, output_dir)` 生成可审核的脚本、旁白文本、SRT 字幕、图卡 JSON 和 Remotion props JSON。
+- `review_episode(...)` 生成带审核元数据的新 `EpisodeSpec`。
+- `render_episode_video(...)` 使用 FFmpeg 生成最小 MP4；未审核、FFmpeg 不可用或渲染失败时返回 `render_status=failed` 和 `error`。
+- 当前任务不接入 FastAPI、RQ 或真实 TTS 音频引擎；这些入口保持在后续任务中接线。

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
+from pathlib import Path
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
@@ -16,6 +17,13 @@ class EpisodeReviewStatus(str, Enum):
     approved = "approved"
     changes_requested = "changes_requested"
     rejected = "rejected"
+
+
+class VideoRenderStatus(str, Enum):
+    pending = "pending"
+    running = "running"
+    succeeded = "succeeded"
+    failed = "failed"
 
 
 def _clean_text(value: str, *, field_name: str) -> str:
@@ -92,6 +100,59 @@ class EpisodeSpec(BaseModel):
     @property
     def ready_for_final_export(self) -> bool:
         return self.review_status == EpisodeReviewStatus.approved
+
+
+class WorkshopAssetBundle(BaseModel):
+    id: str = Field(default_factory=lambda: new_id("assets"))
+    episode_spec_id: str
+    output_dir: Path
+    script_path: Path
+    voiceover_path: Path
+    subtitle_path: Path
+    cards_path: Path
+    remotion_props_path: Path
+    created_at: datetime = Field(default_factory=utc_now)
+
+    @field_validator("episode_spec_id")
+    @classmethod
+    def validate_episode_spec_id(cls, value: str) -> str:
+        return _clean_text(value, field_name="episode_spec_id")
+
+
+class VideoExport(BaseModel):
+    id: str = Field(default_factory=lambda: new_id("export"))
+    episode_spec_id: str
+    script_path: Path
+    voiceover_path: Path
+    subtitle_path: Path
+    cards_path: Path
+    remotion_props_path: Path
+    mp4_path: Path | None = None
+    render_status: VideoRenderStatus = VideoRenderStatus.pending
+    review_record_id: str | None = None
+    error: str | None = None
+    created_at: datetime = Field(default_factory=utc_now)
+    updated_at: datetime = Field(default_factory=utc_now)
+
+    @field_validator("episode_spec_id")
+    @classmethod
+    def validate_export_episode_spec_id(cls, value: str) -> str:
+        return _clean_text(value, field_name="episode_spec_id")
+
+    @field_validator("review_record_id", "error")
+    @classmethod
+    def clean_optional_export_text(cls, value: str | None) -> str | None:
+        return _clean_optional_text(value)
+
+    @model_validator(mode="after")
+    def validate_export_status(self):
+        if self.updated_at < self.created_at:
+            raise ValueError("updated_at cannot be earlier than created_at")
+        if self.render_status == VideoRenderStatus.succeeded and self.mp4_path is None:
+            raise ValueError("succeeded video exports require mp4_path")
+        if self.render_status == VideoRenderStatus.failed and not self.error:
+            raise ValueError("failed video exports require error")
+        return self
 
 
 def terminal_review_statuses() -> set[EpisodeReviewStatus]:
