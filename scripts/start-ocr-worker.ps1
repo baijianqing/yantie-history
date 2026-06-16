@@ -4,7 +4,8 @@ param(
     [string]$Device = "cpu",
     [ValidateSet("fast", "default", "quality")]
     [string]$Mode = "default",
-    [double]$RenderZoom = 2.0
+    [double]$RenderZoom = 2.0,
+    [int]$OcrJobTimeoutSeconds = 28800
 )
 
 $ErrorActionPreference = "Stop"
@@ -22,9 +23,11 @@ if (-not (Test-Path $python)) {
 $env:OCR_DEVICE = $resolvedDevice
 $env:OCR_MODE = $Mode
 $env:OCR_RENDER_ZOOM = [string]$RenderZoom
+$env:METAOS_OCR_JOB_TIMEOUT_SECONDS = [string]$OcrJobTimeoutSeconds
 
 Write-Host "Starting MetaOS OCR worker"
 Write-Host "Environment: $venvName"
 Write-Host "OCR: device=$resolvedDevice mode=$Mode render_zoom=$RenderZoom"
+Write-Host "OCR jobs: timeout=${OcrJobTimeoutSeconds}s"
 
 & $python -m metaos.tasks.worker ocr

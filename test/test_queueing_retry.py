@@ -19,6 +19,41 @@ class FakeQueue:
         self.calls.append(kwargs)
 
 
+class FakeRegistry:
+    def __init__(self, job_ids: list[str] | None = None) -> None:
+        self.job_ids = job_ids or []
+        self.cleanup_called = False
+
+    def cleanup(self) -> None:
+        self.cleanup_called = True
+
+    def get_job_ids(self) -> list[str]:
+        return list(self.job_ids)
+
+
+class FakeRQQueue(FakeQueue):
+    def __init__(self, name: str, failed_job_ids: list[str]) -> None:
+        super().__init__(name)
+        self.connection = object()
+        self.started_job_registry = FakeRegistry()
+        self.failed_job_registry = FakeRegistry(failed_job_ids)
+
+
+class FakeRQJob:
+    exc_info = "Moved to FailedJobRegistry, due to AbandonedJobError"
+    worker_name = "gpu-worker"
+    origin = "ocr"
+    started_at = None
+    ended_at = None
+
+    @classmethod
+    def fetch(cls, job_id: str, *, connection):
+        return cls()
+
+    def get_status(self, refresh: bool = False) -> str:
+        return "failed"
+
+
 class QueueingRetryTests(unittest.TestCase):
     def test_enqueue_retry_job_requeues_failed_job_with_same_id(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -58,7 +93,7 @@ class QueueingRetryTests(unittest.TestCase):
 
             self.assertEqual(retried.message, "Requeued: ocr")
             self.assertEqual(fake_queue.calls[0]["func"], queueing.TASK_OCR_PDF_PAGES)
-            self.assertEqual(fake_queue.calls[0]["timeout"], 2 * 60 * 60)
+            self.assertEqual(fake_queue.calls[0]["timeout"], queueing.configured_ocr_timeout())
 
     def test_retry_rejects_pending_job_without_enqueueing(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -88,6 +123,31 @@ class QueueingRetryTests(unittest.TestCase):
             self.assertEqual(fake_queue.calls, [])
             self.assertEqual(unchanged.status, JobStatus.failed)
             self.assertNotIn(RETRY_HISTORY_KEY, unchanged.result)
+
+    def test_sync_rq_failed_job_marks_running_sqlite_job_failed(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            repo = JobRepository(Path(temp_dir) / "metaos.sqlite3")
+            job = repo.create(JobType.ocr_document, {"source_id": "src_1", "asset_id": "asset_1"})
+            repo.update(job.id, status=JobStatus.running, progress=0.1, message="加载 OCR 引擎")
+            fake_queue = FakeRQQueue("ocr", [job.id])
+
+            with patch.multiple(
+                queueing,
+                rq_queue=lambda queue_name: fake_queue,
+                RQJob=FakeRQJob,
+            ):
+                updated = queueing.sync_rq_failures_to_job_repository(
+                    [queueing.QueueName.ocr],
+                    repo=repo,
+                )
+
+            synced = repo.get(job.id)
+            self.assertEqual(len(updated), 1)
+            self.assertEqual(synced.status, JobStatus.failed)
+            self.assertEqual(synced.progress, 1)
+            self.assertIn("AbandonedJobError", synced.error)
+            self.assertEqual(synced.result["rq_failure"]["worker_name"], "gpu-worker")
+            self.assertTrue(fake_queue.started_job_registry.cleanup_called)
 
     def patched_queueing(self, repo: JobRepository, fake_queue: FakeQueue):
         return patch.multiple(

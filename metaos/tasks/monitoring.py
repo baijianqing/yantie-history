@@ -8,7 +8,7 @@ from redis.exceptions import RedisError
 from rq import Worker
 
 from metaos.core.config import get_settings
-from metaos.tasks.queueing import QueueName, redis_connection, rq_queue
+from metaos.tasks.queueing import QueueName, redis_connection, rq_queue, sync_rq_failures_to_job_repository
 
 
 def runtime_status() -> dict[str, Any]:
@@ -36,6 +36,7 @@ def runtime_status() -> dict[str, Any]:
 
     queues = [queue.value for queue in QueueName]
     try:
+        sync_rq_failures_to_job_repository(queues)
         for queue_name in queues:
             status["queues"].append(queue_status(queue_name))
 

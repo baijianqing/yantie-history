@@ -6,12 +6,13 @@ import sys
 
 from rq import SimpleWorker
 
-from metaos.tasks.queueing import QueueName, redis_connection, rq_queue
+from metaos.tasks.queueing import QueueName, redis_connection, rq_queue, sync_rq_failures_to_job_repository
 
 
 def main(argv: list[str] | None = None) -> None:
     args = argv if argv is not None else sys.argv[1:]
     queue_names = args or [QueueName.ingest.value, QueueName.index.value, QueueName.rag.value]
+    sync_rq_failures_to_job_repository(queue_names)
     queues = [rq_queue(name) for name in queue_names]
     worker = SimpleWorker(queues, connection=redis_connection())
     worker.work()

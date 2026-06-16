@@ -33,6 +33,7 @@ class Settings:
     ocr_device: str
     ocr_mode: str
     ocr_render_zoom: float
+    ocr_job_timeout_seconds: int
 
 
 def get_settings() -> Settings:
@@ -68,6 +69,7 @@ def get_settings() -> Settings:
         ocr_device=os.getenv("OCR_DEVICE", "auto"),
         ocr_mode=os.getenv("OCR_MODE", "default"),
         ocr_render_zoom=float(os.getenv("OCR_RENDER_ZOOM", "2.0")),
+        ocr_job_timeout_seconds=int(os.getenv("METAOS_OCR_JOB_TIMEOUT_SECONDS", "28800")),
     )
 
 

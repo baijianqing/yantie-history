@@ -3,14 +3,15 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Any
+from typing import Any, Iterable
 
 from redis import Redis
 from redis.exceptions import RedisError
 from rq import Queue
+from rq.job import Job as RQJob
 
 from metaos.core.config import get_settings
-from metaos.core.errors import ConfigurationError
+from metaos.core.errors import ConfigurationError, JobNotFoundError
 from metaos.core.schemas import Job, JobStatus, JobType
 from metaos.workspace.jobs import JobRepository
 
@@ -33,6 +34,11 @@ TASK_RAG_ANSWER = "metaos.tasks.rag.run_answer_question"
 
 DEFAULT_TIMEOUT_SECONDS = 60 * 60
 MIN_TIMEOUT_SECONDS = 60
+TERMINAL_JOB_STATUSES = {
+    JobStatus.succeeded,
+    JobStatus.failed,
+    JobStatus.canceled,
+}
 
 
 def redis_connection() -> Redis:
@@ -44,8 +50,93 @@ def rq_queue(queue_name: QueueName | str) -> Queue:
     return Queue(name, connection=redis_connection())
 
 
+def sync_rq_failures_to_job_repository(
+    queue_names: Iterable[QueueName | str] | None = None,
+    *,
+    repo: JobRepository | None = None,
+) -> list[Job]:
+    """Reflect failed or abandoned RQ jobs into the SQLite job table.
+
+    GPU OCR failures can terminate the worker process before task code reaches
+    its exception handler. RQ later marks that job as abandoned, while SQLite
+    may still show it as running. This reconciliation keeps the UI and retry
+    flow honest after worker restart.
+    """
+
+    job_repo = repo or JobRepository()
+    names = list(queue_names or QueueName)
+    updated: list[Job] = []
+    for queue_name in names:
+        queue = rq_queue(queue_name)
+        try:
+            queue.started_job_registry.cleanup()
+        except Exception:
+            pass
+
+        for job_id in queue.failed_job_registry.get_job_ids():
+            try:
+                current = job_repo.get(job_id)
+            except JobNotFoundError:
+                continue
+            if current.status in TERMINAL_JOB_STATUSES:
+                continue
+
+            rq_failure = rq_failure_summary(queue, job_id)
+            result = dict(current.result)
+            result["rq_failure"] = rq_failure
+            updated.append(
+                job_repo.update(
+                    job_id,
+                    status=JobStatus.failed,
+                    progress=1,
+                    message=f"后台任务失败或中断：{queue.name}",
+                    error=rq_failure.get("error") or "RQ job failed or was abandoned.",
+                    result=result,
+                )
+            )
+    return updated
+
+
+def rq_failure_summary(queue: Queue, job_id: str) -> dict[str, Any]:
+    summary: dict[str, Any] = {
+        "queue": queue.name,
+        "rq_job_id": job_id,
+    }
+    try:
+        rq_job = RQJob.fetch(job_id, connection=queue.connection)
+    except Exception as exc:
+        return {
+            **summary,
+            "error": f"RQ job is in failed registry but details could not be loaded: {exc}",
+        }
+
+    exc_info = str(getattr(rq_job, "exc_info", "") or "")
+    summary.update(
+        {
+            "status": str(rq_job.get_status(refresh=True)),
+            "worker_name": getattr(rq_job, "worker_name", None),
+            "origin": getattr(rq_job, "origin", None),
+            "started_at": str(getattr(rq_job, "started_at", "") or ""),
+            "ended_at": str(getattr(rq_job, "ended_at", "") or ""),
+            "error": summarize_exception_text(exc_info),
+        }
+    )
+    return summary
+
+
+def summarize_exception_text(exc_info: str, *, max_lines: int = 12) -> str:
+    lines = [line.rstrip() for line in exc_info.splitlines() if line.strip()]
+    if not lines:
+        return "RQ job failed or was abandoned."
+    return "\n".join(lines[-max_lines:])
+
+
 def configured_timeout(value: int | None) -> int:
     return max(MIN_TIMEOUT_SECONDS, int(value or DEFAULT_TIMEOUT_SECONDS))
+
+
+def configured_ocr_timeout() -> int:
+    return configured_timeout(get_settings().ocr_job_timeout_seconds)
 
 
 def enqueue_job(
@@ -117,7 +208,7 @@ def enqueue_ocr_document(source_id: str, asset_id: str) -> Job:
         queue_name=QueueName.ocr,
         task_path=TASK_OCR_DOCUMENT,
         payload={"source_id": source_id, "asset_id": asset_id},
-        timeout=2 * 60 * 60,
+        timeout=configured_ocr_timeout(),
     )
 
 
@@ -127,7 +218,7 @@ def enqueue_ocr_pdf_pages(source_id: str, asset_id: str, plan_path: str) -> Job:
         queue_name=QueueName.ocr,
         task_path=TASK_OCR_PDF_PAGES,
         payload={"source_id": source_id, "asset_id": asset_id, "plan_path": plan_path},
-        timeout=2 * 60 * 60,
+        timeout=configured_ocr_timeout(),
     )
 
 
@@ -202,7 +293,7 @@ def retry_dispatch_for_job(job: Job) -> tuple[QueueName, str, int]:
         return QueueName.ingest, TASK_PDF_ROUTE, 2 * 60 * 60
     if job.type == JobType.ocr_document:
         task_path = TASK_OCR_PDF_PAGES if job.payload.get("plan_path") else TASK_OCR_DOCUMENT
-        return QueueName.ocr, task_path, 2 * 60 * 60
+        return QueueName.ocr, task_path, configured_ocr_timeout()
     if job.type == JobType.index_knowledge:
         return (
             QueueName.index,

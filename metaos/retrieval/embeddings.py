@@ -6,6 +6,7 @@ import hashlib
 import json
 import math
 import re
+import time
 from dataclasses import dataclass
 from typing import Any
 from typing import Protocol
@@ -18,6 +19,9 @@ from metaos.core.errors import ConfigurationError, EmbeddingProviderError
 
 CJK_RE = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]")
 LATIN_RE = re.compile(r"[A-Za-z0-9_]+")
+OLLAMA_CONNECT_RETRIES = 5
+OLLAMA_CONNECT_RETRY_DELAY_SECONDS = 3.0
+OLLAMA_HEALTH_TIMEOUT_SECONDS = 3.0
 
 
 class OllamaEmbeddingTimeoutError(EmbeddingProviderError):
@@ -98,6 +102,7 @@ class OllamaEmbeddingProvider:
         self.num_gpu = num_gpu
         self.name = f"ollama-{model}"
         self._dimensions: int | None = None
+        self._server_ready = False
 
     @property
     def dimensions(self) -> int | None:
@@ -154,35 +159,57 @@ class OllamaEmbeddingProvider:
     ) -> dict[str, Any]:
         url = f"{self.base_url}{path}"
         body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
-        request = Request(
-            url,
-            data=body,
-            method="POST",
-            headers={"Content-Type": "application/json"},
-        )
+        last_connect_error: BaseException | None = None
+
+        for attempt in range(1, OLLAMA_CONNECT_RETRIES + 1):
+            try:
+                self._ensure_server_ready()
+                request = Request(
+                    url,
+                    data=body,
+                    method="POST",
+                    headers={"Content-Type": "application/json"},
+                )
+                with urlopen(request, timeout=self.timeout) as response:
+                    return json.loads(response.read().decode("utf-8"))
+            except HTTPError as exc:
+                detail = exc.read().decode("utf-8", errors="replace")
+                raise EmbeddingProviderError(
+                    f"Ollama embedding request failed with HTTP {exc.code}: {detail}"
+                ) from exc
+            except TimeoutError as exc:
+                raise OllamaEmbeddingTimeoutError(
+                    f"Ollama embedding request timed out after {self.timeout} seconds "
+                    f"(model={self.model}, attempted_batch_size={request_batch_size}, "
+                    f"configured_batch_size={self.batch_size}, num_gpu={self.num_gpu}). "
+                    "The worker will split timed-out batches automatically; if this keeps "
+                    "happening, lower OLLAMA_EMBED_BATCH_SIZE or increase OLLAMA_EMBED_TIMEOUT."
+                ) from exc
+            except URLError as exc:
+                last_connect_error = exc
+                self._server_ready = False
+                if attempt >= OLLAMA_CONNECT_RETRIES:
+                    break
+                time.sleep(OLLAMA_CONNECT_RETRY_DELAY_SECONDS)
+            except json.JSONDecodeError as exc:
+                raise EmbeddingProviderError("Ollama returned invalid JSON.") from exc
+
+        raise EmbeddingProviderError(
+            f"Cannot connect to Ollama at {self.base_url} after "
+            f"{OLLAMA_CONNECT_RETRIES} attempts. Make sure Ollama is running "
+            f"and {self.model} is installed."
+        ) from last_connect_error
+
+    def _ensure_server_ready(self) -> None:
+        if self._server_ready:
+            return
+
+        request = Request(self.base_url + "/", method="HEAD")
         try:
-            with urlopen(request, timeout=self.timeout) as response:
-                return json.loads(response.read().decode("utf-8"))
-        except HTTPError as exc:
-            detail = exc.read().decode("utf-8", errors="replace")
-            raise EmbeddingProviderError(
-                f"Ollama embedding request failed with HTTP {exc.code}: {detail}"
-            ) from exc
-        except URLError as exc:
-            raise EmbeddingProviderError(
-                f"Cannot connect to Ollama at {self.base_url}. "
-                "Make sure Ollama is running and bge-m3 is installed."
-            ) from exc
+            with urlopen(request, timeout=OLLAMA_HEALTH_TIMEOUT_SECONDS):
+                self._server_ready = True
         except TimeoutError as exc:
-            raise OllamaEmbeddingTimeoutError(
-                f"Ollama embedding request timed out after {self.timeout} seconds "
-                f"(model={self.model}, attempted_batch_size={request_batch_size}, "
-                f"configured_batch_size={self.batch_size}, num_gpu={self.num_gpu}). "
-                "The worker will split timed-out batches automatically; if this keeps "
-                "happening, lower OLLAMA_EMBED_BATCH_SIZE or increase OLLAMA_EMBED_TIMEOUT."
-            ) from exc
-        except json.JSONDecodeError as exc:
-            raise EmbeddingProviderError("Ollama returned invalid JSON.") from exc
+            raise URLError(exc) from exc
 
 
 def parse_ollama_embeddings(response: dict[str, Any]) -> list[list[float]]:
