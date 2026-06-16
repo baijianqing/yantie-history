@@ -1,35 +1,47 @@
 # MetaOS Alpha 业务架构
 
-状态：阶段0业务架构冻结版修订
+状态：Core Alpha 业务架构冻结候选
 
 实现状态：本文档描述目标业务架构，不代表相关能力已经实现
 
-权威范围：产品目标、核心主线、业务闭环、交付分层、业务原则、用户控制点与业务指标
+权威范围：长期愿景、Alpha 产品形态、Core Alpha 业务主链、业务对象职责、用户控制点、业务指标与冻结验收场景
 
-文档边界：本文档允许列出对象名称、业务分类、业务关系、不变量和用户控制点；不维护完整字段、枚举值、必填约束、数据类型和状态转换。这些内容以 `docs/DOMAIN_MODEL.md` 为唯一权威来源。
+文档边界：本文档允许列出对象名称、业务分类、业务关系、不变量和用户控制点；不维护完整字段、枚举值、必填约束、数据类型和状态转换。这些内容以 `docs/DOMAIN_MODEL.md` 为唯一权威来源。检索算法、来源评分、候选融合和工程策略以 `docs/RAG_RETRIEVAL_STRATEGY.md` 和 `docs/TECHNICAL_ARCHITECTURE.md` 为准。
 
-任务标识：`A0-DOC-001-R1`
+任务标识：`A0-DOC-001-R2`
 
 ## 1. 业务定位
 
-MetaOS Alpha 是个人意图操作系统，不是通用知识库、聊天机器人或新闻聚合器。
+MetaOS 的长期愿景、Alpha 产品形态和 Core Alpha 切入口必须分开理解。
 
-它服务的核心问题是：
+长期愿景：
 
 ```text
-用户主动提出问题或遇到信息线索后，
-MetaOS 如何帮助他约束注意力、明确知识范围、收集证据、
-形成可审计判断，并转化为行动、明确不行动或知识型关闭。
+MetaOS 是个人意图操作系统。
 ```
 
-系统不追求回答更多内容，而是让每一次研究都能回答：
+Alpha 产品形态：
+
+```text
+MetaOS Alpha 是面向个人知识库的研究与判断工作台。
+```
+
+Core Alpha 核心切入口：
+
+```text
+帮助用户围绕一个明确问题，
+形成有范围、有证据、可审计、可修订、可处置的判断。
+```
+
+MetaOS Alpha 不是通用知识库、聊天机器人或新闻聚合器。它不追求回答更多内容，而是让每一次研究都能回答：
 
 - 当前问题应进入什么研究深度。
 - 应该从哪些知识来源中寻找证据。
 - 应该采用什么研究方式。
 - 哪些证据真正支持判断。
-- 哪些结论只是推断、类比、争议观点或个人反思。
+- 哪些结论只是事实、解释、推断、类比、争议观点或个人反思。
 - 当前结果应该继续研究、观察、延后、放弃、明确不行动、理解完成，还是进入行动建议。
+- 这个判断日后如何被复核、修订或失效。
 
 ## 2. 目标用户与核心场景
 
@@ -64,14 +76,13 @@ MetaOS 所称的可靠判断并不保证结论绝对正确，而是满足：
 - 关键反证和证据缺口没有被隐藏。
 - 显式来源约束没有被违反。
 - 判断形成过程可以回溯。
-- 新证据出现时可以被修订。
+- 新证据出现时可以被复核和修订。
 
-判断复核语义：
+判断生命周期原则：
 
-- 原始证据变化、定位失效或关键证据删除后，历史判断不得继续显示为当前有效判断。
-- 出现强反证、新版本材料或重大研究策略升级后，应保留原判断，但提示重新审计。
-- 普通索引重建、Embedding 升级或 Prompt 版本变化，如果没有重新执行研究，也不应自动使历史判断失效。
-- 具体状态名称、转换条件和持久化字段以 `docs/DOMAIN_MODEL.md` 为准。
+- 单纯的技术实现、模型或检索策略变化，不应自动改变已经形成的历史判断状态。
+- 只有原始证据身份、内容、可定位性或支持关系发生变化，或者重新执行研究产生新结果时，历史判断才需要失效、降级或重新复核。
+- 判断复核由 `JudgmentReview` 承载。具体状态名称、转换条件和持久化字段以 `docs/DOMAIN_MODEL.md` 为准。
 
 ## 4. Alpha 交付分层
 
@@ -81,51 +92,16 @@ Core Alpha 验证唯一核心命题：
 
 ```text
 用户主动提出问题后，
-MetaOS 能否帮助他形成可靠、可审计、可处置的判断。
+MetaOS 能否帮助他形成可靠、可审计、可处置、可复核的判断。
 ```
 
-Core Alpha 主链冻结为：
-
-```text
-Question
--> ResearchCase
--> ResearchTriage
--> 用户采用或调整研究深度
--> SourceResolution
--> KnowledgeScope
--> ResearchPlan
--> ResearchRun
--> EvidenceUnit
--> Claim
--> JudgmentCard
--> Audit
--> DispositionProposal
--> 用户确认或调整
--> ResearchDisposition
-```
-
-`ResearchRun` 表示一次实际研究执行。`ResearchTrace` 表示该次执行发生了什么。ResearchRun 及其后续环节应持续记录到 ResearchTrace。
-
-Core Alpha 完成后，系统应已经可以作为独立产品持续使用，不依赖 IntentTrace、认知画像、三部榜单或 LensSkill。
-
-完成条件：
-
-- 用户可以从工作台输入问题并形成 ResearchCase。
-- 用户可以采用或调整系统给出的研究深度建议。
-- 用户可以指定、比较或排除知识来源。
-- 显式来源约束不会被长文档或模型记忆覆盖。
-- 系统能生成可定位的 EvidenceUnit。
-- 系统能输出 Claim 级 JudgmentCard。
-- 核心 Claim 必须有证据状态和可审计引用。
-- 审计能区分确定性问题和语义问题。
-- 审计阻断后能进入版本化修订。
-- 系统只能生成 DispositionProposal，最终 ResearchDisposition 必须经用户确认或调整。
-- 只有用户确认后，系统建议才成为 ActionCommitment。
-- 理解型问题可以 knowledge_only_closure，不强制生成行动。
+Core Alpha 是冻结候选。其核心判断闭环和业务不变量不应被 Extended Alpha 或 Beta Ready 破坏。
 
 ### 4.2 Extended Alpha
 
-Extended Alpha 在 Core Alpha 稳定的前提下增加认知增强能力：
+Extended Alpha 是方向性设计，允许验证后调整。
+
+它在 Core Alpha 稳定的前提下探索：
 
 - IntentTrace：显化候选意图，并允许用户修正。
 - BookProfile 与 LensSkill：让经典提供有边界的认知视角。
@@ -139,16 +115,54 @@ Extended Alpha 中任何模块失败，不得破坏 Core Alpha 闭环。
 
 ### 4.3 Beta Ready
 
-Beta Ready 不再扩张新的核心业务概念，只处理产品化收敛：
+Beta Ready 不改变 Core Alpha 的核心判断闭环和业务不变量。
 
-- UI 视觉统一与移动端适配。
-- 性能、成本和 Token 预算约束。
-- 模型、检索、审计的失败降级。
-- ResearchTrace、Token、索引和审计的开发者可观测性。
-- Golden Cases 回归评测。
-- 开发者层与普通用户工作台隔离。
+Beta Ready 允许增加账号、权限、工作空间、配额、分享、视觉统一、移动端适配、开发者诊断、降级策略和发布质量门等产品化支撑概念。
 
-## 5. Core Alpha 用户旅程图
+## 5. 业务主链与对象链
+
+### 5.1 高层业务主链
+
+业务主链解释价值如何产生：
+
+```text
+提出问题
+-> 确定研究深度
+-> 约束知识范围
+-> 执行研究并组织证据
+-> 形成并审计判断
+-> 用户决定如何处置
+-> 后续复核或行动复盘
+```
+
+### 5.2 领域对象链
+
+领域对象链说明业务主链由哪些对象承载：
+
+```text
+Question
+-> ResearchCase
+-> ResearchTriage
+-> 用户采用或调整研究深度
+-> SourceResolution
+-> KnowledgeScope
+-> ResearchPlan
+-> ResearchRun
+-> ResearchAttempt
+-> RetrievalRun
+-> EvidenceUnit
+-> Claim
+-> JudgmentCard
+-> Audit
+-> DispositionProposal
+-> 用户确认或调整
+-> ResearchDisposition
+-> JudgmentReview / ActionProposal / Closure
+```
+
+`RetrievalRun` 属于执行细节，不进入高层业务主链，但必须能被 ResearchTrace 记录。
+
+## 6. Core Alpha 用户旅程图
 
 ```mermaid
 flowchart TB
@@ -157,25 +171,30 @@ flowchart TB
     CASE["ResearchCase<br/>用户侧研究项目"]
     TRIAGE["ResearchTriage<br/>研究深度建议"]
     CHOOSE["用户采用或调整研究深度"]
-    SR["SourceResolution<br/>解析指定 / 比较 / 排除来源"]
+    SR["SourceResolution<br/>解析来源与版本"]
     KS["KnowledgeScope<br/>确定 required / primary / comparison / excluded"]
     RP["ResearchPlan<br/>研究模式、证据要求与停止条件"]
-    RUN["ResearchRun<br/>一次实际研究执行"]
+    RUN["ResearchRun<br/>范围、计划和目标明确的一次研究执行"]
+    ATTEMPT["ResearchAttempt<br/>同一 Run 下的一次执行尝试"]
+    RETRIEVAL["RetrievalRun<br/>一次检索执行细节"]
     EU["EvidenceUnit<br/>可定位、可引用、可校验证据"]
-    CLAIM["Claim<br/>事实、解释、推断、类比、假设、建议"]
+    CLAIM["Claim<br/>判断主张"]
     JC["JudgmentCard<br/>判断、证据、不同解释、证据缺口"]
     AUDIT["Audit<br/>确定性审计 + 语义审计"]
-    REVISION["版本化修订<br/>生成新的 JudgmentCard 版本"]
+    REVISION["判断表达或证据映射修订<br/>同一 ResearchRun 下形成新版本"]
+    LIMIT["awaiting_user / failed<br/>达到修订上限"]
     DP["DispositionProposal<br/>系统提出研究处置建议"]
     CONFIRM["用户确认或调整处置"]
     DISP["ResearchDisposition<br/>最终研究处置"]
+    JREVIEW["JudgmentReview<br/>判断复核"]
     AP["ActionProposal<br/>系统提出行动建议"]
+    AP2["新版本 ActionProposal<br/>用户调整后生成"]
     AC["ActionCommitment<br/>用户确认行动承诺"]
-    REVIEW["ActionReview / 复盘"]
-    OM["OpenMonitoring<br/>等待时间、事件或新证据"]
-    DEFER["Deferred<br/>到期提醒或重新评估"]
+    AREVIEW["ActionReview<br/>行动复盘"]
+    OM["OpenMonitoring<br/>等待事件、时间或新证据"]
+    DEFER["Deferred<br/>到期重新确认"]
     CLOSURE["Closure<br/>放弃 / 明确不行动 / 理解完成"]
-    TRACE["ResearchTrace<br/>记录范围、计划、执行、证据、模型与审计"]
+    TRACE["ResearchTrace<br/>记录 Run、Attempt、Retrieval、证据、模型与审计"]
 
     U --> Q
     Q --> CASE
@@ -185,13 +204,16 @@ flowchart TB
     SR --> KS
     KS --> RP
     RP --> RUN
-    RUN --> EU
+    RUN --> ATTEMPT
+    ATTEMPT --> RETRIEVAL
+    RETRIEVAL --> EU
     EU --> CLAIM
     CLAIM --> JC
     JC --> AUDIT
 
-    AUDIT -->|"存在阻断项"| REVISION
+    AUDIT -->|"可修订问题"| REVISION
     REVISION --> JC
+    AUDIT -->|"达到修订上限"| LIMIT
     AUDIT -->|"可采纳"| DP
     DP --> CONFIRM
     CONFIRM --> DISP
@@ -201,27 +223,46 @@ flowchart TB
     DISP -->|"defer_decision"| DEFER
     DISP -->|"discard / explicit_no_action / knowledge_only_closure"| CLOSURE
     DISP -->|"proceed_to_action"| AP
-    AP -->|"用户接受"| AC
-    AC --> REVIEW
+    DISP -->|"需要复核"| JREVIEW
 
-    RUN -. "持续记录" .-> TRACE
-    EU -. "持续记录" .-> TRACE
-    CLAIM -. "持续记录" .-> TRACE
-    JC -. "持续记录" .-> TRACE
-    AUDIT -. "持续记录" .-> TRACE
-    DISP -. "持续记录" .-> TRACE
-    REVIEW -. "持续记录" .-> TRACE
+    AP -->|"用户拒绝"| DP
+    AP -->|"用户调整"| AP2
+    AP2 --> AP
+    AP -->|"用户接受"| AC
+    AC --> AREVIEW
+    AREVIEW -->|"行动前提被质疑"| JREVIEW
+
+    OM -->|"用户触发或系统检测到已知条件满足"| JREVIEW
+    DEFER -->|"到期重新确认"| TRIAGE
+    CLOSURE -->|"用户重新打开"| TRIAGE
+    JREVIEW -->|"仍成立或仅提示风险"| DISP
+    JREVIEW -->|"需要重新研究"| RUN
+
+    RUN -. "对应完整记录" .-> TRACE
+    ATTEMPT -. "写入" .-> TRACE
+    RETRIEVAL -. "写入" .-> TRACE
+    EU -. "写入" .-> TRACE
+    CLAIM -. "写入" .-> TRACE
+    JC -. "写入" .-> TRACE
+    AUDIT -. "写入" .-> TRACE
+    DISP -. "写入" .-> TRACE
+    JREVIEW -. "写入" .-> TRACE
+    AREVIEW -. "写入" .-> TRACE
 ```
 
 这张图强调：
 
 - ResearchCase 是用户能理解的研究项目。
-- ResearchRun 是一次实际研究执行。
-- ResearchTrace 是执行轨迹，不等同于 ResearchCase。
+- ResearchRun 是一次范围、计划和核心目标已确定的研究执行。
+- ResearchAttempt 是同一 ResearchRun 下的一次执行尝试。
+- RetrievalRun 是 ResearchAttempt 内部的检索执行细节。
+- ResearchTrace 是 ResearchRun 的完整审计记录。
+- JudgmentReview 复核“判断是否仍成立”。
+- ActionReview 复核“行动是否有效”。
 - ResearchDisposition 必须经过用户确认或调整。
-- continue_research、observe、defer_decision 和 Closure 是不同处置路径。
+- OpenMonitoring、Deferred 和 Closure 都可以在用户触发或已知条件满足时回到复核或研究。
 
-## 6. 业务能力地图
+## 7. 业务能力地图
 
 ```mermaid
 flowchart TB
@@ -229,64 +270,66 @@ flowchart TB
         C1["意图与问题管理<br/>Question / ResearchCase / ResearchTriage"]
         C2["知识范围治理<br/>SourceResolution / KnowledgeScope"]
         C3["证据与判断治理<br/>ResearchPlan / ResearchRun / EvidenceUnit / Claim / JudgmentCard / Audit"]
-        C4["处置与复盘<br/>DispositionProposal / ResearchDisposition / Action / Review"]
+        C4["处置、复核与行动<br/>DispositionProposal / ResearchDisposition / JudgmentReview / ActionReview"]
     end
 
-    subgraph EXTENDED["Extended Alpha：认知增强"]
+    subgraph EXTENDED["Extended Alpha：方向性设计"]
         E1["IntentTrace<br/>候选意图与用户修正"]
         E2["BookProfile / LensSkill<br/>有边界的经典认知视角"]
         E3["认知画像<br/>UserConstitution / CurrentState / CognitivePattern"]
         E4["InformationIntake 与三部榜单<br/>有限注意力入口"]
     end
 
-    subgraph BETA["Beta Ready：产品化收敛"]
+    subgraph BETA["Beta Ready：产品化支撑"]
         B1["统一 UI 与移动端"]
-        B2["可观测性与开发者诊断"]
-        B3["模型、检索、审计降级"]
-        B4["Golden Cases、性能与稳定性"]
+        B2["账号、权限、工作空间、分享"]
+        B3["可观测性、降级和成本治理"]
+        B4["冻结验收场景与发布质量门"]
     end
 
     subgraph PRINCIPLES["全局业务原则"]
         P1["当前显式约束优先"]
         P2["证据优先，不让模型记忆冒充知识来源"]
-        P3["短资料不因 Chunk 数量失去发言权"]
+        P3["来源篇幅不得决定来源权重"]
         P4["画像只提供先验，不覆盖当前问题"]
         P5["经典提供视角，不模拟作者人格"]
-        P6["系统建议必须经用户确认后才成为行动"]
+        P6["系统建议必须经用户确认后才成为处置或行动"]
     end
 
     CORE --> EXTENDED
-    EXTENDED --> BETA
+    CORE --> BETA
     PRINCIPLES -. "约束" .-> CORE
     PRINCIPLES -. "约束" .-> EXTENDED
 ```
 
-## 7. Core Alpha 业务对象职责
+## 8. Core Alpha 业务对象职责
 
 本章只说明对象为什么存在、解决什么业务问题、与上下游对象的关系，以及不可违反的业务规则。完整字段、枚举、状态机和持久化约束不在本文档维护。
 
-### 7.1 ResearchCase
+### 8.1 ResearchCase
 
 ResearchCase 是用户侧长期研究聚合对象，表示用户正在研究的一个问题、主题或判断链。
 
-它解决的问题是：同一个问题可能被连续追问、重新检索、修订判断和复盘行动。用户需要看到“这是同一个研究项目的演化”，而不是只能看到多条孤立 Trace。
+它解决的问题是：同一个问题可能被连续追问、重新检索、修订判断和复核行动前提。用户需要看到“这是同一个研究项目的演化”，而不是只能看到多条孤立执行记录。
 
 业务关系：
 
 - 一个 ResearchCase 可以包含原始问题和后续追问。
 - 一个 ResearchCase 可以包含当前 KnowledgeScope。
-- 一个 ResearchCase 可以包含多次 ResearchRun。
+- 一个 ResearchCase 可以拥有多个 ResearchRun。
 - 一个 ResearchCase 可以包含多个 JudgmentCard 版本。
-- 一个 ResearchCase 可以关联当前 ResearchDisposition、Action 与 Review。
+- 一个 ResearchCase 可以关联 ResearchDisposition、JudgmentReview、ActionProposal、ActionCommitment 和 ActionReview。
 
 业务规则：
 
 - ResearchCase 不是聊天会话。
 - ResearchCase 不是 ResearchTrace 的别名。
 - 一次失败或重新研究不应自动创建新的 ResearchCase。
-- 用户可以主动拆分、合并、归档或重新打开 ResearchCase。
+- Core Alpha 支持创建、归档、重新打开 ResearchCase。
+- 用户可以从现有 ResearchCase 的某个问题或判断派生新的 ResearchCase；原 ResearchCase、ResearchRun、JudgmentCard 和 ResearchTrace 保持不变，新 Case 保留来源关联。
+- ResearchCase 合并和移动历史记录式拆分不进入 Core Alpha。
 
-### 7.2 ResearchTriage
+### 8.2 ResearchTriage
 
 ResearchTriage 是研究深度建议机制，不是注意力守门人。
 
@@ -308,9 +351,9 @@ Triage 建议包括：
 - 系统不能因为判断“价值低”而拒绝用户研究。
 - 当前显式选择高于 Triage 推荐。
 - 进入 Core Alpha 工作台的正式回答均应关联 ResearchCase 和 ResearchTrace。
-- 直接回答不能允许模型参数记忆冒充指定来源。
+- 直接回答不能允许模型参数知识冒充指定来源。
 
-### 7.3 SourceResolution
+### 8.3 SourceResolution
 
 SourceResolution 解析用户在问题中指定、比较或排除的知识来源。
 
@@ -318,32 +361,36 @@ SourceResolution 解析用户在问题中指定、比较或排除的知识来源
 
 业务规则：
 
+- SourceResolution 不仅解析作品身份，也应在必要时解析版本、译本、载体和内容版本。
+- 系统采用的作品版本、译本、载体或内容版本必须对用户可见。
+- 存在多个可用版本时，用户可以进行选择或切换。
+- 用户指定的版本当前不可用时，系统必须明确报告不可用，不得静默替换成其他版本。
 - 显式来源解析失败时，不得静默回退到全库检索。
 - 显式来源存在歧义时，应进入澄清、默认版本策略或错误状态，而不是随机选择。
-- 被排除来源不得进入候选、上下文、最终引用或隐式推断。
+- excluded 来源不得进入检索候选、上下文、工具调用输入、引用、EvidenceUnit 和判断证据链。
 
-### 7.4 KnowledgeScope
+### 8.4 KnowledgeScope
 
 KnowledgeScope 决定一次研究允许使用哪些知识来源。
 
 核心业务分类：
 
-- `required_sources`：必须进入检索候选的来源。
+- `required_sources`：必须进入独立取证和结果报告的来源。
 - `primary_sources`：决定回答主结构的来源。
 - `comparison_sources`：用于比较和对照的来源。
-- `excluded_sources`：禁止进入候选、上下文和最终引用的来源。
+- `excluded_sources`：禁止进入候选、上下文、工具输入、引用和证据链的来源。
 
 业务规则：
 
 - 同一来源不得同时出现在 required 与 excluded。
-- required 来源必须被检索，但不保证一定形成支持 Claim。
+- required 来源必须被独立处理，并报告支持、反驳、无证据或不可用等结果。
 - required 来源没有证据时，应报告该来源证据不足，不能找其他来源代答。
 - comparison 来源只能用于对照，不能替代 primary 或 required 来源。
 - Core Alpha 默认采用 `evidence_only`，模型参数知识不能伪装成指定来源内容。
 
-### 7.5 ResearchPlan
+### 8.5 ResearchPlan
 
-ResearchPlan 回答“怎样研究”，避免从范围直接跳到一次 Top-K 检索。
+ResearchPlan 回答“怎样研究”，避免不同问题都走同一种研究动作。
 
 它解决的问题是：事实查询、概念解释、多来源比较和枚举型研究需要不同执行策略。
 
@@ -352,50 +399,52 @@ Core Alpha 最小研究模式包括：
 - `fact_lookup`：局部事实检索。
 - `source_interpretation`：原文概念和上下文解释。
 - `compare_sources`：来源独立取证后按统一维度比较。
-- `enumerate_pattern`：候选生成、条件验证、反证检索、EvidenceMatrix 和排除理由。
+- `enumerate_pattern`：候选生成、条件验证、反证检索、证据矩阵和排除理由。
 
 业务规则：
 
-- 研究模式不得只是标签，必须影响检索计划和证据组织方式。
-- 显式来源锚点应作为范围约束，不应重复污染书内语义查询。
-- 枚举型研究不能退化为一次 Top-K 检索。
+- 研究模式不得只是标签，必须影响证据组织方式。
+- 显式来源锚点应作为范围约束，不应重复污染来源内语义查询。
+- 枚举型研究不能退化为一次普通检索。
 
-### 7.6 ResearchRun 与 ResearchTrace
+### 8.6 ResearchRun、ResearchAttempt、RetrievalRun 与 ResearchTrace
 
-ResearchRun 是一次实际研究执行。ResearchTrace 是该次执行的审计轨迹。
+ResearchRun 是一次范围、计划和核心目标已确定的研究执行。ResearchTrace 是该 ResearchRun 的完整审计记录。
 
-它们解决的问题不同：
-
-- ResearchRun 承载执行过程。
-- ResearchTrace 承载可回溯记录。
+ResearchAttempt 是同一 ResearchRun 下的一次执行尝试。RetrievalRun 是 ResearchAttempt 内部的一次检索执行细节。
 
 业务规则：
 
-- 一个 ResearchCase 可以包含多次 ResearchRun。
-- 每次 ResearchRun 应形成独立 ResearchTrace 或 Trace Attempt。
-- ResearchTrace 采用不可变事实记录加当前状态摘要。
-- 重试产生新的 attempt，不覆盖旧失败。
-- 同一输入、索引、策略和 Prompt 版本下，检索计划、来源约束和关键证据应可比较。
-- 最终自然语言无需逐字一致，但核心 Claim 变化时必须能解释变化来源。
+- 一个 ResearchCase 可以拥有多个 ResearchRun。
+- 每个 ResearchRun 对应一个完整 ResearchTrace。
+- 一个 ResearchRun 可以发生多个 ResearchAttempt。
+- 每个 ResearchAttempt 可以包含一个或多个 RetrievalRun。
+- ResearchTrace 汇总并记录全部 ResearchAttempt 和 RetrievalRun。
+- 失败 ResearchAttempt 不得被后续 ResearchAttempt 覆盖。
+- 只有在 KnowledgeScope、ResearchPlan 和核心研究目标保持不变时，重试才可以作为同一 ResearchRun 的新 ResearchAttempt。
+- 范围、研究模式、核心证据要求或研究目标发生实质变化时，必须创建新的 ResearchRun。
+- RetrievalRun 属于执行细节，不进入高层业务主链。
 
-### 7.7 RetrievalRun 与 EvidenceUnit
+修订边界：
 
-RetrievalRun 执行来源感知检索。EvidenceUnit 是 Claim 可以引用的最小证据单元，不应只等同于 Chunk。
+- 仅修订判断表达或证据映射，例如降低结论强度、补充引用、修正 Claim 分类，应在同一 ResearchRun 下产生新的 JudgmentCard 版本。
+- 重新检索、改变 KnowledgeScope、改变研究模式或改变核心证据要求，应创建新的 ResearchRun，并形成新的 ResearchTrace 和新的 JudgmentCard 版本。
 
-它们共同解决的问题是：系统不能只说“某个 Chunk 支持结论”，而必须让用户知道哪段证据、来自哪个来源、如何支持或反驳判断。
+### 8.7 EvidenceUnit
+
+EvidenceUnit 是 Claim 可以引用的最小证据单元，不应只等同于一段文本切片。
+
+它解决的问题是：系统不能只说“某段材料支持结论”，而必须让用户知道哪段证据、来自哪个来源、如何支持或反驳判断。
 
 业务规则：
 
-- 有显式来源时，先进入指定来源内部检索，再跨指定来源融合。
-- 无显式来源时，先进行来源级路由，再在候选来源内分别检索。
-- 禁止让全库所有 Chunk 直接竞争唯一候选池后再做来源均衡。
-- 来源评分不得按命中 Chunk 总分累加。
-- 短资料可以全书参与候选排序，但不代表把全书所有 Chunk 发给模型。
-- 最终上下文必须同时受 Chunk 数量和 Token 预算约束。
-- 核心 Claim 必须引用可定位 EvidenceUnit。
-- 相邻或重叠 Chunk 不能虚增证据数量。
+- 核心 Claim 必须引用可定位、可校验的 EvidenceUnit。
+- EvidenceUnit 必须能回到具体来源、版本和定位。
+- 来源篇幅不得决定来源权重。
+- 相邻或重叠文本不得被计算为多份独立证据。
+- 检索失败、证据不足和来源不存在必须被区分。
 
-### 7.8 Claim 与 JudgmentCard
+### 8.8 Claim 与 JudgmentCard
 
 Claim 是判断的基本单位。JudgmentCard 是一次研究面向用户的综合出口。
 
@@ -403,14 +452,17 @@ Claim 是判断的基本单位。JudgmentCard 是一次研究面向用户的综�
 
 业务规则：
 
-- Claim 必须区分事实、解释、推断、类比、假设、建议等认识性质。
-- Claim 必须表达证据支持状态和重要性，但具体枚举以 `docs/DOMAIN_MODEL.md` 为准。
+- Claim 必须区分认识性质和表达角色。
+- 认识性质至少包括事实、解释、推断、类比、假设。
+- 表达角色至少包括核心判断、补充说明、反证、建议、待验证问题、用户反思。
+- 表达角色为“建议”的 Claim 仍然只是 JudgmentCard 中的一项判断表达，不会自动成为 ActionProposal，更不会自动形成 ActionCommitment。
+- Claim 必须表达证据支持状态和重要性，但具体字段和枚举以 `docs/DOMAIN_MODEL.md` 为准。
 - 核心 Claim 无支持证据必须阻断。
 - 类比必须标记为模型推演，不能写成原文事实。
 - 有争议的判断不得被包装成确定结论。
-- JudgmentCard 修订必须形成新版本，不得覆盖旧版本。
+- JudgmentCard 采用版本化管理；每次修订产生新的 JudgmentCard 版本。是否存在独立版本实体，由 `docs/DOMAIN_MODEL.md` 决定。
 
-### 7.9 Audit
+### 8.9 Audit
 
 Audit 判断一次研究是否可采纳。
 
@@ -418,43 +470,85 @@ Audit 判断一次研究是否可采纳。
 
 审计分为两类：
 
-- 确定性审计：引用是否存在、来源是否越界、required 来源是否进入候选、excluded 来源是否被使用。
+- 确定性审计：引用是否存在、来源是否越界、required 来源是否被独立处理、excluded 来源是否被使用。
 - 语义审计：证据是否真正支持 Claim、是否省略反证、是否把相关性写成因果、是否存在确认偏误。
 
 业务规则：
 
 - 审计结果不能只有通过或失败，必须能表达问题、严重性、影响范围和建议修订方向。
-- 阻断问题必须阻止 JudgmentCard 被显示为可采纳判断。
+- 非阻断性审计警告可以由用户知情确认、接受风险或要求修订。
+- 阻断性审计问题必须阻止 JudgmentCard 被显示为可采纳判断。
+- 用户不能通过接受操作，将 blocked Claim 改为 ready。
+- 用户可以在知晓风险后继续处置或行动，但系统必须记录为用户覆盖，并保留风险提示，不得继续标记为可靠判断。
 - 审计阻断后进入有上限的版本化修订循环。
 - 达到修订上限后，研究应转入 awaiting_user 或 failed，而不是假装得到可靠答案。
 
-### 7.10 DispositionProposal、ResearchDisposition 与 Action
+### 8.10 DispositionProposal、ResearchDisposition 与 Action
 
 DispositionProposal 是系统提出的研究处置建议。ResearchDisposition 是用户确认或调整后的最终处置。
 
 它们解决的问题是：系统不能替用户决定“放弃这个问题”“不行动”或“理解完成”。
 
+处置语义：
+
+- `continue_research`：现有证据不足，立即继续研究。
+- `observe`：当前不继续研究，等待外部事件、时间或新证据。
+- `defer_decision`：已有一定判断，但用户选择在明确时间点重新决策。
+- `discard`：问题已经失去价值或不再值得继续研究。
+- `explicit_no_action`：研究已经形成判断，结论是当前不应采取行动。
+- `knowledge_only_closure`：理解目标已经完成，该问题本身不要求行动。
+
 业务规则：
 
 - Audit 之后先生成 DispositionProposal。
 - 用户确认或调整后，才形成 ResearchDisposition。
-- `continue_research` 回到 ResearchPlan。
-- `observe` 进入 OpenMonitoring，等待时间、事件或新证据。
-- `defer_decision` 进入 Deferred，到期提醒或重新评估。
-- `discard`、`explicit_no_action`、`knowledge_only_closure` 进入 Closure。
+- `observe` 是事件或条件驱动。
+- `defer_decision` 是时间或用户决策驱动。
 - 只有 `proceed_to_action` 才进入 ActionProposal。
 - 系统只能提出 ActionProposal，用户接受后才形成 ActionCommitment。
-- 复盘主要针对用户确认过的 ActionCommitment。
+- ActionProposal 被用户调整时，应产生新版本建议。
+- ActionProposal 被用户拒绝时，应回到处置确认，而不是直接静默关闭。
 
-## 8. 用户控制点
+### 8.11 JudgmentReview 与 ActionReview
+
+JudgmentReview 是业务对象，记录一次判断复核及其结果。ActionReview 记录一次行动复盘及其结果。
+
+两者不应混用：
+
+- JudgmentReview 复核“认知是否仍成立”。
+- ActionReview 复核“行动是否有效”。
+
+Core Alpha 最小能力：
+
+- 用户可以主动发起 JudgmentReview。
+- 用户重新打开 ResearchCase 时可以发起 JudgmentReview。
+- 系统发现已引用证据被删除、定位失效或内容变化时，必须提示原判断不再有效或需要复核。
+- OpenMonitoring、Deferred 到期后，允许用户手动恢复研究或发起复核。
+
+后续增强能力：
+
+- 自动发现新证据影响了哪些历史判断。
+- 自动定期复核。
+- 自动监控外部事件。
+- 自动发送提醒。
+
+业务规则：
+
+- JudgmentReview 至少必须能够表达判断仍然成立、可信度降低、需要重新研究、被新版本取代、因证据失效不可继续使用等业务含义。
+- 具体状态名称、枚举和转换规则由 `docs/DOMAIN_MODEL.md` 定义。
+- ActionReview 如果发现行动前提错误，应进入 JudgmentReview；必要时启动新的 ResearchRun。
+
+## 9. 用户控制点
 
 MetaOS 的可靠性不只来自系统审计，也来自用户能参与判断形成。
 
 Core Alpha 至少应保留以下用户控制点：
 
-- 创建、拆分、合并、归档或重新打开 ResearchCase。
+- 创建、归档或重新打开 ResearchCase。
+- 从现有 ResearchCase 派生新的 ResearchCase。
 - 采用或调整 ResearchTriage 给出的研究深度。
 - 指定、比较或排除知识来源。
+- 指定或切换可用来源版本。
 - 修正 KnowledgeScope。
 - 标记“证据不支持此判断”。
 - 标记“这只是推断”。
@@ -462,14 +556,18 @@ Core Alpha 至少应保留以下用户控制点：
 - 要求降低结论强度。
 - 要求继续查证。
 - 接受或拒绝 Claim。
+- 确认非阻断性审计警告或要求修订。
 - 确认或调整 DispositionProposal。
 - 接受、拒绝或调整 ActionProposal。
+- 发起 JudgmentReview。
 
 没有用户操作不能被默认为接受。系统应区分“用户明确接受”“用户拒绝”“用户尚未处理”。
 
-## 9. Extended Alpha 业务增强
+## 10. Extended Alpha 业务增强
 
-### 9.1 IntentTrace
+Extended Alpha 是方向性设计，不与 Core Alpha 使用同一冻结强度。
+
+### 10.1 IntentTrace
 
 IntentTrace 显化用户可能真正关心的问题。
 
@@ -481,7 +579,7 @@ IntentTrace 显化用户可能真正关心的问题。
 - 没有画像时，Core Alpha 闭环仍必须完整运行。
 - 用户否定候选意图后，不得继续强化该方向。
 
-### 9.2 BookProfile 与 LensSkill
+### 10.2 BookProfile 与 LensSkill
 
 经典不是人格 Agent。经典通过 BookProfile 和 LensSkill 提供有边界的认知视角。
 
@@ -496,7 +594,7 @@ IntentTrace 显化用户可能真正关心的问题。
 - LensSkill 失败不得破坏 Core Alpha 判断闭环。
 - 长期可将认知视角扩展到书籍之外的专家框架、方法论或理论体系；该方向不属于当前 Alpha 承诺。
 
-### 9.3 认知画像
+### 10.3 认知画像
 
 认知画像不直接输出意图，只提供先验。
 
@@ -509,7 +607,7 @@ IntentTrace 显化用户可能真正关心的问题。
 - ProfileUpdateCandidate 需要用户确认或规则审核后才可合并。
 - CurrentState 必须具有过期时间和衰减策略。
 
-### 9.4 InformationIntake 与三部有限榜单
+### 10.4 InformationIntake 与三部有限榜单
 
 InformationIntake 负责接收候选资料，三部有限榜单负责有限注意力分配。
 
@@ -534,56 +632,89 @@ Alpha 规则：
 - 用户阅读、停留、跳过、收藏、关闭等互动可以进入 CognitiveEvent。
 - CognitiveEvent 只能辅助画像候选，不得直接覆盖当前问题。
 
-## 10. 用户工作台
+## 11. 用户工作台
 
 Streamlit 当前界面在 Alpha 中逐步收敛为个人认知工作台。
 
 建议主导航：
 
-- 工作台：提出问题、管理 ResearchCase、指定范围、查看判断卡和处置。
+- 工作台：提出问题、管理 ResearchCase、指定范围、查看判断卡、处置建议、判断复核和行动建议。
 - 知识：查看作品、版本、结构、引用记录和来源解析。
-- 复盘：查看 ResearchDisposition、ActionReview 和画像更新候选。
-- 开发者：查看索引、Chunk、队列、Token、Trace、审计和失败原因。
+- 复盘：查看 ResearchDisposition、JudgmentReview、ActionReview 和画像更新候选。
+- 开发者：查看研究轨迹、证据链、审计问题、失败原因、外部模型材料范围和执行成本。
 
 业务规则：
 
-- 默认用户界面不暴露 RAG 和索引实现细节。
+- 默认用户界面不暴露底层检索实现细节。
 - 开发者层保留诊断能力。
-- 判断应区分草稿、审计中、可采纳。
+- 判断应区分草稿、审计中、可采纳、需复核和不可继续使用。
 - 审计阻断时，UI 可以展示草稿和问题，但不能以最终结论样式呈现。
 - 用户可以查看系统发送给外部模型的材料范围。
 
-## 11. 业务指标
+## 12. 业务指标
 
-业务指标用于发现问题，不直接作为优化目标。不能为了提高研究完成率而降低审计标准，也不能为了提高行动接受率而增加激进建议。
+业务指标用于发现问题，不直接作为优化目标。不能为了提高完成率而降低审计标准，也不能为了提高行动接受率而增加激进建议。
 
-### 11.1 Core Alpha 指标
+### 12.1 业务结果指标
 
 | 指标 | 定义 | 计算口径 | 观测周期 | 期望方向 | 不能单独说明什么 |
 | --- | --- | --- | --- | --- | --- |
-| 研究完成率 | ResearchCase 形成可采纳 JudgmentCard 或明确处置的比例 | 完成研究数 / 新建 ResearchCase 数 | 周 / 月 | 稳定提高 | 不能证明判断质量高 |
-| 首次可靠判断时间 | 从提交 ResearchCase 到首个 ready JudgmentCard 的时间 | 中位数与 P95 | 周 / 月 | 下降 | 不能为了更快牺牲审计 |
-| 范围修正率 | 用户修改系统初始 KnowledgeScope 的 ResearchCase 占比 | 被修正范围的 ResearchCase 数 / 有初始范围的 ResearchCase 数 | 周 / 月 | 逐步下降但不追求 0 | 高可能代表系统选错，也可能代表用户积极治理 |
-| Claim 采纳率 | 用户明确接受的核心 Claim 占比 | 明确接受核心 Claim 数 / 已呈现核心 Claim 数 | 周 / 月 | 稳定提高 | 没有操作不能视为接受 |
-| 审计修订率 | 草稿因审计被有效修订的比例 | 修订后通过的 JudgmentCard 数 / 审计阻断 JudgmentCard 数 | 周 / 月 | 适中 | 过高可能说明生成质量低，过低可能说明审计无效 |
-| 处置明确率 | 研究最终形成明确 ResearchDisposition 的比例 | 有最终处置的 ResearchCase 数 / 可处置 ResearchCase 数 | 周 / 月 | 提高 | 不能说明处置一定正确 |
-| 行动接受率 | 用户接受 ActionProposal 并形成 ActionCommitment 的比例 | ActionCommitment 数 / ActionProposal 数 | 周 / 月 | 合理稳定 | 不是越高越好，MetaOS 也应帮助用户明确不行动 |
-| 复盘闭环率 | 已确认行动完成 ActionReview 的比例 | 有 Review 的 ActionCommitment 数 / 到期 ActionCommitment 数 | 周 / 月 | 提高 | 不能说明行动收益高 |
-| 判断修正率 | 后续新证据促使用户调整判断的比例 | 被修订 JudgmentCard 数 / 可复核 JudgmentCard 数 | 月 / 季度 | 可观测 | 高不一定坏，可能说明系统真的支持修正认知 |
+| 可靠判断完成率 | 进入正式研究后形成 ready JudgmentCard 的比例 | ready JudgmentCard 所属 ResearchCase 数 / 进入正式研究的 ResearchCase 数 | 周 / 月 | 稳定提高 | 不能证明行动一定正确 |
+| 处置完成率 | 形成最终 ResearchDisposition 的比例 | 有最终 ResearchDisposition 的 ResearchCase 数 / 已具备处置条件的 ResearchCase 数 | 周 / 月 | 提高 | 不能说明处置一定正确 |
+| 判断复核完成率 | 到期或满足复核条件后完成 JudgmentReview 的比例 | 已完成 JudgmentReview 的判断数 / 已到期或满足复核条件的判断数 | 月 / 季度 | 提高 | 不能说明原判断质量高 |
+| 行动复盘闭环率 | 已确认行动完成 ActionReview 的比例 | 有 ActionReview 的 ActionCommitment 数 / 到期 ActionCommitment 数 | 周 / 月 | 提高 | 不能说明行动收益高 |
 
-### 11.2 Extended Alpha 后续观测
+### 12.2 业务可靠性护栏
 
-Extended Alpha 再观测：
+| 指标 | 定义 | 计算口径 | 观测周期 | 期望方向 | 不能单独说明什么 |
+| --- | --- | --- | --- | --- | --- |
+| 来源边界违规率 | excluded 来源进入候选、上下文、工具输入、引用或证据链的比例 | 违规研究数 / 涉及 excluded 来源的研究数 | 周 / 月 | 目标为 0 | 不能说明未排除来源都合适 |
+| 核心 Claim 证据覆盖率 | ready 核心 Claim 具有有效支持证据的比例 | 具有有效支持证据的 ready 核心 Claim 数 / 所有 ready 核心 Claim 数 | 周 / 月 | 目标为 100% | 不能说明证据解释一定充分 |
+| 引用定位有效率 | EvidenceUnit 能回到有效来源和定位的比例 | 有效定位 EvidenceUnit 数 / 被引用 EvidenceUnit 数 | 周 / 月 | 提高 | 不能说明引用一定支持 Claim |
+| required source 独立检索报告覆盖率 | required source 均有独立结果说明的比例 | 有独立结果说明的 required source 数 / 成功解析的 required source 数 | 周 / 月 | 目标为 100% | 来源解析失败应另行观察 |
+| 审计阻断误显示率 | 被阻断内容误显示为最终结论的比例 | 误显示 JudgmentCard 数 / 被阻断 JudgmentCard 数 | 周 / 月 | 目标为 0 | 不能说明非阻断内容都高质量 |
+| 失效判断误显示率 | 已不应继续使用的判断仍显示为当前有效的比例 | 误显示失效判断数 / 已知失效判断数 | 月 / 季度 | 目标为 0 | 不能说明所有未失效判断都正确 |
 
-- 候选意图修正率。
-- 榜单有效关注率。
-- 画像更新接受率。
+### 12.3 运营与技术观察项
 
-这些指标不进入 Core Alpha 完成条件。
+| 指标 | 定义 | 计算口径 | 观测周期 | 期望方向 | 不能单独说明什么 |
+| --- | --- | --- | --- | --- | --- |
+| 单个可靠判断平均执行成本 | 形成 ready JudgmentCard 的平均资源成本 | 总执行成本 / ready JudgmentCard 数 | 周 / 月 | 可控 | 不能为了降成本牺牲证据 |
+| 平均研究耗时 | 从进入正式研究到 ready JudgmentCard 或明确处置的时间 | 中位数与 P95 | 周 / 月 | 下降 | 不能为了更快牺牲审计 |
+| 平均修订轮数 | JudgmentCard 从草稿到可采纳的平均修订次数 | 修订次数 / ready JudgmentCard 数 | 周 / 月 | 可观测 | 过低不一定好，可能审计不足 |
+| 达到修订上限比例 | 审计修订达到上限的比例 | 达到上限 JudgmentCard 数 / 进入审计 JudgmentCard 数 | 周 / 月 | 下降 | 不能说明未达上限都可靠 |
+| 检索失败后有效降级率 | 检索失败后系统给出正确失败说明或替代处置的比例 | 有效降级次数 / 检索失败次数 | 周 / 月 | 提高 | 不能说明检索本身质量高 |
 
-## 12. 全局业务原则
+### 12.4 用户主权指标
 
-### 12.1 上下文优先级
+| 指标 | 定义 | 计算口径 | 观测周期 | 期望方向 | 不能单独说明什么 |
+| --- | --- | --- | --- | --- | --- |
+| 未确认处置被视为已接受比例 | 系统将未确认处置当成最终处置的比例 | 违规处置数 / 待确认处置数 | 周 / 月 | 目标为 0 | 不能说明确认后的处置正确 |
+| 系统建议被用户调整比例 | 用户调整 Triage、DispositionProposal 或 ActionProposal 的比例 | 被调整建议数 / 已呈现建议数 | 周 / 月 | 可观测 | 高可能是系统不准，也可能是用户积极治理 |
+| 用户确认或覆盖非阻断性审计警告比例 | 用户知情处理非阻断警告的比例 | 被确认或覆盖的非阻断警告数 / 已呈现非阻断警告数 | 周 / 月 | 可观测 | 不代表阻断问题可被覆盖 |
+| 用户查看外部模型材料范围比例 | 用户查看外部模型发送材料范围的比例 | 查看次数 / 外部模型调用展示次数 | 月 / 季度 | 可观测 | 低不一定代表用户不关心隐私 |
+
+### 12.5 冻结与发布质量门
+
+Golden Cases 审计逃逸率作为冻结与发布质量门，不作为日常业务指标。目标为 0。
+
+## 13. Core Alpha 冻结验收场景
+
+这些场景是业务架构冻结验收场景，不是完整自动化测试用例。具体测试输入、Fixture 和断言由后续评测文档维护。
+
+| 场景 | 输入条件 | 用户显式约束 | 系统必须行为 | 系统禁止行为 | 最终可观察结果 | 关联业务不变量 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 指定单一来源解释 | 用户要求解释某概念 | 只允许《鬼谷子》 | 只在指定来源中取证；证据不足时说明不足 | 用全库其他资料代答 | JudgmentCard 只引用允许来源，或返回该来源证据不足 | 显式来源约束优先；模型参数知识不能伪装成指定来源 |
+| 双来源比较 | 用户比较《鬼谷子》和《理想国》 | 两个来源都必须覆盖 | 两边分别取证，再按统一维度比较 | 只取证一方后推断另一方 | 比较结论显示双方 EvidenceUnit 和差异 | comparison 来源必须独立取证 |
+| required 来源无证据 | 用户指定某来源必须参与 | required 来源已解析但无相关证据 | 报告该来源 no_evidence | 找其他来源填补 required 来源结论 | ResearchDisposition 可建议继续研究或证据不足关闭 | required 来源必须独立报告；无证据不得代答 |
+| excluded 来源污染测试 | 用户明确排除某来源 | excluded 来源存在且相关 | 排除该来源进入候选、上下文、工具输入、引用和证据链 | 引用或用该来源支撑核心 Claim | Trace 和 JudgmentCard 不含 excluded 来源证据 | excluded 来源边界可审计 |
+| 短资料公平性测试 | 短资料与长资料都可能相关 | 无显式偏好 | 短资料获得独立被检索和报告机会 | 因篇幅短而完全失去候选机会 | 来源报告显示短资料 supporting / contradicting / no_evidence / unavailable 之一 | 来源篇幅不得决定来源权重 |
+| 审计阻断测试 | 核心 Claim 无证据 | 用户仍想看结论 | 阻止其显示为可采纳判断，可展示草稿和问题 | 把 blocked Claim 标为 ready | UI 显示审计问题，不能作为可靠判断处置 | 审计状态与用户接受状态独立 |
+| 判断失效测试 | 关键证据删除或版本变化 | 用户查看旧判断 | 提示旧判断不可继续作为当前有效判断 | 继续显示为 ready 且无风险提示 | JudgmentReview 或失效提示可见 | 判断必须随证据变化被复核或失效 |
+
+## 14. 全局业务原则
+
+### 14.1 上下文优先级
 
 所有检索、推荐、意图推断、行动建议都必须遵守：
 
@@ -598,43 +729,44 @@ Extended Alpha 再观测：
 
 任何下层信息不得覆盖上层显式要求。
 
-### 12.2 证据原则
+### 14.2 证据原则
 
 - 证据优先于模型自由发挥。
 - 模型参数知识不能伪装成指定知识来源。
-- 检索不能让 Chunk 数量决定发言权。
+- 来源篇幅不得决定来源权重。
 - 短资料不因篇幅短而失去被引用机会。
 - 证据不足、来源歧义和检索失败必须明确区分。
 - 原文事实、模型推断、争议观点和个人反思必须区分。
 
-### 12.3 用户主权原则
+### 14.3 用户主权原则
 
 - 画像只提供先验，不覆盖当前问题。
 - Triage 只提供建议，不阻止用户研究。
 - 系统只能提出 DispositionProposal，最终 ResearchDisposition 由用户确认或调整。
 - 系统建议必须经用户确认后才成为行动。
 - 用户可以拒绝、调整或关闭画像更新。
-- 不行动、延后、继续研究、观察和理解完成都是合法处置。
+- 不行动、延后、继续研究、观察、复核和理解完成都是合法处置。
 
-### 12.4 知识边界原则
+### 14.4 知识边界原则
 
 - 用户私有资料默认不得外泄。
 - 不同知识库或工作空间之间不得串库。
-- 被排除来源不仅不得引用，也不得参与隐式推断。
+- excluded 来源不得进入检索候选、上下文、工具调用输入、引用、EvidenceUnit 和判断证据链。
+- 由于无法证明模型权重中不存在某一来源的潜在知识，系统不承诺在参数层消除该知识；系统只承诺它不能成为可采纳判断的证据，也不能被伪装成允许来源内容。
 - ResearchTrace 默认保存必要的定位、Hash 和摘要；是否保存完整原文，应由资料敏感级别与本地 / 外部模型策略决定。
 - 用户可以删除研究记录及其衍生画像候选。
 - 外部模型调用时，应明确发给哪个 Provider、发送哪些片段、是否包含用户画像、是否可关闭。
 
-### 12.5 经典视角原则
+### 14.5 经典视角原则
 
 - 经典是知识来源和认知视角，不是人格化 Agent。
 - 书籍是来源，BookProfile 描述其思想结构，LensSkill 提供受边界约束的使用方式。
 - 原文观点、现代类比和模型推演必须分开标记。
 - Alpha 不承诺把所有方法论、专家理论或组织管理体系都建成 LensSkill。
 
-## 13. 与其他文档的关系
+## 15. 与其他文档的关系
 
-本文档只维护业务目标、核心主线、业务闭环、用户控制点和业务指标。
+本文档只维护业务目标、业务主链、业务闭环、用户控制点、业务指标和冻结验收场景。
 
 其他权威文档：
 
@@ -645,5 +777,3 @@ Extended Alpha 再观测：
 - 具体任务拆分：`docs/TASK_INDEX.md`
 - 检索算法与来源治理：`docs/RAG_RETRIEVAL_STRATEGY.md`
 - Alpha 总览和关键决策：`docs/METAOS_ALPHA_UNIFIED_PLAN.md`
-
-`A0-DOC-001-R1` 先用于本次修订执行和提交记录；其任务状态、依赖和完成结果由后续 `A0-DOC-005` 或独立任务统一回填至 `docs/TASK_INDEX.md`。
