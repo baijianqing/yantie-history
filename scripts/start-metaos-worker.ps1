@@ -1,6 +1,7 @@
 [CmdletBinding()]
 param(
     [string[]]$Queues = @("ingest", "index", "rag"),
+    [switch]$SplitQueues,
     [int]$OllamaEmbedTimeout = 300,
     [int]$OllamaEmbedBatchSize = 64,
     [string]$OllamaEmbedNumGpu = "0",
@@ -37,5 +38,19 @@ Write-Host "Queues: $($Queues -join ', ')"
 Write-Host "Embedding: model=$OllamaEmbedModel batch=$OllamaEmbedBatchSize num_gpu=$OllamaEmbedNumGpu chroma_upsert=$ChromaUpsertBatchSize timeout=${OllamaEmbedTimeout}s"
 Write-Host "Index jobs: item_timeout=${IndexJobTimeoutSeconds}s rebuild_timeout=${RebuildIndexJobTimeoutSeconds}s"
 Write-Host "OCR jobs: timeout=${OcrJobTimeoutSeconds}s"
+
+if ($SplitQueues) {
+    Write-Host "Starting one hidden worker process per queue."
+    foreach ($queue in ($Queues | Select-Object -Unique)) {
+        $process = Start-Process `
+            -FilePath $python `
+            -ArgumentList @("-m", "metaos.tasks.worker", $queue) `
+            -WorkingDirectory $projectRoot `
+            -WindowStyle Hidden `
+            -PassThru
+        Write-Host "Started MetaOS worker PID $($process.Id): $queue"
+    }
+    return
+}
 
 & $python -m metaos.tasks.worker @Queues
