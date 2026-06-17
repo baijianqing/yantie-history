@@ -10,6 +10,8 @@
 
 任务标识：`A0-DOC-001-R2`
 
+关联一致性修订：`A0-DOC-002-R2`
+
 ## 1. 业务定位
 
 MetaOS 的长期愿景、Alpha 产品形态和 Core Alpha 切入口必须分开理解。
@@ -149,7 +151,7 @@ Question
 -> ResearchPlan
 -> ResearchRun
 -> ResearchAttempt
--> RetrievalRun
+-> RetrievalRun / 复用已有有效证据
 -> EvidenceUnit
 -> Claim
 -> JudgmentCard
@@ -177,6 +179,7 @@ flowchart TB
     RUN["ResearchRun<br/>范围、计划和目标明确的一次研究执行"]
     ATTEMPT["ResearchAttempt<br/>同一 Run 下的一次执行尝试"]
     RETRIEVAL["RetrievalRun<br/>一次检索执行细节"]
+    REUSE["复用已有有效证据<br/>零 RetrievalRun 路径"]
     EU["EvidenceUnit<br/>可定位、可引用、可校验证据"]
     CLAIM["Claim<br/>判断主张"]
     JC["JudgmentCard<br/>判断、证据、不同解释、证据缺口"]
@@ -205,8 +208,10 @@ flowchart TB
     KS --> RP
     RP --> RUN
     RUN --> ATTEMPT
-    ATTEMPT --> RETRIEVAL
+    ATTEMPT -->|"需要检索"| RETRIEVAL
+    ATTEMPT -->|"复用已有有效证据"| REUSE
     RETRIEVAL --> EU
+    REUSE --> EU
     EU --> CLAIM
     CLAIM --> JC
     JC --> AUDIT
@@ -241,6 +246,7 @@ flowchart TB
     RUN -. "对应完整记录" .-> TRACE
     ATTEMPT -. "写入" .-> TRACE
     RETRIEVAL -. "写入" .-> TRACE
+    REUSE -. "写入" .-> TRACE
     EU -. "写入" .-> TRACE
     CLAIM -. "写入" .-> TRACE
     JC -. "写入" .-> TRACE
@@ -256,6 +262,7 @@ flowchart TB
 - ResearchRun 是一次范围、计划和核心目标已确定的研究执行。
 - ResearchAttempt 是同一 ResearchRun 下的一次执行尝试。
 - RetrievalRun 是 ResearchAttempt 内部的检索执行细节。
+- 零 RetrievalRun 不等于无证据回答，只表示本次 ResearchAttempt 复用了已经存在且重新校验有效的 EvidenceUnit。
 - ResearchTrace 是 ResearchRun 的完整审计记录。
 - JudgmentReview 复核“判断是否仍成立”。
 - ActionReview 复核“行动是否有效”。
@@ -418,8 +425,9 @@ ResearchAttempt 是同一 ResearchRun 下的一次执行尝试。RetrievalRun �
 - 一个 ResearchCase 可以拥有多个 ResearchRun。
 - 每个 ResearchRun 对应一个完整 ResearchTrace。
 - 一个 ResearchRun 可以发生多个 ResearchAttempt。
-- 每个 ResearchAttempt 可以包含一个或多个 RetrievalRun。
-- ResearchTrace 汇总并记录全部 ResearchAttempt 和 RetrievalRun。
+- 每个 ResearchAttempt 可以包含零个或多个 RetrievalRun。
+- 不包含 RetrievalRun 的 ResearchAttempt 只能复用已有且重新校验有效的 EvidenceUnit，不得使用模型参数知识代替证据。
+- ResearchTrace 汇总并记录全部 ResearchAttempt、RetrievalRun 和复用证据关系。
 - 失败 ResearchAttempt 不得被后续 ResearchAttempt 覆盖。
 - 只有在 KnowledgeScope、ResearchPlan 和核心研究目标保持不变时，重试才可以作为同一 ResearchRun 的新 ResearchAttempt。
 - 范围、研究模式、核心证据要求或研究目标发生实质变化时，必须创建新的 ResearchRun。
@@ -476,10 +484,11 @@ Audit 判断一次研究是否可采纳。
 业务规则：
 
 - 审计结果不能只有通过或失败，必须能表达问题、严重性、影响范围和建议修订方向。
-- 非阻断性审计警告可以由用户知情确认、接受风险或要求修订。
+- 非阻断性审计警告可以由用户知情确认、接受风险或要求修订，确认后可以继续处置或行动。
 - 阻断性审计问题必须阻止 JudgmentCard 被显示为可采纳判断。
 - 用户不能通过接受操作，将 blocked Claim 改为 ready。
-- 用户可以在知晓风险后继续处置或行动，但系统必须记录为用户覆盖，并保留风险提示，不得继续标记为可靠判断。
+- 阻断性审计问题不得进入 `proceed_to_action`，也不能通过用户接受变为可靠判断。
+- 阻断后，用户只能拒绝采用该草稿、终止本次研究、延后处理、继续研究或查看草稿；这些操作不表示形成可靠判断。
 - 审计阻断后进入有上限的版本化修订循环。
 - 达到修订上限后，研究应转入 awaiting_user 或 failed，而不是假装得到可靠答案。
 
