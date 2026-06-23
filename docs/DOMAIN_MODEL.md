@@ -6,7 +6,7 @@
 
 文档性质：本文描述目标领域契约，不表示相关能力已经可运行。阶段 0 允许代码与本文暂时不一致。
 
-任务标识：`A0-DOC-003-R1.2`
+任务标识：`A0-DOC-003-R1.2.1`
 
 依赖：业务架构 `A0-DOC-001-R7.1`，技术架构 `A0-DOC-002-R4.1`
 
@@ -114,7 +114,7 @@ JudgmentCard
 - 对未识别 code 拒绝写入，或按照该字段明确声明的降级策略处理；
 - 在 Trace 中记录实际 code 与注册表版本。
 
-开放代码值字段包括 `KnowledgeItem.item_type`、`EvidenceRequirement.requirement_type`、`RetrievalRun.retrieval_channel`、`EvidenceUnit.origin_type`、`AuditFinding.finding_type`、`ResearchRunOutcome.reason_code`、`TraceEvent.event_type`、`TraceEvent.actor_type`，以及 Capability 的 operation 与 failure category。
+开放代码值字段包括 `KnowledgeItem.item_type`、`EvidenceRequirement.requirement_type`、`RetrievalRun.retrieval_channel`、`EvidenceUnit.origin_type`、`AuditFinding.finding_type`、`ResearchRunOutcome.reason_code`、`TraceEvent.event_type`、`TraceEvent.actor_type`、`MaterialManifest.invocation_type`，以及 Capability 的 operation 与 failure category。
 
 ## 3. 对象注册与聚合边界
 
@@ -125,7 +125,7 @@ JudgmentCard
 | 对象 | 交付层级 | 类别 | 聚合根或归属 | 权威业务状态 | 权威技术记录 | 版本化 |
 | --- | --- | --- | --- | ---: | ---: | --- |
 | KnowledgeItem | Minimum Slice | Aggregate Root | Knowledge Catalog | 是 | 否 | 并发修订 |
-| KnowledgeItemVersion | Minimum Slice | Immutable Record | KnowledgeItem | 是 | 否 | 是 |
+| KnowledgeItemVersion | Minimum Slice | Entity | KnowledgeItem | 是 | 否 | 内容版本不可变、可用性可变 |
 | Chunk | Minimum Slice | Immutable Record | KnowledgeItem | 是 | 否 | 随来源版本 |
 | IndexGeneration | Minimum Slice | Technical Record | Knowledge Catalog | 否 | 是 | generation 链 |
 | SourceResolution | Minimum Slice | Immutable Record | ResearchCase | 是 | 否 | 以记录追加 |
@@ -213,13 +213,12 @@ JudgmentCard
 
 #### KnowledgeItemVersion
 
-- 类别：Immutable Record；所属聚合：KnowledgeItem。
+- 类别：Entity；所属聚合：KnowledgeItem。
 - 目的：固定可寻址、可检索、可引用的内容身份。
 - 必填：`knowledge_item_version_id`、`knowledge_item_id`、`version`、`storage_ref`、`content_hash`、`structure_hash`、`parser_version`、`language`、`availability_status`、`created_at`。
 - 可选：`previous_version_id`。
 - `availability_status`：`available / unavailable / withdrawn`。
-- 不变量：发布后内容、Hash、版本身份和存储引用不可原地修改；OCR 修正、文件替换、译本变化、文本校订或重新解析必须产生新版本；指定版本不可用时不得静默替换。
-- 本对象不可变，不拥有独立生命周期状态；availability 只表达可用性，不改写历史内容。
+- 不变量：发布后内容、Hash、版本号、存储引用和解析器版本不可原地修改；OCR 修正、文件替换、译本变化、文本校订或重新解析必须产生新内容版本；指定版本不可用时不得静默替换；availability 通过 KnowledgeItem 聚合变更，只递增 KnowledgeItem.revision，不创建新内容版本。
 
 #### Chunk
 
@@ -402,11 +401,11 @@ JudgmentCard
 
 - 类别：Entity；所属聚合：JudgmentCard。
 - 目的：表达 EvidenceUnit 对特定 Claim 的作用。
-- 必填：`claim_evidence_link_id`、`claim_version_id`、`evidence_unit_id`、`evidence_role`、`support_strength`、`created_at`。
+- 必填：`claim_evidence_link_id`、`claim_version_id`、`research_evidence_use_id`、`evidence_unit_id`、`evidence_role`、`support_strength`、`created_at`。
 - 可选：`scope_note`。
 - `evidence_role`：`supports / contradicts / defines / context / background`。
 - `support_strength`：结构化值对象，包含 `level` 与 `reason`；`level` 固定为 `weak / moderate / strong`。
-- 不变量：同一 EvidenceUnit 可支持一个 Claim 并反驳另一个；角色属于关系而非证据永久属性；相同底层证据不得虚增证据数量。
+- 不变量：ResearchEvidenceUse 必须属于 JudgmentCard 对应的 ResearchRun，且其 evidence_unit_id 必须与 Link 一致；validity_result=invalid 不得创建 Link；needs_review 只能作为背景、反证或触发 warning，不能单独支撑可采纳核心 Claim；同一 EvidenceUnit 可支持一个 Claim 并反驳另一个；角色属于关系而非证据永久属性；相同底层证据不得虚增证据数量。
 
 #### JudgmentRationale
 
@@ -532,10 +531,10 @@ JudgmentCard
 - 类别：Aggregate Root。
 - 目的：统一承载尚未激活的问题、Case、知识缺口、复核建议或外部线索。
 - 必填：`attention_backlog_item_id`、`source_type`、`title`、`reason`、`status`、`revision`、`created_at`。
-- 可选：`source_ref_id`、`question_text`、`external_lead_summary`、`estimated_attention_cost`、`activated_research_case_id`、`resolved_at`。
+- 可选：`source_ref_id`、`question_text`、`external_source_ref`、`external_lead_summary`、`estimated_attention_cost`、`activated_research_case_id`、`resolved_at`。
 - `source_type`：`saved_question / inactive_case / knowledge_gap / review_suggestion / external_lead`。
 - 状态：`pending / activated / discarded / archived`。
-- 条件必填：`saved_question` 必须有 `question_text`，source ref 可空；`inactive_case` 必须引用 ResearchCase；`knowledge_gap` 必须引用 KnowledgeAsset；`review_suggestion` 必须引用 JudgmentReview 或 ReviewResult；`external_lead` 必须有外部引用或摘要。
+- 条件必填：`saved_question` 必须有 `question_text`，source ref 可空；`inactive_case` 必须引用 ResearchCase；`knowledge_gap` 必须引用 KnowledgeAsset；`review_suggestion` 必须通过 source_ref_id 引用 ReviewResult；`external_lead` 必须通过 external_source_ref 保存外部 URL、文件或平台引用，或具有摘要，且不得把外部标识塞入内部 source_ref_id。
 - 不变量：激活 saved question 时原子创建 `ResearchCase + ResearchQuestion`；激活前不自动创建 active Case；知识缺口不自动占用在办名额；用户覆盖软门禁必须可追踪。
 
 ### 5.3 JudgmentReview 与 ReviewResult
@@ -603,8 +602,9 @@ JudgmentCard
 - 可选：`target_knowledge_asset_id`、`audit_finding_ids`、`warning_acknowledgement_ids`、`previous_version_id`。
 - `contribution_type`：`claim / evidence / gap`。
 - `validation_status`：`not_required / pending / passed / failed`。
-- `user_decision_status`：`pending / accepted / rejected`。
+- `user_decision_status`：`pending / accepted_as_knowledge / saved_as_note / rejected`。
 - `lifecycle_status`：`current / superseded / closed`。
+- 条件必填：`accepted_as_knowledge` 只允许在 validation 为 `not_required / passed` 时发生；`saved_as_note` 可以在 validation=failed 时发生；后三种用户决定都必须使 lifecycle 进入 closed。
 - 不变量：与 DispositionProposal 并行且互不依赖；没有候选是合法结果；blocked 判断不得产生可确认候选；用户改变结论强度、语义、证据关系或范围时必须重新校验；校验失败不得写入 KnowledgeAsset；用户确认不提升 Claim 证据状态。
 
 ### 5.6 KnowledgeAsset
@@ -663,6 +663,8 @@ Attempt 不得修改该快照；索引切换不影响已启动 Run；超出允�
 
 `aggregate_type / aggregate_id / aggregate_revision` 精确标识产生事件的聚合及其版本。Case 范围事件必须具有 `research_case_id`；Knowledge Catalog、IndexGeneration 等非 Case 事件可以为空。correlation 与 causation 负责串联跨聚合原子用例，不用上下文 ID 代替聚合身份。
 
+aggregate_type / aggregate_id 只能锚定聚合根：IndexGeneration 子记录事件锚定 KnowledgeItem，Claim 与 AuditFinding 事件锚定 JudgmentCard，ActionReview 事件锚定 ActionCommitment；技术子记录不得冒充聚合根。aggregate_revision 始终是该聚合根的 revision，而不是子记录版本号。
+
 ### 6.5 ResearchTrace 与 CaseActivityLog
 
 - `ResearchTrace` 是由 TraceEvent 形成的 Run 级查询投影，可查询输入快照、范围、计划、执行、检索、证据、推理、判断、审计、用途、出站材料、Outcome、降级和失败。
@@ -671,7 +673,13 @@ Attempt 不得修改该快照；索引切换不影响已启动 Run；超出允�
 
 ### 6.6 MaterialManifest
 
-不可变出站审计记录，必填：`material_manifest_id`、`research_run_id`、`capability_invocation_id`、数据对象引用、来源版本、Hash、定位、长度、敏感级别、provider、purpose、出站政策版本、判定、原因、是否包含画像数据和 `created_at`；可选：EvidenceUnit/Chunk 引用。
+不可变出站审计记录，必填：`material_manifest_id`、`invocation_type`、`invocation_id`、`provider`、`purpose`、`policy_version`、`policy_decision`、材料对象引用、来源版本、Hash、定位、长度、敏感级别、是否包含画像数据和 `created_at`。
+
+`policy_decision`：`allowed / denied`。
+
+条件引用：`research_case_id`、`research_run_id`、`research_attempt_id`、`capability_invocation_id`、`intake_or_import_context_ref`。
+
+规则：Run 前调用至少绑定 ResearchCase 或明确的 intake/import 上下文；只有 Capability 调用要求 capability_invocation_id；LLM、Embedding、OCR、Reranker、Tool 或其他 Provider 的每个实际子调用分别生成 Manifest，不以一次上层编排记录代替多个出站事实。
 
 默认不保存完整原文、完整 Prompt、画像全文、API Key 或认证 Header。
 
@@ -742,7 +750,7 @@ flowchart TB
     RUN --> JC[JudgmentCard]
     JC --> CL[Claim]
     CL --> CEL[ClaimEvidenceLink]
-    CEL --> EU
+    CEL --> REU
     CL --> RAT[JudgmentRationale]
     RAT --> CEL
     JC --> JA[JudgmentAudit]
@@ -772,8 +780,8 @@ flowchart LR
     AR -->|前提受质疑| REVIEW
 
     CARD --> KCC[KnowledgeContributionCandidate]
-    KCC -->|校验并确认| KA[KnowledgeAsset]
-    KCC -->|保存为个人观点| NOTE[UserNote]
+    KCC -->|accepted_as_knowledge| KA[KnowledgeAsset]
+    KCC -->|saved_as_note| NOTE[UserNote]
     KA -->|知识缺口| BACKLOG
 ```
 
@@ -801,8 +809,10 @@ flowchart TB
 stateDiagram-v2
     [*] --> created
     created --> running
+    created --> cancelled
     running --> awaiting_user
     awaiting_user --> running
+    awaiting_user --> cancelled
     running --> completed
     running --> failed
     running --> cancelled
@@ -819,12 +829,11 @@ stateDiagram-v2
 | --- | --- | --- |
 | KnowledgeItem.lifecycle_status | `active -> archived / deleted`；`archived -> active / deleted` | deleted 不可恢复；内容版本变化不通过该状态表达 |
 | KnowledgeItemVersion.availability_status | `available -> unavailable / withdrawn`；`unavailable -> available / withdrawn` | 状态变化不修改内容身份 |
-| VersionedObject.lifecycle_status | `current -> superseded` | 新 current 与旧 current 转换原子完成；适用于 Scope、Plan、Claim、JudgmentCard 及各版本化 Proposal/Candidate |
 | IndexGeneration.status | `pending -> building -> ready / failed`；`ready -> superseded / invalid` | failed 重试创建新 generation，不复用失败记录 |
 | ResearchCase.lifecycle_status | `open -> archived`；`archived -> open` | 归档时 attention 不得为 active；重新打开不恢复旧在办状态 |
 | ResearchCase.attention_status | `saved -> active / closed`；`active -> paused / observing / deferred / closed`；`paused / observing / deferred -> active / closed` | active 受软门禁约束；系统不得自动关闭 |
-| ResearchAttempt.status | `created -> running`；`running -> completed / failed / cancelled / stale` | stale 结果不得更新 current 投影 |
-| RetrievalRun.status | `created -> running`；`running -> completed / failed / cancelled` | outcome 必须与终态一致 |
+| ResearchAttempt.status | `created -> running / cancelled / stale`；`running -> completed / failed / cancelled / stale` | stale 结果不得更新 current 投影 |
+| RetrievalRun.status | `created -> running / cancelled`；`running -> completed / failed / cancelled` | outcome 必须与终态一致 |
 | JudgmentAudit.audit_run_status | `pending -> running -> completed / failed` | completed 必须具有 gate_result；failed 不改变既有可采纳状态 |
 | EvidenceUnit.validity_status | `valid -> needs_review -> valid / invalid`；`valid -> invalid` | 只修改有效性与 revision，不修改证据内容身份 |
 | ResearchTriage.decision_status | `pending -> accepted / adjusted / overridden` | 非 pending 状态必须记录 `selected_path` 与 `decided_at` |
@@ -835,6 +844,8 @@ stateDiagram-v2
 | KnowledgeAsset.lifecycle_status | `active -> withdrawn / archived` | withdrawn 是用户撤回，archived 是保留但不活跃，均不等于 invalid |
 | UserNote.lifecycle_status | `active -> withdrawn / archived` | 不改变其非证据属性 |
 
+所有版本化对象共享“创建新版本时 current -> superseded 必须原子切换”的不变量；除此之外，KnowledgeScope、ResearchPlan、Claim、JudgmentCard、各 Proposal 与 Candidate 分别遵守自身定义的完整生命周期状态机，不使用一套通用状态机替代具体状态。
+
 Proposal 与候选分别维护多套正交状态：
 
 - `DispositionProposal.user_decision_status`：`pending -> accepted / adjusted / rejected`。adjusted 必须创建新版本，旧版本进入 superseded。
@@ -842,7 +853,7 @@ Proposal 与候选分别维护多套正交状态：
 - `ActionProposal.user_decision_status`：`pending -> accepted / rejected`；用户修改视为创建新版本而非在原版本增加 adjusted 状态。
 - `ActionProposal.lifecycle_status`：`current -> superseded / expired / withdrawn`。
 - `KnowledgeContributionCandidate.validation_status`：`not_required`，或 `pending -> passed / failed`。
-- `KnowledgeContributionCandidate.user_decision_status`：`pending -> accepted / rejected`；只有 validation 为 `not_required / passed` 时才可 accepted。
+- `KnowledgeContributionCandidate.user_decision_status`：`pending -> accepted_as_knowledge / saved_as_note / rejected`；只有 validation 为 `not_required / passed` 时才可 accepted_as_knowledge，validation=failed 时可 saved_as_note。
 - `KnowledgeContributionCandidate.lifecycle_status`：`current -> superseded / closed`。
 
 ### 9.3 JudgmentCard
@@ -868,8 +879,8 @@ ActionProposal
 -> 用户修改 -> 新版本 Proposal + 新风险评估 + 新用途校验
 
 KnowledgeContributionCandidate
--> 必要校验 -> 用户确认 -> KnowledgeAsset
--> 校验失败但用户希望保留 -> UserNote
+-> 必要校验 -> accepted_as_knowledge -> KnowledgeAsset
+-> 校验失败但用户希望保留 -> saved_as_note -> UserNote
 -> 用户拒绝 -> closed
 ```
 
@@ -906,9 +917,17 @@ ReviewResult 不得直接覆盖旧 ResearchDisposition。上游证据或确定�
 
 ```text
 确认 KnowledgeContributionCandidate
-= Candidate.user_decision_status -> accepted
+= Candidate.user_decision_status -> accepted_as_knowledge
 + Candidate.lifecycle_status -> closed
 + 创建 KnowledgeAsset
++ 追加 TraceEvent
+```
+
+```text
+保存为 UserNote
+= Candidate.user_decision_status -> saved_as_note
++ Candidate.lifecycle_status -> closed
++ 创建 UserNote
 + 追加 TraceEvent
 ```
 
@@ -1007,6 +1026,11 @@ ReviewResult 不得直接覆盖旧 ResearchDisposition。上游证据或确定�
 58. 每条版本链最多一个 current 版本，版本号单调递增、前序同源且无环；current 切换与旧版本 superseded 必须原子完成。
 59. 开放代码值必须绑定稳定 code 和注册表版本，未知 code 不得作为任意自然语言写入。
 60. KnowledgeScope.default_access_policy 只能是 allowed 或 excluded；required 只能由显式 SourceBinding 声明。
+61. KnowledgeItemVersion 的内容身份不可变，但 availability 可由 KnowledgeItem 聚合修改；该操作只递增 KnowledgeItem.revision。
+62. 每个实际 Provider 子调用都必须形成独立 MaterialManifest；Run 前调用必须绑定 Case 或 intake/import 上下文，非 Capability 调用不得伪造 capability_invocation_id。
+63. ClaimEvidenceLink 必须引用同一 ResearchRun 的 ResearchEvidenceUse 快照；invalid 不得进入 Link，needs_review 不得单独支撑可采纳核心 Claim。
+64. KnowledgeContributionCandidate 的 accepted_as_knowledge、saved_as_note 与 rejected 是互斥终态决定，分别原子创建对应对象或关闭候选。
+65. TraceEvent 只能锚定聚合根，aggregate_revision 必须来自该聚合根；技术子记录通过 payload 或上下文引用表达。
 
 ## 11. 与其他权威文档的关系
 
