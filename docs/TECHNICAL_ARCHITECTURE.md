@@ -10,7 +10,7 @@
 
 本文重复出现业务术语时，只用于说明技术职责、强制控制点、数据归属和失败行为，不构成另一套业务定义或状态枚举；跨文档冲突时仍以上述权威文档为准。
 
-任务标识：`A0-DOC-002-R4`
+任务标识：`A0-DOC-002-R4.1`
 
 关联业务架构修订：`A0-DOC-001-R7.1`
 
@@ -118,6 +118,7 @@ flowchart TB
     subgraph ADAPTERS["入口适配层"]
         API_ADAPTER["FastAPI Adapter"]
         WORKER_ADAPTER["RQ Worker Adapter"]
+        INTERNAL_RESULT_ADAPTER["Internal Result Adapter<br/>进程内 / RQ / 受信任人工 / 测试"]
     end
 
     WORKBENCH --> API_ADAPTER
@@ -135,8 +136,8 @@ flowchart TB
 
     API_ADAPTER --> COMMAND
     API_ADAPTER --> QUERY
-    API_ADAPTER --> RESULT_COMMAND
-    WORKER_ADAPTER --> RESULT_COMMAND
+    WORKER_ADAPTER --> INTERNAL_RESULT_ADAPTER
+    INTERNAL_RESULT_ADAPTER --> RESULT_COMMAND
     QUERY --> VIEW_DTO
     VIEW_DTO -. "响应" .-> API_ADAPTER
 
@@ -214,8 +215,7 @@ flowchart TB
     LLM --> STRUCTURED
     CAPABILITY --> STRUCTURED
     STRUCTURED --> CANDIDATE
-    CANDIDATE -. "同步结果" .-> API_ADAPTER
-    CANDIDATE -. "异步结果" .-> WORKER_ADAPTER
+    CANDIDATE --> INTERNAL_RESULT_ADAPTER
 
     subgraph PORTS["Repository / Port 层"]
         CASE_REPO["Case Repository Port"]
@@ -315,7 +315,8 @@ Streamlit 继续作为 Alpha 本地工作台，FastAPI 继续作为本地 API �
 - Streamlit 和 FastAPI 不直接修改领域状态。
 - Streamlit 不直接查询 SQLite、Chroma、领域 Repository 或 Event Projection；所有用户与开发者读取都通过 Application Query Handler。
 - RQ Worker Adapter 只是异步入口，不拥有独立业务规则。
-- API Adapter 将用户写操作路由到 use-case Command Handler，将读取路由到 Query Handler；Worker Adapter 只提交 Candidate Result Command。
+- API Adapter 将普通用户写操作路由到 use-case Command Handler，将读取路由到 Query Handler；普通工作台 API 不暴露 Candidate Result Command。
+- Internal Result Adapter 只接受进程内同步执行器、RQ Worker Adapter、受信任人工审核入口或测试 Fixture 的候选结果。
 - blocked JudgmentCard 不得以可采纳结论样式展示。
 - 表现层必须分别展示运行结果、判断用途和用户处置，不能用一个状态标签合并 ResearchRunOutcome、DecisionFitness 与 ResearchDisposition。
 - Chroma 和 FTS5 只服务检索，不得作为用户业务状态、当前版本或用户确认的查询源。
@@ -346,13 +347,22 @@ Domain Module 负责业务不变量和状态转换。Repository / Port 只负责
 
 Candidate Result Command Handler 专门接收已经通过 Pydantic / JSON Schema 校验的模型或 Capability 候选。Schema 合法只证明数据形状正确；Handler 仍需检查输入版本、KnowledgeScope、Run / Attempt 生命周期、EvidenceUnit 范围、幂等键和 Tombstone，再调用 Domain Module 决定是否接纳。
 
+Candidate Result Command 是内部可信应用入口，不是普通用户 API。它至少校验 service / worker identity、job identity、operation type、RunExecutionSpec、Attempt ID、input version、idempotency key、lifecycle generation、capability implementation version、output schema version 和 correlation / causation ID。若通过 FastAPI 承载，必须使用独立内部路由、独立鉴权和受限网络边界；本地同步执行优先使用进程内 Application Service 调用。
+
 Application Query Handler 负责：
 
 - 选择 JudgmentCard、ResearchRunOutcome、ResearchDisposition 等对象的 current version。
 - 合并证据失效、needs_review、blocked、非阻断 warning 和 DecisionFitness 的展示映射。
-- 从领域持久化集合或只读投影构建 View DTO，不在 UI 中拼装业务状态。
+- 从领域持久化集合或满足一致性要求的只读投影构建 View DTO，不在 UI 中拼装业务状态。
 - 为普通用户和开发者生成不同 DTO；开发者 DTO 可以包含 Trace、Activity、MaterialManifest 和失败诊断，普通用户 DTO 遵守最小披露与脱敏策略。
 - 读取失败时返回明确的不可用或投影滞后语义，不回退到 Chroma 推断业务状态。
+
+查询一致性分为两类：
+
+- 强一致当前状态：当前 ResearchCase、KnowledgeScope、JudgmentCard、DecisionFitness、DispositionProposal、ResearchDisposition、ActionProposal，以及用户刚完成的确认结果。优先读取领域持久化集合和 current pointer；使用 Read Model 时，其 projection version 必须不早于请求携带的 minimum command version，否则回退到领域 Repository。
+- 最终一致诊断：ResearchTrace、CaseActivityLog、统计、成本汇总、长期时间线和开发者诊断投影。允许延迟，但 DTO 必须暴露 projection version、updated at 和 lagging 语义。
+
+命令响应直接返回本次事务形成的权威结果及 command version。随后当前状态查询不得展示早于该版本的投影；`minimum_projection_version` 只是契约语义，具体字段由 API 契约定义。
 
 ### 4.3 Core Alpha 能力模块
 
@@ -420,9 +430,9 @@ BookProfile 与 CognitiveLens 属于 Extended Alpha 可选认知视角。Cogniti
 
 | 层级 | 发布前置技术能力 |
 | --- | --- |
-| Minimum Slice 必须 | use-case Command Handlers、Query Handler / View DTO、Domain Module、单阶段 Full SourceResolution、二维 KnowledgeScope、ResearchPlan、ResearchRun / RunExecutionSpec / Attempt、EvidenceUnit、JudgmentRationale、版本化 JudgmentCard、Audit Pipeline、DecisionFitness、ResearchRunOutcome、DispositionProposal / ResearchDisposition、最小 ResearchTrace、输入版本检查、structured candidate validation、单一 research execution path、SQLite 权威校验与派生索引结果过滤 |
-| Minimum Slice 条件性 | 仅当使用 RQ 异步执行时，Outbox、幂等 Job、stale result rejection、lifecycle generation / Tombstone、Candidate Result Command 和持久化检查点成为发布前置；完全同步首版可以只保留接口与切换边界 |
-| Core Alpha Complete 增加 | Preliminary Source Anchor Parsing、ResearchTriage、ResearchBudgetGuard、AttentionBacklog、JudgmentReview、Action、Knowledge Contribution、Evidence Validity 传播、完整 CaseActivityLog、WarningAcknowledgement、延后 / 观察恢复入口 |
+| Minimum Slice 必须 | use-case Command Handlers、Query Handler / View DTO、Internal Result Adapter / Candidate Result Command、Domain Module、单阶段 Full SourceResolution、二维 KnowledgeScope、ResearchPlan、ResearchRun / RunExecutionSpec / Attempt、EvidenceUnit、JudgmentRationale、版本化 JudgmentCard、Audit Pipeline、最小 AuditFinding / WarningAcknowledgement、DecisionFitness、ResearchRunOutcome、引用 warning acknowledgement 的 DispositionProposal / ResearchDisposition、最小 ResearchTrace、输入版本检查、structured candidate validation、同步双事务 research execution path、SQLite 权威校验与派生索引结果过滤 |
+| Minimum Slice 条件性 | 仅当使用 RQ 异步执行时，Worker Adapter、Outbox、幂等 Job、stale result rejection、lifecycle generation / Tombstone 和持久化检查点成为发布前置；完全同步首版可以只保留这些异步接口与切换边界 |
+| Core Alpha Complete 增加 | Preliminary Source Anchor Parsing、ResearchTriage、ResearchBudgetGuard、AttentionBacklog、JudgmentReview、Action、Knowledge Contribution、Evidence Validity 传播、完整 CaseActivityLog、WarningAcknowledgement 向 Action / Knowledge Contribution / KnowledgeAsset / Review 的完整传播、延后 / 观察恢复入口 |
 | Extended Alpha 可选 | UserContextProvider、Intent / Profile / Ranking、BookProfile / CognitiveLens；失败时 Core Alpha 仍使用空先验继续运行 |
 
 Outbox、Tombstone、完整 Activity 投影和异步恢复不能因为写入本文档就被视为同步 Minimum Slice 的强制首批实现；是否启用由具体任务的执行模式决定。
@@ -456,16 +466,24 @@ ResearchRun
 - 每个结束的 ResearchRun 都必须形成 ResearchRunOutcome；它记录形成判断、证据不足、审计阻断、用户终止、判断前延后或被新 Run 取代等结束语义。
 - ResearchRunOutcome 与 ResearchDisposition 分开持久化和投影。前者是执行结果，后者只在满足用途约束的可采纳判断和用户确认后存在。
 - Worker 可以提交 RunOutcome 候选，但必须由 Research Execution Domain Module 校验当前版本、生命周期代数和结束条件后写入。
+- ResearchRun 进入 terminal state、创建 ResearchRunOutcome 和追加对应事件必须由 FinalizeResearchRunCommand 或等价 use-case Handler 在同一领域事务中提交。
+- 不允许先将 Run 标记为完成，再依赖异步修复任务补写 Outcome；修复队列只处理异常历史数据，不参与正常结束路径。
 
 RunExecutionSpec 是技术执行快照，不是新的业务对象。它至少固定：
 
 - KnowledgeScope、Full SourceResolution 和 ResearchPlan 版本。
-- Retrieval、Context Packing、Embedding、Reranker 和 Capability Provider 实现版本。
+- index snapshot：source version set，以及每个 KnowledgeItemVersion 允许使用的 vector / FTS IndexGeneration。
+- Retrieval、Context Packing、Embedding、Reranker 和 Capability Provider contract / implementation set。
 - Prompt、输出 Schema、Audit Policy、DecisionFitness Policy 和 Data Egress Policy 版本。
 - 允许的 fallback 链与质量影响规则。
 - 运行预算、关键上游版本、创建时间和关联标识。
 
 实际调用的 Provider、模型、fallback 和预算消费继续记录在 ResearchTrace；RunExecutionSpec 记录“允许按什么执行”，Trace 记录“实际如何执行”。两者都不得被后续 Attempt 原地覆盖。
+
+- 同一 ResearchRun 的多个 Attempt 默认使用相同 index snapshot；current generation pointer 切换不影响正在执行的 Run。
+- 固定 generation 仍可用时继续使用；如果它已失效或删除，不得静默改用新 generation。
+- 切换到新代际必须创建新的 ResearchRun，除非 RunExecutionSpec 已明确允许该 generation fallback 及质量影响。
+- RunExecutionSpec 可以固定允许的 capability contract、implementation set 和 fallback policy，不要求所有能力只能使用唯一物理 Provider；实际实现仍由 Trace 和 MaterialManifest 记录。
 
 零 RetrievalRun 路径称为 `reuse_existing_evidence`：
 
@@ -537,6 +555,8 @@ ResearchTrace 至少记录：
 - 本次运行生成的 KnowledgeContributionCandidate 引用，可选。
 - 降级路径、能力缺失和失败原因。
 
+ResearchTrace 中的输入快照、模型调用和 CandidateResult 默认保存对象引用、Hash、版本、长度和必要的脱敏摘要，不自动复制完整私有原文、完整 Prompt、认证信息或用户画像全文。需要诊断预览时仍受 MaterialManifest、Data Egress Policy 和本地保留策略约束。
+
 CaseActivityLog 至少记录：
 
 - Case 创建、归档、重新打开。
@@ -553,7 +573,7 @@ CaseActivityLog 至少记录：
 
 ## 7. 命令、并发、Outbox 与 Worker
 
-### 7.1 命令版本绑定
+### 7.1 命令版本绑定与同步事务边界
 
 所有改变用户可见当前状态的命令，必须携带并校验并发令牌、目标版本和其依据的上游版本。具体请求字段由 `docs/API_CONTRACTS.md` 定义。
 
@@ -575,6 +595,31 @@ Worker 结果提交也必须校验输入版本。若输入已经被新版本取�
 - 可以保留执行结果和 Trace。
 - 应将结果标记为 stale 或 superseded 语义。
 - 是否允许用户查看，由表现层决定。
+
+同步和异步执行共享同一个 Candidate Result Command，只在调度方式和调用方是否等待结果上不同，不在候选接纳或领域状态写入路径上分叉。
+
+同步执行也必须拆成两个短事务：
+
+```text
+第一段短事务
+StartResearchRunCommand
+-> 创建 ResearchRun / ResearchAttempt
+-> 固化 RunExecutionSpec
+-> 追加事件
+-> 提交
+
+事务外
+-> Retrieval / Capability / LLM
+
+第二段短事务
+SubmitCandidateResultCommand
+-> 版本、范围、生命周期和幂等校验
+-> Domain Module 接纳候选
+-> 写 Evidence / Judgment / Audit / ResearchRunOutcome
+-> 追加事件并提交
+```
+
+同步调用不能在 SQLite 写事务中等待检索、外部 Provider 或模型返回。UI 请求中断不改变第一段事务已提交的事实；重复提交通过 idempotency key 返回已有结果或 no-op。
 
 ### 7.2 Outbox 与至少一次投递
 
@@ -819,7 +864,7 @@ MaterialManifest 默认保存：
 
 - 面向领域对象的模型输出必须先产出结构化 JSON。
 - JSON 必须通过 Pydantic 或 JSON Schema 校验。
-- 通过 Schema 的输出仍只是 CandidateResult，必须通过 API / Worker Adapter、Candidate Result Command Handler 和 Domain Module 后才能改变领域状态。
+- 通过 Schema 的输出仍只是 CandidateResult，必须通过 Internal Result Adapter、Candidate Result Command Handler 和 Domain Module 后才能改变领域状态。
 - 校验失败进入可重试路径。
 - 最终失败必须保存失败记录，不得静默返回自由文本。
 - 模型参数知识不能成为可采纳核心 Claim 的证据，也不能伪装成允许来源内容。
@@ -981,6 +1026,8 @@ DecisionFitness 是 JudgmentCard 或 Audit 的结构化业务结果，不要求�
 - DispositionProposal、ActionProposal、KnowledgeContributionCandidate 和 KnowledgeAsset 引用 Finding / Acknowledgement，不只复制一段 warning 文本。
 - 下游需要快照时同时保存引用版本和策略版本，确保 JudgmentReview 能判断用户接受的风险条件是否已经发生。
 
+Minimum Slice 至少持久化 AuditFinding、用户确认或要求修订的结果，以及 DispositionProposal 对 WarningAcknowledgement 的引用。向 ActionProposal、KnowledgeContributionCandidate、KnowledgeAsset 和 JudgmentReview 的完整传播属于 Core Alpha Complete。
+
 阻断后，用户操作只表达为拒绝采用该草稿、终止本次研究、延后处理或继续研究。是否需要新的领域状态，由 `docs/DOMAIN_MODEL.md` 决定，本技术文档不提前增加枚举。
 
 ## 12. Decision、JudgmentReview、Action 与 Knowledge Contribution
@@ -1089,7 +1136,7 @@ Query Handler 可以读取领域集合和投影，但不得以 Read Model、Trac
 
 Core Alpha 冻结逻辑执行角色，不冻结物理队列拓扑。
 
-Minimum Slice 可以先采用完全同步 research execution path；此时 research worker 不是首版发布前置。只要启用 RQ 异步执行，Outbox、幂等、stale result rejection、Tombstone、Candidate Result Command 和持久化检查点必须同时启用。
+Minimum Slice 可以先采用完全同步 research execution path；此时 research worker 不是首版发布前置，但同步结果仍走 Internal Result Adapter 和 Candidate Result Command。只要启用 RQ 异步执行，Worker Adapter、Outbox、幂等、stale result rejection、Tombstone 和持久化检查点必须同时启用。
 
 Core Alpha 初期可采用一个 research worker 角色编排：
 
@@ -1123,6 +1170,7 @@ API 原则：
 - 请求和响应契约以 `docs/API_CONTRACTS.md` 为准。
 - API Adapter 必须调用 Application Command Handler。
 - 所有查询必须调用 Application Query Handler，并由 View DTO Mapper 输出；API Adapter 不直接读取 Repository、SQLite、Chroma 或 Trace projection。
+- 普通用户 API 不暴露 Candidate Result Command；如使用 HTTP 承载内部结果提交，必须使用独立内部路由、服务身份和受限网络边界。
 - API 不应让前端绕过 Audit 直接把草稿标为 ready。
 - API 必须分别表达 ResearchRunOutcome、JudgmentCard / DecisionFitness 和 ResearchDisposition，不得用一个通用状态混合运行结果与用户处置。
 - API 不应把未确认 DispositionProposal 当作 ResearchDisposition。
@@ -1214,15 +1262,15 @@ Decision Gate 根据上述信息判断：
 
 | 业务不变量 | 强制执行点 | 持久化证据 | 失败行为 | 验收方式 |
 | --- | --- | --- | --- | --- |
-| UI 不直接读取或拼装业务状态 | Application Query Handler、Read Model / DTO Mapper、Repository 访问边界 | query log、projection version、DTO policy version | 返回不可用或投影滞后，不回退直查 Chroma | Query Handler 契约与 UI 集成测试 |
+| UI 不直接读取或拼装业务状态 | Application Query Handler、Read Model / DTO Mapper、Repository 访问边界 | query log、command / projection version、DTO policy version | 当前状态投影落后时回读领域集合；诊断查询标记 lagging；不回退 Chroma | read-after-write 与 Query Handler 集成测试 |
 | Command 事务不依赖消息投递 | Unit of Work、Outbox Writer、独立 Dispatcher | domain state、event、Outbox Record、dispatch attempt | 事务提交后重试派发 | Outbox 崩溃恢复测试 |
-| Schema 合法不等于领域状态合法 | Structured Validation、Candidate Result Handler、Domain Module | CandidateResult、input version、validation event | 拒绝 stale / 越界候选 | Worker Result 契约测试 |
+| Schema 合法不等于领域状态合法 | Internal Result Adapter、Structured Validation、Candidate Result Handler、Domain Module | service / job identity、CandidateResult、input version、validation event | 拒绝普通用户提交、stale 或越界候选 | 内部 Result 入口与 Worker 契约测试 |
 | 显式来源约束优先 | KnowledgeScope 快照、Retrieval Router、Data Egress Guard | RetrievalRun、MaterialManifest、AuditFinding | 阻断检索或模型调用 | 来源约束 Golden Case |
 | excluded 来源不得进入上下文或证据链 | 检索前过滤、Context Packer、Data Egress Guard、Deterministic Pre-check | TraceEvent、MaterialManifest、EvidenceUnit 关系 | 阻断调用或 JudgmentCard blocked | excluded 污染测试 |
 | 访问政策与分析角色正交 | Scope Governance、Schema 校验、Retrieval Router | KnowledgeScope snapshot、RetrievalRun | 拒绝矛盾 Scope 或阻断执行 | 双来源比较与 Scope 契约测试 |
 | 核心 Claim 必须有证据和匹配理由链 | Claim-Evidence-Rationale 关系、Deterministic Decision Gate | Claim、EvidenceUnit、JudgmentRationale、AuditFinding | JudgmentCard blocked | 推断 Claim 理由链测试 |
 | blocked 不得显示为可靠判断 | Domain Module 状态门、API 写保护、UI 展示映射 | AuditFinding、JudgmentCard version、ActivityEvent | 保持草稿或 blocked | UI / API 回归测试 |
-| 每个结束 Run 必须有 RunOutcome | Research Execution Domain Module、Worker Result Command | ResearchRunOutcome、TraceEvent | 拒绝不完整结束或进入修复队列 | RunOutcome 状态机测试 |
+| 每个结束 Run 必须有 RunOutcome | FinalizeResearchRunCommand、Research Execution Domain Module、同事务事件追加 | terminal state、ResearchRunOutcome、TraceEvent | 原子拒绝不完整结束；修复队列仅处理异常历史数据 | RunOutcome 原子事务测试 |
 | 可采纳不等于无限用途许可 | DecisionFitness Gate、Decision Module、Action Module | DecisionFitness、DispositionProposal、ActionProposal | 拒绝越级并返回升级路径 | 判断用途越级与高风险升级测试 |
 | 未确认处置不得成为最终处置 | Application Command Handler、Decision Module、乐观并发控制 | 用户命令事件、DispositionProposal version | concurrency conflict 或保持待确认 | API 契约测试 |
 | ActionProposal 不能自动成为 Commitment | Action Module、用户确认命令 | ActionProposal、ActionCommitment、ActivityEvent | 拒绝状态转换 | API / 状态机测试 |
@@ -1233,6 +1281,7 @@ Decision Gate 根据上述信息判断：
 | Worker 不得提交过期结果 | Worker Result Command、输入版本检查、Tombstone | TraceEvent、stale / superseded 标记 | 不更新 current projection | 并发测试 |
 | Worker 不以内存状态作为流程权威 | 持久化检查点、幂等命令、Job 恢复 | checkpoint、event、job attempt | 从最后提交点恢复或等待用户 | Worker 崩溃恢复测试 |
 | Chroma / FTS 不是内容权威 | SQLite 校验、IndexGeneration、current pointer | generation metadata、filter diagnostics | 丢弃失效代际结果 | 索引切换与删除污染测试 |
+| 同一 Run 默认固定索引快照 | RunExecutionSpec、Retrieval Router、SQLite generation 校验 | source-version / generation mapping、RetrievalRun | 固定代际失效时阻断或按已声明 fallback；不得静默切换 | current generation 切换并发测试 |
 | 判断随证据失效而复核 | KnowledgeItemVersion 不可变、Evidence Validity Checker | Evidence dependency、CaseActivityLog | needs_review 或 invalid 语义 | 判断失效测试 |
 | 历史执行不得覆盖 | append-only event、版本化 JudgmentCard | TraceEvent、JudgmentCard version | 拒绝覆盖写入 | Repository 测试 |
 | Extended Alpha 失败不破坏 Core | 可选 UserContextProvider Port、反向依赖禁止 | 空上下文记录、降级记录 | Core Alpha 继续运行 | 模块依赖测试 |
