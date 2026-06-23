@@ -8,7 +8,7 @@
 
 文档边界：本文档允许列出对象名称、业务分类、业务关系、不变量和用户控制点；不维护完整字段、枚举值、必填约束、数据类型和状态转换。这些内容以 `docs/DOMAIN_MODEL.md` 为唯一权威来源。检索算法、来源评分、候选融合和工程策略以 `docs/RAG_RETRIEVAL_STRATEGY.md` 和 `docs/TECHNICAL_ARCHITECTURE.md` 为准。
 
-任务标识：`A0-DOC-001-R6`
+任务标识：`A0-DOC-001-R7.1`
 
 关联一致性修订：`A0-DOC-002-R2`
 
@@ -36,6 +36,8 @@ Core Alpha 核心切入口：
 ```
 
 MetaOS Alpha 不是通用知识库、聊天机器人或新闻聚合器。它不追求回答更多内容，而是让每一次研究都能回答：
+
+MetaOS 也不是通用 Agent 框架、Agent 编排平台或 Skill 市场。它可以复用这些基础能力，但核心价值是治理问题、证据、判断、用途、行动和复核，而不是拥有更多 Agent 或 Skill。
 
 - 当前问题应进入什么研究深度。
 - 应该从哪些知识来源中寻找证据。
@@ -111,6 +113,7 @@ MetaOS 所称的可靠判断并不保证结论绝对正确，而是满足：
 - 原文事实、解释、推断、类比、争议观点和个人反思被区分。
 - 关键反证和证据缺口没有被隐藏。
 - 显式来源约束没有被违反。
+- 判断明确说明适用用途和不适用的行动强度。
 - 判断形成过程可以回溯。
 - 新证据出现时可以被复核和修订。
 
@@ -140,6 +143,7 @@ Core Alpha 是冻结候选。其核心判断闭环和业务不变量不应被 Ex
 ```text
 Question
 -> ResearchCase
+-> SourceResolution
 -> KnowledgeScope
 -> ResearchPlan
 -> ResearchRun
@@ -148,6 +152,7 @@ Question
 -> Claim
 -> JudgmentCard
 -> Audit
+-> 判断用途适配性
 -> 用户确认 ResearchDisposition
 ```
 
@@ -157,7 +162,9 @@ Minimum Slice 只优先验证：
 2. 是否能形成可定位证据。
 3. 是否能将回答拆成少量、可审计的核心 Claim 和推理链。
 4. 是否能阻断无依据、无推理链或过度确定的核心判断。
-5. 用户是否认为该判断比普通 RAG 回答更能支撑下一步处置。
+5. 用户是否认为该判断比普通 RAG 回答更能支撑其被允许的下一步用途。
+
+每个 ResearchRun 无论成功、失败、被用户终止或被新 Run 取代，都必须形成 ResearchRunOutcome。只有通过审计且满足当前用途约束的判断，才可以形成 DispositionProposal；ResearchRunOutcome 不等于 ResearchDisposition。
 
 #### 4.1.2 Core Alpha Complete
 
@@ -167,7 +174,7 @@ Minimum Slice 经过真实使用验证后，Core Alpha Complete 再增加：
 - 在办 ResearchCase 软门禁和 AttentionBacklogItem。
 - JudgmentReview 和人工复核。
 - 低成本、可逆、可验证的 ActionProposal。
-- 可选 KnowledgeContributionCandidate，以及用户确认后的最小“经过验证的知识笔记”。
+- 可选 KnowledgeContributionCandidate，以及用户确认后的最小“证据支持的知识笔记”。
 
 Core Alpha Complete 不承诺全局知识合并、复杂修订传播、自动依赖分析、多版本知识资产图、删除级联策略全集、知识图谱或复杂关系编辑器。
 
@@ -178,7 +185,7 @@ Extended Alpha 是方向性设计，允许验证后调整。
 它在 Core Alpha 稳定的前提下探索：
 
 - IntentTrace：显化候选意图，并允许用户修正。
-- BookProfile 与 LensSkill：让经典提供有边界的认知视角。
+- BookProfile 与 CognitiveLens：让经典提供有边界的认知视角。
 - Cognitive Profile：记录用户长期原则、当前状态和认知模式，但只作为先验。
 - ProfileUpdateCandidate：复盘后生成画像更新候选，而不是自动修改画像。
 - InformationIntake：摄入有限来源。
@@ -202,15 +209,20 @@ Beta Ready 允许增加账号、权限、工作空间、配额、分享、视觉
 
 ```text
 提出问题
+-> 初步解析显式来源锚点
 -> 确定研究深度
 -> 经过在办研究软门禁
--> 约束知识范围
+-> 完整解析来源并约束知识范围
 -> 执行研究并组织证据
 -> 形成并审计判断
--> 用户决定如何处置
--> 在有沉淀价值时产生可选 KnowledgeContributionCandidate
--> 后续复核或行动复盘
+-> 明确判断适用与不适用的用途
+
+已审计且满足用途约束的判断
+├-> 用户决定如何处置 -> 后续复核或行动复盘
+└-> 在有沉淀价值时产生可选 KnowledgeContributionCandidate
 ```
+
+这是 Core Alpha Complete 的高层主链；Minimum Slice 不要求 ResearchTriage、在办软门禁、JudgmentReview、ActionProposal 或知识沉淀出口。
 
 ### 5.2 领域对象链
 
@@ -219,9 +231,10 @@ Beta Ready 允许增加账号、权限、工作空间、配额、分享、视觉
 ```text
 Question
 -> ResearchCase
+-> Preliminary Source Anchor Parsing
 -> ResearchTriage
 -> 用户采用或调整研究深度
--> SourceResolution
+-> Full SourceResolution
 -> KnowledgeScope
 -> ResearchPlan
 -> ResearchRun
@@ -232,21 +245,51 @@ Question
 -> Claim
 -> JudgmentCard
 -> Audit
--> DispositionProposal / 可选 KnowledgeContributionCandidate
--> 用户分别确认、调整或拒绝
--> ResearchDisposition / 创建或修订 KnowledgeAsset
--> JudgmentReview / ActionProposal / Closure / 知识缺口与冲突
+-> DecisionFitness
+
+可采纳且满足用途约束的 JudgmentCard
+├-> DispositionProposal -> 用户确认或调整 -> ResearchDisposition
+└-> 可选 KnowledgeContributionCandidate -> 用户确认、调整或拒绝 -> 最小 KnowledgeAsset
+
+每个 ResearchRun
+└-> ResearchRunOutcome
 ```
 
 `RetrievalRun` 属于执行细节，不进入高层业务主链，但必须能被 ResearchTrace 记录。
 
 ## 6. Core Alpha 用户旅程与业务全景
 
-### 6.1 简化用户旅程图
+### 6.1 Core Alpha Minimum Slice 业务图
 
 ```mermaid
 flowchart LR
     Q["提出问题"]
+    CASE["ResearchCase"]
+    SOURCE["解析显式来源"]
+    SCOPE["约束知识范围"]
+    RESEARCH["执行研究"]
+    EVIDENCE["组织 EvidenceUnit"]
+    RATIONALE["形成 JudgmentRationale"]
+    CLAIM["形成核心 Claim"]
+    AUDIT["审计判断"]
+    FITNESS["明确用途适配性"]
+    DISPOSITION["用户确认处置"]
+    OUTCOME["记录 ResearchRunOutcome"]
+
+    Q --> CASE --> SOURCE --> SCOPE --> RESEARCH --> EVIDENCE --> RATIONALE --> CLAIM --> AUDIT
+    AUDIT -->|"通过且适用于当前用途"| FITNESS --> DISPOSITION
+    AUDIT -->|"通过或阻断"| OUTCOME
+    RESEARCH -. "用户终止或被新 Run 取代" .-> OUTCOME
+```
+
+Minimum Slice 只承诺范围、证据、理由链、Claim、审计、用途适配性、运行结果和用户处置。图中未出现的 Triage、在办软门禁、判断复核、行动建议和知识沉淀均不属于 Minimum Slice 发布前置条件。
+
+### 6.2 Core Alpha Complete 简化用户旅程图
+
+```mermaid
+flowchart LR
+    Q["提出问题"]
+    ANCHOR["初步来源锚点解析"]
     ATTENTION["研究深度<br/>与注意力门禁"]
     SCOPE["约束知识范围"]
     RESEARCH["执行研究<br/>并组织证据"]
@@ -257,7 +300,7 @@ flowchart LR
     REVIEW["判断复核"]
     KNOWLEDGE["可选知识沉淀"]
 
-    Q --> ATTENTION --> SCOPE --> RESEARCH --> JUDGMENT --> DISPOSITION
+    Q --> ANCHOR --> ATTENTION --> SCOPE --> RESEARCH --> JUDGMENT --> DISPOSITION
     DISPOSITION --> ACTION
     DISPOSITION --> CLOSURE
     DISPOSITION --> REVIEW
@@ -265,20 +308,21 @@ flowchart LR
     KNOWLEDGE -. "缺口经用户确认" .-> ATTENTION
 ```
 
-### 6.2 Core Alpha 业务对象与闭环全景图
+### 6.3 Core Alpha Complete 业务对象与闭环全景图
 
 ```mermaid
 flowchart TB
     U["用户"]
     Q["Question<br/>提出问题"]
     CASE["ResearchCase<br/>用户侧研究项目"]
+    PRE_SR["Preliminary Source Anchor Parsing<br/>来源数量、歧义、版本与排除锚点"]
     TRIAGE["ResearchTriage<br/>研究深度建议"]
     CHOOSE["用户采用或调整研究深度"]
     WIP["在办研究软门禁<br/>检查 active ResearchCase 上限"]
     BACKLOG["AttentionBacklogItem<br/>未激活问题、知识缺口、线索或已有 Case 引用"]
     ACTIVATE["用户选择激活<br/>创建或关联 ResearchCase"]
-    SR["SourceResolution<br/>解析来源与版本"]
-    KS["KnowledgeScope<br/>确定 required / primary / comparison / excluded"]
+    SR["Full SourceResolution<br/>完整解析来源与版本"]
+    KS["KnowledgeScope<br/>访问政策 + 分析角色"]
     RP["ResearchPlan<br/>研究模式、证据要求与停止条件"]
     RUN["ResearchRun<br/>范围、计划和目标明确的一次研究执行"]
     ATTEMPT["ResearchAttempt<br/>同一 Run 下的一次执行尝试"]
@@ -289,6 +333,9 @@ flowchart TB
     CLAIM["Claim<br/>判断主张"]
     JC["JudgmentCard<br/>判断、证据、不同解释、证据缺口"]
     AUDIT["Audit<br/>确定性审计 + 语义审计"]
+    ACCEPTED["可采纳 JudgmentCard<br/>仍需声明用途适配性"]
+    FITNESS["DecisionFitness<br/>允许与禁止的判断用途"]
+    RUN_OUTCOME["ResearchRunOutcome<br/>本次 Run 如何结束"]
     REVISION["判断表达或证据映射修订<br/>同一 ResearchRun 下形成新版本"]
     LIMIT["修订上限处理<br/>请求用户介入或明确报告研究失败"]
     DP["DispositionProposal<br/>系统提出研究处置建议"]
@@ -298,6 +345,8 @@ flowchart TB
     JR_RESULT["ReviewResult<br/>复核结果与处置影响"]
     BLOCKED_EXIT["blocked 合法出口<br/>继续研究 / 延后 / 终止 / 拒绝采用 / 查看草稿"]
     AP["ActionProposal<br/>系统提出行动建议"]
+    ACTION_GATE["行动用途与风险检查<br/>证据是否足以支持该行动强度"]
+    ESCALATE["升级处理<br/>补充研究 / 专家审核 / 拆成低风险实验"]
     AP_DECIDE["用户决策<br/>接受 / 调整 / 拒绝"]
     AP2["新版本 ActionProposal<br/>用户调整后生成"]
     AC["ActionCommitment<br/>用户确认行动承诺"]
@@ -305,13 +354,14 @@ flowchart TB
     OM["OpenMonitoring<br/>等待事件、时间或新证据"]
     DEFER["Deferred<br/>到期重新确认"]
     CLOSURE["Closure<br/>放弃 / 明确不行动 / 理解完成"]
+    KVALUE["Contribution Value Check<br/>对照现有知识、修正与复用价值"]
     KCC["KnowledgeContributionCandidate<br/>知识贡献候选"]
     KCONFIRM["用户决策<br/>确认 / 调整 / 拒绝候选"]
     KVALIDATE["调整后重新证据校验<br/>语义、强度、证据关系与适用范围"]
     KFAIL_DECIDE["校验不通过后的用户选择<br/>保存观点 / 降低强度 / 继续研究 / 放弃"]
     KWEAKEN["降低结论强度<br/>重新形成可校验候选"]
-    KNOTE["保存为用户观点或笔记<br/>不标记为系统验证 KnowledgeAsset"]
-    KASSET["最小 KnowledgeAsset<br/>经过验证的知识笔记"]
+    KNOTE["保存为用户观点或笔记<br/>不标记为证据支持的 KnowledgeAsset"]
+    KASSET["最小 KnowledgeAsset<br/>证据支持的知识笔记"]
     KGAP["知识缺口、冲突或过期判断"]
     ATTN_SUGGEST["加入注意力待办建议"]
     ATTN_CONFIRM["用户确认是否占用待办位置"]
@@ -321,7 +371,8 @@ flowchart TB
 
     U --> Q
     Q --> CASE
-    CASE --> TRIAGE
+    CASE --> PRE_SR
+    PRE_SR --> TRIAGE
     TRIAGE --> CHOOSE
     CHOOSE --> WIP
     WIP -->|"未达上限"| SR
@@ -346,9 +397,13 @@ flowchart TB
     REVISION --> JC
     AUDIT -->|"达到修订上限"| LIMIT
     LIMIT --> BLOCKED_EXIT
-    AUDIT -->|"可采纳"| DP
+    AUDIT -->|"可采纳"| ACCEPTED
     AUDIT -->|"阻断且不继续修订"| BLOCKED_EXIT
-    DP -. "对应判断可采纳且满足沉淀条件时可选" .-> KCC
+    ACCEPTED --> FITNESS
+    FITNESS --> DP
+    ACCEPTED -. "可选" .-> KVALUE
+    KVALUE -->|"有明确沉淀价值"| KCC
+    ACCEPTED -->|"completed_with_judgment"| RUN_OUTCOME
     DP --> CONFIRM
     CONFIRM --> DISP
 
@@ -362,7 +417,7 @@ flowchart TB
     KWEAKEN --> KVALIDATE
     KFAIL_DECIDE -->|"继续研究"| RP
     KFAIL_DECIDE -->|"放弃候选"| KREJECT
-    KNOTE -. "需要系统验证时继续研究" .-> RP
+    KNOTE -. "需要形成证据支持知识时继续研究" .-> RP
     KCONFIRM -->|"拒绝"| KREJECT
     KASSET -->|"若发现缺口、冲突或过期判断"| KGAP
     KGAP --> ATTN_SUGGEST
@@ -374,10 +429,14 @@ flowchart TB
     DISP -->|"observe"| OM
     DISP -->|"defer_decision"| DEFER
     DISP -->|"discard / explicit_no_action / knowledge_only_closure"| CLOSURE
-    DISP -->|"proceed_to_action"| AP
+    DISP -->|"proceed_to_action"| ACTION_GATE
+
+    ACTION_GATE -->|"适用于该行动强度"| AP
+    ACTION_GATE -->|"不足以支持高风险行动"| ESCALATE
+    ESCALATE --> RP
 
     BLOCKED_EXIT -->|"继续研究"| RP
-    BLOCKED_EXIT -->|"延后处理"| DEFER
+    BLOCKED_EXIT -->|"延后 / 终止 / 拒绝采用"| RUN_OUTCOME
 
     AP --> AP_DECIDE
     AP_DECIDE -->|"用户拒绝"| DP
@@ -395,6 +454,7 @@ flowchart TB
     JR_RESULT -->|"需要重新确认处置或建议保留原处置"| DP
 
     RUN -. "对应完整记录" .-> TRACE
+    RUN_OUTCOME -. "写入" .-> TRACE
     ATTEMPT -. "写入" .-> TRACE
     RETRIEVAL -. "写入" .-> TRACE
     REUSE -. "写入" .-> TRACE
@@ -413,11 +473,14 @@ flowchart TB
 这张图强调：
 
 - ResearchCase 是用户能理解的研究项目。
+- Preliminary Source Anchor Parsing 只为 Triage 提供来源数量、歧义、版本和排除锚点，不执行完整检索；用户确认研究深度后再完成 Full SourceResolution。
 - ResearchRun 是一次范围、计划和核心目标已确定的研究执行。
 - ResearchAttempt 是同一 ResearchRun 下的一次执行尝试。
 - RetrievalRun 是 ResearchAttempt 内部的检索执行细节。
 - 零 RetrievalRun 不等于无证据回答，只表示本次 ResearchAttempt 复用了已经存在且重新校验有效的 EvidenceUnit。
 - ResearchTrace 是 ResearchRun 的完整审计记录。
+- 每个 ResearchRun 都形成 ResearchRunOutcome；运行失败、用户终止或被新 Run 取代不等于形成 ResearchDisposition。
+- 可采纳不是无限用途许可；DecisionFitness 必须说明判断可用于什么，以及不足以支持什么强度的行动。
 - JudgmentReview 复核“判断是否仍成立”。
 - ActionReview 复核“行动是否有效”。
 - ResearchDisposition 必须经过用户确认或调整。
@@ -425,8 +488,9 @@ flowchart TB
 - blocked 判断不能进入行动路径，但用户仍可继续研究、延后、终止、拒绝采用或查看草稿。
 - 在办 ResearchCase 达到上限后，新问题会进入注意力待办；系统不自动关闭旧 Case，用户可显式覆盖软门禁。
 - 可采纳 JudgmentCard 只是生成 KnowledgeContributionCandidate 的资格条件，不要求每次研究都产生候选。
+- DispositionProposal 与 KnowledgeContributionCandidate 都来源于已审计的 JudgmentCard，二者并行且互不依赖。
 - 未确认的知识贡献候选不会改变长期知识体系，其生成或处理失败也不阻断判断与处置闭环。
-- 调整后的知识贡献候选校验不通过时，由用户选择保存为个人观点、降低强度后重试、继续研究或放弃，不会自动生成系统验证知识。
+- 调整后的知识贡献候选校验不通过时，由用户选择保存为个人观点、降低强度后重试、继续研究或放弃，不会自动生成证据支持的知识资产。
 - 知识缺口只能提出“加入待办”建议；用户确认后才能占用注意力待办位置。
 - OpenMonitoring、Deferred 和 Closure 都可以在用户触发或已配置的时间 / 条件到达时回到复核或研究。
 
@@ -486,11 +550,12 @@ flowchart TB
 
 ```mermaid
 flowchart LR
-    CORE["Core Alpha<br/>最小可靠判断闭环<br/>最小注意力软门禁<br/>最小知识贡献候选"]
+    MIN["Core Alpha Minimum Slice<br/>范围、证据、理由链<br/>审计、用途适配与 RunOutcome"]
+    CORE["Core Alpha Complete<br/>Triage 与注意力软门禁<br/>复核、低风险行动与最小知识笔记"]
     EXTENDED["Extended Alpha<br/>意图显影与有限榜单<br/>概念关系、争议、缺口与演化视图"]
     BETA["Beta Ready<br/>统一体验、隐私、成本<br/>稳定性、降级与发布质量门"]
 
-    CORE --> EXTENDED --> BETA
+    MIN --> CORE --> EXTENDED --> BETA
 ```
 
 ## 8. Core Alpha 业务对象职责
@@ -503,7 +568,9 @@ flowchart LR
 | --- | --- | --- |
 | 用户业务对象 | ResearchCase、KnowledgeScope、JudgmentCard、ResearchDisposition、ActionProposal、KnowledgeContributionCandidate、JudgmentReview | 用户需要理解、查看或确认的核心产品对象 |
 | 领域内部对象 | Claim、EvidenceUnit、JudgmentRationale、ResearchPlan、ResearchRun、Audit、KnowledgeAsset | 保持业务严谨性，用户可以查看其重要结果，但不一定直接编辑底层结构 |
-| 业务结果与执行记录 | ReviewResult、ResearchAttempt、RetrievalRun、ResearchTrace、SourceResolution 结果、模型调用记录 | ReviewResult 需要向用户解释处置影响；其余内容服务于执行、诊断、回放和开发者审计，默认不占用用户主工作台 |
+| 业务结果与执行记录 | DecisionFitness、ResearchRunOutcome、ReviewResult、ResearchAttempt、RetrievalRun、ResearchTrace、SourceResolution 结果、模型调用记录 | 前三项需要向用户解释用途、运行终局或复核影响；其余内容服务于执行、诊断、回放和开发者审计，默认不占用用户主工作台 |
+
+阶段边界：Minimum Slice 只要求 ResearchCase、SourceResolution、KnowledgeScope、ResearchPlan、ResearchRun / Outcome、EvidenceUnit、JudgmentRationale、Claim、JudgmentCard、Audit / DecisionFitness、DispositionProposal 和用户确认的 ResearchDisposition。ResearchTriage、AttentionBacklogItem、JudgmentReview、ActionProposal、KnowledgeContributionCandidate 与 KnowledgeAsset 属于 Core Alpha Complete。
 
 ### 8.1 ResearchCase
 
@@ -565,6 +632,7 @@ Triage 建议包括：
 业务规则：
 
 - ResearchTriage 只决定研究深度、预算和执行策略。
+- ResearchTriage 之前必须先完成轻量来源锚点解析，以识别显式来源数量、明显歧义、版本要求和 excluded 锚点；该步骤不执行完整检索。
 - ResearchTriage 应给出预计注意力成本和是否建议现在激活该 Case，但不替用户决定。
 - ResearchTriage 与在办软门禁共同决定问题是进入 active 研究还是注意力待办。
 - ResearchTriage 不决定是否保留溯源与证据约束。
@@ -576,12 +644,14 @@ Triage 建议包括：
 
 ### 8.3 SourceResolution
 
-SourceResolution 解析用户在问题中指定、比较或排除的知识来源。
+SourceResolution 分为初步来源锚点解析和完整来源解析，两者属于同一业务职责，不要求实现为两个独立服务。
 
 它解决的问题是：用户说“鬼谷子”“理想国”或“不要引用理想国”时，系统必须先解析这些锚点，再决定检索范围。
 
 业务规则：
 
+- 初步来源锚点解析发生在 ResearchTriage 之前，只识别是否存在显式来源、来源数量、明显歧义、版本指定和 excluded 锚点。
+- 完整来源解析发生在用户采用或调整研究深度之后，形成 KnowledgeScope 所需的明确来源与版本结果。
 - SourceResolution 不仅解析作品身份，也应在必要时解析版本、译本、载体和内容版本。
 - 系统采用的作品版本、译本、载体或内容版本必须对用户可见。
 - 存在多个可用版本时，用户可以进行选择或切换。
@@ -592,21 +662,28 @@ SourceResolution 解析用户在问题中指定、比较或排除的知识来源
 
 ### 8.4 KnowledgeScope
 
-KnowledgeScope 决定一次研究允许使用哪些知识来源。
+KnowledgeScope 决定一次研究允许使用哪些知识来源，以及每个来源在分析中承担什么角色。这是两个正交维度。
 
-核心业务分类：
+访问政策：
 
-- `required_sources`：必须进入独立取证和结果报告的来源。
-- `primary_sources`：决定回答主结构的来源。
-- `comparison_sources`：用于比较和对照的来源。
-- `excluded_sources`：禁止其内容进入候选、模型上下文、证据处理输入、引用和证据链的来源；来源标识可作为排除条件与审计记录。
+- `required`：必须进入独立取证和结果报告。
+- `allowed`：允许使用，但不保证一定进入最终证据链。
+- `excluded`：禁止其内容进入候选、模型上下文、证据处理输入、引用和证据链；来源标识可作为排除条件与审计记录。
+
+分析角色：
+
+- `primary`：决定回答主结构。
+- `comparison`：用于比较和对照。
+- `background`：只提供必要背景，不得替代 primary 或 required 来源。
 
 业务规则：
 
-- 同一来源不得同时出现在 required 与 excluded。
+- 每个已解析来源只能具有一个访问政策，并可同时具有一个分析角色。
+- `required` 与 `excluded` 互斥；`primary` 不自动等于 `required`，`comparison` 也可以是 `required` 或 `allowed`。
+- 未显式列出的来源采用什么访问政策必须由当前 KnowledgeScope 明确，不得在执行时临时猜测。
 - required 来源必须被独立处理，并报告支持、反驳、无证据或不可用等结果。
 - required 来源没有证据时，应报告该来源证据不足，不能找其他来源代答。
-- comparison 来源只能用于对照，不能替代 primary 或 required 来源。
+- comparison 来源只能用于对照，不能替代 primary 来源或其他 required 来源的独立报告。
 - Core Alpha 默认采用 `evidence_only`，模型参数知识不能伪装成指定来源内容。
 
 ### 8.5 ResearchPlan
@@ -615,12 +692,13 @@ ResearchPlan 回答“怎样研究”，避免不同问题都走同一种研究�
 
 它解决的问题是：事实查询、概念解释、多来源比较和枚举型研究需要不同执行策略。
 
-Core Alpha 最小研究模式包括：
+Core Alpha 研究模式包括：
 
 - `fact_lookup`：局部事实检索。
 - `source_interpretation`：原文概念和上下文解释。
 - `compare_sources`：来源独立取证后按统一维度比较。
 - `enumerate_pattern`：候选生成、条件验证、反证检索、证据矩阵和排除理由。
+- `claim_evaluation`：提出候选 Claim，分解前提，分别取证，寻找竞争性解释和反证，再形成带边界的判断。
 
 业务规则：
 
@@ -628,7 +706,7 @@ Core Alpha 最小研究模式包括：
 - 显式来源锚点应作为范围约束，不应重复污染来源内语义查询。
 - 枚举型研究不能退化为一次普通检索。
 
-### 8.6 ResearchRun、ResearchAttempt、RetrievalRun 与 ResearchTrace
+### 8.6 ResearchRun、ResearchAttempt、RetrievalRun、ResearchRunOutcome 与 ResearchTrace
 
 ResearchRun 是一次范围、计划和核心目标已确定的研究执行。ResearchTrace 是该 ResearchRun 的完整审计记录。
 
@@ -647,6 +725,13 @@ ResearchAttempt 是同一 ResearchRun 下的一次执行尝试。RetrievalRun �
 - 只有在 KnowledgeScope、ResearchPlan 和核心研究目标保持不变时，重试才可以作为同一 ResearchRun 的新 ResearchAttempt。
 - 范围、研究模式、核心证据要求或研究目标发生实质变化时，必须创建新的 ResearchRun。
 - RetrievalRun 属于执行细节，不进入高层业务主链。
+
+ResearchRunOutcome 只说明一次 ResearchRun 如何结束，不表达用户如何处置研究问题。它至少必须能够表达：形成可采纳判断、证据不足、审计阻断、用户终止、在判断形成前延后，以及被新 ResearchRun 取代等业务含义；具体状态名称由 `docs/DOMAIN_MODEL.md` 定义。
+
+- 每个结束的 ResearchRun 都必须形成 ResearchRunOutcome。
+- ResearchRunOutcome 可以存在而 ResearchDisposition 不存在，例如审计阻断或用户主动终止。
+- ResearchDisposition 只能建立在满足其用途约束的可采纳判断和用户确认之上。
+- ResearchRunOutcome 不得被用来伪造“用户已经明确处置”的产品状态。
 
 修订边界：
 
@@ -676,14 +761,12 @@ JudgmentRationale 是 EvidenceUnit 与 Claim 之间的结构化推理桥梁。�
 
 它解决的问题是：证据不会自动产生结论，系统必须暴露“为什么这些证据允许得出该 Claim”。
 
-每个核心 Claim 至少应能回答：
+JudgmentRationale 应按 Claim 类型裁剪，不能机械要求所有 Claim 填写同一套字段：
 
-- 它使用了哪些直接证据或证据前提。
-- 采用了什么推理方式。
-- 依赖哪些关键假设。
-- 适用范围和外推边界是什么。
-- 存在哪些反证或竞争性解释。
-- 在什么条件下结论会失效或需要降低强度。
+- 事实型：来源、定位、事实映射和版本限制。
+- 解释型：原文、上下文、解释路径和替代解释。
+- 推断与假设型：证据前提、推理方式、关键假设、适用边界、反证和失效条件。
+- 建议型：判断依据、目标、成本、风险、可逆性和停止条件。
 
 业务规则：
 
@@ -711,7 +794,7 @@ Claim 是判断的基本单位。JudgmentCard 是一次研究面向用户的综�
 - 有争议的判断不得被包装成确定结论。
 - JudgmentCard 采用版本化管理；每次修订产生新的 JudgmentCard 版本。是否存在独立版本实体，由 `docs/DOMAIN_MODEL.md` 决定。
 
-### 8.10 Audit
+### 8.10 Audit 与 DecisionFitness
 
 Audit 判断一次研究是否可采纳。
 
@@ -735,6 +818,23 @@ Audit 判断一次研究是否可采纳。
 - 审计阻断后进入有上限的版本化修订循环。
 - 达到修订上限后，研究应请求用户介入或明确报告研究失败，而不是假装得到可靠答案。
 
+Audit 还必须形成用途适配性结果 DecisionFitness。它不是对“真或假”的第二次投票，而是说明当前证据与判断强度足以支持哪些用途。
+
+DecisionFitness 可以作为 JudgmentCard 或 Audit 的结构化业务结果；是否实现为独立持久化实体由 `docs/DOMAIN_MODEL.md` 决定。
+
+DecisionFitness 至少应区分：
+
+- 可用于理解问题、规划后续研究或继续观察。
+- 可用于低成本验证或常规可逆行动。
+- 不足以支持高成本投入、长期承诺、不可逆行动或重大外部影响。
+
+业务规则：
+
+- “可采纳”不等于可以支持任意强度的行动。
+- 审计可以表达暂时可采纳或带条件可采纳；具体认识论状态名称由 `docs/DOMAIN_MODEL.md` 定义。
+- DispositionProposal 和 ActionProposal 必须遵守 DecisionFitness，不得把理解型判断升级为高风险行动依据。
+- 当用户请求的用途超过当前适配范围时，系统必须建议补充研究、专家审核，或拆解为低风险、可逆实验。
+
 ### 8.11 DispositionProposal、ResearchDisposition 与 Action
 
 DispositionProposal 是系统提出的研究处置建议。ResearchDisposition 是用户确认或调整后的最终处置。
@@ -755,6 +855,8 @@ DispositionProposal 是系统提出的研究处置建议。ResearchDisposition �
 
 - Audit 之后先生成 DispositionProposal。
 - 用户确认或调整后，才形成 ResearchDisposition。
+- 只有存在满足当前用途约束的可采纳 JudgmentCard 时，才形成 ResearchDisposition。
+- blocked、证据不足或用户提前终止时，“继续研究”“延后”“终止”只是对下一步执行的选择；当前 ResearchRun 以 ResearchRunOutcome 结束，不强制生成 ResearchDisposition。
 - `observe` 是事件或条件驱动。
 - `defer_decision` 是时间或用户决策驱动。
 - 只有 `proceed_to_action` 才进入 ActionProposal。
@@ -764,6 +866,7 @@ DispositionProposal 是系统提出的研究处置建议。ResearchDisposition �
 - ActionProposal 被用户拒绝时，应回到处置确认，而不是直接静默关闭。
 - ActionProposal 至少应说明目标、与 JudgmentCard 的关系、预期收益、注意力与资源成本、可逆性、最大可接受损失、关键假设、停止条件和复盘时点。
 - Core Alpha 优先支持低成本、可逆、可验证的小步行动；行动风险越高，所需证据、用户确认强度和复盘要求越高。
+- Core Alpha 不承诺生成高风险行动方案；当请求超出 DecisionFitness 时，系统应拒绝越级，转为补充研究、专家审核或低风险实验。
 
 ### 8.12 JudgmentReview 与 ActionReview
 
@@ -801,7 +904,7 @@ Core Alpha 最小能力：
 
 ### 8.13 KnowledgeContributionCandidate
 
-KnowledgeContributionCandidate 是一次可采纳研究对个人知识体系的更新候选。
+KnowledgeContributionCandidate 是已审计 JudgmentCard 在满足沉淀价值条件时，对个人知识体系提出的可选贡献候选。它不依赖 ResearchDisposition，也不由 DispositionProposal 产生。
 
 它解决的问题是：JudgmentCard 不应作为孤立回答留在 ResearchCase 中，而应说明本次研究可以为已有知识体系新增、修订、否定或暴露什么。
 
@@ -815,6 +918,7 @@ Core Alpha 只承诺三类最小贡献：
 
 业务规则：
 
+- 候选来源于已审计 JudgmentCard、现有 KnowledgeAsset 对照和贡献价值检查，不来源于 DispositionProposal 或 ResearchDisposition。
 - 通过阻断门的可采纳 JudgmentCard 只是生成知识贡献候选的资格条件，不要求每次研究都生成候选。
 - “本次研究没有值得沉淀的新知识”是合法结果。
 - 生成候选至少应满足：存在明显新信息、修正旧主张、增加关键证据或反证、暴露重要缺口，或对后续研究具有明确复用价值之一。
@@ -825,7 +929,7 @@ Core Alpha 只承诺三类最小贡献：
 - 仅修改标题、措辞或标签，且不改变语义和证据关系时，可以直接确认。
 - 修改 Claim 含义、结论强度、证据关系或适用范围时，必须重新进行证据校验。
 - 调整后无法通过校验时，系统必须让用户选择：保存为用户观点或笔记、降低结论强度后重新校验、继续研究，或放弃候选。
-- 系统不得自动把校验失败的候选保存为用户观点，也不得把它标记为系统验证的 KnowledgeAsset。
+- 系统不得自动把校验失败的候选保存为用户观点，也不得把它标记为证据支持的 KnowledgeAsset。
 - 未确认候选不得改变长期知识体系，没有用户操作不能被默认为接受。
 - blocked JudgmentCard 不得沉淀为可靠知识资产。
 - 候选生成、确认或写入失败不得破坏判断、处置和行动闭环。
@@ -837,7 +941,7 @@ KnowledgeAsset 是用户明确确认、具有来源和判断版本依据、能�
 
 KnowledgeAsset 可以表达有证据的主张、证据关系、知识缺口或复核要求，但它不等于绝对真理，也不等于原始资料。
 
-Core Alpha Complete 对 KnowledgeAsset 的最小承诺是“经过验证的知识笔记”：能够绑定 JudgmentCard 版本与 EvidenceUnit、保留审计警告、被用户查看和撤回，并明确不作为新的原始证据。Core Alpha Minimum Slice 不依赖 KnowledgeAsset 才能成立。
+Core Alpha Complete 对 KnowledgeAsset 的最小承诺是“证据支持的知识笔记”：能够绑定 JudgmentCard 版本与 EvidenceUnit、保留审计警告、被用户查看和撤回，并明确不作为新的原始证据。这个名称只表示来源、证据关系和审计过程可追溯，不承诺知识在绝对意义上为真。Core Alpha Minimum Slice 不依赖 KnowledgeAsset 才能成立。
 
 ```text
 KnowledgeItem
@@ -885,33 +989,38 @@ Core Alpha 只承诺通过 KnowledgeContributionCandidate 建立最小沉淀出�
 
 ## 9. 用户控制点
 
-MetaOS 的可靠性不只来自系统审计，也来自用户能参与判断形成。
+MetaOS 的可靠性不只来自系统审计，也来自用户能参与判断形成。控制点必须按交付层级实现，不能用 Core Alpha Complete 的完整清单反向扩大 Minimum Slice。
 
-Core Alpha 至少应保留以下用户控制点：
+### 9.1 Minimum Slice 必须控制点
 
-- 创建、归档或重新打开 ResearchCase。
-- 从现有 ResearchCase 派生新的 ResearchCase。
-- 设置在办 ResearchCase 上限。
-- 在达到上限时暂停旧 Case、保留新问题为待办，或显式覆盖软门禁。
-- 采用或调整 ResearchTriage 给出的研究深度。
-- 指定、比较或排除知识来源。
-- 指定或切换可用来源版本。
-- 修正 KnowledgeScope。
-- 标记“证据不支持此判断”。
-- 标记“这只是推断”。
-- 标记“缺少反证”。
-- 要求降低结论强度。
-- 要求继续查证。
-- 接受或拒绝 Claim。
+- 创建 ResearchCase。
+- 指定、比较或排除知识来源，并修正 KnowledgeScope。
+- 查看采用的来源版本与 EvidenceUnit 定位。
+- 标记“证据不支持此判断”“这只是推断”或“缺少反证”。
+- 要求降低结论强度或继续查证。
+- 接受或拒绝 Claim；用户接受不改变证据状态。
 - 确认非阻断性审计警告或要求修订。
-- 确认或调整 DispositionProposal。
-- 接受、拒绝或调整 ActionProposal。
+- 查看判断的 DecisionFitness，知道它适用与不适用的用途。
+- 查看 ResearchRunOutcome；在存在满足用途约束的可采纳判断时，确认或调整 DispositionProposal。
+
+### 9.2 Core Alpha Complete 新增控制点
+
+- 归档、重新打开或从现有 ResearchCase 派生新 Case。
+- 设置在办 ResearchCase 上限，在触发门禁时暂停旧 Case、保留新问题为待办或显式覆盖。
+- 采用或调整 ResearchTriage 给出的研究深度。
+- 接受、拒绝或调整低风险 ActionProposal。
 - 发起 JudgmentReview。
-- 查看 KnowledgeContributionCandidate 及其 JudgmentCard 版本和 EvidenceUnit 依据。
-- 确认、调整或拒绝 KnowledgeContributionCandidate。
+- 查看、确认、调整或拒绝 KnowledgeContributionCandidate 及其 JudgmentCard 版本和 EvidenceUnit 依据。
 - 决定知识缺口是否进入注意力待办，或只保留在知识体系中。
 - 从注意力待办中激活、放弃或归档 AttentionBacklogItem。
-- 要求已沉淀知识进入复核，或在后续契约允许时回退更新。
+- 要求已沉淀知识进入复核或撤回使用。
+
+### 9.3 Extended Alpha 新增控制点
+
+- 修正 IntentTrace 候选意图。
+- 查看、修改、删除或关闭认知画像及其更新候选。
+- 调整有限榜单和主动信息摄入的偏好与边界。
+- 管理更丰富的概念关系、争议和知识演化视图。
 
 没有用户操作不能被默认为接受。系统应区分“用户明确接受”“用户拒绝”“用户尚未处理”。
 
@@ -931,19 +1040,21 @@ IntentTrace 显化用户可能真正关心的问题。
 - 没有画像时，Core Alpha 闭环仍必须完整运行。
 - 用户否定候选意图后，不得继续强化该方向。
 
-### 10.2 BookProfile 与 LensSkill
+### 10.2 BookProfile 与 CognitiveLens
 
-经典不是人格 Agent。经典通过 BookProfile 和 LensSkill 提供有边界的认知视角。
+经典不是人格 Agent。经典通过 BookProfile 和 CognitiveLens 提供有边界的认知视角。
+
+BookProfile 描述作品的思想结构、核心概念和来源边界；CognitiveLens 描述如何在这些边界内使用某部经典或理论框架观察问题。CognitiveLens 是业务层认知视角，不等同于 Agent Runtime 加载的程序性 Skill。
 
 业务规则：
 
 - Alpha 当前以 BookProfile 为经典视角的主要载体。
-- LensSkill 必须区分解释经典自身内容和使用经典视角解释现代对象。
+- CognitiveLens 必须区分解释经典自身内容和使用经典视角解释现代对象。
 - 解释经典自身内容时，核心判断必须由原文支持。
 - 使用经典视角解释现代对象时，必须区分原文观点、现代类比和模型推演。
 - 不模拟经典作者人格。
 - 不把现代类比写成“原文认为”。
-- LensSkill 失败不得破坏 Core Alpha 判断闭环。
+- CognitiveLens 失败不得破坏 Core Alpha 判断闭环。
 - 长期可将认知视角扩展到书籍之外的专家框架、方法论或理论体系；该方向不属于当前 Alpha 承诺。
 
 ### 10.3 认知画像
@@ -1011,12 +1122,16 @@ Streamlit 当前界面在 Alpha 中逐步收敛为个人认知工作台。
 - 默认用户界面不暴露底层检索实现细节。
 - 开发者层保留诊断能力。
 - 判断应区分草稿、审计中、可采纳、需复核和不可继续使用。
+- 可采纳判断必须同时展示 DecisionFitness，明确“可用于什么”和“不足以支持什么”。
+- ResearchRunOutcome 与 ResearchDisposition 必须分别展示，不能把运行失败或用户终止伪装成判断处置。
 - 审计阻断时，UI 可以展示草稿和问题，但不能以最终结论样式呈现。
 - 用户可以查看系统发送给外部模型的材料范围。
 
 ## 12. 业务指标
 
 指标用于发现问题和验证价值，不直接成为单调优化目标。不能为了提高完成率而降低审计标准，也不能为了提高行动或知识贡献接受率而增加激进建议。完成率采用成熟队列，例如启动后 7 天和 30 天，不把统计周期末刚启动的对象直接计为失败。
+
+首批 10～20 个真实 ResearchCase 采用逐案例评审，检查来源约束、核心 Claim 依据、理由链透明度、用户修正点、用途适配性、处置支撑力，以及相对普通 RAG 的新增价值。比例指标在积累约 20～30 个真实 Case 后才用于观察趋势；样本不足时不得据此判定产品成败。
 
 ### 12.1 Alpha 核心价值指标
 
@@ -1036,6 +1151,7 @@ Streamlit 当前界面在 Alpha 中逐步收敛为个人认知工作台。
 | 核心 Claim 依据与推理覆盖率 | 可采纳核心 Claim 具有有效 EvidenceUnit；推断型 Claim 同时具有 JudgmentRationale 的比例 | 满足相应依据要求的可采纳核心 Claim 数 / 所有可采纳核心 Claim 数 | 每次发布 / 周 | 目标为 100% | 不能说明推理结论必然正确 |
 | 引用定位有效率 | EvidenceUnit 能回到有效来源和定位的比例 | 有效定位 EvidenceUnit 数 / 被引用 EvidenceUnit 数 | 每次发布 / 周 | 目标为 100% | 不能说明引用一定支持 Claim |
 | required source 独立报告覆盖率 | 成功解析的 required source 均有独立结果说明的比例 | 有独立结果说明的 required source 数 / 成功解析的 required source 数 | 每次发布 / 周 | 目标为 100% | 来源解析失败必须另行报告 |
+| 判断用途越级放行率 | JudgmentCard 被用于超出 DecisionFitness 的处置或行动的比例 | 越级放行次数 / 涉及用途限制的判断次数 | 每次发布 / 周 | 目标为 0 | 不能说明被允许的行动本身一定正确 |
 | 审计阻断误显示率 | 被阻断内容误显示为可采纳判断的比例 | 误显示 JudgmentCard 数 / 被阻断 JudgmentCard 数 | 每次发布 / 周 | 目标为 0 | 不能说明非阻断内容都高质量 |
 | 失效判断误显示率 | 已知失效判断仍显示为当前有效的比例 | 误显示失效判断数 / 已知失效判断数 | 每次发布 / 月 | 目标为 0 | 不能说明未失效判断都正确 |
 | Golden Cases 审计逃逸率 | 固定冻结场景中的违规行为未被阻断的比例 | 发生逃逸的 Golden Case 数 / 应被阻断的 Golden Case 数 | 每次发布 | 目标为 0 | 不能覆盖所有现实输入 |
@@ -1059,35 +1175,35 @@ Streamlit 当前界面在 Alpha 中逐步收敛为个人认知工作台。
 
 ### 12.5 Alpha 首批仪表盘
 
-首批只实现不超过八项：判断充分率、判断修正价值、ResearchRun 可靠完成率、ResearchCase 阶段性解决率、来源边界违规率、核心 Claim 依据与推理覆盖率、引用定位有效率、审计阻断误显示率。其他指标先保留定义，待相应业务能力出现后再接入。
+首批只实现不超过八项：判断充分率、判断修正价值、ResearchRun 可靠完成率、ResearchCase 阶段性解决率、来源边界违规率、核心 Claim 依据与推理覆盖率、判断用途越级放行率、审计阻断误显示率。其他指标先保留定义，待相应业务能力出现后再接入。
 
 ## 13. Core Alpha 冻结验收场景
 
 这些场景是业务架构冻结验收场景，不是完整自动化测试用例。具体测试输入、Fixture 和断言由后续评测文档维护。
 
-| 场景 | 输入条件 | 用户显式约束 | 系统必须行为 | 系统禁止行为 | 最终可观察结果 | 关联业务不变量 |
-| --- | --- | --- | --- | --- | --- | --- |
-| 指定单一来源解释 | 用户要求解释某概念 | 只允许《鬼谷子》 | 只在指定来源中取证；证据不足时说明不足 | 用全库其他资料代答 | JudgmentCard 只引用允许来源，或返回该来源证据不足 | 显式来源约束优先；模型参数知识不能伪装成指定来源 |
-| 双来源比较 | 用户比较《鬼谷子》和《理想国》 | 两个来源都必须覆盖 | 两边分别取证，再按统一维度比较 | 只取证一方后推断另一方 | 比较结论显示双方 EvidenceUnit 和差异 | comparison 来源必须独立取证 |
-| required 来源无证据 | 用户指定某来源必须参与 | required 来源已解析但无相关证据 | 报告该来源 no_evidence | 找其他来源填补 required 来源结论 | ResearchDisposition 可建议继续研究或证据不足关闭 | required 来源必须独立报告；无证据不得代答 |
-| excluded 来源污染测试 | 用户明确排除某来源 | excluded 来源存在且相关 | 允许来源标识作为排除参数，但排除其内容进入候选、模型上下文、证据处理、引用和证据链 | 引用或用该来源内容支撑核心 Claim | Trace 可记录排除标识，JudgmentCard 和 EvidenceUnit 不含 excluded 来源内容 | excluded 来源内容边界可审计 |
-| 短资料公平性测试 | 短资料与长资料都可能相关 | 无显式偏好 | 短资料获得独立被检索和报告机会 | 因篇幅短而完全失去候选机会 | 来源报告显示短资料 supporting / contradicting / no_evidence / unavailable 之一 | 来源篇幅不得决定来源权重 |
-| 审计阻断测试 | 核心 Claim 无证据 | 用户仍想看结论 | 阻止其显示为可采纳判断，可展示草稿和问题 | 把 blocked Claim 标为可采纳判断 | UI 显示审计问题，不能作为可靠判断处置 | 审计状态与用户接受状态独立 |
-| 判断失效测试 | 关键证据删除或版本变化 | 用户查看旧判断 | 提示旧判断不可继续作为当前有效判断 | 继续显示为当前可采纳且无风险提示 | JudgmentReview 或失效提示可见 | 判断必须随证据变化被复核或失效 |
-| 在办软门禁 | active ResearchCase 已达用户上限 | 用户提交新问题 | 保存问题并进入注意力待办，提供暂停旧 Case 或显式覆盖的选择 | 自动关闭旧 Case、拒绝保存新问题或静默超限 | 新 Case 处于待办，覆盖操作可追溯 | 注意力约束不覆盖用户主权 |
-| 知识贡献证据绑定 | JudgmentCard 已通过审计 | 用户查看候选贡献 | 展示候选所绑定的 JudgmentCard 版本和 EvidenceUnit | 产生无法追溯的长期知识 | 用户可基于具体证据确认或调整 | 知识沉淀必须继承判断证据链 |
-| 知识贡献拒绝 | 系统已生成 KnowledgeContributionCandidate | 用户拒绝候选 | 保留拒绝记录，知识体系保持不变 | 将未确认候选写入长期知识 | 候选关闭，后续研究不引用其为已确认知识 | 没有用户操作不能默认为接受 |
-| blocked 判断禁止沉淀 | JudgmentCard 存在阻断性审计问题 | 用户查看草稿 | 允许查看草稿与审计问题，不生成可采纳知识贡献 | 将 blocked Claim 沉淀为可靠知识资产 | 无可确认 KnowledgeContributionCandidate | 认知治理的审计门同样约束知识沉淀 |
-| 无新增知识 | JudgmentCard 可采纳，但与现有 KnowledgeAsset 相比无明显新信息 | 用户完成研究 | 允许不生成 KnowledgeContributionCandidate，处置和行动闭环正常完成 | 为流程完整而制造低价值候选 | 本次研究明确记录为无值得沉淀的新知识 | 知识沉淀服从知识价值，不服从流程配额 |
-| 派生知识不循环举证 | 后续研究召回 KnowledgeAsset | 研究需要支持来源型 Claim | 回溯 KnowledgeAsset 所依赖的 JudgmentCard 和底层 EvidenceUnit | 将 KnowledgeAsset 计算为新的独立原始证据 | 证据数量不因派生知识重复而增加 | 派生知识可导航，不替代原始证据 |
-| 知识缺口注意力门禁 | 创建或修订 KnowledgeAsset 时暴露新缺口 | 用户尚未确认追加研究 | 只提出加入待办建议，保留用户确认和拒绝权 | 自动激活 ResearchCase 或占用注意力待办位置 | 未确认缺口只保留在知识体系 | 知识体系不得反向劫持注意力 |
-| 删除依赖提示 | 用户删除被最小知识笔记引用的 JudgmentCard 或 EvidenceUnit | 用户要求删除 | 提示受影响笔记，并阻止其继续显示为系统验证知识 | 静默留下无法追溯的知识笔记 | 相关笔记被撤回使用或提示依据失效；复杂级联策略后置设计 | 删除与可追溯必须同时受用户治理 |
-| 用户调整候选导致证据失配 | 用户调整 KnowledgeContributionCandidate，提高结论强度或增加新主张 | 用户希望确认调整后内容 | 重新校验调整后主张与 EvidenceUnit 的支持关系；失败后提供保存观点、降低强度重试、继续研究或放弃 | 因用户点击确认就将缺乏支持的内容标记为系统验证知识，或自动保存为用户观点 | 通过校验后才形成系统验证知识；失败后的去向由用户选择 | 用户确认不提升证据状态 |
-| 用户接受不改变证据状态 | Claim 处于部分支持或存在争议 | 用户选择接受 Claim | 记录用户接受，同时保留原证据状态和审计警告 | 将用户接受解释为 Claim 已获得充分证据支持 | 用户态度与证据状态分别可见 | 用户主权不得覆盖认识论约束 |
-| 推断 Claim 缺少理由链 | EvidenceUnit 存在，但核心 Claim 属于推断或建议 | 用户希望采纳结论 | 展示 JudgmentRationale、关键假设、适用边界和失效条件；缺失时阻断 | 仅凭引用存在就将推断标为可靠 | Claim 与证据前提、推理过程和限制可追溯 | 证据存在不等于推断成立 |
-| blocked 判断合法退出 | JudgmentCard 存在阻断性问题且用户不继续修订 | 用户希望结束或暂缓 | 允许继续研究、延后、终止、拒绝采用或查看草稿 | 迫使用户继续修订，或让 blocked 判断进入行动 | Case 保留真实失败与用户选择，不产生可靠判断或行动承诺 | 认识论阻断不剥夺用户退出权 |
-| JudgmentReview 二次确认 | 历史判断完成复核并建议改变原处置 | 用户查看 ReviewResult | 生成新的 DispositionProposal，由用户再次确认或调整 | 复核流程直接覆盖原 ResearchDisposition | 新旧处置及用户确认过程均可追溯 | 复核结果不能替用户决定处置 |
-| 高风险行动建议 | 可采纳判断可能导向高成本或不可逆行动 | 用户请求行动建议 | 展示成本、可逆性、最大损失、关键假设、停止条件和复盘点，并提高确认要求 | 用弱证据推动不可逆行动，或把 ActionProposal 当成承诺 | 用户只能在看见风险与依据后形成 ActionCommitment | 行动风险必须与证据和确认强度相称 |
+| 场景 | 适用阶段 | 输入条件 | 用户显式约束 | 系统必须行为 | 系统禁止行为 | 最终可观察结果 | 关联业务不变量 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 指定单一来源解释 | Minimum Slice | 用户要求解释某概念 | 只允许《鬼谷子》 | 只在指定来源中取证；证据不足时说明不足 | 用全库其他资料代答 | JudgmentCard 只引用允许来源，或返回该来源证据不足 | 显式来源约束优先 |
+| 双来源比较 | Minimum Slice | 用户比较《鬼谷子》和《理想国》 | 两个来源都必须覆盖 | 两边分别取证，再按统一维度比较 | 只取证一方后推断另一方 | 比较结论显示双方 EvidenceUnit 和差异 | 来源访问政策与分析角色正交 |
+| required 来源无证据 | Minimum Slice | required 来源已解析但无相关证据 | 该来源必须独立报告 | 报告 no_evidence，并记录 ResearchRunOutcome | 找其他来源代答或伪造 ResearchDisposition | Run 以证据不足结束，用户可选择是否启动新 Run | 无证据不得代答；RunOutcome 不等于处置 |
+| excluded 来源污染 | Minimum Slice | excluded 来源存在且相关 | 排除其内容 | 仅将标识作为排除参数，内容不得进入候选、上下文、证据或引用 | 用 excluded 内容支撑 Claim | Trace 有排除记录，证据链无其内容 | 来源边界可审计 |
+| 短资料公平性 | Minimum Slice | 长短资料都可能相关 | 无显式偏好 | 给短资料独立取证和报告机会 | 因篇幅短使其失去候选机会 | 来源报告说明支持、反驳、无证据或不可用 | 篇幅不得决定来源权重 |
+| 推断 Claim 缺少理由链 | Minimum Slice | EvidenceUnit 存在但核心 Claim 属于推断 | 用户希望采纳 | 展示前提、推理、假设、边界和反证；缺失时阻断 | 仅凭引用存在就判为可靠 | Claim 与 JudgmentRationale 可追溯 | 证据存在不等于推断成立 |
+| 事实型理由链裁剪 | Minimum Slice | Claim 是简单来源事实 | 无 | 只要求来源、定位、事实映射和版本限制 | 强迫生成无意义的假设和竞争解释 | 理由链与 Claim 类型相称 | 审计不应退化为机械填表 |
+| 用户接受不改变证据状态 | Minimum Slice | Claim 部分支持或存在争议 | 用户选择接受 | 记录用户态度并保留证据状态和警告 | 将接受解释成充分支持 | 用户态度与证据状态分别可见 | 用户主权不覆盖认识论约束 |
+| 判断用途越级 | Minimum Slice | 判断足以理解问题但不足以支持高成本行动 | 用户希望直接行动 | 显示 DecisionFitness 并限制用途 | 用统一“可采纳”标签放行任意行动 | 判断可用于理解或研究规划，但明确不可用于高风险行动 | 可采纳不等于无限用途许可 |
+| 审计阻断与运行结束 | Minimum Slice | 核心 Claim 无证据且用户终止 | 用户不继续修订 | 记录 blocked JudgmentCard 和 ResearchRunOutcome | 生成可靠判断或普通 ResearchDisposition | Run 真实结束，Case 可保留或日后重启 | RunOutcome 与 ResearchDisposition 分离 |
+| 在办软门禁 | Core Alpha Complete | active Case 已达上限 | 用户提交新问题 | 保存到待办并允许暂停旧 Case 或显式覆盖 | 自动关闭旧 Case或拒绝保存 | 覆盖可追溯 | 注意力约束不覆盖用户主权 |
+| 判断失效与复核 | Core Alpha Complete | 关键证据删除或确认历史缺陷 | 用户查看旧判断 | 提示失效并允许 JudgmentReview | 无提示地继续显示为当前有效 | 复核入口与影响范围可见 | 判断随依据与已知缺陷复核 |
+| JudgmentReview 二次确认 | Core Alpha Complete | 复核建议改变原处置 | 用户查看 ReviewResult | 生成新 DispositionProposal 并再次确认 | 直接覆盖 ResearchDisposition | 新旧处置和确认过程可追溯 | 复核不能替用户决定处置 |
+| 高风险行动升级测试 | Core Alpha Complete | 用户请求高成本、长期或不可逆行动 | 当前判断只适合低风险验证 | 识别用途越级，建议补充研究、专家审核或拆成低风险实验 | 直接生成可执行的高风险承诺 | 不形成越级 ActionCommitment | Core Alpha 具备拒绝越级能力，不承诺治理所有高风险决策 |
+| 知识贡献证据绑定 | Core Alpha Complete | 可采纳判断具有沉淀价值 | 用户查看候选 | 展示 JudgmentCard 版本和 EvidenceUnit | 产生无法追溯的知识 | 用户可据此确认或调整 | 知识沉淀继承证据链 |
+| 知识贡献拒绝 | Core Alpha Complete | 已生成候选 | 用户拒绝 | 保留拒绝记录且知识体系不变 | 将未确认候选写入长期知识 | 候选关闭 | 没有操作不能默认为接受 |
+| blocked 判断禁止沉淀 | Core Alpha Complete | JudgmentCard 被阻断 | 用户查看草稿 | 不生成可采纳知识贡献 | 沉淀为系统知识 | 无可确认候选 | 审计门同时约束知识沉淀 |
+| 无新增知识 | Core Alpha Complete | 判断可采纳但无明显新信息 | 用户完成研究 | 允许不生成候选 | 为填流程制造候选 | 判断与处置正常完成 | 知识价值高于流程配额 |
+| 用户调整候选导致失配 | Core Alpha Complete | 用户增强候选强度或加入新主张 | 用户希望确认 | 重新校验；失败后提供保存观点、降强度、继续研究或放弃 | 自动认定为证据支持知识 | 失败去向由用户选择 | 用户确认不提升证据状态 |
+| 派生知识不循环举证 | Core Alpha Complete | 后续研究召回 KnowledgeAsset | 需要支持来源型 Claim | 回溯底层 EvidenceUnit | 将派生知识算作新原始证据 | 证据数不因派生重复增加 | 派生知识可导航但不替代原始证据 |
+| 知识缺口注意力门禁 | Core Alpha Complete | 知识笔记暴露新缺口 | 用户未确认追加研究 | 只提出加入待办建议 | 自动激活 ResearchCase | 缺口留在知识体系 | 知识体系不得劫持注意力 |
 
 ## 14. 全局业务原则
 
@@ -1135,16 +1251,16 @@ UserConstitution、CurrentState 和 CognitivePattern 只有在对象实际存在
 - ResearchTrace 默认保存必要的定位、Hash 和摘要；是否保存完整原文，应由资料敏感级别与本地 / 外部模型策略决定。
 - 用户可以删除研究记录及其衍生画像候选。
 - 用户删除上游 JudgmentCard 或 EvidenceUnit 前，系统必须提示会受影响的最小知识笔记、Action 和 JudgmentReview。
-- Core Alpha 不得因删除上游记录而静默留下仍被显示为系统验证知识的孤立笔记；至少应撤回其使用资格或明确提示依据失效。
+- Core Alpha 不得因删除上游记录而静默留下仍被显示为证据支持知识的孤立笔记；至少应撤回其使用资格或明确提示依据失效。
 - 完整依赖传播、级联删除、逻辑删除、物理删除和脱敏机制属于后续独立设计，以 `docs/DOMAIN_MODEL.md` 与 `docs/TECHNICAL_ARCHITECTURE.md` 为准。
 - 外部模型调用时，应明确发给哪个 Provider、发送哪些片段、是否包含用户画像、是否可关闭。
 
 ### 14.5 经典视角原则
 
 - 经典是知识来源和认知视角，不是人格化 Agent。
-- 书籍是来源，BookProfile 描述其思想结构，LensSkill 提供受边界约束的使用方式。
+- 书籍是来源，BookProfile 描述其思想结构，CognitiveLens 提供受边界约束的观察方式。
 - 原文观点、现代类比和模型推演必须分开标记。
-- Alpha 不承诺把所有方法论、专家理论或组织管理体系都建成 LensSkill。
+- Alpha 不承诺把所有方法论、专家理论或组织管理体系都建成 CognitiveLens。
 
 ### 14.6 注意力与知识演化原则
 
@@ -1159,12 +1275,15 @@ UserConstitution、CurrentState 和 CognitivePattern 只有在对象实际存在
 - ActionProposal 必须说明预期收益、成本、可逆性、关键假设、最大可接受损失、停止条件和复盘时点。
 - Core Alpha 优先将判断转化为低成本、可逆、可验证的小步行动，不以“推动更多行动”为目标。
 - 行动的潜在损失、不可逆性或外部影响越高，所需证据覆盖、用户确认强度和复盘要求越高。
+- 当现有 DecisionFitness 不足以支持高风险行动时，Core Alpha 必须拒绝越级，并建议补充研究、专家审核或拆成低风险实验。
 - 用户接受行动建议不改变相关 Claim 的证据状态，也不能绕过阻断性审计问题。
 
 ### 14.8 能力实现可替换原则
 
 - 检索、比较、反证搜索、Claim 提取、JudgmentRationale 生成和审计可以由 Skill、模型、算法或工作流实现。
 - Skill 是业务能力的可替换实现，不是新的一级业务链、人格化 Agent 或绕过领域规则的入口。
+- Skill 不拥有 ResearchCase、KnowledgeScope、EvidenceUnit、JudgmentCard、Audit、DecisionFitness 或 ResearchDisposition 的权威状态；它只接收受控输入并返回候选结果，最终状态由领域规则验证、业务状态机确认并持久化。
+- Skill 执行成功只表示某项程序性能力完成，不表示 ResearchRun 成功、判断可采纳或可以进入行动；业务成功仍由 EvidenceUnit、JudgmentRationale、Audit、DecisionFitness 和用户确认共同决定。
 - 更换实现不得改变业务对象语义，不得伪造 EvidenceUnit、覆盖 ResearchTrace、跳过审计或用户确认，也不得绕过行动风险门槛。
 - 新实现是否进入主路径必须由固定验收场景和质量指标驱动。
 
@@ -1172,10 +1291,10 @@ UserConstitution、CurrentState 和 CognitivePattern 只有在对象实际存在
 
 本文档只维护业务目标、业务主链、业务闭环、用户控制点、业务指标和冻结验收场景。
 
-本次 R6 收敛 Core Alpha Minimum Slice 与 Complete 的交付边界，补充 JudgmentRationale、复核后二次处置确认、行动风险治理、最小知识笔记和对象分层。后续文档按以下权威边界分别承接：
+本次 R7.1 在 R7 语义收敛基础上，只消除 CognitiveLens 与程序性 Skill 的术语冲突，并补强 Skill 不拥有权威业务状态、执行成功不等于业务成功的边界。后续文档按以下权威边界分别承接：
 
-- `docs/DOMAIN_MODEL.md`：定义 KnowledgeContributionCandidate、最小 KnowledgeAsset、JudgmentCard / EvidenceUnit 依赖、审计警告传播、AttentionBacklogItem / active 语义，以及用户观点与系统验证知识的边界。
-- `docs/TECHNICAL_ARCHITECTURE.md`：定义知识体系能力的模块或 Port、候选确认写入路径、证据有效性检查和 Extended Alpha 隔离，不将其拆成独立微服务。
+- `docs/DOMAIN_MODEL.md`：定义 DecisionFitness、ResearchRunOutcome、KnowledgeScope 二维语义、KnowledgeContributionCandidate、最小 KnowledgeAsset、JudgmentCard / EvidenceUnit 依赖、AttentionBacklogItem / active 语义，以及用户观点与证据支持知识的边界。
+- `docs/TECHNICAL_ARCHITECTURE.md`：定义两阶段来源解析、用途门禁、RunOutcome 写入、知识体系能力模块或 Port、候选确认路径、证据有效性检查和 Extended Alpha 隔离，不将其拆成独立微服务。
 - `docs/API_CONTRACTS.md`：定义候选查看、确认、调整、拒绝，以及删除影响确认契约。
 - `docs/METAOS_ALPHA_UNIFIED_PLAN.md`、`docs/ROADMAP.md` 和 `docs/TASK_INDEX.md`：同步阶段顺序、任务依赖和验收条件。
 
