@@ -6,7 +6,7 @@
 
 文档性质：本文描述目标领域契约，不表示相关能力已经可运行。阶段 0 允许代码与本文暂时不一致。
 
-任务标识：`A0-DOC-003-R1.2.1`
+任务标识：`A0-DOC-003-R1.2.2`
 
 依赖：业务架构 `A0-DOC-001-R7.1`，技术架构 `A0-DOC-002-R4.1`
 
@@ -287,6 +287,7 @@ JudgmentCard
 - 目的：保存原始问题或追问的语义身份。
 - 必填：`research_question_id`、`research_case_id`、`question_text`、`question_role`、`created_by`、`created_at`。
 - 可选：`parent_question_id`。
+- `question_role`：`root / follow_up / clarification / derived`。
 - 不变量：原始问题与追问分别保存；改变问题语义产生新记录；它不是聊天消息。
 - 本对象不可变，不拥有独立生命周期状态。
 
@@ -326,31 +327,34 @@ JudgmentCard
 
 - 类别：Aggregate Root。
 - 目的：表示范围、计划和核心目标已确定的一次研究执行。
-- 必填：`research_run_id`、`research_case_id`、`research_question_id`、`knowledge_scope_version_id`、`research_plan_version_id`、`run_execution_spec_id`、`status`、`revision`。
+- 必填：`research_run_id`、`research_case_id`、`research_question_id`、`knowledge_scope_version_id`、`research_plan_version_id`、`run_execution_spec_id`、`status`、`revision`、`created_at`。
 - 可选：`started_at`、`ended_at`、`superseded_by_run_id`。
 - 状态：`created / running / awaiting_user / completed / failed / cancelled / superseded`。
+- 时间条件：进入 running 后必须有 `started_at`；进入 `completed / failed / cancelled / superseded` 后必须有 `ended_at`。
 - 不变量：`completed / failed / cancelled / superseded` 为终态；进入终态必须原子创建唯一 Outcome 并追加事件；`awaiting_user` 不是终态。
 
 #### ResearchAttempt
 
 - 类别：Entity；所属聚合：ResearchRun。
 - 目的：记录业务层决定的一次执行尝试，与基础设施重投区分。
-- 必填：`research_attempt_id`、`research_run_id`、`attempt_number`、`attempt_mode`、`status`、`started_at`。
-- 可选：`previous_attempt_id`、`ended_at`、`failure_category`、`failure_reason`。
+- 必填：`research_attempt_id`、`research_run_id`、`attempt_number`、`attempt_mode`、`status`、`created_at`。
+- 可选：`previous_attempt_id`、`started_at`、`ended_at`、`failure_category`、`failure_reason`。
 - `attempt_mode`：`retrieval / reuse_existing_evidence`。
 - 状态：`created / running / completed / failed / cancelled / stale`。
+- 时间条件：进入 running 后必须有 `started_at`；进入 `completed / failed / cancelled / stale` 后必须有 `ended_at`。
 - 不变量：基础设施重投不是新 Attempt；失败 Attempt 不被覆盖；reuse 模式必须记录实际复用证据，不得以模型参数知识代替。
 
 #### RetrievalRun
 
 - 类别：Entity；所属聚合：ResearchRun。
 - 目的：记录 Attempt 中一次来源或通道级检索。
-- 必填：`retrieval_run_id`、`research_attempt_id`、`knowledge_scope_source_binding_id`、`retrieval_channel`、`query_ref`、`status`、`retrieval_outcome`、`started_at`。
-- 可选：`index_generation_id`、`ended_at`、`failure_reason`。
+- 必填：`retrieval_run_id`、`research_attempt_id`、`knowledge_scope_source_binding_id`、`retrieval_channel`、`query_ref`、`status`、`retrieval_outcome`、`created_at`。
+- 可选：`index_generation_id`、`started_at`、`ended_at`、`failure_reason`。
 - `status`：`created / running / completed / failed / cancelled`。
 - `retrieval_channel`：开放代码值；必须由 RunExecutionSpec 中允许的检索能力注册表解析。
 - `retrieval_outcome`：`completed_with_candidates / no_evidence / source_unavailable / failed / cancelled`。
 - 状态映射：completed 只能对应 `completed_with_candidates / no_evidence / source_unavailable`；failed 只能对应 `failed`；cancelled 只能对应 `cancelled`。
+- 时间条件：进入 running 后必须有 `started_at`；进入 `completed / failed / cancelled` 后必须有 `ended_at`。
 - 不变量：一个 Attempt 可有零个或多个 RetrievalRun；required source 必须有独立检索或等价独立结果；RetrievalRun 不是证据。
 
 #### ResearchRunOutcome
@@ -456,10 +460,11 @@ JudgmentCard
 
 - 类别：Entity；所属聚合：JudgmentCard。
 - 目的：承载一个判断版本的一次具体审计过程。
-- 必填：`judgment_audit_id`、`judgment_card_version_id`、`audit_policy_version`、`audit_run_status`、`finding_ids`、`started_at`。
-- 可选：`gate_result`、`completed_at`。
+- 必填：`judgment_audit_id`、`judgment_card_version_id`、`audit_policy_version`、`audit_run_status`、`finding_ids`、`created_at`。
+- 可选：`gate_result`、`started_at`、`completed_at`。
 - `audit_run_status`：`pending / running / completed / failed`。
 - `gate_result`：`acceptable / provisionally_acceptable / blocked`；只有 completed 审计可以具有 gate result。
+- 时间条件：进入 running 后必须有 `started_at`；进入 `completed / failed` 后必须有 `completed_at`。
 - 不变量：一个判断版本可有多次审计；最新完成且被领域规则接纳的审计决定 audit status；模型可以生成 Finding 候选，但不能单独将判断标为 acceptable。
 
 #### AuditFinding
@@ -567,7 +572,7 @@ JudgmentCard
 - `user_decision_status`：`pending / accepted / rejected`。
 - `lifecycle_status`：`current / superseded / expired / withdrawn`。
 - 条件必填：`lifecycle_status=expired` 必须有 `expires_at`。
-- 不变量：必须传播其依据判断中仍适用的非阻断 Finding，并引用有效 WarningAcknowledgement；用户修改行动目标、步骤、损失上限或外部影响时产生新版本，重新计算风险、校验 DecisionFitness 和 warning；原确认不再适用时不得沿用。
+- 不变量：只能由 ResearchCase 当前有效且 `disposition_type=proceed_to_action` 的 ResearchDisposition 创建；observe、defer_decision、explicit_no_action 及其他处置不得生成 ActionProposal；对应 JudgmentCard 必须可采纳，DecisionFitness 必须允许相应行动用途，warning 必须有效确认，ActionRiskProfile 不得超过 risk ceiling；必须传播仍适用的非阻断 Finding；用户修改行动目标、步骤、损失上限或外部影响时产生新版本，并重新计算风险、用途和 warning，原确认不再适用时不得沿用。
 
 #### ActionRiskProfile
 
@@ -647,9 +652,13 @@ Attempt 不得修改该快照；索引切换不影响已启动 Run；超出允�
 
 ### 6.2 ExecutionCheckpoint
 
-必填：`execution_checkpoint_id`、`research_run_id`、`research_attempt_id`、`checkpoint_type`、`input_revision`、`completed_at`、`result_ref_id`、`idempotency_key`。
+必填：`execution_checkpoint_id`、`research_run_id`、`checkpoint_type`、`input_revision`、`completed_at`、`result_ref_id`、`idempotency_key`。
+
+可选：`research_attempt_id`。
 
 `checkpoint_type` 至少包含：`run_started / retrieval_completed / evidence_assembled / judgment_candidate_generated / deterministic_precheck_completed / semantic_audit_completed / decision_gate_completed / outcome_committed`。
+
+条件引用：`retrieval_completed / evidence_assembled / judgment_candidate_generated / deterministic_precheck_completed / semantic_audit_completed / decision_gate_completed` 必须引用 ResearchAttempt；`run_started / outcome_committed` 可以只引用 ResearchRun。
 
 本对象属于 Minimum Slice Conditional：只有启用异步 Worker 或可恢复的多步骤执行时才是交付前置；完全同步 Minimum Slice 可以只保留最小 TraceEvent。
 
@@ -1031,6 +1040,9 @@ ReviewResult 不得直接覆盖旧 ResearchDisposition。上游证据或确定�
 63. ClaimEvidenceLink 必须引用同一 ResearchRun 的 ResearchEvidenceUse 快照；invalid 不得进入 Link，needs_review 不得单独支撑可采纳核心 Claim。
 64. KnowledgeContributionCandidate 的 accepted_as_knowledge、saved_as_note 与 rejected 是互斥终态决定，分别原子创建对应对象或关闭候选。
 65. TraceEvent 只能锚定聚合根，aggregate_revision 必须来自该聚合根；技术子记录通过 payload 或上下文引用表达。
+66. created/pending 对象只要求 created_at；started_at 和 ended_at/completed_at 必须按照实际状态条件出现，不得为满足 Schema 预填虚假时间。
+67. Run 级 ExecutionCheckpoint 可以不引用 Attempt；Attempt 内检查点必须绑定所属 ResearchAttempt。
+68. ActionProposal 只能来自当前有效的 proceed_to_action 处置，并同时通过判断、用途、warning 与风险上限门禁。
 
 ## 11. 与其他权威文档的关系
 
