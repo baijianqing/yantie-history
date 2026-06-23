@@ -1,12 +1,12 @@
 # MetaOS Alpha 领域模型
 
-状态：Core Alpha 领域模型冻结候选
+状态：Core Alpha 领域模型冻结版
 
 权威范围：Core Alpha 对象、字段语义、聚合边界、关系、枚举、版本语义、状态转换与全局领域不变量
 
 文档性质：本文描述目标领域契约，不表示相关能力已经可运行。阶段 0 允许代码与本文暂时不一致。
 
-任务标识：`A0-DOC-003-R1`
+任务标识：`A0-DOC-003-R1.1`
 
 依赖：业务架构 `A0-DOC-001-R7.1`，技术架构 `A0-DOC-002-R4.1`
 
@@ -51,9 +51,15 @@ Extended Alpha 只定义方向性边界，不冻结完整字段和状态机。
 
 - `revision` 是可变聚合根的乐观并发令牌，每次权威状态变化递增。
 - `version` 是对象的语义版本号。
-- `previous_version_id` 或 `supersedes_id` 表达历史关系。
+- 版本化对象采用“双 ID”规则：`*_id` 是整个版本序列的稳定逻辑 ID，`*_version_id` 是一个具体版本记录的唯一 ID。
+- `previous_version_id` 指向同一逻辑对象的前一个具体 `*_version_id`；`supersedes_id` 指向被当前不可变事实替代的同类事实记录。
+- 需要精确复现历史状态的下游对象必须引用 `*_version_id`，不得只引用逻辑 `*_id` 或裸 `version` 数字。
 - 同一字段不得同时承担并发控制与业务版本语义。
 - 修改已发布的版本化内容必须产生新版本，不得覆盖历史版本。
+
+该规则适用于 `KnowledgeScope`、`ResearchPlan`、`Claim`、`JudgmentCard`、`DispositionProposal`、`ActionProposal` 和 `KnowledgeContributionCandidate`。`KnowledgeItemVersion` 自身已经是 `KnowledgeItem` 的具体内容版本，不再增加第三层版本 ID。
+
+`Claim.user_attitude` 是用户交互状态。修改它只递增所属聚合的 `revision`，不产生新的 Claim 语义版本，也不改变 `evidence_status`。
 
 ### 2.3 状态维度分离
 
@@ -87,57 +93,66 @@ JudgmentCard
 - 向量或全文检索结果；
 - Worker 内存状态和 Prompt 自由文本。
 
+权威技术记录与权威业务状态是两个维度。TraceEvent、MaterialManifest、IndexGeneration metadata、ExecutionCheckpoint 和 CapabilityCandidateResult 可以是不可覆盖的权威技术事实，但不能自行改变业务状态；ResearchTrace 与 CaseActivityLog 只是可重建投影。
+
 不可变值对象和纯记录不机械增加状态字段。此类对象在各节明确为“不可变，不拥有独立生命周期状态”。
 
 ## 3. 对象注册与聚合边界
 
 ### 3.1 对象注册表
 
-| 对象 | 交付层级 | 类别 | 聚合根或归属 | 权威状态 | 版本化 |
-| --- | --- | --- | --- | --- | --- |
-| KnowledgeItem | Minimum Slice | Aggregate Root | Knowledge Catalog | 是 | 并发修订 |
-| KnowledgeItemVersion | Minimum Slice | Immutable Record | KnowledgeItem | 是 | 是 |
-| Chunk | Minimum Slice | Immutable Record | KnowledgeItem | 是 | 随来源版本 |
-| IndexGeneration | Minimum Slice | Technical Record | Knowledge Catalog | 否，派生记录 | 是 |
-| SourceResolution | Minimum Slice | Immutable Record | ResearchCase | 是 | 以记录追加 |
-| KnowledgeScope | Minimum Slice | Versioned Entity | ResearchCase | 是 | 是 |
-| ResearchQuestion | Minimum Slice | Immutable Record | ResearchCase | 是 | 以记录追加 |
-| ResearchCase | Minimum Slice | Aggregate Root | ResearchCase | 是 | 并发修订 |
-| EvidenceRequirement | Minimum Slice | Value Object | ResearchPlan | 是 | 随计划版本 |
-| ResearchPlan | Minimum Slice | Versioned Entity | ResearchCase | 是 | 是 |
-| ResearchRun | Minimum Slice | Aggregate Root | ResearchRun | 是 | 并发修订 |
-| ResearchAttempt | Minimum Slice | Entity | ResearchRun | 是 | 以记录追加 |
-| RetrievalRun | Minimum Slice | Entity | ResearchRun | 是 | 以记录追加 |
-| ResearchRunOutcome | Minimum Slice | Immutable Record | ResearchRun | 是 | 否 |
-| EvidenceUnit | Minimum Slice | Immutable Record | Evidence Catalog | 是 | 内容不可变 |
-| ClaimEvidenceLink | Minimum Slice | Entity | JudgmentCard | 是 | 随判断版本 |
-| JudgmentRationale | Minimum Slice | Immutable Record | JudgmentCard | 是 | 随 Claim 版本 |
-| Claim | Minimum Slice | Versioned Entity | JudgmentCard | 是 | 是 |
-| JudgmentCard | Minimum Slice | Aggregate Root | Judgment | 是 | 是 |
-| JudgmentAudit | Minimum Slice | Entity | JudgmentCard | 是 | 以审计追加 |
-| AuditFinding | Minimum Slice | Immutable Record | JudgmentCard | 是 | 否 |
-| WarningAcknowledgement | Minimum Slice | Immutable Record | JudgmentCard | 是 | 否 |
-| DecisionFitness | Minimum Slice | Immutable Record | JudgmentCard | 是 | 以策略版本绑定 |
-| DispositionProposal | Minimum Slice | Aggregate Root | Decision | 是 | 是 |
-| ResearchDisposition | Minimum Slice | Immutable Record | Decision | 是 | 以记录追加 |
-| ResearchTriage | Core Complete | Entity | ResearchCase | 是 | 以建议追加 |
-| AttentionBacklogItem | Core Complete | Aggregate Root | Attention | 是 | 并发修订 |
-| JudgmentReview | Core Complete | Aggregate Root | Judgment Review | 是 | 并发修订 |
-| ReviewResult | Core Complete | Immutable Record | JudgmentReview | 是 | 否 |
-| ActionProposal | Core Complete | Aggregate Root | Action | 是 | 是 |
-| ActionRiskProfile | Core Complete | Immutable Record | ActionProposal | 是 | 随提案版本 |
-| ActionCommitment | Core Complete | Entity | ActionProposal | 是 | 并发修订 |
-| ActionReview | Core Complete | Immutable Record | ActionProposal | 是 | 以记录追加 |
-| KnowledgeContributionCandidate | Core Complete | Aggregate Root | Knowledge Contribution | 是 | 是 |
-| KnowledgeAsset | Core Complete | Entity | Knowledge Contribution | 是 | 以来源候选追踪 |
-| UserNote | Core Complete | Entity | Knowledge Contribution | 是 | 并发修订 |
-| RunExecutionSpec | Minimum Slice | Immutable Technical Record | ResearchRun | 否，执行快照 | 否 |
-| TraceEvent | Minimum Slice | Immutable Technical Record | Event Store | 否，审计事实 | 以追加保存 |
-| ResearchTrace | Minimum Slice | Projection | ResearchRun | 否 | 可重建 |
-| CaseActivityLog | Minimum Slice | Projection | ResearchCase | 否 | 可重建 |
-| MaterialManifest | Minimum Slice | Immutable Technical Record | Invocation | 否，出站审计 | 否 |
-| CapabilityInvocationContext | Minimum Slice | Immutable Value Object | Invocation | 否 | 否 |
-| CapabilityCandidateResult | Minimum Slice | Immutable Technical Record | Invocation | 否 | 否 |
+“权威业务状态”表示对象能否参与业务状态转换；“权威技术记录”表示记录是否是不可覆盖的技术事实。派生投影两者都不是，但可由权威记录重建。
+
+| 对象 | 交付层级 | 类别 | 聚合根或归属 | 权威业务状态 | 权威技术记录 | 版本化 |
+| --- | --- | --- | --- | ---: | ---: | --- |
+| KnowledgeItem | Minimum Slice | Aggregate Root | Knowledge Catalog | 是 | 否 | 并发修订 |
+| KnowledgeItemVersion | Minimum Slice | Immutable Record | KnowledgeItem | 是 | 否 | 是 |
+| Chunk | Minimum Slice | Immutable Record | KnowledgeItem | 是 | 否 | 随来源版本 |
+| IndexGeneration | Minimum Slice | Technical Record | Knowledge Catalog | 否 | 是 | generation 链 |
+| SourceResolution | Minimum Slice | Immutable Record | ResearchCase | 是 | 否 | 以记录追加 |
+| KnowledgeScope | Minimum Slice | Versioned Entity | ResearchCase | 是 | 否 | 双 ID |
+| ResearchQuestion | Minimum Slice | Immutable Record | ResearchCase | 是 | 否 | 以记录追加 |
+| ResearchCase | Minimum Slice | Aggregate Root | ResearchCase | 是 | 否 | 并发修订 |
+| EvidenceRequirement | Minimum Slice | Value Object | ResearchPlan | 是 | 否 | 随计划版本 |
+| ResearchPlan | Minimum Slice | Versioned Entity | ResearchCase | 是 | 否 | 双 ID |
+| ResearchRun | Minimum Slice | Aggregate Root | ResearchRun | 是 | 否 | 并发修订 |
+| ResearchAttempt | Minimum Slice | Entity | ResearchRun | 是 | 否 | 以记录追加 |
+| RetrievalRun | Minimum Slice | Entity | ResearchRun | 是 | 否 | 以记录追加 |
+| ResearchRunOutcome | Minimum Slice | Immutable Record | ResearchRun | 是 | 否 | 否 |
+| EvidenceUnit | Minimum Slice | Entity | Evidence Catalog | 是 | 否 | 内容不可变、有效性可变 |
+| ClaimEvidenceLink | Minimum Slice | Entity | JudgmentCard | 是 | 否 | 随判断版本 |
+| JudgmentRationale | Minimum Slice | Immutable Record | JudgmentCard | 是 | 否 | 随 Claim 版本 |
+| Claim | Minimum Slice | Versioned Entity | JudgmentCard | 是 | 否 | 双 ID |
+| JudgmentCard | Minimum Slice | Aggregate Root | Judgment | 是 | 否 | 双 ID |
+| JudgmentAudit | Minimum Slice | Entity | JudgmentCard | 是 | 否 | 以审计追加 |
+| AuditFinding | Minimum Slice | Immutable Record | JudgmentCard | 是 | 否 | 否 |
+| WarningAcknowledgement | Minimum Slice | Immutable Record | JudgmentCard | 是 | 否 | 否 |
+| DecisionFitness | Minimum Slice | Immutable Record | JudgmentCard | 是 | 否 | 以策略版本绑定 |
+| DispositionProposal | Minimum Slice | Aggregate Root | Decision | 是 | 否 | 双 ID |
+| ResearchDisposition | Minimum Slice | Immutable Record | Decision | 是 | 否 | 以记录追加 |
+| ResearchTriage | Core Complete | Entity | ResearchCase | 是 | 否 | 以建议追加 |
+| AttentionBacklogItem | Core Complete | Aggregate Root | Attention | 是 | 否 | 并发修订 |
+| JudgmentReview | Core Complete | Aggregate Root | Judgment Review | 是 | 否 | 并发修订 |
+| ReviewResult | Core Complete | Immutable Record | JudgmentReview | 是 | 否 | 否 |
+| ActionProposal | Core Complete | Aggregate Root | Action | 是 | 否 | 双 ID |
+| ActionRiskProfile | Core Complete | Immutable Record | ActionProposal | 是 | 否 | 随提案版本 |
+| ActionCommitment | Core Complete | Entity | ActionProposal | 是 | 否 | 并发修订 |
+| ActionReview | Core Complete | Immutable Record | ActionProposal | 是 | 否 | 以记录追加 |
+| KnowledgeContributionCandidate | Core Complete | Aggregate Root | Knowledge Contribution | 是 | 否 | 双 ID |
+| KnowledgeAsset | Core Complete | Aggregate Root | Knowledge Asset | 是 | 否 | 并发修订 |
+| UserNote | Core Complete | Aggregate Root | User Note | 是 | 否 | 并发修订 |
+| RunExecutionSpec | Minimum Slice | Immutable Technical Record | ResearchRun | 否 | 是 | 否 |
+| ExecutionCheckpoint | Minimum Slice | Immutable Technical Record | ResearchRun | 否 | 是 | 以记录追加 |
+| BudgetSnapshot | Core Complete | Immutable Technical Record | ResearchRun | 否 | 是 | 否 |
+| BudgetConsumptionRecord | Core Complete | Immutable Technical Record | ResearchRun | 否 | 是 | 以记录追加 |
+| TraceEvent | Minimum Slice | Immutable Technical Record | Event Store | 否 | 是 | 以记录追加 |
+| ResearchTrace | Minimum Slice | Projection | ResearchRun | 否 | 否，可重建 | 可重建 |
+| CaseActivityLog | Minimum Slice | Projection | ResearchCase | 否 | 否，可重建 | 可重建 |
+| MaterialManifest | Minimum Slice | Immutable Technical Record | Invocation | 否 | 是 | 否 |
+| CapabilityInvocationContext | Minimum Slice | Immutable Value Object | Invocation | 否 | 否 | 否 |
+| CapabilityCandidateResult | Minimum Slice | Immutable Technical Record | Invocation | 否 | 是 | 否 |
+| Tombstone | Minimum Slice | Immutable Technical Record | Lifecycle | 否 | 是 | 以记录追加 |
+| LifecycleGeneration | Minimum Slice | Technical Value | Lifecycle | 否 | 是 | 单调递增 |
 
 ### 3.2 聚合边界
 
@@ -145,7 +160,7 @@ JudgmentCard
 
 **ResearchCase Aggregate** 以 `ResearchCase` 为根，关联问题、当前范围、研究执行、当前判断和当前处置。它不拥有 ResearchTrace 的事实内容。
 
-**ResearchRun Aggregate** 以 `ResearchRun` 为根，包含执行快照、Attempt、Retrieval、Checkpoint、预算记录和 Outcome。Run 进入终态与 Outcome 创建是同一事务不变量。
+**ResearchRun Aggregate** 以 `ResearchRun` 为根，包含执行快照、Attempt、Retrieval、Checkpoint 和 Outcome；Core Alpha Complete 额外纳入正式预算快照与消费记录。Run 进入终态与 Outcome 创建是同一事务不变量。
 
 **Judgment Aggregate** 以 `JudgmentCard` 为根，管理 Claim、推理链、Claim 与证据关系、审计、警告确认和用途适配。`EvidenceUnit` 是可复用证据，不复制为判断内部文本副本。
 
@@ -153,7 +168,9 @@ JudgmentCard
 
 **Action Aggregate** 以 `ActionProposal` 为根，管理风险、承诺和复盘。
 
-**Knowledge Contribution Aggregate** 以 `KnowledgeContributionCandidate` 为根，用户确认后可形成 `KnowledgeAsset` 或 `UserNote`。
+**Knowledge Contribution Aggregate** 以 `KnowledgeContributionCandidate` 为根，只管理候选的校验、用户决定和关闭。
+
+**Knowledge Asset Aggregate** 以 `KnowledgeAsset` 为根；**User Note Aggregate** 以 `UserNote` 为根。二者创建后拥有独立生命周期，Candidate 仅作为来源引用，不再拥有它们。
 
 ## 4. Core Alpha Minimum Slice 精确模型
 
@@ -164,7 +181,9 @@ JudgmentCard
 - 类别：Aggregate Root；所属聚合：Knowledge Catalog。
 - 目的：表示逻辑作品或原始知识来源，不等于某个文件版本。
 - 必填：`knowledge_item_id`、`title`、`item_type`、`language`、`owner_scope`、`lifecycle_status`、`revision`、`created_at`、`updated_at`。
-- 可选：`current_version_id`。
+- 可选：`current_knowledge_item_version_id`。
+- `item_type`：开放代码值；必须来自受版本管理的类型注册表，Core 不冻结媒体类型全集。
+- `lifecycle_status`：`active / archived / deleted`。
 - 不变量：current version 必须属于该 Item 且当前可用；归档、删除和内容版本变化分别表达。
 
 #### KnowledgeItemVersion
@@ -173,6 +192,7 @@ JudgmentCard
 - 目的：固定可寻址、可检索、可引用的内容身份。
 - 必填：`knowledge_item_version_id`、`knowledge_item_id`、`version`、`storage_ref`、`content_hash`、`structure_hash`、`parser_version`、`language`、`availability_status`、`created_at`。
 - 可选：`previous_version_id`。
+- `availability_status`：`available / unavailable / withdrawn`。
 - 不变量：发布后内容、Hash、版本身份和存储引用不可原地修改；OCR 修正、文件替换、译本变化、文本校订或重新解析必须产生新版本；指定版本不可用时不得静默替换。
 - 本对象不可变，不拥有独立生命周期状态；availability 只表达可用性，不改写历史内容。
 
@@ -204,20 +224,25 @@ JudgmentCard
 - 可选：`requested_version_hint`、`resolved_knowledge_item_id`、`resolved_knowledge_item_version_id`、`ambiguity_reason`、`failure_reason`。
 - `resolution_stage`：`preliminary / full`。
 - `resolution_status`：`resolved / ambiguous / not_found / unavailable`。
-- 不变量：`excluded` 是访问政策而非解析状态；preliminary 仅识别锚点、歧义、版本要求和排除意图，full 才能固定版本；显式锚点失败不得静默回退全库；被排除锚点可以解析身份，但内容不得进入检索与证据链。
+- 条件必填：
+  - `resolved + full` 必须包含 `resolved_knowledge_item_id`；非 excluded 请求还必须包含 `resolved_knowledge_item_version_id`；
+  - `ambiguous` 必须包含非空候选列表和 `ambiguity_reason`；
+  - `not_found / unavailable` 必须包含 `failure_reason`；
+  - excluded 请求可以只固定作品身份，不读取或固定内容版本。
+- 不变量：`excluded` 是访问政策而非解析状态；Minimum Slice 使用 full，preliminary 只在 Core Alpha Complete 的 Triage 前置路径使用；显式锚点失败不得静默回退全库；被排除锚点可以解析身份，但内容不得进入检索与证据链。
 - 本对象不可变，不拥有独立生命周期状态。
 
 #### KnowledgeScope
 
 - 类别：Versioned Entity；所属聚合：ResearchCase。
 - 目的：固定一次研究可访问的来源与分析角色。
-- 必填：`knowledge_scope_id`、`research_case_id`、`version`、`scope_mode`、`default_access_policy`、`source_bindings`、`created_by`、`created_at`。
+- 必填：`knowledge_scope_id`、`knowledge_scope_version_id`、`research_case_id`、`version`、`scope_mode`、`default_access_policy`、`source_bindings`、`created_by`、`created_at`。
 - 可选：`previous_version_id`。
 - `scope_mode`：Minimum Slice 固定支持 `evidence_only`。
-- `KnowledgeScopeSourceBinding` 必填：`source_resolution_id`、`knowledge_item_id`、`knowledge_item_version_id`、`access_policy`；可选：`analysis_role`。
+- `KnowledgeScopeSourceBinding` 必填：`source_resolution_id`、`knowledge_item_id`、`access_policy`；可选：`knowledge_item_version_id`、`analysis_role`。
 - `access_policy`：`required / allowed / excluded`。
 - `analysis_role`：`primary / comparison / background`。
-- 不变量：同一版本绑定只有一个访问政策；required 与 excluded 互斥；analysis role 不覆盖访问政策；excluded 不得设置分析角色；primary 不自动等于 required；未声明来源由 default policy 决定；Run 绑定确定的 Scope 版本；用户修正产生新版本。
+- 不变量：同一版本绑定只有一个访问政策；required 与 excluded 互斥；analysis role 不覆盖访问政策；excluded 不得设置分析角色，且可进行作品级排除而不固定版本；required/allowed 必须绑定具体可用版本；primary 不自动等于 required；未声明来源由 default policy 决定；Run 绑定确定的 Scope 版本实例；用户修正产生新版本。
 
 ### 4.3 问题与研究项目
 
@@ -235,7 +260,7 @@ JudgmentCard
 - 类别：Aggregate Root。
 - 目的：聚合一个可长期继续、复核和派生的研究问题。
 - 必填：`research_case_id`、`title`、`root_question_id`、`current_question_id`、`lifecycle_status`、`attention_status`、`revision`、`created_at`、`updated_at`。
-- 可选：`current_knowledge_scope_id`、`current_judgment_card_id`、`current_research_disposition_id`、`parent_research_case_id`、`archived_at`。
+- 可选：`current_knowledge_scope_version_id`、`current_judgment_card_version_id`、`current_research_disposition_id`、`parent_research_case_id`、`archived_at`。
 - `lifecycle_status`：`open / archived`。
 - `attention_status`：`saved / active / paused / observing / deferred / closed`。
 - 不变量：attention 状态与待处理工作共同决定是否占用在办名额；失败 Run 不创建新 Case；派生 Case 不移动或覆盖原历史；Case 不是 Run，也不是聊天会话。
@@ -254,10 +279,10 @@ JudgmentCard
 
 - 类别：Versioned Entity；所属聚合：ResearchCase。
 - 目的：把问题、范围、研究模式、证据要求和停止条件固化为可执行计划。
-- 必填：`research_plan_id`、`research_case_id`、`knowledge_scope_id`、`version`、`research_mode`、`primary_objective`、`evidence_requirements`、`stop_conditions`、`research_budget`、`created_at`。
-- 可选：`previous_version_id`。
+- 必填：`research_plan_id`、`research_plan_version_id`、`research_case_id`、`knowledge_scope_version_id`、`version`、`research_mode`、`primary_objective`、`evidence_requirements`、`minimum_completion_condition`、`created_at`。
+- 可选：`previous_version_id`、`stop_conditions`、`research_budget`。
 - `research_mode`：`fact_lookup / source_interpretation / compare_sources / enumerate_pattern / claim_evaluation`。
-- 不变量：模式必须改变证据组织方式；改变模式、核心目标、Scope 或核心证据要求产生新计划和新 Run；Prompt 版本属于 RunExecutionSpec。
+- 不变量：模式必须改变证据组织方式；改变模式、核心目标、Scope 或核心证据要求产生新计划和新 Run；Minimum Slice 只要求最小完成条件，未提供正式预算时由 RunExecutionSpec 注入系统安全上限；完整预算、停止条件和预算守卫属于 Core Alpha Complete；Prompt 版本属于 RunExecutionSpec。
 
 ### 4.5 研究执行
 
@@ -265,7 +290,7 @@ JudgmentCard
 
 - 类别：Aggregate Root。
 - 目的：表示范围、计划和核心目标已确定的一次研究执行。
-- 必填：`research_run_id`、`research_case_id`、`research_question_id`、`knowledge_scope_id`、`research_plan_id`、`run_execution_spec_id`、`status`、`revision`。
+- 必填：`research_run_id`、`research_case_id`、`research_question_id`、`knowledge_scope_version_id`、`research_plan_version_id`、`run_execution_spec_id`、`status`、`revision`。
 - 可选：`started_at`、`ended_at`、`superseded_by_run_id`。
 - 状态：`created / running / awaiting_user / completed / failed / cancelled / superseded`。
 - 不变量：`completed / failed / cancelled / superseded` 为终态；进入终态必须原子创建唯一 Outcome 并追加事件；`awaiting_user` 不是终态。
@@ -286,7 +311,10 @@ JudgmentCard
 - 目的：记录 Attempt 中一次来源或通道级检索。
 - 必填：`retrieval_run_id`、`research_attempt_id`、`source_binding_id`、`retrieval_channel`、`query_ref`、`status`、`retrieval_outcome`、`started_at`。
 - 可选：`index_generation_id`、`ended_at`、`failure_reason`。
+- `status`：`created / running / completed / failed / cancelled`。
+- `retrieval_channel`：开放代码值；必须由 RunExecutionSpec 中允许的检索能力注册表解析。
 - `retrieval_outcome`：`completed_with_candidates / no_evidence / source_unavailable / failed / cancelled`。
+- 状态映射：completed 只能对应 `completed_with_candidates / no_evidence / source_unavailable`；failed 只能对应 `failed`；cancelled 只能对应 `cancelled`。
 - 不变量：一个 Attempt 可有零个或多个 RetrievalRun；required source 必须有独立检索或等价独立结果；RetrievalRun 不是证据。
 
 #### ResearchRunOutcome
@@ -294,37 +322,48 @@ JudgmentCard
 - 类别：Immutable Record；所属聚合：ResearchRun。
 - 目的：说明一次 Run 如何结束，不表达用户最终处置。
 - 必填：`research_run_outcome_id`、`research_run_id`、`outcome_type`、`reason_code`、`reason_summary`、`created_at`。
-- 可选：`judgment_card_id`。
+- 可选：`judgment_card_version_id`。
 - `outcome_type`：`completed_with_judgment / insufficient_evidence / audit_blocked / execution_failed / cancelled_by_user / deferred_before_judgment / superseded_by_new_run`。
 - 不变量：每个终态 Run 恰好一个 Outcome；Outcome 可以存在而 ResearchDisposition 不存在；证据不足、阻断或用户终止不得伪装为处置。
+- 终态映射：
+
+| Run 终态 | 允许的 Outcome |
+| --- | --- |
+| `completed` | `completed_with_judgment / insufficient_evidence / audit_blocked / deferred_before_judgment` |
+| `failed` | `execution_failed` |
+| `cancelled` | `cancelled_by_user` |
+| `superseded` | `superseded_by_new_run` |
+
+- `completed_with_judgment` 与 `audit_blocked` 必须引用相应 JudgmentCard 版本；`execution_failed` 不得伪造 JudgmentCard。
 - 本对象不可变，不拥有独立生命周期状态。
 
 ### 4.6 证据、Claim 与推理链
 
 #### EvidenceUnit
 
-- 类别：Immutable Record；归属：Evidence Catalog。
+- 类别：Entity；归属：Evidence Catalog。
 - 目的：保存可定位、可验证、可复用的证据内容和来源身份。
-- 必填：`evidence_unit_id`、`knowledge_item_id`、`knowledge_item_version_id`、`location`、`excerpt`、`content_hash`、`origin_type`、`validity_status`、`created_at`。
+- 必填：`evidence_unit_id`、`knowledge_item_id`、`knowledge_item_version_id`、`location`、`excerpt`、`content_hash`、`origin_type`、`validity_status`、`revision`、`created_at`、`updated_at`。
 - 可选：`chunk_id`、`origin_retrieval_run_id`。
 - `validity_status`：`valid / needs_review / invalid`。
-- 不变量：必须回到具体版本和定位；相同内容与定位不重复创建；模型参数知识不能形成 EvidenceUnit；KnowledgeAsset 不能成为新的独立原始证据；EvidenceUnit 本身不永久承担支持或反驳角色。
+- 不变量：来源版本、定位、excerpt、content_hash 和产生关系不可变；`validity_status` 与 `revision` 可变；有效性变化不改变证据内容身份；必须回到具体版本和定位；相同内容与定位不重复创建；模型参数知识不能形成 EvidenceUnit；KnowledgeAsset 不能成为新的独立原始证据；EvidenceUnit 本身不永久承担支持或反驳角色。
 - 产生关系记录最初提取路径；使用关系由 ClaimEvidenceLink 和 Run 引用表达。
 
 #### ClaimEvidenceLink
 
 - 类别：Entity；所属聚合：JudgmentCard。
 - 目的：表达 EvidenceUnit 对特定 Claim 的作用。
-- 必填：`claim_evidence_link_id`、`claim_id`、`evidence_unit_id`、`evidence_role`、`support_strength`、`created_at`。
+- 必填：`claim_evidence_link_id`、`claim_version_id`、`evidence_unit_id`、`evidence_role`、`support_strength`、`created_at`。
 - 可选：`scope_note`。
 - `evidence_role`：`supports / contradicts / defines / context / background`。
+- `support_strength`：结构化值对象，包含 `level` 与 `reason`；`level` 固定为 `weak / moderate / strong`。
 - 不变量：同一 EvidenceUnit 可支持一个 Claim 并反驳另一个；角色属于关系而非证据永久属性；相同底层证据不得虚增证据数量。
 
 #### JudgmentRationale
 
 - 类别：Immutable Record；所属聚合：JudgmentCard。
 - 目的：在 Claim 与证据关系之间保存结构化推理桥梁。
-- 必填：`judgment_rationale_id`、`claim_id`、`rationale_profile`、`evidence_link_ids`、`reasoning_summary`、`created_at`。
+- 必填：`judgment_rationale_id`、`claim_version_id`、`rationale_profile`、`evidence_link_ids`、`reasoning_summary`、`created_at`。
 - 类型化内容：事实记录来源、定位、事实映射和版本限制；解释记录原文、上下文、解释路径和替代解释；推断或假设记录前提、推理方式、关键假设、适用边界、反证和失效条件；建议记录依据、目标、成本、风险、可逆性和停止条件。
 - 不变量：建议型 rationale 由 Claim 的表达角色触发，不把 recommendation 混入认识性质。
 - 本对象不可变，不拥有独立生命周期状态。
@@ -333,7 +372,7 @@ JudgmentCard
 
 - 类别：Versioned Entity；所属聚合：JudgmentCard。
 - 目的：表达判断卡中的一个可独立审计主张。
-- 必填：`claim_id`、`judgment_card_id`、`claim_text`、`epistemic_type`、`expression_role`、`evidence_status`、`importance`、`confidence_level`、`lifecycle_status`、`user_attitude`、`judgment_rationale_id`、`version`、`created_at`。
+- 必填：`claim_id`、`claim_version_id`、`judgment_card_version_id`、`claim_text`、`epistemic_type`、`expression_role`、`evidence_status`、`importance`、`confidence_level`、`lifecycle_status`、`user_attitude`、`judgment_rationale_id`、`version`、`created_at`。
 - 可选：`previous_version_id`。
 - `epistemic_type`：`fact / interpretation / inference / analogy / hypothesis`。
 - `expression_role`：`core_judgment / supplement / counterargument / recommendation / open_question / user_reflection`。
@@ -342,7 +381,7 @@ JudgmentCard
 - `confidence_level`：`unknown / low / medium / high`。
 - `lifecycle_status`：`draft / current / superseded / archived`。
 - `user_attitude`：`unreviewed / accepted / rejected / needs_revision`。
-- 不变量：用户接受不改变 evidence_status；confidence 不替代证据与推理链；analogy 必须标为模型推演；user reflection 不伪装成事实；核心 Claim 缺少类型匹配的证据或理由链必须阻断。
+- 不变量：改变主张语义、认识性质、表达角色或适用范围产生新 Claim 版本；修改 user_attitude 只递增 JudgmentCard 聚合 revision，不产生语义版本；用户接受不改变 evidence_status；confidence 不替代证据与推理链；analogy 必须标为模型推演；user reflection 不伪装成事实；核心 Claim 缺少类型匹配的证据或理由链必须阻断。
 
 ### 4.7 JudgmentCard 与审计
 
@@ -350,26 +389,28 @@ JudgmentCard
 
 - 类别：Aggregate Root。
 - 目的：汇总可版本化、可审计、可复核的判断。
-- 必填：`judgment_card_id`、`research_case_id`、`research_run_id`、`version`、`claim_ids`、`summary`、`uncertainties`、`evidence_gaps`、`audit_status`、`validity_status`、`lifecycle_status`、`created_at`。
+- 必填：`judgment_card_id`、`judgment_card_version_id`、`research_case_id`、`research_run_id`、`version`、`claim_version_ids`、`summary`、`uncertainties`、`evidence_gaps`、`audit_status`、`validity_status`、`lifecycle_status`、`created_at`。
 - 可选：`previous_version_id`、`current_judgment_audit_id`、`decision_fitness_id`。
 - `audit_status`：`pending / auditing / provisionally_acceptable / acceptable / blocked`。
 - `validity_status`：`valid / needs_review / invalid`。
 - `lifecycle_status`：`draft / current / superseded / archived`。
-- 不变量：current 只表示当前版本；blocked + current 合法但不得展示为可靠判断；实质修订产生新版本；重新检索或改变 Scope/Plan 必须属于新 Run。
+- 不变量：current 只表示当前版本；blocked + current 合法但不得展示为可靠判断；实质修订产生新版本；重新检索或改变 Scope/Plan 必须属于新 Run；`provisionally_acceptable / acceptable` 必须绑定 DecisionFitness。
+- `acceptable` 表示不存在未解决的非阻断条件；`provisionally_acceptable` 表示判断可在受限条件下采用，但仍附带有效 warning 或条件。用户确认 warning 不提升认识论状态，判断可以继续保持 provisionally acceptable；具体用途由 DecisionFitness 决定。
 
 #### JudgmentAudit
 
 - 类别：Entity；所属聚合：JudgmentCard。
 - 目的：承载一个判断版本的一次具体审计过程。
-- 必填：`judgment_audit_id`、`judgment_card_id`、`judgment_card_version`、`audit_policy_version`、`audit_run_status`、`finding_ids`、`started_at`。
+- 必填：`judgment_audit_id`、`judgment_card_version_id`、`audit_policy_version`、`audit_run_status`、`finding_ids`、`started_at`。
 - 可选：`gate_result`、`completed_at`。
 - `audit_run_status`：`pending / running / completed / failed`。
+- `gate_result`：`acceptable / provisionally_acceptable / blocked`；只有 completed 审计可以具有 gate result。
 - 不变量：一个判断版本可有多次审计；最新完成且被领域规则接纳的审计决定 audit status；模型可以生成 Finding 候选，但不能单独将判断标为 acceptable。
 
 #### AuditFinding
 
 - 类别：Immutable Record；所属聚合：JudgmentCard。
-- 必填：`audit_finding_id`、`judgment_audit_id`、`affected_claim_ids`、`finding_type`、`severity`、`description`、`supporting_reason`、`policy_version`、`created_at`。
+- 必填：`audit_finding_id`、`judgment_audit_id`、`affected_claim_version_ids`、`finding_type`、`severity`、`description`、`supporting_reason`、`policy_version`、`created_at`。
 - 可选：`recommended_revision`、`risk_trigger_condition`。
 - `severity`：`warning / blocking`。
 - 不变量：blocking 不可由用户确认放行；warning 可被知情确认或要求修订；Finding 必须保留对具体审计和版本的追踪。
@@ -378,7 +419,7 @@ JudgmentCard
 #### WarningAcknowledgement
 
 - 类别：Immutable Record；所属聚合：JudgmentCard。
-- 必填：`warning_acknowledgement_id`、`audit_finding_id`、`judgment_card_id`、`judgment_card_version`、`acknowledged_by`、`acknowledged_at`。
+- 必填：`warning_acknowledgement_id`、`audit_finding_id`、`judgment_card_version_id`、`acknowledged_by`、`acknowledged_at`。
 - 可选：`acknowledgement_note`。
 - 不变量：只能引用 warning；新判断版本必须重新校验其有效性；下游 Proposal 只能引用仍有效的确认。
 - 本对象不可变，不拥有独立生命周期状态。
@@ -387,8 +428,9 @@ JudgmentCard
 
 - 类别：Immutable Record；所属聚合：JudgmentCard。
 - 目的：限定判断允许支持的用途与风险上限。
-- 必填：`decision_fitness_id`、`judgment_card_id`、`judgment_card_version`、`policy_version`、`allowed_uses`、`forbidden_uses`、`required_conditions`、`risk_ceiling`、`escalation_triggers`、`created_at`。
+- 必填：`decision_fitness_id`、`judgment_card_version_id`、`policy_version`、`allowed_uses`、`forbidden_uses`、`required_conditions`、`risk_ceiling`、`escalation_triggers`、`created_at`。
 - `allowed_uses` 至少支持：`understanding / research_planning / observation / low_risk_experiment / reversible_action`。
+- `risk_ceiling`：结构化值对象，至少表达最高成本等级、最低可逆性、最大外部影响和是否需要专家复核，不使用无解释的单一数字。
 - 不变量：绑定具体判断与策略版本；可采纳不代表允许任意用途；禁止用途不得被处置或行动越过；证据失效或确认的历史策略缺陷可触发重新评估。
 - 本对象不可变，不拥有独立生命周期状态。
 
@@ -398,20 +440,22 @@ JudgmentCard
 
 - 类别：Aggregate Root。
 - 目的：提出用户如何处理当前可靠判断，但不替用户作决定。
-- 必填：`disposition_proposal_id`、`research_case_id`、`judgment_card_id`、`judgment_card_version`、`decision_fitness_id`、`proposed_disposition_type`、`reason`、`user_decision_status`、`lifecycle_status`、`version`、`created_at`。
-- 可选：`warning_acknowledgement_ids`、`previous_version_id`。
+- 必填：`disposition_proposal_id`、`disposition_proposal_version_id`、`research_case_id`、`judgment_card_version_id`、`decision_fitness_id`、`proposed_disposition_type`、`reason`、`user_decision_status`、`lifecycle_status`、`version`、`created_at`。
+- 可选：`warning_acknowledgement_ids`、`previous_version_id`、`expires_at`、`defer_until`、`observation_condition`。
 - `user_decision_status`：`pending / accepted / adjusted / rejected`。
 - `lifecycle_status`：`current / superseded / expired / withdrawn`。
 - `proposed_disposition_type`：`proceed_to_action / continue_research / defer_decision / observe / discard / explicit_no_action / knowledge_only_closure`。
+- 条件必填：`lifecycle_status=expired` 必须有 `expires_at`；`defer_decision` 必须有 `defer_until`；`observe` 必须有 `observation_condition`；其他处置类型不得携带不相关条件。
 - 不变量：仅当前可采纳且用途匹配的判断可生成 Proposal；有效 warning 未确认时不得进入相应下游；blocked、证据不足和提前终止不强制产生 Proposal。
 
 #### ResearchDisposition
 
 - 类别：Immutable Record；所属聚合：Decision。
 - 目的：记录用户对可靠判断的最终处置事实。
-- 必填：`research_disposition_id`、`research_case_id`、`source_disposition_proposal_id`、`judgment_card_id`、`judgment_card_version`、`decision_fitness_id`、`disposition_type`、`confirmed_by`、`confirmed_at`。
+- 必填：`research_disposition_id`、`research_case_id`、`source_disposition_proposal_version_id`、`judgment_card_version_id`、`decision_fitness_id`、`disposition_type`、`confirmed_by`、`confirmed_at`。
 - 可选：`supersedes_disposition_id`、`defer_until`、`observation_condition`。
-- 不变量：未确认 Proposal 不得成为 Disposition；ReviewResult 不直接覆盖处置；改变处置产生新 Proposal 和新记录；defer 时间与 observe 事件条件分开表达；blocked、证据不足或提前终止后的操作不伪造为普通处置。
+- 条件必填：`defer_decision` 必须有 `defer_until`；`observe` 必须有 `observation_condition`；其他类型不得携带不相关条件。
+- 不变量：未确认 Proposal 不得成为 Disposition；ReviewResult 不直接覆盖处置；改变处置产生新 Proposal 和新记录；blocked、证据不足或提前终止后的操作不伪造为普通处置。
 - 本对象不可变，不拥有独立生命周期状态。
 
 ## 5. Core Alpha Complete 精确模型
@@ -420,35 +464,39 @@ JudgmentCard
 
 - 类别：Entity；所属聚合：ResearchCase。
 - 目的：提供研究深度、注意力成本和激活建议，并保留用户覆盖权。
-- 必填：`research_triage_id`、`research_case_id`、`preliminary_source_resolution_ids`、`recommended_depth`、`estimated_attention_cost`、`estimated_resource_budget`、`activation_recommendation`、`reason`、`user_decision`、`created_at`。
-- 可选：`adjusted_depth`、`decided_at`。
+- 必填：`research_triage_id`、`research_case_id`、`preliminary_source_resolution_ids`、`recommended_depth`、`estimated_attention_cost`、`estimated_resource_budget`、`activation_recommendation`、`reason`、`decision_status`、`created_at`。
+- 可选：`selected_depth`、`decided_at`。
 - 建议类型：`direct_answer / quick_research / standard_research / deep_research / clarification_required`。
+- `decision_status`：`pending / accepted / adjusted / overridden`。
+- 条件必填：创建系统建议时必须为 pending，且 `selected_depth / decided_at` 为空；其他状态必须同时具有二者。
 - 不变量：Triage 只建议深度、预算和策略，不取消证据与 Trace 约束，也不替用户决定是否研究。
 
 ### 5.2 AttentionBacklogItem
 
 - 类别：Aggregate Root。
 - 目的：统一承载尚未激活的问题、Case、知识缺口、复核建议或外部线索。
-- 必填：`attention_backlog_item_id`、`source_type`、`source_ref_id`、`title`、`reason`、`status`、`created_at`。
-- 可选：`estimated_attention_cost`、`activated_research_case_id`、`resolved_at`。
+- 必填：`attention_backlog_item_id`、`source_type`、`title`、`reason`、`status`、`created_at`。
+- 可选：`source_ref_id`、`question_text`、`external_lead_summary`、`estimated_attention_cost`、`activated_research_case_id`、`resolved_at`。
 - `source_type`：`saved_question / inactive_case / knowledge_gap / review_suggestion / external_lead`。
 - 状态：`pending / activated / discarded / archived`。
-- 不变量：激活前不自动创建 active Case；知识缺口不自动占用在办名额；用户覆盖软门禁必须可追踪。
+- 条件必填：`saved_question` 必须有 `question_text`，source ref 可空；`inactive_case` 必须引用 ResearchCase；`knowledge_gap` 必须引用 KnowledgeAsset；`review_suggestion` 必须引用 JudgmentReview 或 ReviewResult；`external_lead` 必须有外部引用或摘要。
+- 不变量：激活 saved question 时原子创建 `ResearchCase + ResearchQuestion`；激活前不自动创建 active Case；知识缺口不自动占用在办名额；用户覆盖软门禁必须可追踪。
 
 ### 5.3 JudgmentReview 与 ReviewResult
 
 #### JudgmentReview
 
 - 类别：Aggregate Root。
-- 必填：`judgment_review_id`、`research_case_id`、`judgment_card_id`、`judgment_card_version`、`trigger_type`、`status`、`created_at`。
+- 必填：`judgment_review_id`、`research_case_id`、`judgment_card_version_id`、`trigger_type`、`status`、`created_at`。
 - 可选：`trigger_ref_id`、`completed_at`。
 - 状态：`requested / in_progress / completed / cancelled`。
+- `trigger_type`：`user_requested / case_reopened / evidence_changed / evidence_invalid / known_system_defect / risk_triggered / action_assumption_failed`。
 - 目的：承载用户主动复核、重新打开 Case、证据失效或已知系统缺陷触发的一次判断复核。
 
 #### ReviewResult
 
 - 类别：Immutable Record；所属聚合：JudgmentReview。
-- 必填：`review_result_id`、`judgment_review_id`、`result_type`、`reason`、`affected_claim_ids`、`recommended_next_step`、`created_at`。
+- 必填：`review_result_id`、`judgment_review_id`、`result_type`、`reason`、`affected_claim_version_ids`、`recommended_next_step`、`created_at`。
 - 可选：`new_research_run_id`。
 - `result_type`：`still_valid / confidence_reduced / research_required / superseded / invalid`。
 - 不变量：不直接覆盖 ResearchDisposition；需要改变处置时产生新 Proposal；证据失效可改变判断有效性但不覆盖历史版本。
@@ -459,22 +507,27 @@ JudgmentCard
 #### ActionProposal
 
 - 类别：Aggregate Root。
-- 必填：`action_proposal_id`、`research_case_id`、`research_disposition_id`、`judgment_card_id`、`judgment_card_version`、`decision_fitness_id`、`goal`、`proposed_steps`、`expected_benefit`、`stop_conditions`、`action_risk_profile_id`、`user_decision_status`、`lifecycle_status`、`version`、`created_at`。
-- 可选：`review_at`、`previous_version_id`。
+- 必填：`action_proposal_id`、`action_proposal_version_id`、`research_case_id`、`research_disposition_id`、`judgment_card_version_id`、`decision_fitness_id`、`goal`、`proposed_steps`、`expected_benefit`、`stop_conditions`、`action_risk_profile_id`、`user_decision_status`、`lifecycle_status`、`version`、`created_at`。
+- 可选：`review_at`、`previous_version_id`、`expires_at`。
 - `user_decision_status`：`pending / accepted / rejected`。
 - `lifecycle_status`：`current / superseded / expired / withdrawn`。
+- 条件必填：`lifecycle_status=expired` 必须有 `expires_at`。
 - 不变量：用户调整产生新版本，并重新计算风险、校验 DecisionFitness 和 warning，不沿用旧放行结果。
 
 #### ActionRiskProfile
 
 - 类别：Immutable Record；所属聚合：ActionProposal。
-- 必填：`action_risk_profile_id`、`action_proposal_id`、`cost_level`、`reversibility`、`time_commitment`、`external_impact`、`maximum_acceptable_loss`、`dependency_uncertainty`、`expert_review_required`、`risk_level`、`created_at`。
+- 必填：`action_risk_profile_id`、`action_proposal_version_id`、`cost_level`、`reversibility`、`time_commitment`、`external_impact`、`maximum_acceptable_loss`、`dependency_uncertainty`、`expert_review_required`、`risk_level`、`created_at`。
+- `cost_level`：`low / medium / high`。
+- `reversibility`：`reversible / partially_reversible / irreversible`。
+- `external_impact`：`none / limited / significant`。
+- `risk_level`：`low / medium / high / critical`。
 - 本对象不可变，不拥有独立生命周期状态。
 
 #### ActionCommitment
 
 - 类别：Entity；所属聚合：ActionProposal。
-- 必填：`action_commitment_id`、`action_proposal_id`、`status`、`committed_by`、`committed_at`、`revision`。
+- 必填：`action_commitment_id`、`action_proposal_version_id`、`status`、`committed_by`、`committed_at`、`revision`。
 - 可选：`started_at`、`completed_at`、`deferred_until`。
 - 状态：`planned / in_progress / blocked / completed / cancelled / deferred`。
 - 不变量：只有用户接受当前 Proposal 后形成；Proposal 不等于 Commitment；行动状态不改变 Claim 的 evidence status。
@@ -490,7 +543,7 @@ JudgmentCard
 
 - 类别：Aggregate Root。
 - 目的：承载从可靠判断产生、等待校验和用户决定的知识贡献。
-- 必填：`knowledge_contribution_candidate_id`、`research_case_id`、`judgment_card_id`、`judgment_card_version`、`contribution_type`、`proposed_content`、`evidence_unit_ids`、`validation_status`、`user_decision_status`、`lifecycle_status`、`version`、`created_at`。
+- 必填：`knowledge_contribution_candidate_id`、`knowledge_contribution_candidate_version_id`、`research_case_id`、`judgment_card_version_id`、`contribution_type`、`proposed_content`、`evidence_unit_ids`、`validation_status`、`user_decision_status`、`lifecycle_status`、`version`、`created_at`。
 - 可选：`target_knowledge_asset_id`、`audit_finding_ids`、`warning_acknowledgement_ids`、`previous_version_id`。
 - `contribution_type`：`claim / evidence / gap`。
 - `validation_status`：`not_required / pending / passed / failed`。
@@ -500,9 +553,9 @@ JudgmentCard
 
 ### 5.6 KnowledgeAsset
 
-- 类别：Entity；所属聚合：Knowledge Contribution。
+- 类别：Aggregate Root；所属聚合：Knowledge Asset。
 - 目的：表示由已确认候选形成的证据支持知识笔记。
-- 必填：`knowledge_asset_id`、`source_candidate_id`、`asset_type`、`title`、`content`、`judgment_card_id`、`judgment_card_version`、`evidence_unit_ids`、`validity_status`、`lifecycle_status`、`created_by`、`created_at`。
+- 必填：`knowledge_asset_id`、`source_knowledge_contribution_candidate_version_id`、`asset_type`、`title`、`content`、`judgment_card_version_id`、`evidence_unit_ids`、`validity_status`、`lifecycle_status`、`revision`、`created_by`、`created_at`。
 - 可选：`audit_finding_ids`、`warning_acknowledgement_ids`、`withdrawn_at`。
 - `asset_type`：`claim_note / evidence_note / knowledge_gap`。
 - `validity_status`：`valid / needs_review / invalid`。
@@ -511,10 +564,11 @@ JudgmentCard
 
 ### 5.7 UserNote
 
-- 类别：Entity；所属聚合：Knowledge Contribution。
+- 类别：Aggregate Root；所属聚合：User Note。
 - 目的：为未通过证据校验但用户希望保留的观点或普通笔记提供合法出口。
-- 必填：`user_note_id`、`source_candidate_id`、`research_case_id`、`title`、`content`、`note_type`、`lifecycle_status`、`created_by`、`created_at`。
+- 必填：`user_note_id`、`source_knowledge_contribution_candidate_version_id`、`research_case_id`、`title`、`content`、`note_type`、`lifecycle_status`、`revision`、`created_by`、`created_at`。
 - `note_type`：`personal_note / user_viewpoint`。
+- `lifecycle_status`：`active / withdrawn / archived`。
 - 不变量：不得标记为 evidence-backed、参与 EvidenceUnit 计数或显示为系统验证知识；升级为 KnowledgeAsset 必须重新研究、校验和审计。
 
 ### 5.8 非独立对象
@@ -531,7 +585,7 @@ Core Alpha 不单独建立 OpenMonitoring、Deferred 或 Closure 实体。它们
 
 ### 6.1 RunExecutionSpec
 
-不可变技术快照，必含 `run_execution_spec_id`、`research_run_id`、Scope/SourceResolution/Plan 版本、source version set、各版本对应的 IndexGeneration、检索与上下文策略版本、embedding 与 reranker 契约、Capability 契约、允许实现与降级政策、Prompt 和输出 Schema 版本、审计与用途政策版本、出站政策版本、预算快照和 `created_at`。
+不可变技术快照，必含 `run_execution_spec_id`、`research_run_id`、Scope/SourceResolution/Plan 版本实例、source version set、各版本对应的 IndexGeneration、检索与上下文策略版本、embedding 与 reranker 契约、Capability 契约、允许实现与降级政策、Prompt 和输出 Schema 版本、审计与用途政策版本、出站政策版本、系统安全上限和 `created_at`；Core Alpha Complete 可额外绑定正式 BudgetSnapshot。
 
 Attempt 不得修改该快照；索引切换不影响已启动 Run；超出允许降级的变化创建新 Run；实际调用结果进入 Trace。
 
@@ -543,7 +597,7 @@ Attempt 不得修改该快照；索引切换不影响已启动 Run；超出允�
 
 ### 6.3 BudgetSnapshot 与 BudgetConsumptionRecord
 
-预算快照记录 Run 启动预算、Retrieval 与模型调用上限、成本和时长上限及修订轮次上限；消费记录逐次记录消耗和剩余预算。预算只决定是否继续自动消费，不决定判断是否可采纳。
+二者属于 Core Alpha Complete。BudgetSnapshot 记录 Run 启动时的时间、成本、模型调用、RetrievalRun 和修订轮次限制；BudgetConsumptionRecord 逐次记录消费类型、消耗量、剩余预算、发生时间和关联调用。ResearchBudgetGuard 依据这些记录决定是否允许继续自动消费。预算耗尽只停止或转人工，不决定判断是否可采纳。
 
 ### 6.4 TraceEvent
 
@@ -692,7 +746,38 @@ stateDiagram-v2
 
 进入 `completed / failed / cancelled / superseded` 时，必须在同一事务中创建唯一 ResearchRunOutcome、追加 TraceEvent 并更新聚合 revision。事务失败则三者都不生效。
 
-### 9.2 JudgmentCard
+### 9.2 其他对象状态机
+
+| 对象与状态维度 | 合法转换 | 约束 |
+| --- | --- | --- |
+| KnowledgeItem.lifecycle_status | `active -> archived / deleted`；`archived -> active / deleted` | deleted 不可恢复；内容版本变化不通过该状态表达 |
+| KnowledgeItemVersion.availability_status | `available -> unavailable / withdrawn`；`unavailable -> available / withdrawn` | 状态变化不修改内容身份 |
+| IndexGeneration.status | `pending -> building -> ready / failed`；`ready -> superseded / invalid` | failed 重试创建新 generation，不复用失败记录 |
+| ResearchCase.lifecycle_status | `open -> archived`；`archived -> open` | 归档时 attention 不得为 active；重新打开不恢复旧在办状态 |
+| ResearchCase.attention_status | `saved -> active / closed`；`active -> paused / observing / deferred / closed`；`paused / observing / deferred -> active / closed` | active 受软门禁约束；系统不得自动关闭 |
+| ResearchAttempt.status | `created -> running`；`running -> completed / failed / cancelled / stale` | stale 结果不得更新 current 投影 |
+| RetrievalRun.status | `created -> running`；`running -> completed / failed / cancelled` | outcome 必须与终态一致 |
+| JudgmentAudit.audit_run_status | `pending -> running -> completed / failed` | completed 必须具有 gate_result；failed 不改变既有可采纳状态 |
+| EvidenceUnit.validity_status | `valid -> needs_review -> valid / invalid`；`valid -> invalid` | 只修改有效性与 revision，不修改证据内容身份 |
+| ResearchTriage.decision_status | `pending -> accepted / adjusted / overridden` | 非 pending 状态必须记录 selected depth 与 decided_at |
+| AttentionBacklogItem.status | `pending -> activated / discarded / archived`；`activated -> archived` | activated 必须绑定已创建或恢复的 Case |
+| JudgmentReview.status | `requested -> in_progress -> completed / cancelled`；`requested -> cancelled` | completed 必须原子创建 ReviewResult |
+| ActionCommitment.status | `planned -> in_progress / deferred / cancelled`；`in_progress -> blocked / completed / cancelled / deferred`；`blocked / deferred -> in_progress / cancelled` | completed 和 cancelled 为终态 |
+| KnowledgeAsset.validity_status | `valid -> needs_review -> valid / invalid`；`valid -> invalid` | 上游证据无效可直接进入 invalid |
+| KnowledgeAsset.lifecycle_status | `active -> withdrawn / archived` | withdrawn 是用户撤回，archived 是保留但不活跃，均不等于 invalid |
+| UserNote.lifecycle_status | `active -> withdrawn / archived` | 不改变其非证据属性 |
+
+Proposal 与候选分别维护多套正交状态：
+
+- `DispositionProposal.user_decision_status`：`pending -> accepted / adjusted / rejected`。adjusted 必须创建新版本，旧版本进入 superseded。
+- `DispositionProposal.lifecycle_status`：`current -> superseded / expired / withdrawn`。
+- `ActionProposal.user_decision_status`：`pending -> accepted / rejected`；用户修改视为创建新版本而非在原版本增加 adjusted 状态。
+- `ActionProposal.lifecycle_status`：`current -> superseded / expired / withdrawn`。
+- `KnowledgeContributionCandidate.validation_status`：`not_required`，或 `pending -> passed / failed`。
+- `KnowledgeContributionCandidate.user_decision_status`：`pending -> accepted / rejected`；只有 validation 为 `not_required / passed` 时才可 accepted。
+- `KnowledgeContributionCandidate.lifecycle_status`：`current -> superseded / closed`。
+
+### 9.3 JudgmentCard
 
 三套状态独立转换：
 
@@ -702,7 +787,7 @@ stateDiagram-v2
 
 `audit_status=blocked` 与 `lifecycle_status=current` 是合法组合，但 UI 和下游必须显示为不可采纳草稿。`acceptable` 仍必须通过 DecisionFitness 限定用途。
 
-### 9.3 Proposal 与用户确认
+### 9.4 Proposal 与用户确认
 
 ```text
 DispositionProposal
@@ -720,7 +805,7 @@ KnowledgeContributionCandidate
 -> 用户拒绝 -> closed
 ```
 
-### 9.4 判断复核
+### 9.5 判断复核
 
 ```text
 JudgmentReview
@@ -731,6 +816,43 @@ JudgmentReview
 ```
 
 ReviewResult 不得直接覆盖旧 ResearchDisposition。上游证据或确定的历史系统缺陷影响判断时，先改变 validity 或发起新 Run，再由用户重新处置。
+
+### 9.6 跨聚合原子操作
+
+在 Core Alpha 的单 SQLite、模块化单体边界内，下列操作使用同一短事务，不引入 Saga：
+
+```text
+确认 DispositionProposal
+= Proposal.user_decision_status -> accepted
++ 创建 ResearchDisposition
++ 更新 ResearchCase.current_research_disposition_id
++ 追加 TraceEvent
+```
+
+```text
+接受 ActionProposal
+= Proposal.user_decision_status -> accepted
++ 创建 ActionCommitment
++ 追加 TraceEvent
+```
+
+```text
+确认 KnowledgeContributionCandidate
+= Candidate.user_decision_status -> accepted
++ Candidate.lifecycle_status -> closed
++ 创建 KnowledgeAsset
++ 追加 TraceEvent
+```
+
+```text
+调整任一版本化 Proposal 或 Candidate
+= 旧版本 lifecycle_status -> superseded
++ 创建带新 version ID 的新版本
++ 重新执行适用的证据、风险、用途与 warning 校验
++ 追加 TraceEvent
+```
+
+任何一步失败时整个事务回滚，不允许出现已接受但没有确认事实、已 superseded 但没有新版本，或已创建资产但候选仍 pending 的中间状态。
 
 ## 10. 全局领域不变量
 
@@ -751,52 +873,59 @@ ReviewResult 不得直接覆盖旧 ResearchDisposition。上游证据或确定�
 10. Scope、Plan、核心证据要求或研究目标实质变化必须创建新 ResearchRun。
 11. Run 终态、Outcome 与事件必须原子提交。
 12. RunOutcome 不等于 ResearchDisposition。
+13. Minimum Slice 必须具有证据完成条件和系统安全上限，但正式可配置预算、消费记录和预算守卫只属于 Core Alpha Complete。
 
 ### 证据与判断
 
-13. EvidenceUnit 不天然支持或反驳；角色属于 ClaimEvidenceLink。
-14. 核心 Claim 必须具有类型匹配的 EvidenceUnit 和 JudgmentRationale。
-15. 用户接受不改变 evidence_status。
-16. confidence 不能替代证据和推理链。
-17. JudgmentCard 版本不得原地覆盖。
-18. blocked 判断不得显示为可靠判断。
-19. EvidenceUnit 失效必须传播到 JudgmentCard 和相关 KnowledgeAsset 的 validity。
+14. EvidenceUnit 不天然支持或反驳；角色属于 ClaimEvidenceLink。
+15. EvidenceUnit 的内容身份不可变，有效性和 revision 可变。
+16. 核心 Claim 必须具有类型匹配的 EvidenceUnit 和 JudgmentRationale。
+17. 用户接受不改变 evidence_status；修改 user attitude 不产生 Claim 语义版本。
+18. confidence 不能替代证据和推理链。
+19. 所有版本化对象使用稳定逻辑 ID 与具体版本 ID；历史关系必须引用具体版本。
+20. JudgmentCard 版本不得原地覆盖。
+21. blocked 判断不得显示为可靠判断。
+22. 用户确认 warning 不把 provisionally acceptable 提升为 acceptable。
+23. EvidenceUnit 失效必须传播到 JudgmentCard 和相关 KnowledgeAsset 的 validity。
 
 ### 审计与用途
 
-20. blocking AuditFinding 不可由用户确认放行。
-21. WarningAcknowledgement 只能确认非阻断 Finding。
-22. 非阻断警告必须传播到允许的下游对象。
-23. 可采纳不等于允许任意行动用途。
-24. DecisionFitness 必须绑定具体 JudgmentCard 和 policy 版本。
-25. 超出 DecisionFitness 的请求必须升级研究、请求专家审核或拆成低风险可逆实验。
+24. blocking AuditFinding 不可由用户确认放行。
+25. WarningAcknowledgement 只能确认非阻断 Finding。
+26. 非阻断警告必须传播到允许的下游对象。
+27. 可采纳不等于允许任意行动用途。
+28. DecisionFitness 必须绑定具体 JudgmentCard 版本实例和 policy version。
+29. 超出 DecisionFitness 的请求必须升级研究、请求专家审核或拆成低风险可逆实验。
 
 ### 用户主权
 
-26. 未确认的 DispositionProposal 不得形成 ResearchDisposition。
-27. 未接受的 ActionProposal 不得形成 ActionCommitment。
-28. ReviewResult 不得直接覆盖 ResearchDisposition。
-29. 没有用户操作不得默认为接受。
-30. 用户调整 Proposal 后必须重新校验相关风险、用途和警告。
+30. 未确认的 DispositionProposal 不得形成 ResearchDisposition。
+31. 未接受的 ActionProposal 不得形成 ActionCommitment。
+32. ReviewResult 不得直接覆盖 ResearchDisposition。
+33. 没有用户操作不得默认为接受。
+34. 用户调整 Proposal 后必须创建新版本并重新校验相关风险、用途和警告。
+35. saved question 激活时才原子创建 ResearchCase 与 ResearchQuestion。
 
 ### 知识沉淀
 
-31. KnowledgeContributionCandidate 与 DispositionProposal 并行且互不依赖。
-32. blocked 判断不得形成证据支持的 KnowledgeAsset。
-33. Candidate 校验失败不得自动保存为 KnowledgeAsset。
-34. UserNote 不得伪装成证据支持知识。
-35. KnowledgeAsset 不得成为新的独立原始证据。
-36. 多个派生资产回溯同一 EvidenceUnit 时不得虚增证据数量。
-37. 上游证据失效必须使相关 KnowledgeAsset 进入 needs_review 或 invalid。
+36. KnowledgeContributionCandidate 与 DispositionProposal 并行且互不依赖。
+37. blocked 判断不得形成证据支持的 KnowledgeAsset。
+38. Candidate 校验失败不得自动保存为 KnowledgeAsset。
+39. UserNote 不得伪装成证据支持知识。
+40. KnowledgeAsset 与 UserNote 创建后是独立聚合，不受 Candidate 生命周期所有。
+41. KnowledgeAsset 不得成为新的独立原始证据。
+42. 多个派生资产回溯同一 EvidenceUnit 时不得虚增证据数量。
+43. 上游证据失效必须使相关 KnowledgeAsset 进入 needs_review 或 invalid。
 
 ### 技术边界
 
-38. Capability、模型、Worker 和可插拔实现不拥有权威领域状态。
-39. Schema 合法不等于领域状态合法。
-40. Trace、Read Model 和 View DTO 不得反向覆盖领域状态。
-41. Chroma 和 FTS 不得决定内容版本、删除状态或当前判断。
-42. stale CandidateResult 不得更新 current 状态。
-43. Extended Alpha 缺失或失败不得破坏 Core Alpha 闭环。
+44. Capability、模型、Worker 和可插拔实现不拥有权威领域状态。
+45. Schema 合法不等于领域状态合法。
+46. 权威技术记录可以证明执行事实，但不得自行触发业务状态转换。
+47. Trace、Read Model 和 View DTO 不得反向覆盖领域状态。
+48. Chroma 和 FTS 不得决定内容版本、删除状态或当前判断。
+49. stale CandidateResult 不得更新 current 状态。
+50. Extended Alpha 缺失或失败不得破坏 Core Alpha 闭环。
 
 ## 11. 与其他权威文档的关系
 
