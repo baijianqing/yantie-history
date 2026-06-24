@@ -4,6 +4,8 @@
 
 任务标识：`A0-DOC-004-R1.2.1`
 
+关联机械勘误：`A1-CONTRACT-001`
+
 依赖：业务架构 `A0-DOC-001-R7.1`、技术架构 `A0-DOC-002-R4.1`、领域模型 `A0-DOC-003-R1.2.2`
 
 文档性质：本文描述目标 HTTP 与应用命令契约，不表示运行时代码已经提供这些接口。
@@ -404,7 +406,7 @@ Asset `asset_type=claim_note|evidence_note|knowledge_gap`、`validity_status=val
 | `SourceResolutionResponse` | R: `source_resolution_id, research_question_id, resolution_stage, raw_anchor, requested_access_policy, resolution_status, candidate_knowledge_item_ids, created_at`；N: `requested_version_hint, resolved_knowledge_item_id, resolved_knowledge_item_version_id, ambiguity_reason, failure_reason`。条件必填遵循领域模型。 |
 | `KnowledgeScopeSourceBindingResponse` | R: `knowledge_scope_source_binding_id, knowledge_scope_version_id, source_resolution_id, knowledge_item_id, access_policy, created_at`；N: `knowledge_item_version_id, analysis_role`。 |
 | `ResearchAttemptResponse` | R: `research_attempt_id, research_run_id, attempt_number, attempt_mode, status, created_at`；N: `previous_attempt_id, started_at, ended_at, failure_category, failure_reason`。 |
-| `RetrievalRunResponse` | R: `retrieval_run_id, research_attempt_id, knowledge_scope_source_binding_id, retrieval_channel, query_ref, status, retrieval_outcome, created_at`；N: `index_generation_id, started_at, ended_at, failure_reason`。`retrieval_channel` 使用开放代码对象。 |
+| `RetrievalRunResponse` | R: `retrieval_run_id, research_attempt_id, knowledge_scope_source_binding_id, retrieval_channel, query_ref, status, created_at`；N: `retrieval_outcome, index_generation_id, started_at, ended_at, failure_reason`。`retrieval_channel` 使用开放代码对象。 |
 | `JudgmentRationaleResponse` | R: `judgment_rationale_id, claim_version_id, rationale_profile, evidence_link_ids, reasoning_summary, created_at`。`rationale_profile` 是带 `profile_type=fact|interpretation|inference|hypothesis|recommendation` 的判别联合对象；analogy 使用 `profile_type=inference` 且固定 `reasoning_method=analogy`；不同 profile 的必填内容遵循领域模型，不返回与类型无关的空字段。 |
 | `ClaimEvidenceLinkResponse` | R: `claim_evidence_link_id, claim_version_id, research_evidence_use_id, evidence_unit_id, evidence_role, support_strength, created_at`；N: `scope_note`。`support_strength={level, reason}`，level 为 `weak|moderate|strong`。 |
 | `JudgmentAuditResponse` | R: `judgment_audit_id, judgment_card_version_id, audit_policy_version, audit_run_status, finding_ids, created_at`；N: `gate_result, started_at, completed_at`。 |
@@ -412,7 +414,7 @@ Asset `asset_type=claim_note|evidence_note|knowledge_gap`、`validity_status=val
 | `WarningAcknowledgementResponse` | R: `warning_acknowledgement_id, audit_finding_id, judgment_card_version_id, acknowledged_by, acknowledged_at`；N: `acknowledgement_note`。 |
 | `DecisionFitnessResponse` | R: `decision_fitness_id, judgment_card_version_id, policy_version, allowed_uses, forbidden_uses, required_conditions, risk_ceiling, escalation_triggers, created_at`。`risk_ceiling` 完整返回成本、可逆性、外部影响和专家复核限制，不使用单一分数。 |
 
-Attempt `attempt_mode=retrieval|reuse_existing_evidence`，状态为 `created|running|completed|failed|cancelled|stale`。Retrieval 状态和 outcome 的合法组合必须符合领域模型。SourceResolution `resolution_stage=preliminary|full`、`resolution_status=resolved|ambiguous|not_found|unavailable`。
+Attempt `attempt_mode=retrieval|reuse_existing_evidence`，状态为 `created|running|completed|failed|cancelled|stale`。Retrieval 的 `created / running` 状态固定返回 `retrieval_outcome=null`；进入 `completed / failed / cancelled` 后 outcome 必须非 null，且合法组合符合领域模型。SourceResolution `resolution_stage=preliminary|full`、`resolution_status=resolved|ambiguous|not_found|unavailable`。
 
 ### 3.7 Core Alpha Complete 资源表示
 
@@ -746,7 +748,10 @@ Payload：
 
 ```json
 {
-  "operation_type": "judgment_candidate",
+  "operation_type": {
+    "code": "judgment_candidate",
+    "registry_version": "core-alpha-v1"
+  },
   "research_run_id": "run_...",
   "research_attempt_id": "attempt_...",
   "run_execution_spec_id": "spec_...",
@@ -778,11 +783,11 @@ Payload：
 }
 ```
 
-`submission_status` 固定为 `accepted_for_domain_processing|rejected_stale|rejected_version_mismatch|rejected_lifecycle|rejected_tombstoned|rejected_schema`。幂等重放完整返回首次 `submission_status`，仅通过 `command.idempotent_replay=true` 表示本次是重放，不创造第二种处理结果。rejected 结果不产生权威领域状态，只追加受限的拒绝 TraceEvent。accepted 结果创建技术 CandidateResult 与 TraceEvent，并可列出待执行的后续内部命令；它本身仍不是 JudgmentCard、Claim 或其他领域事实。外层 JSON 无效返回 422；通过 Schema 后的候选拒绝使用上述 200 结果，不混用 HTTP 错误。
+`submission_status` 固定为 `accepted_for_domain_processing|rejected_stale|rejected_version_mismatch|rejected_lifecycle|rejected_tombstoned|rejected_schema`。`capability_candidate_result_id` 始终出现在响应中：accepted 时必须非 null，任一 rejected 状态固定为 null。幂等重放完整返回首次 `submission_status`，仅通过 `command.idempotent_replay=true` 表示本次是重放，不创造第二种处理结果。rejected 结果不产生权威领域状态，只追加受限的拒绝 TraceEvent。accepted 结果创建技术 CandidateResult 与 TraceEvent，并可列出待执行的后续内部命令；它本身仍不是 JudgmentCard、Claim 或其他领域事实。外层 JSON 无效返回 422；通过 Schema 后的候选拒绝使用上述 200 结果，不混用 HTTP 错误。
 
 ### 6.3 CreateDispositionProposalCommand
 
-Payload 必填：`research_case_id, judgment_card_version_id, judgment_card_revision, judgment_audit_id, decision_fitness_id, proposed_disposition_type, reason`；可选：`warning_acknowledgement_ids, expires_at, defer_until, observation_condition`。
+Payload 必填：`research_case_id, judgment_card_version_id, judgment_card_revision, judgment_audit_id, decision_fitness_id, proposed_disposition_type, reason`；可选：`expected_research_case_revision, warning_acknowledgement_ids, expires_at, defer_until, observation_condition`。仅当命令同步切换 ResearchCase 的 current 引用时，`expected_research_case_revision` 条件必填；不改变 Case 时固定为 null 或省略。
 
 前置条件：JudgmentCard 为 current、有效且可采纳；指定 Audit 与 DecisionFitness 当前生效；warning 确认仍有效；处置类型满足用途和条件字段。命令校验 JudgmentCard revision；若同时切换 Case 的相关 current 引用，还必须校验 ResearchCase revision。
 

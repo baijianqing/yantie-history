@@ -176,12 +176,13 @@ flowchart TB
 
 ## 4. Minimum Slice 实现任务
 
-以下任务全部为 `pending`，只有 A0-GATE-001 完成后才能启动。
+以下任务默认状态为 `pending`；任务条目明确标记为 `completed` 的除外。只有 A0-GATE-001 完成后才能启动阶段1任务。
 
 Contract 子任务 B/C/D 可以并行，但只能修改各自模块、测试和独立 errata，不得修改共享导出文件或冻结 API 文档；统一导出和 API 机械勘误由 Contract Epic Gate 单点完成。Persistence 子任务因共享迁移链必须按 A -> B -> C -> D 串行执行。API 子任务可以分别实现 router，但公共 app 接线只由专门的 assembly 子任务修改。
 
 ### A1-CONTRACT-001：Schema 映射 Epic Gate
 
+- 状态：`completed`。
 - 价值：确认四组 Pydantic 映射共同覆盖 Minimum Slice 冻结契约。
 - 依赖：A1-CONTRACT-001A、A1-CONTRACT-001B、A1-CONTRACT-001C、A1-CONTRACT-001D。
 - 允许修改范围：contracts 公共导出文件、`test/test_core_alpha_contract_exports.py`、`docs/API_CONTRACTS.md` 机械勘误和本 Epic 状态。
