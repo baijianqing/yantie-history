@@ -1,765 +1,581 @@
 # MetaOS Alpha API 契约
 
-本文档描述 Alpha 目标 API。标注“现有”的接口已在当前 FastAPI 中存在；标注“目标”的接口仅为阶段0契约设计。
+状态：Core Alpha 目标 API 契约冻结候选
 
-## 通用规则
+任务标识：`A0-DOC-004-R1`
 
-- 请求和响应使用 JSON。
-- 所有模型输出必须通过 Pydantic Schema 校验。
-- 所有写接口返回创建或更新后的资源。
-- 所有后台任务返回 `job_id` 和资源引用。
-- 所有研究输出必须包含引用或明确的证据不足标记。
-- 所有 Alpha API 错误返回统一结构：
+依赖：业务架构 `A0-DOC-001-R7.1`、技术架构 `A0-DOC-002-R4.1`、领域模型 `A0-DOC-003-R1.2.2`
+
+文档性质：本文描述目标 HTTP 与应用命令契约，不表示运行时代码已经提供这些接口。
+
+## 1. 权威边界与非目标
+
+本文是以下内容的唯一权威来源：
+
+- 路由、HTTP 方法与成功状态码；
+- JSON 字段名称和表示方式；
+- 请求条件、幂等、并发与读后写规则；
+- HTTP 错误与领域 Outcome 的边界；
+- 普通用户、开发者和内部调用边界。
+
+对象含义、聚合边界、字段语义、状态机和领域不变量以 `docs/DOMAIN_MODEL.md` 为唯一权威。本文引用这些规则，但不定义另一套领域模型。
+
+本文只冻结 Core Alpha Minimum Slice 与 Core Alpha Complete。不定义 Extended Alpha API，不维护旧接口兼容清单，也不修改 FastAPI、公共 Schema、存储、Worker 或运行态数据。
+
+## 2. HTTP 与 JSON 通用规则
+
+### 2.1 路由与方法
+
+- 普通产品路由使用 `/alpha` 前缀。
+- 开发者诊断路由使用 `/alpha/developer` 前缀。
+- 内部结果提交仅在启用 HTTP Adapter 时使用 `/internal/alpha` 前缀。
+- 查询使用 GET；创建和状态转换使用 POST。
+- 不使用通用状态字段更新接口；每个状态转换必须对应显式领域命令。
+- 请求与响应使用 UTF-8 JSON，时间使用 UTC ISO 8601 字符串。
+
+### 2.2 成功状态码
+
+| 场景 | HTTP |
+| --- | ---: |
+| 创建资源或新聚合 | 201 |
+| 同步领域命令完成 | 200 |
+| 异步执行被接受 | 202 |
+| 查询成功 | 200 |
+| 幂等重放 | 首次请求的原始状态码 |
+
+所有成功命令均返回响应体，不使用空响应表示成功。
+
+### 2.3 服务端拥有字段
+
+客户端不得提交：
+
+- 资源 ID、command ID 或 Trace ID；
+- `created_at / updated_at / started_at / ended_at / completed_at`；
+- `revision` 或 `version` 的目标值；
+- lifecycle、audit、validity、execution 等状态字段；
+- `created_by / confirmed_by / acknowledged_by / committed_by`；
+- AuditFinding、DecisionFitness、ResearchRunOutcome 等系统判定结果。
+
+客户端只提交用户输入、用户选择、当前版本引用、`expected_revision`、条件参数和 `Idempotency-Key`。actor 字段由认证上下文产生。
+
+### 2.4 命令响应
+
+```json
+{
+  "data": {},
+  "command": {
+    "command_id": "cmd_...",
+    "trace_id": "trace_...",
+    "idempotency_key": "string",
+    "idempotent_replay": false
+  },
+  "consistency": {
+    "source": "authoritative_store",
+    "aggregate_revision": 7,
+    "projection_checkpoint": null,
+    "is_stale": false,
+    "observed_at": "2026-06-24T01:00:00Z"
+  }
+}
+```
+
+命令响应直接返回本次事务形成的权威资源。`aggregate_revision` 是命令完成后的聚合 revision。
+
+### 2.5 查询响应与分页
+
+单资源响应：
+
+```json
+{
+  "data": {},
+  "consistency": {
+    "source": "authoritative_store",
+    "aggregate_revision": 7,
+    "projection_checkpoint": null,
+    "is_stale": false,
+    "observed_at": "2026-06-24T01:00:00Z"
+  }
+}
+```
+
+列表响应：
+
+```json
+{
+  "data": [],
+  "page": {
+    "next_cursor": null
+  },
+  "consistency": {
+    "source": "projection",
+    "aggregate_revision": null,
+    "projection_checkpoint": "cursor_...",
+    "is_stale": false,
+    "observed_at": "2026-06-24T01:00:00Z"
+  }
+}
+```
+
+- 单聚合或明确聚合范围查询可以使用 `minimum_revision`。
+- 列表投影使用 `minimum_checkpoint`，不得把多个聚合压缩为一个 revision。
+- 权威存储响应必须为 `source=authoritative_store` 且 `is_stale=false`。
+- 投影无法在等待窗口内达到要求时返回 `409 projection_not_ready`，不得返回旧数据冒充满足一致性要求。
+- 列表使用不透明 cursor；`limit` 默认 50，最大 200。
+
+### 2.6 幂等
+
+所有 POST 请求必须携带 `Idempotency-Key` 请求头。
+
+幂等作用域为：认证主体 + HTTP 方法 + 标准化路由。服务端保存请求体规范化 Hash、状态码和完整响应。
+
+- 相同 Key 与相同请求体：返回首次响应，`idempotent_replay=true`。
+- 相同 Key 与不同请求体：返回 `409 idempotency_conflict`。
+- 重放不得重复创建版本、TraceEvent、确认事实或其他领域对象。
+- `Idempotency-Key` 不替代 `expected_revision`。
+- 内部应用命令使用独立幂等键，不能复用外部请求 Key 作为不同操作的幂等身份。
+
+### 2.7 乐观并发与版本
+
+- 创建新聚合时不传 `expected_revision`。
+- 修改既有聚合时，`expected_revision` 必须放在 JSON 请求体中。
+- adjust 命令同时绑定当前具体 `*_version_id` 和所属聚合 `expected_revision`。
+- revision 不一致返回 `409 concurrency_conflict`，不允许最后写入获胜。
+- 新版本、旧 current 进入 superseded、current pointer 更新和 TraceEvent 必须原子提交。
+- 已被 ResearchRun 绑定的历史 KnowledgeScope 或 ResearchPlan 版本不可修改。
+
+## 3. 公共表示
+
+### 3.1 资源引用
+
+```json
+{
+  "resource_type": "judgment_card_version",
+  "resource_id": "jcv_..."
+}
+```
+
+所有需要历史复现的引用使用具体 `*_version_id`。逻辑 `*_id` 只用于版本序列和 current 查询。
+
+### 3.2 SourceAnchorInput
+
+```json
+{
+  "raw_anchor": "鬼谷子",
+  "requested_access_policy": "required",
+  "requested_version_hint": null
+}
+```
+
+`requested_access_policy` 为 `required / allowed / excluded`。
+
+### 3.3 KnowledgeScopeBindingInput
+
+```json
+{
+  "source_resolution_id": "sr_...",
+  "knowledge_item_id": "ki_...",
+  "knowledge_item_version_id": "kiv_...",
+  "access_policy": "required",
+  "analysis_role": "primary"
+}
+```
+
+excluded 绑定可以省略版本和分析角色；required/allowed 必须绑定可用版本。
+
+### 3.4 ErrorResponse
 
 ```json
 {
   "error": {
-    "code": "string",
+    "code": "concurrency_conflict",
     "message": "string",
-    "details": {}
+    "details": {},
+    "trace_id": "trace_...",
+    "retryable": false
   }
 }
 ```
 
-## 现有 API
+## 4. Minimum Slice API
 
-### `GET /health`
+### 4.1 Knowledge Catalog
 
-用途：健康检查。
+这些接口只读取知识身份，不在本任务中定义导入、删除、切块或重建命令。
 
-响应：
+| 方法与路由 | 成功 | 输入 | 输出 |
+| --- | ---: | --- | --- |
+| `GET /alpha/knowledge-items` | 200 | `cursor, limit, item_type, lifecycle_status` | KnowledgeItem 列表 |
+| `GET /alpha/knowledge-items/{knowledge_item_id}` | 200 | `minimum_revision` 可选 | KnowledgeItem |
+| `GET /alpha/knowledge-items/{knowledge_item_id}/versions` | 200 | `cursor, limit, availability_status` | KnowledgeItemVersion 列表 |
+| `GET /alpha/knowledge-item-versions/{knowledge_item_version_id}` | 200 | 无 | KnowledgeItemVersion |
+| `GET /alpha/knowledge-item-versions/{knowledge_item_version_id}/chunks` | 200 | `cursor, limit` | Chunk 列表，不默认返回完整原文 |
+
+普通响应可以返回标题、版本、结构、定位和可用性。IndexGeneration 只通过 Developer API 查询。
+
+### 4.2 ResearchCase 与问题
+
+#### `POST /alpha/research-cases`
+
+状态码：`201`。不传 `expected_revision`。
 
 ```json
 {
-  "status": "ok",
-  "version": "string"
+  "title": "隐藏真实意图",
+  "question_text": "如何理解隐藏真实意图？",
+  "question_role": "root"
 }
 ```
 
-### `GET /workspace`
+同一事务创建 ResearchCase 与 root ResearchQuestion。
 
-用途：返回本地工作区路径。
+#### 查询与命令
 
-### `GET /runtime/status`
+| 方法与路由 | 成功 | 请求要点 |
+| --- | ---: | --- |
+| `GET /alpha/research-cases` | 200 | cursor、limit、lifecycle_status、attention_status、minimum_checkpoint |
+| `GET /alpha/research-cases/{research_case_id}` | 200 | minimum_revision 可选 |
+| `POST /alpha/research-cases/{research_case_id}/questions` | 201 | expected_revision、question_text、question_role、parent_question_id 可选 |
+| `POST /alpha/research-cases/{research_case_id}/commands/archive` | 200 | expected_revision |
+| `POST /alpha/research-cases/{research_case_id}/commands/reopen` | 200 | expected_revision |
+| `POST /alpha/research-cases/{research_case_id}/commands/derive` | 201 | expected_revision、source_question_id 或 judgment_card_version_id、title、question_text |
 
-用途：返回 Redis、队列、Worker 状态。
+question_role 为 `root / follow_up / clarification / derived`。derive 创建新 Case，不移动原 Case 历史。
 
-### `GET /jobs`
+### 4.3 SourceResolution
 
-用途：列出任务。
+#### `POST /alpha/research-cases/{research_case_id}/source-resolutions`
 
-查询参数：
-
-- `limit`
-
-### `GET /jobs/{job_id}`
-
-用途：读取任务状态。
-
-### `POST /jobs/{job_id}/retry`
-
-Purpose: retry a failed job through its original RQ queue and task path.
-
-Response: `Job` JSON with `status=pending`, preserved `id`, and `result.retry_history`.
-
-Errors:
-- `404` when the job id does not exist.
-- `400` when the job is not failed, the job type cannot be retried, or Redis enqueue fails.
-
-### `POST /ingest/documents`
-
-用途：上传文件并提交入库任务。
-
-输入：multipart file。
-
-输出：
-
-- `job`
-- `source`
-- `asset`
-
-### `GET /knowledge`
-
-用途：列出知识条目。
-
-### `GET /knowledge/{item_id}/chunks`
-
-用途：列出知识条目的 chunks。
-
-### `DELETE /knowledge/{item_id}`
-
-用途：删除知识条目、chunks 和 Chroma 索引。
-
-### `POST /knowledge/{item_id}/chunks/rebuild`
-
-用途：提交 chunk 重建任务。
-
-注意：Alpha 后新主题不得调用该能力作为研究前置条件。
-
-### `POST /knowledge/{item_id}/index`
-
-用途：同步索引单个知识条目。
-
-### `POST /knowledge/{item_id}/index/jobs`
-
-用途：异步索引单个知识条目。
-
-### `POST /index/rebuild`
-
-用途：同步重建或续建全部索引。
-
-注意：Alpha 后新主题不得调用该能力作为研究前置条件。
-
-### `POST /index/rebuild/jobs`
-
-用途：异步重建或续建全部索引。
-
-### `GET /index/status`
-
-用途：查看向量索引状态。
-
-### `GET /search`
-
-用途：向量检索。
-
-查询参数：
-
-- `q`
-- `top_k`
-
-### `POST /rag/answer/jobs`
-
-用途：提交单轮 RAG 问答任务。
-
-请求：
+状态码：`201`。Minimum Slice 仅接受 `resolution_stage=full`。
 
 ```json
 {
-  "question": "string",
-  "top_k": 5
-}
-```
-
-## 目标 API：用户主权层
-
-### `POST /alpha/constitution`
-
-创建或更新认知宪法。
-
-请求：
-
-```json
-{
-  "principles": ["string"],
-  "decision_rules": ["string"],
-  "attention_rules": ["string"],
-  "not_to_do_defaults": ["string"],
-  "risk_preferences": {}
-}
-```
-
-响应：`CognitiveConstitution`。
-
-### `POST /alpha/intents`
-
-创建意图。
-
-请求：
-
-```json
-{
-  "title": "string",
-  "description": "string",
-  "horizon": "quarter",
-  "priority": 1,
-  "success_criteria": ["string"],
-  "constraints": ["string"]
-}
-```
-
-响应：`Intent`。
-
-### `GET /alpha/intents/active`
-
-返回当前 active 意图列表。
-
-### `POST /alpha/current-role`
-
-设置当前角色。
-
-### `POST /alpha/attention-budgets`
-
-创建每日注意力预算。
-
-### `POST /alpha/not-to-do`
-
-创建不做清单项。
-
-A1-SOV-003 implementation note:
-
-- `POST /alpha/constitution` is implemented and persists `CognitiveConstitution`.
-- `GET /alpha/constitution` is implemented for local review.
-- `POST /alpha/intents`, `GET /alpha/intents`, `GET /alpha/intents/active`, and `POST /alpha/intents/{intent_id}/activate` are implemented.
-- `POST /alpha/current-role` and `GET /alpha/current-role` are implemented; setting a current role closes other open roles.
-- `POST /alpha/attention-budgets` and `GET /alpha/attention-budgets` are implemented.
-- `POST /alpha/not-to-do`, `GET /alpha/not-to-do`, and `PATCH /alpha/not-to-do/{item_id}/active` are implemented.
-- These endpoints only expose the sovereignty layer. They do not modify RAG, retrieval, workers, Streamlit, or runtime knowledge data.
-
-## 目标 API：每日认知账本
-
-### `POST /alpha/daily-plans`
-
-创建今日计划。
-
-### `POST /alpha/work-events`
-
-记录工作事件。
-
-### `POST /alpha/work-events/collect/git/jobs`
-
-提交 Git commit 采集任务。
-
-请求：
-
-```json
-{
-  "repo_path": "string",
-  "date_from": "2026-06-15",
-  "date_to": "2026-06-15"
-}
-```
-
-### `POST /alpha/work-events/collect/markdown/jobs`
-
-提交 Markdown 变更采集任务。
-
-A2-LEDGER-002 implementation note:
-
-- Collector-level support is implemented in `metaos/ledger/collectors.py`.
-- `GitCommitCollectionPayload` accepts `repo_path`, `date_from`, `date_to`, and optional `related_intent_id`.
-- `MarkdownChangeCollectionPayload` accepts `markdown_dir`, `date_from`, `date_to`, optional `related_intent_id`, and Markdown extensions.
-- `collect_git_commits(...)` and `collect_markdown_changes(...)` return `WorkEvent` lists.
-- This task does not expose background jobs or write ledger records yet; the `/alpha/work-events/collect/*/jobs` endpoints remain target API contracts for a later task.
-
-### `POST /alpha/decisions`
-
-记录决策。
-
-### `POST /alpha/actions`
-
-创建行动。
-
-### `PATCH /alpha/actions/{action_id}`
-
-更新行动状态。
-
-### `POST /alpha/daily-reviews`
-
-创建每日复盘。
-
-### `POST /alpha/daily-summaries/jobs`
-
-生成 DailySummary。
-
-## 目标 API：知识底座
-
-### `GET /alpha/sources/{source_id}/versions`
-
-列出文档版本。
-
-### `POST /alpha/document-versions`
-
-注册标准化文档版本。
-
-### `GET /alpha/chunks/{chunk_id}/citation`
-
-返回 chunk 的可审计引用。
-
-### `GET /alpha/entities`
-
-按名称、类型或 alias 查询实体。
-
-### `GET /alpha/claims`
-
-按主题、实体、来源或 stance 查询主张。
-
-## 目标 API：多路检索
-
-### `POST /alpha/search`
-
-请求：
-
-```json
-{
-  "query": "string",
-  "theme_spec": {},
-  "filters": {
-    "source_ids": [],
-    "entity_ids": [],
-    "date_range": null,
-    "categories": []
-  },
-  "top_k": 20,
-  "channels": ["vector", "full_text"],
-  "rrf": {
-    "enabled": true,
-    "k": 60
-  },
-  "rerank": {
-    "enabled": false
-  }
-}
-```
-
-响应：
-
-```json
-{
-  "retrieval_run_id": "string",
-  "results": [
+  "expected_revision": 3,
+  "research_question_id": "rq_...",
+  "resolution_stage": "full",
+  "anchors": [
     {
-      "chunk_id": "string",
-      "score": 0.0,
-      "channel_scores": {},
-      "citation": {}
+      "raw_anchor": "鬼谷子",
+      "requested_access_policy": "required",
+      "requested_version_hint": null
     }
   ]
 }
 ```
 
-A5-SEARCH-002 implementation note:
+响应 data 为 SourceResolution 数组。`ambiguous / not_found / unavailable` 是成功创建的领域记录，不映射为 HTTP 错误。显式锚点失败不得回退全库。
 
-- RRF fusion support is implemented in `metaos/search/fusion.py`.
-- `SearchCandidate` is the channel-neutral input contract for vector, full-text, and future rerank candidates.
-- `rrf_fuse({"vector": [...], "full_text": [...]}, filters, top_k, k)` applies metadata filters before fusion, computes reciprocal-rank scores, and returns `EvidenceCandidate` results.
-- `EvidenceCandidate` preserves `citation`, `channel_ranks`, and `channel_scores`.
-- The `/alpha/search` HTTP endpoint is implemented in `metaos/app/api.py`.
-- It returns fused `EvidenceCandidate` payloads from current chunks, optional dense vector retrieval, metadata filters, and RRF ranking.
-- It can disable the vector channel with `include_vector=false` for deterministic full-text-only calls.
+`GET /alpha/research-cases/{research_case_id}/source-resolutions` 返回该 Case 的解析记录。
 
-## 目标 API：议题编译器
+### 4.4 KnowledgeScope
 
-### `POST /alpha/research/compile`
+| 方法与路由 | 成功 | 行为 |
+| --- | ---: | --- |
+| `POST /alpha/research-cases/{research_case_id}/knowledge-scopes` | 201 | 创建初始 Scope 版本 |
+| `GET /alpha/research-cases/{research_case_id}/knowledge-scopes/current` | 200 | 读取 current 版本 |
+| `GET /alpha/knowledge-scopes/{knowledge_scope_version_id}` | 200 | 读取历史或当前版本 |
+| `POST /alpha/knowledge-scopes/{knowledge_scope_version_id}/commands/adjust` | 200 | 创建新版本并 supersede 旧版本 |
 
-请求：
+创建和 adjust 请求包含 `expected_revision`、`default_access_policy`、`scope_mode=evidence_only` 和 bindings。default policy 只能是 allowed/excluded。adjust 必须绑定路径中的 current version ID。
 
-```json
-{
-  "question": "string",
-  "intent_id": "string",
-  "role_id": "string",
-  "attention_budget_id": "string"
-}
-```
+### 4.5 ResearchPlan
 
-响应：
+| 方法与路由 | 成功 | 行为 |
+| --- | ---: | --- |
+| `POST /alpha/research-cases/{research_case_id}/research-plans` | 201 | 创建初始计划版本 |
+| `GET /alpha/research-cases/{research_case_id}/research-plans/current` | 200 | 读取 current 版本 |
+| `GET /alpha/research-plans/{research_plan_version_id}` | 200 | 读取指定版本 |
+| `POST /alpha/research-plans/{research_plan_version_id}/commands/adjust` | 200 | 创建新版本并 supersede 旧版本 |
 
-```json
-{
-  "research_task": {},
-  "operator": "causal_analysis",
-  "theme_spec": {},
-  "evidence_requirements": [],
-  "research_scope": {},
-  "research_plan": {}
-}
-```
+请求字段：`expected_revision`、`knowledge_scope_version_id`、`research_mode`、`primary_objective`、`evidence_requirements`、`minimum_completion_condition`；stop conditions 与正式预算为 Core Complete 可选字段。
 
-验收要求：
+adjust 不得修改已被 Run 绑定的历史版本，只能创建新的 plan version ID。
 
-- 输入五个不同主题时，使用同一套代码生成不同 `ThemeSpec`。
-- 不新增主题分支。
+### 4.6 ResearchRun
 
-A6-COMPILER-002 implementation note:
-
-- Runtime compiler service support is implemented in `metaos/compiler/service.py`.
-- `IssueCompiler` accepts a `CompilerModelProvider`; tests use a fake provider that returns structured JSON.
-- `CompileResearchRequest` is converted into a prompt payload with allowed operators and required output contracts.
-- Provider output is converted into `ResearchCompilation` and validated by Pydantic schemas.
-- The five required themes compile through the same `IssueCompiler.compile(...)` code path; theme differences live in `ThemeSpec` data.
-- The `/alpha/research/compile` HTTP endpoint is implemented in `metaos/app/api.py`.
-- It runs the same `IssueCompiler.compile(...)` path and returns schema-validated `ResearchCompilation` JSON.
-- Invalid structured provider output is rejected with HTTP 400.
-
-## 目标 API：研究执行器
-
-### `POST /alpha/research/tasks`
-
-创建研究任务。
-
-### `POST /alpha/research/tasks/{task_id}/run/jobs`
-
-提交研究执行任务。
-
-### `GET /alpha/research/tasks/{task_id}`
-
-读取研究任务状态。
-
-### `GET /alpha/research/tasks/{task_id}/evidence-matrix`
-
-读取证据矩阵。
-
-### `GET /alpha/research/tasks/{task_id}/answer`
-
-读取最终带引用回答。
-
-响应必须区分：
+#### `POST /alpha/research-cases/{research_case_id}/research-runs`
 
 ```json
 {
-  "fact_statements": [],
-  "model_inferences": [],
-  "disputed_views": [],
-  "personal_reflections": [],
-  "actions": [],
-  "no_action_reason": null,
-  "citations": []
+  "expected_revision": 6,
+  "research_question_id": "rq_...",
+  "knowledge_scope_version_id": "ksv_...",
+  "research_plan_version_id": "rpv_...",
+  "execution_mode": "synchronous"
 }
 ```
 
-A7-RESEARCH-002 implementation note:
+execution_mode 为 `synchronous / asynchronous`，默认 synchronous。
 
-- Research answer drafting is implemented in `metaos/research/answer.py`.
-- `ResearchAnswer` separates facts, model inferences, disputed views, personal reflections, actions, no-action reason, and citations.
-- Each `AnswerStatement` carries `source_status=cited|uncited`.
-- `draft_research_answer(...)` creates a ledger `Action` when `action_title` is provided, or requires/sets `no_action_reason` when no action is proposed.
-- This task does not perform censorate audit; audited final answer gating remains a later task.
+- 同步：创建并完成可执行流程后返回 `201`，data 包含 ResearchRun、当前 JudgmentCard 或 RunOutcome 引用。
+- 异步：持久化 ResearchRun 后返回 `202`，data 只包含领域 Run 与已知引用，不返回通用任务标识。
+- 异步能力未启用：`503 async_execution_unavailable`。
+- Run 创建前必要依赖不可用：HTTP 503。
+- Run 创建后执行失败：形成 `ResearchRunOutcome.execution_failed`。
 
-## 目标 API：御史台
+#### 查询与取消
 
-### `POST /alpha/audit/research/{task_id}/jobs`
+| 方法与路由 | 成功 | 输出或请求 |
+| --- | ---: | --- |
+| `GET /alpha/research-runs/{research_run_id}` | 200 | ResearchRun |
+| `POST /alpha/research-runs/{research_run_id}/commands/cancel` | 200 | expected_revision、reason |
+| `GET /alpha/research-runs/{research_run_id}/outcome` | 200 | ResearchRunOutcome；未结束时 data=null |
+| `GET /alpha/research-runs/{research_run_id}/attempts` | 200 | Attempt 列表 |
+| `GET /alpha/research-attempts/{research_attempt_id}/retrieval-runs` | 200 | RetrievalRun 列表 |
+| `GET /alpha/research-runs/{research_run_id}/evidence-uses` | 200 | ResearchEvidenceUse 列表 |
 
-提交研究审计任务。
+### 4.7 Evidence 与 Judgment
 
-### `GET /alpha/audit/reports/{audit_report_id}`
+| 方法与路由 | 成功 | 输出或请求 |
+| --- | ---: | --- |
+| `GET /alpha/evidence-units/{evidence_unit_id}` | 200 | 脱敏 EvidenceUnit 与来源定位 |
+| `GET /alpha/research-evidence-uses/{research_evidence_use_id}` | 200 | Scope、evidence revision 和有效性快照 |
+| `GET /alpha/research-cases/{research_case_id}/judgment-cards/current` | 200 | Case 当前 JudgmentCard version 或 null |
+| `GET /alpha/judgment-cards/{judgment_card_version_id}` | 200 | JudgmentCard、Claim version 引用、状态与缺口 |
+| `GET /alpha/judgment-cards/{judgment_card_version_id}/claims` | 200 | Claim、Rationale、ClaimEvidenceLink；Link 保留 research_evidence_use_id |
+| `GET /alpha/claims/{claim_id}/current` | 200 | Claim 当前语义版本 |
+| `GET /alpha/claim-versions/{claim_version_id}` | 200 | Claim 指定历史版本 |
+| `GET /alpha/judgment-cards/{judgment_card_version_id}/audit` | 200 | JudgmentAudit 与 Finding |
+| `GET /alpha/judgment-cards/{judgment_card_version_id}/decision-fitness` | 200 | DecisionFitness |
+| `POST /alpha/audit-findings/{audit_finding_id}/commands/acknowledge` | 201 | 创建 WarningAcknowledgement；expected_revision、judgment_card_version_id、acknowledgement_note |
+| `POST /alpha/claims/{claim_version_id}/commands/set-user-attitude` | 200 | expected_revision、user_attitude |
 
-读取审计报告。
+blocking Finding 不允许 acknowledge。修改 user attitude 不改变 evidence status 或 Claim 语义版本。
 
-## 目标 API：三部推荐
+### 4.8 Decision
 
-### `POST /alpha/ministries/daily/jobs`
+DispositionProposal 在 JudgmentAudit 与 DecisionFitness 完成后，由内部 `CreateDispositionProposalCommand` 生成，不提供公开创建路由。
 
-生成每日三部推荐。
+| 方法与路由 | 成功 | 行为 |
+| --- | ---: | --- |
+| `GET /alpha/research-cases/{research_case_id}/disposition-proposals/current` | 200 | 当前 Proposal 或 null |
+| `GET /alpha/disposition-proposals/{disposition_proposal_version_id}` | 200 | 指定版本 |
+| `POST /alpha/disposition-proposals/{disposition_proposal_version_id}/commands/accept` | 200 | 形成 ResearchDisposition |
+| `POST /alpha/disposition-proposals/{disposition_proposal_version_id}/commands/adjust` | 200 | 形成新 Proposal 版本 |
+| `POST /alpha/disposition-proposals/{disposition_proposal_version_id}/commands/reject` | 200 | 记录拒绝，不形成 Disposition |
+| `GET /alpha/research-dispositions/{research_disposition_id}` | 200 | 最终处置事实 |
 
-请求：
+三个决定命令都包含 DispositionProposal 聚合的 `expected_revision`。accept 还包含 `judgment_card_version_id`、`decision_fitness_id` 和有效 `warning_acknowledgement_ids`；adjust 还包含新的 disposition type、reason 及 defer/observe 条件。
+
+### 4.9 普通 ResearchTrace
+
+`GET /alpha/research-runs/{research_run_id}/trace` 返回领域级过程：Scope、Plan、Attempt、证据使用、判断、审计、Outcome 和处置引用。普通响应不暴露 Provider、模型、索引参数、完整 Prompt 或完整私有原文。
+
+## 5. Core Alpha Complete API
+
+### 5.1 ResearchTriage
+
+| 方法与路由 | 成功 | 行为 |
+| --- | ---: | --- |
+| `POST /alpha/research-cases/{research_case_id}/triages` | 201 | 创建 preliminary 解析与 Triage 建议 |
+| `GET /alpha/research-triages/{research_triage_id}` | 200 | 读取建议与用户决定 |
+| `POST /alpha/research-triages/{research_triage_id}/commands/accept` | 200 | 采用 recommended_path |
+| `POST /alpha/research-triages/{research_triage_id}/commands/adjust` | 200 | 提交 selected_path |
+| `POST /alpha/research-triages/{research_triage_id}/commands/override` | 200 | 用户显式覆盖建议 |
+
+创建 Triage 与三个决定命令都包含所属 ResearchCase 的 `expected_revision`。
+
+### 5.2 AttentionBacklogItem
+
+| 方法与路由 | 成功 | 行为 |
+| --- | ---: | --- |
+| `POST /alpha/attention-backlog-items` | 201 | 保存问题、Case 引用、知识缺口、复核建议或外部线索 |
+| `GET /alpha/attention-backlog-items` | 200 | cursor 列表查询 |
+| `GET /alpha/attention-backlog-items/{attention_backlog_item_id}` | 200 | 单项查询 |
+| `POST /alpha/attention-backlog-items/{attention_backlog_item_id}/commands/activate` | 200 或 201 | 激活并关联或创建 Case |
+| `POST /alpha/attention-backlog-items/{attention_backlog_item_id}/commands/discard` | 200 | 丢弃 |
+| `POST /alpha/attention-backlog-items/{attention_backlog_item_id}/commands/archive` | 200 | 归档 |
+
+创建 AttentionBacklogItem 不传 `expected_revision`；activate、discard、archive 要求该 Item 的 `expected_revision`。saved question 激活时原子创建 ResearchCase 与 ResearchQuestion。
+
+### 5.3 JudgmentReview
+
+| 方法与路由 | 成功 | 行为 |
+| --- | ---: | --- |
+| `POST /alpha/judgment-cards/{judgment_card_version_id}/reviews` | 201 | 发起 JudgmentReview |
+| `GET /alpha/judgment-reviews/{judgment_review_id}` | 200 | Review 与 ReviewResult |
+| `POST /alpha/judgment-reviews/{judgment_review_id}/commands/cancel` | 200 | 取消未完成复核 |
+
+创建 JudgmentReview 不传 `expected_revision`，但必须绑定具体 JudgmentCard version；cancel 要求 JudgmentReview 的 `expected_revision`。ReviewResult 由内部 `CompleteJudgmentReviewCommand` 与 Review 完成状态原子创建，不提供公开创建路由。需要改变处置时生成新的 DispositionProposal。
+
+### 5.4 Action
+
+#### 创建与调整 ActionProposal
+
+`POST /alpha/research-dispositions/{research_disposition_id}/commands/create-action-proposal` 返回 `201`。
+
+请求包含 `expected_revision`（目标为 ResearchCase）、`judgment_card_version_id`、`decision_fitness_id`、目标、步骤、预期收益、停止条件、复盘时间、风险输入和 warning acknowledgements。
+
+只有当前有效且 disposition type 为 proceed_to_action 的处置可以调用；判断、用途、warning 或 risk ceiling 不满足时返回 409。
+
+| 方法与路由 | 成功 | 行为 |
+| --- | ---: | --- |
+| `GET /alpha/research-cases/{research_case_id}/action-proposals/current` | 200 | 当前 ActionProposal 或 null |
+| `GET /alpha/action-proposals/{action_proposal_version_id}` | 200 | 指定版本 |
+| `POST /alpha/action-proposals/{action_proposal_version_id}/commands/adjust` | 200 | 新版本、重新风险和用途校验 |
+| `POST /alpha/action-proposals/{action_proposal_version_id}/commands/accept` | 200 | 创建 ActionCommitment |
+| `POST /alpha/action-proposals/{action_proposal_version_id}/commands/reject` | 200 | 记录拒绝 |
+
+#### ActionCommitment 与复盘
+
+ActionProposal 的 adjust、accept、reject 都要求 ActionProposal 聚合的 `expected_revision`。
+
+| 方法与路由 | 成功 | 请求或输出 |
+| --- | ---: | --- |
+| `GET /alpha/action-commitments/{action_commitment_id}` | 200 | Commitment |
+| `POST /alpha/action-commitments/{action_commitment_id}/commands/start` | 200 | expected_revision |
+| `POST /alpha/action-commitments/{action_commitment_id}/commands/block` | 200 | expected_revision、reason |
+| `POST /alpha/action-commitments/{action_commitment_id}/commands/defer` | 200 | expected_revision、deferred_until、reason |
+| `POST /alpha/action-commitments/{action_commitment_id}/commands/resume` | 200 | expected_revision |
+| `POST /alpha/action-commitments/{action_commitment_id}/commands/complete` | 200 | expected_revision、completion_summary |
+| `POST /alpha/action-commitments/{action_commitment_id}/commands/cancel` | 200 | expected_revision、reason |
+| `POST /alpha/action-commitments/{action_commitment_id}/reviews` | 201 | expected_revision、expected_result、actual_result、assumption_failures |
+
+ActionReview 发现判断前提错误时返回 `judgment_review_required=true`，后续由独立命令发起 JudgmentReview。
+
+### 5.5 Knowledge Contribution
+
+KnowledgeContributionCandidate 由内部 `CreateKnowledgeContributionCandidateCommand` 生成，不提供公开创建路由。
+
+| 方法与路由 | 成功 | 行为 |
+| --- | ---: | --- |
+| `GET /alpha/research-cases/{research_case_id}/knowledge-contribution-candidates` | 200 | Case 候选列表；默认只返回 current，可显式包含历史版本 |
+| `GET /alpha/knowledge-contribution-candidates/{knowledge_contribution_candidate_id}/current` | 200 | 逻辑候选的 current 版本 |
+| `GET /alpha/knowledge-contribution-candidate-versions/{knowledge_contribution_candidate_version_id}` | 200 | 指定候选版本 |
+| `POST /alpha/knowledge-contribution-candidate-versions/{knowledge_contribution_candidate_version_id}/commands/adjust` | 200 | 新版本并重新校验 |
+| `POST /alpha/knowledge-contribution-candidate-versions/{knowledge_contribution_candidate_version_id}/commands/accept-as-knowledge` | 200 | 创建 KnowledgeAsset |
+| `POST /alpha/knowledge-contribution-candidate-versions/{knowledge_contribution_candidate_version_id}/commands/save-as-note` | 200 | 创建 UserNote |
+| `POST /alpha/knowledge-contribution-candidate-versions/{knowledge_contribution_candidate_version_id}/commands/reject` | 200 | 关闭候选 |
+
+命令包含 `expected_revision`、`judgment_card_version_id`、EvidenceUnit 引用和 warning acknowledgements。validation failed 不能接受为知识，但可以保存为笔记。
+
+### 5.6 KnowledgeAsset 与 UserNote
+
+| 方法与路由 | 成功 | 行为 |
+| --- | ---: | --- |
+| `GET /alpha/knowledge-assets` | 200 | cursor 列表 |
+| `GET /alpha/knowledge-assets/{knowledge_asset_id}` | 200 | 资产及证据回溯 |
+| `POST /alpha/knowledge-assets/{knowledge_asset_id}/commands/withdraw` | 200 | expected_revision |
+| `POST /alpha/knowledge-assets/{knowledge_asset_id}/commands/archive` | 200 | expected_revision |
+| `GET /alpha/user-notes` | 200 | cursor 列表 |
+| `GET /alpha/user-notes/{user_note_id}` | 200 | 普通笔记 |
+| `POST /alpha/user-notes/{user_note_id}/commands/withdraw` | 200 | expected_revision |
+| `POST /alpha/user-notes/{user_note_id}/commands/archive` | 200 | expected_revision |
+
+KnowledgeAsset 必须保留 JudgmentCard version、EvidenceUnit 和 warning 引用；UserNote 不得显示为系统验证知识。
+
+## 6. 内部应用契约
+
+### 6.1 SubmitCandidateResultCommand
+
+该命令不是普通用户 API。进程内调用优先；启用 HTTP Adapter 时固定为：
+
+`POST /internal/alpha/candidate-results`
+
+请求至少包含：
 
 ```json
 {
-  "date": "2026-06-15",
-  "intent_id": "string",
-  "attention_budget_id": "string"
+  "service_identity": "research-worker",
+  "operation_type": "judgment_candidate",
+  "research_run_id": "run_...",
+  "research_attempt_id": "attempt_...",
+  "run_execution_spec_id": "spec_...",
+  "input_versions": {},
+  "idempotency_key": "internal-key",
+  "lifecycle_generation": 3,
+  "capability_implementation_version": "string",
+  "output_schema_version": "string",
+  "candidate_result": {},
+  "correlation_id": "string",
+  "causation_id": "string"
 }
 ```
 
-响应任务完成后必须满足：
+Handler 必须重新校验版本、Scope、生命周期、幂等、Tombstone 和 Schema。合法候选也不能直接成为权威领域状态。
 
-- 每部最多 3 条。
-- 总数最多 5 条。
-- 可以为空，并给出“今日无事上奏”。
+### 6.2 内部对象产生命令
 
-### `POST /alpha/ministries/daily-reports`
+| 命令 | 原子结果 |
+| --- | --- |
+| CreateDispositionProposalCommand | 绑定已完成 Audit 与 DecisionFitness，创建 Proposal |
+| CreateKnowledgeContributionCandidateCommand | 判断具有沉淀价值时创建 Candidate |
+| CompleteJudgmentReviewCommand | Review completed 与 ReviewResult 同事务提交 |
 
-同步生成每日三部推荐。
+内部 HTTP Adapter 要求服务身份。缺少身份返回 401；身份无权执行对应 operation 返回 403。
 
-请求：
+## 7. Outcome、错误与降级
 
-```json
-{
-  "date": "2026-06-16",
-  "intent": {},
-  "attention_budget": {},
-  "candidates": []
-}
+### 7.1 领域结果不是 HTTP 错误
+
+- SourceResolution 的 ambiguous、not_found、unavailable 返回成功创建的记录。
+- insufficient_evidence、audit_blocked、cancelled_by_user 和 Run 创建后的 execution_failed 通过 ResearchRunOutcome 表达。
+- blocked JudgmentCard 可以查询，但不得显示成可靠判断或生成可采纳处置。
+
+### 7.2 错误码
+
+| HTTP | code | 含义 |
+| ---: | --- | --- |
+| 401 | authentication_required | 缺少调用主体或服务身份 |
+| 403 | forbidden | 主体无权访问内部或诊断能力 |
+| 404 | resource_not_found | 路由引用的 API 资源不存在 |
+| 409 | idempotency_conflict | 同一 Key 使用不同请求体 |
+| 409 | concurrency_conflict | expected_revision 不匹配 |
+| 409 | version_conflict | version ID 非 current 或上游版本不匹配 |
+| 409 | lifecycle_conflict | 当前状态不允许该命令 |
+| 409 | projection_not_ready | 投影未达到 minimum revision/checkpoint |
+| 409 | decision_fitness_violation | 用途或风险超过 DecisionFitness |
+| 409 | warning_acknowledgement_required | 缺少有效 warning 确认 |
+| 422 | validation_error | JSON、枚举或字段类型错误 |
+| 422 | condition_required | 条件必填字段缺失或互斥字段冲突 |
+| 503 | async_execution_unavailable | 请求异步但能力未启用 |
+| 503 | dependency_unavailable | 命令接受前所需依赖不可用 |
+
+409 projection_not_ready 与 503 错误必须设置 `retryable=true`；其余错误根据 details 明确是否可重试。
+
+## 8. Developer Diagnostics
+
+Developer API 使用独立访问策略，不属于普通产品 API。
+
+| 方法与路由 | 输出 |
+| --- | --- |
+| `GET /alpha/developer/research-runs/{research_run_id}/trace` | 技术 Trace、Capability、降级与失败 |
+| `GET /alpha/developer/research-cases/{research_case_id}/activity` | CaseActivityLog |
+| `GET /alpha/developer/material-manifests` | 按 Run、Provider、purpose 查询 MaterialManifest |
+| `GET /alpha/developer/index-generations` | IndexGeneration metadata |
+| `GET /alpha/developer/research-runs/{research_run_id}/budget` | BudgetSnapshot 与消费记录 |
+| `GET /alpha/developer/projections/status` | checkpoint、lag 和失败摘要 |
+
+默认只返回对象引用、Hash、版本和脱敏摘要。不返回完整 Prompt、完整私有原文、API Key 或认证 Header。
+
+## 9. 跨接口不变量
+
+1. API 不得混用 ResearchRunOutcome、JudgmentCard 状态和 ResearchDisposition。
+2. 未确认 Proposal 不得序列化为最终处置或承诺。
+3. 所有判断、行动和知识接口绑定具体 JudgmentCard version 与 DecisionFitness。
+4. ClaimEvidenceLink 响应必须保留 ResearchEvidenceUse，使历史判断回到当时 Scope 和 evidence revision。
+5. adjust 只能创建新版本，不能原地修改历史版本。
+6. 幂等重放不产生新命令副作用。
+7. 普通 API 不允许直接提交审计结论、用途适配或内部候选结果。
+8. Diagnostics 和内部接口必须与普通用户权限隔离。
+9. Extended Alpha 缺失不得改变 Core Alpha 路由语义。
+
+## 10. 验收
+
+强制检查：
+
+```powershell
+git status --short
+git diff --check -- docs/API_CONTRACTS.md
+git diff --name-only
+rg -n "^(<<<<<<<|=======|>>>>>>>)" docs/API_CONTRACTS.md
 ```
 
-响应：
-
-```json
-[
-  {
-    "id": "ministry_...",
-    "date": "2026-06-16",
-    "ministry": "technology",
-    "items": [],
-    "empty_reason": "今日无事上奏"
-  }
-]
-```
-
-A10-MIN-001 implementation note:
-
-- Limited ministry recommendation contracts are implemented in `metaos/ministries/schemas.py`.
-- Alpha ministries are restricted to `technology`, `cognition`, and `business`.
-- `generate_ministry_reports(...)` filters candidates by current `Intent`, obeys `AttentionBudget`, caps each ministry at 3 items, caps all items at 5, and returns `empty_reason="今日无事上奏"` for empty ministries.
-- The `/alpha/ministries/daily/jobs` HTTP endpoint remains a target API contract for a later wiring task.
-
-A10-MIN-002 implementation note:
-
-- `POST /alpha/ministries/daily-reports` is implemented as a synchronous schema-validated API in `metaos/app/api.py`.
-- The endpoint calls `generate_ministry_reports(...)` with caller-provided structured candidates and returns three `MinistryReport` JSON payloads.
-- The endpoint does not create a durable RQ job or persist reports; durable job orchestration remains a later task.
-
-## 目标 API：宰相
-
-### `POST /alpha/chancellor/daily/jobs`
-
-生成今日简报。
-
-### `POST /alpha/chancellor/daily-briefings`
-
-同步生成今日简报。
-
-请求：
-
-```json
-{
-  "date": "2026-06-16",
-  "intent": {},
-  "role": {},
-  "attention_budget": {},
-  "daily_review": {},
-  "research_answers": [],
-  "ministry_reports": []
-}
-```
-
-### `GET /alpha/chancellor/briefings/{briefing_id}`
-
-读取宰相简报。
-
-响应：
-
-```json
-{
-  "today_focus": [],
-  "deferred_items": [],
-  "ignored_items": [],
-  "cognitive_traps": []
-}
-```
-
-### `POST /alpha/chancellor/weekly-reports`
-
-同步生成周报打包结果。
-
-请求：
-
-```json
-{
-  "week_start": "2026-06-15",
-  "week_end": "2026-06-21",
-  "intent": {},
-  "daily_summaries": [],
-  "briefings": [],
-  "research_answers": [],
-  "video_exports": []
-}
-```
-
-响应：
-
-```json
-{
-  "id": "weekly_...",
-  "week_start": "2026-06-15",
-  "week_end": "2026-06-21",
-  "intent_id": "intent_alpha",
-  "daily_summary_ids": [],
-  "briefing_ids": [],
-  "research_answer_ids": [],
-  "video_export_ids": [],
-  "completed_actions": [],
-  "pending_actions": [],
-  "evidence_highlights": [],
-  "disputed_or_risk_items": [],
-  "cognitive_traps": [],
-  "content_exports": [],
-  "next_week_focus": []
-}
-```
-
-A11-CHAN-001 implementation note:
-
-- Chancellor briefing support is implemented in `metaos/chancellor/schemas.py`.
-- `generate_chancellor_briefing(...)` combines current `Intent`, optional `CurrentRole`, `AttentionBudget`, optional `DailyReview`, `ResearchAnswer` items, and `MinistryReport` items.
-- The output includes today focus, deferred items, ignored items, cognitive trap reminders, source research ids, and source review id.
-- The `/alpha/chancellor/daily/jobs` HTTP endpoint remains a target API contract for a later wiring task.
-
-A11-CHAN-002 implementation note:
-
-- `POST /alpha/chancellor/daily-briefings` is implemented as a synchronous schema-validated API in `metaos/app/api.py`.
-- The endpoint calls `generate_chancellor_briefing(...)` with caller-provided structured records and returns a `ChancellorBriefing` JSON payload.
-- The endpoint does not create a durable RQ job or persist briefings; durable job orchestration remains a later task.
-
-A11-WEEKLY-002 implementation note:
-
-- `POST /alpha/chancellor/weekly-reports` is implemented as a synchronous schema-validated API in `metaos/app/api.py`.
-- The endpoint calls `generate_weekly_report(...)` with caller-provided structured records and returns a `WeeklyReport` JSON payload.
-- Invalid week ranges are mapped to HTTP 400.
-- The endpoint does not create a durable RQ job or persist reports; durable job orchestration remains a later task.
-
-## 目标 API：内容工坊
-
-### `POST /alpha/workshop/episodes`
-
-同步从 `DailySummary` 生成 `EpisodeSpec`。
-
-请求：
-
-```json
-{
-  "daily_summary": {},
-  "title": "Daily Build Review",
-  "angle": "Turn the day into a verifiable account"
-}
-```
-
-响应：
-
-```json
-{
-  "id": "episode_...",
-  "daily_summary_id": "summary_1",
-  "title": "Daily Build Review",
-  "angle": "Turn the day into a verifiable account",
-  "facts": [],
-  "judgments": [],
-  "reflections": [],
-  "actions": [],
-  "review_status": "draft"
-}
-```
-
-### `POST /alpha/workshop/episodes/jobs`
-
-从 `DailySummary` 生成 `EpisodeSpec`。
-
-### `POST /alpha/workshop/episodes/{episode_id}/assets`
-
-同步生成可审核视频资产。
-
-请求：
-
-```json
-{
-  "episode": {},
-  "output_dir": "library/exports/episodes"
-}
-```
-
-响应：
-
-```json
-{
-  "id": "assets_...",
-  "episode_spec_id": "episode_...",
-  "output_dir": "library/exports/episodes/episode_...",
-  "script_path": ".../script.md",
-  "voiceover_path": ".../voiceover.txt",
-  "subtitle_path": ".../subtitles.srt",
-  "cards_path": ".../cards.json",
-  "remotion_props_path": ".../remotion_props.json"
-}
-```
-
-### `POST /alpha/workshop/episodes/{episode_id}/render`
-
-同步渲染已审核 Episode 的 MP4。
-
-请求：
-```json
-{
-  "episode": {},
-  "assets": {},
-  "output_dir": "library/exports/videos"
-}
-```
-
-响应：
-```json
-{
-  "id": "export_...",
-  "episode_spec_id": "episode_...",
-  "script_path": ".../script.md",
-  "voiceover_path": ".../voiceover.txt",
-  "subtitle_path": ".../subtitles.srt",
-  "cards_path": ".../cards.json",
-  "remotion_props_path": ".../remotion_props.json",
-  "mp4_path": ".../episode_....mp4",
-  "render_status": "succeeded",
-  "review_record_id": "human_reviewer",
-  "error": null
-}
-```
-
-### `POST /alpha/workshop/episodes/{episode_id}/render/jobs`
-
-提交视频渲染任务。
-
-### `PATCH /alpha/workshop/episodes/{episode_id}/review`
-
-人工审核 Episode。
-
-请求：
-
-```json
-{
-  "episode": {},
-  "status": "approved",
-  "reviewer_id": "human_reviewer",
-  "reviewed_at": "2026-06-16T10:00:00Z",
-  "review_notes": "Approved for export"
-}
-```
-
-响应：
-
-```json
-{
-  "id": "episode_...",
-  "review_status": "approved",
-  "reviewer_id": "human_reviewer",
-  "reviewed_at": "2026-06-16T10:00:00Z",
-  "review_notes": "Approved for export"
-}
-```
-
-### `GET /alpha/workshop/video-exports/{export_id}`
-
-读取 MP4 导出结果。
-
-A3-WORKSHOP-002 implementation note:
-
-- Workshop service-level support is implemented in `metaos/workshop/service.py`.
-- `generate_episode_assets(...)` writes script, voiceover text, SRT subtitles, visual card JSON, and Remotion props JSON for human review.
-- `review_episode(...)` records structured human review state on `EpisodeSpec`.
-- `render_episode_video(...)` returns a `VideoExport` with `render_status=succeeded` and `mp4_path`, or `render_status=failed` and `error`.
-- The HTTP endpoints above remain target API contracts for a later API/RQ wiring task.
-
-A3-WORKSHOP-003 implementation note:
-
-- `POST /alpha/workshop/episodes` is implemented as a synchronous schema-validated API in `metaos/app/api.py`.
-- The endpoint calls `episode_from_daily_summary(...)` with caller-provided `DailySummary`, optional title, and optional angle.
-- The endpoint returns a draft `EpisodeSpec` JSON payload and does not generate assets, render MP4, persist records, or create a durable RQ job.
-
-A3-WORKSHOP-004 implementation note:
-
-- `PATCH /alpha/workshop/episodes/{episode_id}/review` is implemented as a synchronous schema-validated API in `metaos/app/api.py`.
-- The endpoint requires the path `episode_id` to match the submitted `EpisodeSpec.id`, then calls `review_episode(...)`.
-- Terminal review states still require reviewer metadata through the `EpisodeSpec` schema.
-- The endpoint returns the reviewed `EpisodeSpec` JSON payload and does not persist records or create a durable RQ job.
-
-A3-WORKSHOP-005 implementation note:
-
-- `POST /alpha/workshop/episodes/{episode_id}/assets` is implemented as a synchronous schema-validated API in `metaos/app/api.py`.
-- The endpoint requires the path `episode_id` to match the submitted `EpisodeSpec.id`, then calls `generate_episode_assets(...)`.
-- When `output_dir` is omitted, assets are written below the workspace exports directory.
-- The endpoint returns a `WorkshopAssetBundle` JSON payload and does not review the episode, render MP4, persist records, or create a durable RQ job.
-
-A3-WORKSHOP-006 implementation note:
-
-- `POST /alpha/workshop/episodes/{episode_id}/render` is implemented as a synchronous schema-validated API in `metaos/app/api.py`.
-- The endpoint requires the path `episode_id` to match both the submitted `EpisodeSpec.id` and `WorkshopAssetBundle.episode_spec_id`.
-- The endpoint calls `render_episode_video(...)` and writes MP4 output below the workspace exports directory when `output_dir` is omitted.
-- Unapproved episodes return a `VideoExport` with `render_status=failed` and no `mp4_path`, preserving the final export review gate.
-- The endpoint returns a `VideoExport` JSON payload and does not persist records or create a durable RQ job.
+人工验收：
+
+- 每个版本化对象具有 current 与历史版本查询；每个允许用户调整的版本化对象具有 adjust 契约；
+- 每个 Proposal 具有明确产生入口和用户决定命令；
+- 每个 POST 标明状态码、幂等与 expected_revision 要求；
+- 异步响应返回 ResearchRun，不出现通用任务对象；
+- SourceResolution 与 RunOutcome 不被映射成 HTTP 404/503；
+- 行动与知识命令绑定 JudgmentCard version、DecisionFitness 和 warning；
+- 仅 `docs/API_CONTRACTS.md` 发生变化。
