@@ -12,6 +12,8 @@
 
 任务标识：`A0-DOC-002-R4.1`
 
+机械勘误：`A0-DOC-002-R4.1.1`
+
 关联业务架构修订：`A0-DOC-001-R7.1`
 
 ## 1. 架构定位
@@ -57,7 +59,7 @@ Preliminary Source Anchor Parsing
 
 - 用户显式来源约束进入检索、上下文打包、模型输入、证据链和审计环节。
 - ResearchRun、ResearchAttempt、RetrievalRun、ResearchTrace 和 CaseActivityLog 的关系可追溯。
-- 每个 ready 核心 Claim 都能关联可定位 EvidenceUnit；推断型和建议型 Claim 还必须具备符合类型的 JudgmentRationale。
+- 每个由 `audit_status=acceptable / provisionally_acceptable` 的 JudgmentCard 展示为可采纳结论的核心 Claim，都能关联可定位 EvidenceUnit；推断型和建议型 Claim 还必须具备符合类型的 JudgmentRationale。
 - Audit 阻断结果不能被 UI、API 或 Worker 显示成可靠判断。
 - 每个结束的 ResearchRun 都形成 ResearchRunOutcome，且不得将运行结果伪装成 ResearchDisposition。
 - JudgmentCard 必须携带 DecisionFitness；“可采纳”不得自动放行超出用途范围的处置或行动。
@@ -967,7 +969,7 @@ JudgmentCard 是面向用户的综合出口，但必须版本化。
 - 每次修订生成新的 JudgmentCard 版本。
 - 旧版本不得被覆盖。
 - 版本之间需要可追踪 supersedes / previous 关系，具体字段以 `docs/DOMAIN_MODEL.md` 为准。
-- ready、blocked、needs_review 等状态名称由领域模型最终确定。
+- JudgmentCard 的 `audit_status`、`validity_status` 和 `lifecycle_status` 名称、组合与转换由领域模型确定；不得另行引入单一“可采纳状态”合并这些维度。
 
 ### 11.5 Audit 与 DecisionFitness
 
@@ -1002,12 +1004,12 @@ Semantic Audit 可以由模型辅助，输出结构化 Finding：
 Deterministic Decision Gate 由代码和规则决定：
 
 - 哪些 Finding 是 blocking。
-- JudgmentCard 是否可以 ready。
+- JudgmentCard 的 `audit_status` 应为 `acceptable`、`provisionally_acceptable` 还是 `blocked`。
 - 是否需要修订。
 - 是否达到修订上限。
 - 当前 JudgmentCard 的 DecisionFitness。
 
-LLM 可以提出严重程度，但不能单独把 JudgmentCard 标成 ready。架构允许生成模型和审计模型使用不同 Prompt、模型或 Provider，但 Core Alpha 不强制使用两个模型。
+LLM 可以提出严重程度，但不能单独决定 JudgmentCard 的 `acceptable / provisionally_acceptable` 审计结果，也不能生成直接生效的 DecisionFitness。架构允许生成模型和审计模型使用不同 Prompt、模型或 Provider，但 Core Alpha 不强制使用两个模型。
 
 DecisionFitness 是 JudgmentCard 或 Audit 的结构化业务结果，不要求独立表，但必须与对应 JudgmentCard 版本绑定。它至少表达允许用途、禁止用途、适用条件和触发升级的风险边界。
 
@@ -1171,7 +1173,7 @@ API 原则：
 - API Adapter 必须调用 Application Command Handler。
 - 所有查询必须调用 Application Query Handler，并由 View DTO Mapper 输出；API Adapter 不直接读取 Repository、SQLite、Chroma 或 Trace projection。
 - 普通用户 API 不暴露 Candidate Result Command；如使用 HTTP 承载内部结果提交，必须使用独立内部路由、服务身份和受限网络边界。
-- API 不应让前端绕过 Audit 直接把草稿标为 ready。
+- API 不应让前端绕过 Audit 直接把草稿的 `audit_status` 改为 `acceptable / provisionally_acceptable`，也不得让前端直接生成生效的 DecisionFitness。
 - API 必须分别表达 ResearchRunOutcome、JudgmentCard / DecisionFitness 和 ResearchDisposition，不得用一个通用状态混合运行结果与用户处置。
 - API 不应把未确认 DispositionProposal 当作 ResearchDisposition。
 - API 不应把 ActionProposal 当作 ActionCommitment。
@@ -1203,7 +1205,7 @@ Core Alpha 必须区分失败类型，不得统一显示“资料不足”。失
 
 Capability Provider 返回成功不构成降级完成或业务成功。Research Execution 与 Judgment 模块仍需根据证据充分性、理由链、Audit 和 DecisionFitness 决定 RunOutcome 与后续路径。
 
-降级后的 JudgmentCard 只有在以下条件仍满足时才能 ready：
+降级后的 JudgmentCard 只有在以下条件仍满足，并再次通过 Deterministic Decision Gate 时，`audit_status` 才能进入 `acceptable / provisionally_acceptable`：
 
 - required source 独立覆盖。
 - 核心 Claim 证据充分。
@@ -1251,7 +1253,7 @@ Decision Gate 根据上述信息判断：
 质量门：
 
 - 来源边界违规率目标为 0。
-- ready 核心 Claim 证据与类型化 JudgmentRationale 覆盖率目标为 100%。
+- `audit_status=acceptable / provisionally_acceptable` 的 JudgmentCard 中，核心 Claim 的证据与类型化 JudgmentRationale 覆盖率目标为 100%。
 - required source 独立检索报告覆盖率目标为 100%。
 - DecisionFitness 越级放行率目标为 0。
 - 审计阻断误显示率目标为 0。
