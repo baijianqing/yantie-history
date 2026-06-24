@@ -1,8 +1,8 @@
 # MetaOS Alpha API 契约
 
-状态：Core Alpha 目标 API 契约冻结候选
+状态：Core Alpha 目标 API 契约冻结稿
 
-任务标识：`A0-DOC-004-R1.1`
+任务标识：`A0-DOC-004-R1.2`
 
 依赖：业务架构 `A0-DOC-001-R7.1`、技术架构 `A0-DOC-002-R4.1`、领域模型 `A0-DOC-003-R1.2.2`
 
@@ -92,6 +92,33 @@
 
 命令响应直接返回本次事务形成的权威资源。`primary_aggregate` 表示命令的主要并发边界；同一事务改变的其他聚合放入 `affected_aggregates`。新建且不拥有 revision 的不可变事实可省略两者，只返回资源 ID。跨聚合命令不得用一个 revision 代表多个聚合。
 
+#### 2.4.1 命令 data 的固定形状
+
+单资源命令统一返回以资源类型 snake_case 命名的对象，不直接把资源字段摊平到 `data`。版本调整命令同时返回旧版本引用与新版本完整对象。以下跨资源命令固定返回：
+
+| 命令 | `data` 必填键 | nullable / 条件键 |
+| --- | --- | --- |
+| 创建 ResearchCase | `research_case, research_question` | 无 |
+| 派生 ResearchCase | `source_research_case_ref, research_case, research_question` | 无 |
+| 创建 SourceResolution | `source_resolutions` | 无；始终为数组 |
+| 创建或调整 KnowledgeScope | `knowledge_scope` | adjust 另含 `superseded_version_ref` |
+| 创建或调整 ResearchPlan | `research_plan` | adjust 另含 `superseded_version_ref` |
+| 启动 ResearchRun | `research_run` | `research_run_outcome, judgment_card`，规则见 3.5 |
+| 确认 warning | `warning_acknowledgement, judgment_card` | 无 |
+| accept DispositionProposal | `disposition_proposal, research_disposition, research_case` | 无 |
+| adjust DispositionProposal | `disposition_proposal, superseded_version_ref` | 无 |
+| reject DispositionProposal | `disposition_proposal` | 无 |
+| activate AttentionBacklogItem | `attention_backlog_item, activation_result, research_case` | `research_question`；仅新建 Case 时非 null |
+| complete JudgmentReview（内部） | `judgment_review, review_result, follow_up_commands` | 无；ReviewResult 自身可引用既有新 Run |
+| create ActionProposal | `research_disposition, action_proposal` | 无 |
+| adjust ActionProposal | `action_proposal, superseded_version_ref` | 无 |
+| accept ActionProposal | `action_proposal, action_commitment` | 无 |
+| accept-as-knowledge | `knowledge_contribution_candidate, knowledge_asset` | 无 |
+| save-as-note | `knowledge_contribution_candidate, user_note` | 无 |
+| reject Candidate | `knowledge_contribution_candidate` | 无 |
+
+`*_ref` 使用 3.1 的资源引用；其他键使用 3.5 至 3.8 的规范响应。未列出的单资源命令返回该命令完成后的完整当前资源，例如 `{ "action_commitment": {} }`。所有键即使为 null 也必须出现，客户端不得依据字段缺失猜测执行分支。
+
 ### 2.5 查询响应与分页
 
 单资源响应：
@@ -133,6 +160,18 @@
 }
 ```
 
+单资源 GET 的 `data` 直接是对应规范资源对象，未形成可选资源时为 null；列表 GET 的 `data` 是规范资源对象数组。以下复合查询例外使用固定键：
+
+| 查询 | `data` 形状 |
+| --- | --- |
+| JudgmentCard claims | `{ "claims": [{ "claim": {}, "rationale": null, "evidence_links": [] }] }` |
+| 指定 JudgmentAudit | `{ "judgment_audit": {}, "audit_findings": [] }` |
+| JudgmentReview | `{ "judgment_review": {}, "review_result": null }` |
+| ResearchRun trace | `ResearchTraceResponse` |
+| Developer Case activity | `CaseActivityLogResponse` |
+
+`rationale` 只有在 Claim 引用 JudgmentRationale 时非 null。复合查询不得用可变的 include 参数改变顶层结构。
+
 - 单聚合或明确聚合范围查询可以使用 `minimum_revision`。
 - 列表投影使用 `minimum_checkpoint`，不得把多个聚合压缩为一个 revision。
 - 使用 `minimum_revision` 或 `minimum_checkpoint` 时可传 `consistency_wait_ms`；默认 `0`，最大 `5000`。
@@ -141,6 +180,19 @@
 - 列表使用不透明、签名 cursor；`limit` 默认 50，最大 200。cursor 绑定认证主体、筛选条件、排序和快照水位，默认稳定排序为 `created_at DESC, resource_id DESC`。
 - cursor 不使用数据库 offset。无效、过期或与当前主体、筛选、排序不匹配时返回 `422 invalid_cursor`。
 - 同一分页会话固定快照水位，防止翻页时重复或漏读；水位后新增记录只在新的分页会话中出现。
+
+`projection_not_ready` 的 details 固定为：
+
+```json
+{
+  "target_type": "checkpoint",
+  "target_value": "cursor_target_...",
+  "current_value": "cursor_current_...",
+  "waited_ms": 5000
+}
+```
+
+`target_type=revision|checkpoint`；revision 值使用 JSON integer，checkpoint 值使用 string。
 
 ### 2.6 幂等
 
@@ -163,6 +215,13 @@
 - 新版本、旧 current 进入 superseded、current pointer 更新和 TraceEvent 必须原子提交。
 - 已被 ResearchRun 绑定的历史 KnowledgeScope 或 ResearchPlan 版本不可修改。
 
+### 2.8 current 的唯一语义
+
+- 版本化对象的 `/current` 返回唯一 `lifecycle_status=current` 的版本；它不表示用户已接受，也不表示对象已成为最终事实。
+- JudgmentAudit 的 `/current` 返回当前被领域规则接纳并决定 JudgmentCard audit status 的审计。
+- DecisionFitness 的 `/current` 返回当前对该 JudgmentCard version 生效的用途适配记录。
+- 用户决定始终读取 `user_decision_status` 或最终事实对象，不得从 `/current` 推断。
+
 ## 3. 公共表示
 
 ### 3.1 资源引用
@@ -175,6 +234,14 @@
 ```
 
 所有需要历史复现的引用使用具体 `*_version_id`。逻辑 `*_id` 只用于版本序列和 current 查询。
+
+通用基础类型：
+
+- 所有 `*_id` 为非空 string；`revision`、`version`、`attempt_number` 为大于等于 1 的 integer。
+- `*_at` 为 UTC ISO 8601 string；Hash 为 `算法:小写十六进制` string。
+- `*_ids` 为 ID string 数组；`*_refs` 为 ResourceReference 数组。
+- 所有布尔值使用 JSON boolean，计数和 offset 使用大于等于 0 的 integer。
+- 请求与响应对象执行严格字段校验，未在对应 Schema 中声明的字段返回 `422 validation_error`。
 
 ### 3.2 SourceAnchorInput
 
@@ -201,6 +268,8 @@
 ```
 
 excluded 绑定可以省略版本和分析角色；required/allowed 必须绑定可用版本。
+
+服务端必须校验 Binding 与 SourceResolution 的一致性：`knowledge_item_id` 必须等于解析结果；非 excluded 的 `knowledge_item_version_id` 必须等于 full resolution 固定版本；`access_policy` 必须等于该 Resolution 的 `requested_access_policy`。改变访问政策必须先产生新的 SourceResolution，不得在 Binding 中单独改写。客户端不得手工组合字段绕过解析结果；不一致返回 `409 source_binding_conflict`。
 
 ### 3.4 ErrorResponse
 
@@ -323,9 +392,56 @@ R: `knowledge_contribution_candidate_id, knowledge_contribution_candidate_versio
 
 Asset `asset_type=claim_note|evidence_note|knowledge_gap`、`validity_status=valid|needs_review|invalid`、`lifecycle_status=active|withdrawn|archived`。Note `note_type=personal_note|user_viewpoint`、`lifecycle_status=active|withdrawn|archived`；UserNote 响应不得含有“系统验证”标志。
 
-### 3.6 其他资源表示
+### 3.6 其余 Minimum Slice 资源表示
 
-未在 3.5 单列的资源仍须完整返回 `docs/DOMAIN_MODEL.md` 中该对象的全部公开字段，并遵守相同的 R/N/C、枚举、ID 引用和隐藏字段规则。接口实现前必须把对应表示加入本章；路由表中的自然语言输出说明不能替代规范 Schema。
+| 类型 | 规范字段 |
+| --- | --- |
+| `ChunkResponse` | R: `chunk_id, knowledge_item_version_id, position, content_hash, chunker_version, created_at`；N: `parent_chunk_id, previous_chunk_id, next_chunk_id, section_path, page, timestamp_seconds, start_offset, end_offset, token_count`。普通响应不含完整 Chunk 文本。 |
+| `ResearchQuestionResponse` | R: `research_question_id, research_case_id, question_text, question_role, created_by, created_at`；N: `parent_question_id`。`question_role=root|follow_up|clarification|derived`。 |
+| `SourceResolutionResponse` | R: `source_resolution_id, research_question_id, resolution_stage, raw_anchor, requested_access_policy, resolution_status, candidate_knowledge_item_ids, created_at`；N: `requested_version_hint, resolved_knowledge_item_id, resolved_knowledge_item_version_id, ambiguity_reason, failure_reason`。条件必填遵循领域模型。 |
+| `KnowledgeScopeSourceBindingResponse` | R: `knowledge_scope_source_binding_id, knowledge_scope_version_id, source_resolution_id, knowledge_item_id, access_policy, created_at`；N: `knowledge_item_version_id, analysis_role`。 |
+| `ResearchAttemptResponse` | R: `research_attempt_id, research_run_id, attempt_number, attempt_mode, status, created_at`；N: `previous_attempt_id, started_at, ended_at, failure_category, failure_reason`。 |
+| `RetrievalRunResponse` | R: `retrieval_run_id, research_attempt_id, knowledge_scope_source_binding_id, retrieval_channel, query_ref, status, retrieval_outcome, created_at`；N: `index_generation_id, started_at, ended_at, failure_reason`。`retrieval_channel` 使用开放代码对象。 |
+| `JudgmentRationaleResponse` | R: `judgment_rationale_id, claim_version_id, rationale_profile, evidence_link_ids, reasoning_summary, created_at`。`rationale_profile` 是带 `profile_type=fact|interpretation|inference|recommendation` 的判别联合对象；不同 profile 的必填内容遵循领域模型，不返回与类型无关的空字段。 |
+| `ClaimEvidenceLinkResponse` | R: `claim_evidence_link_id, claim_version_id, research_evidence_use_id, evidence_unit_id, evidence_role, support_strength, created_at`；N: `scope_note`。`support_strength={level, reason}`，level 为 `weak|moderate|strong`。 |
+| `JudgmentAuditResponse` | R: `judgment_audit_id, judgment_card_version_id, audit_policy_version, audit_run_status, finding_ids, created_at`；N: `gate_result, started_at, completed_at`。 |
+| `AuditFindingResponse` | R: `audit_finding_id, judgment_audit_id, affected_claim_version_ids, finding_type, severity, description, supporting_reason, policy_version, created_at`；N: `recommended_revision, risk_trigger_condition`。`finding_type` 使用开放代码对象；`severity=warning|blocking`。 |
+| `WarningAcknowledgementResponse` | R: `warning_acknowledgement_id, audit_finding_id, judgment_card_version_id, acknowledged_by, acknowledged_at`；N: `acknowledgement_note`。 |
+| `DecisionFitnessResponse` | R: `decision_fitness_id, judgment_card_version_id, policy_version, allowed_uses, forbidden_uses, required_conditions, risk_ceiling, escalation_triggers, created_at`。`risk_ceiling` 完整返回成本、可逆性、外部影响和专家复核限制，不使用单一分数。 |
+
+Attempt `attempt_mode=retrieval|reuse_existing_evidence`，状态为 `created|running|completed|failed|cancelled|stale`。Retrieval 状态和 outcome 的合法组合必须符合领域模型。SourceResolution `resolution_stage=preliminary|full`、`resolution_status=resolved|ambiguous|not_found|unavailable`。
+
+### 3.7 Core Alpha Complete 资源表示
+
+| 类型 | 规范字段 |
+| --- | --- |
+| `ResearchTriageResponse` | R: `research_triage_id, research_case_id, preliminary_source_resolution_ids, recommended_path, estimated_attention_cost, estimated_resource_budget, activation_recommendation, reason, decision_status, created_at`；N: `selected_path, decided_at`。 |
+| `AttentionBacklogItemResponse` | R: `attention_backlog_item_id, source_type, title, reason, status, revision, created_at`；N: `source_ref_id, question_text, external_source_ref, external_lead_summary, estimated_attention_cost, activated_research_case_id, resolved_at`。 |
+| `JudgmentReviewResponse` | R: `judgment_review_id, research_case_id, judgment_card_version_id, trigger_type, status, revision, created_at`；N: `trigger_ref_id, completed_at`。 |
+| `ReviewResultResponse` | R: `review_result_id, judgment_review_id, result_type, reason, affected_claim_version_ids, recommended_next_step, created_at`；N: `new_research_run_id`。 |
+| `ActionReviewResponse` | R: `action_review_id, action_commitment_id, reviewed_at, expected_result, actual_result, assumption_failures, stop_condition_triggered, judgment_review_required, created_at`。 |
+
+Triage path 为 `direct_answer|quick_research|standard_research|deep_research|clarification_required`，decision status 为 `pending|accepted|adjusted|overridden`。Backlog、Review 与 ReviewResult 的枚举完全采用领域模型，条件字段不满足时不得以 null 规避必填约束。
+
+### 3.8 Developer 技术记录表示
+
+Developer API 使用以下规范表示；所有 payload、预览和实现配置仍受第 8 章脱敏边界限制。
+
+| 类型 | 规范字段 |
+| --- | --- |
+| `IndexGenerationResponse` | R: `index_generation_id, index_type, knowledge_item_version_id, chunk_strategy_version, index_strategy_version, status, expected_item_count, actual_item_count, validation_summary, created_at`；N: `embedding_model, embedding_dimension, previous_generation_id, ready_at, invalidated_at`。 |
+| `TraceEventResponse` | R: `trace_event_id, event_type, occurred_at, actor_type, aggregate_type, aggregate_id, aggregate_revision, correlation_id, causation_id, payload_ref, payload_hash, schema_version`；N: `actor_id, research_case_id, research_run_id, research_attempt_id`。 |
+| `ResearchTraceResponse` | R: `research_run_id, projection_checkpoint, events, input_snapshot_refs, requested_capabilities, available_capabilities, missing_capabilities, fallback_path, quality_impact, observed_at`。 |
+| `CaseActivityLogResponse` | R: `research_case_id, projection_checkpoint, events, observed_at`。 |
+| `MaterialManifestResponse` | R: `material_manifest_id, invocation_type, invocation_id, provider, purpose, policy_version, policy_decision, material_refs, source_version_ids, content_hashes, locations, lengths, sensitivity_levels, contains_profile_data, created_at`；N: `research_case_id, research_run_id, research_attempt_id, capability_invocation_id, intake_or_import_context_ref, redacted_preview`。 |
+| `RunExecutionSpecResponse` | R: `run_execution_spec_id, research_run_id, knowledge_scope_version_id, source_resolution_ids, research_plan_version_id, source_version_ids, index_generation_ids, retrieval_strategy_version, context_strategy_version, embedding_contract, reranker_contract, capability_contracts, allowed_implementations, fallback_policy, prompt_version, output_schema_version, audit_policy_version, decision_fitness_policy_version, egress_policy_version, system_safety_limits, created_at`；N: `budget_snapshot_id`。 |
+| `ExecutionCheckpointResponse` | R: `execution_checkpoint_id, research_run_id, checkpoint_type, input_revision, completed_at, result_ref_id, idempotency_key`；N: `research_attempt_id`。 |
+| `CapabilityCandidateResultResponse` | R: `capability_candidate_result_id, invocation_ref, execution_status, candidate_payload_ref, output_schema_version, implementation_version, provider, resource_consumption, idempotency_identity, fallback_path, quality_impact, warnings, failure_category, created_at`。 |
+| `BudgetSnapshotResponse` | R: `budget_snapshot_id, research_run_id, limits, consumed, remaining, observed_at, consumption_records`。 |
+| `BudgetConsumptionRecordResponse` | R: `budget_consumption_record_id, research_run_id, consumption_type, consumed_amount, remaining_budget, occurred_at, invocation_ref`。 |
+| `ProjectionStatusResponse` | R: `projection_name, checkpoint, lag, status, observed_at`；N: `failure_summary`。 |
+
+`events` 使用 `TraceEventResponse`；`consumption_records` 使用 `BudgetConsumptionRecordResponse`；`material_refs` 只含对象 ID、Hash 与定位。`redacted_preview` 默认 null，仅在本地策略允许且有诊断必要时返回。技术记录不是领域状态权威。
 
 ## 4. Minimum Slice API
 
@@ -478,7 +594,7 @@ blocking Finding 不允许 acknowledge。修改 user attitude 不改变 evidence
 
 ### 4.8 Decision
 
-DispositionProposal 在 JudgmentAudit 与 DecisionFitness 完成后，由内部 `CreateDispositionProposalCommand` 生成，不提供公开创建路由。“current”表示当前被领域规则接纳的版本，不表示按时间排序的最新记录。
+DispositionProposal 在 JudgmentAudit 与 DecisionFitness 完成后，由内部 `CreateDispositionProposalCommand` 生成，不提供公开创建路由。其 `/current` 仅表示 `lifecycle_status=current`，不表示用户已经接受。
 
 | 方法与路由 | 成功 | 行为 |
 | --- | ---: | --- |
@@ -545,7 +661,7 @@ DispositionProposal 在 JudgmentAudit 与 DecisionFitness 完成后，由内部 
 
 | 方法与路由 | 成功 | 行为 |
 | --- | ---: | --- |
-| `GET /alpha/research-dispositions/{research_disposition_id}/action-proposals/current` | 200 | 该处置下当前被领域规则接纳的 ActionProposal 或 null |
+| `GET /alpha/research-dispositions/{research_disposition_id}/action-proposals/current` | 200 | 该处置下唯一 lifecycle_status=current 的 ActionProposal 或 null |
 | `GET /alpha/research-cases/{research_case_id}/action-proposals` | 200 | Case 下 Proposal 列表，可按 research_disposition_id、lifecycle_status 筛选 |
 | `GET /alpha/action-proposal-versions/{action_proposal_version_id}` | 200 | 指定版本 |
 | `POST /alpha/action-proposal-versions/{action_proposal_version_id}/commands/adjust` | 200 | 新版本、重新风险和用途校验 |
@@ -583,7 +699,7 @@ KnowledgeContributionCandidate 由内部 `CreateKnowledgeContributionCandidateCo
 | `POST /alpha/knowledge-contribution-candidate-versions/{knowledge_contribution_candidate_version_id}/commands/save-as-note` | 200 | 创建 UserNote |
 | `POST /alpha/knowledge-contribution-candidate-versions/{knowledge_contribution_candidate_version_id}/commands/reject` | 200 | 关闭候选 |
 
-adjust 命令包含 `expected_revision`、当前 Candidate version ID、修订后的内容或证据关系，并产生新版本与重新校验。accept-as-knowledge、save-as-note、reject 只提交 `expected_revision`、`judgment_card_version_id` 和适用的 `warning_acknowledgement_ids`；它们使用当前 Candidate version 已冻结的 `evidence_unit_ids`，不得在决定命令中替换证据。若客户端额外提交证据引用，必须与当前版本完全一致，否则返回 `409 version_conflict`。validation failed 不能接受为知识，但可以保存为笔记。
+adjust 命令包含 `expected_revision`、当前 Candidate version ID、修订后的内容或证据关系，并产生新版本与重新校验。accept-as-knowledge、save-as-note、reject 只提交 `expected_revision`、`judgment_card_version_id` 和适用的 `warning_acknowledgement_ids`；它们使用当前 Candidate version 已冻结的 `evidence_unit_ids`，不得在决定命令中替换证据。决定命令出现 EvidenceUnit 字段属于请求 Schema 错误，返回 `422 validation_error`。validation failed 不能接受为知识，但可以保存为笔记。
 
 ### 5.6 KnowledgeAsset 与 UserNote
 
@@ -602,23 +718,35 @@ KnowledgeAsset 必须保留 JudgmentCard version、EvidenceUnit 和 warning 引�
 
 ## 6. 内部应用契约
 
-### 6.1 SubmitCandidateResultCommand
+### 6.1 CommandContext 与内部 HTTP 身份
 
-该命令不是普通用户 API。进程内调用优先；启用 HTTP Adapter 时固定为：
+进程内命令使用可信 `CommandContext`，包含：`command_id, actor_type, actor_id, idempotency_key, correlation_id, causation_id, trace_id`。这些字段由 Application Command Handler 注入，不属于业务 Payload。
 
-`POST /internal/alpha/candidate-results`
+启用内部 HTTP Adapter 时：
 
-请求至少包含：
+- 服务身份来自 mTLS、服务令牌或等价内部认证上下文；请求体不得自声明身份。
+- 幂等键只来自 `Idempotency-Key` Header；请求体不得重复携带。
+- HTTP Adapter 将已认证身份与 Header 映射为 `CommandContext`。
+- TraceEvent 记录已认证 actor，而不是 Payload 中的字符串。
+- 缺少身份返回 `401 authentication_required`；无权执行 operation 返回 `403 forbidden`。
+
+### 6.2 SubmitCandidateResultCommand
+
+进程内调用优先；启用 HTTP Adapter 时固定为 `POST /internal/alpha/candidate-results`，成功处理返回 `200`。
+
+Payload：
 
 ```json
 {
-  "service_identity": "research-worker",
   "operation_type": "judgment_candidate",
   "research_run_id": "run_...",
   "research_attempt_id": "attempt_...",
   "run_execution_spec_id": "spec_...",
-  "input_versions": {},
-  "idempotency_key": "internal-key",
+  "input_versions": {
+    "research_run_revision": 7,
+    "knowledge_scope_version_id": "ksv_...",
+    "research_plan_version_id": "rpv_..."
+  },
   "lifecycle_generation": 3,
   "capability_implementation_version": "string",
   "output_schema_version": "string",
@@ -628,17 +756,54 @@ KnowledgeAsset 必须保留 JudgmentCard version、EvidenceUnit 和 warning 引�
 }
 ```
 
-Handler 必须重新校验版本、Scope、生命周期、幂等、Tombstone 和 Schema。合法候选也不能直接成为权威领域状态。
+前置校验：Run revision、Attempt 归属与状态、RunExecutionSpec、Scope/Plan 版本、生命周期代数、Tombstone、输出 Schema 和 operation 权限必须全部匹配。
 
-### 6.2 内部对象产生命令
+结果：
 
-| 命令 | 原子结果 |
-| --- | --- |
-| CreateDispositionProposalCommand | 绑定已完成 Audit 与 DecisionFitness，创建 Proposal |
-| CreateKnowledgeContributionCandidateCommand | 判断具有沉淀价值时创建 Candidate |
-| CompleteJudgmentReviewCommand | Review completed 与 ReviewResult 同事务提交 |
+```json
+{
+  "data": {
+    "submission_status": "accepted_for_domain_processing",
+    "capability_candidate_result_id": "ccr_...",
+    "follow_up_commands": []
+  },
+  "command": {},
+  "consistency": {}
+}
+```
 
-内部 HTTP Adapter 要求服务身份。缺少身份返回 401；身份无权执行对应 operation 返回 403。
+`submission_status` 固定为 `accepted_for_domain_processing|duplicate_replay|rejected_stale|rejected_version_mismatch|rejected_lifecycle|rejected_tombstoned|rejected_schema`。`duplicate_replay` 返回首次完整响应；其余 rejected 结果不产生权威领域状态，只追加受限的拒绝 TraceEvent。accepted 结果创建技术 CandidateResult 与 TraceEvent，并可列出待执行的后续内部命令；它本身仍不是 JudgmentCard、Claim 或其他领域事实。外层 JSON 无效返回 422；通过 Schema 后的候选拒绝使用上述 200 结果，不混用 HTTP 错误。
+
+### 6.3 CreateDispositionProposalCommand
+
+Payload 必填：`research_case_id, judgment_card_version_id, judgment_card_revision, judgment_audit_id, decision_fitness_id, proposed_disposition_type, reason`；可选：`warning_acknowledgement_ids, expires_at, defer_until, observation_condition`。
+
+前置条件：JudgmentCard 为 current、有效且可采纳；指定 Audit 与 DecisionFitness 当前生效；warning 确认仍有效；处置类型满足用途和条件字段。命令校验 JudgmentCard revision；若同时切换 Case 的相关 current 引用，还必须校验 ResearchCase revision。
+
+成功原子创建 DispositionProposal、追加 TraceEvent，并返回 `{ "disposition_proposal": {} }`。领域拒绝原因固定为 `judgment_not_current|judgment_not_acceptable|audit_not_current|decision_fitness_not_current|warning_not_acknowledged|disposition_not_allowed|version_mismatch`，映射为 409。命令只影响新 Proposal 聚合；若改变 Case current 引用，则同时在 consistency 中返回 Case 新 revision。
+
+### 6.4 CreateKnowledgeContributionCandidateCommand
+
+Payload 必填：`research_case_id, judgment_card_version_id, judgment_card_revision, contribution_type, proposed_content, evidence_unit_ids`；可选：`target_knowledge_asset_id, audit_finding_ids, warning_acknowledgement_ids`。
+
+前置条件：JudgmentCard 为 current、有效且非 blocked；EvidenceUnit 与该判断的 ResearchEvidenceUse/ClaimEvidenceLink 可追溯；候选不提升 Claim evidence status。命令校验 JudgmentCard revision 与所有 EvidenceUnit revision 快照。
+
+成功原子创建 Candidate 与 TraceEvent，返回 `{ "knowledge_contribution_candidate": {} }`。拒绝原因固定为 `judgment_not_current|judgment_blocked|judgment_invalid|evidence_not_linked|evidence_invalid|version_mismatch`，映射为 409。没有沉淀价值是合法的“未触发命令”，不得伪造空 Candidate。
+
+### 6.5 CompleteJudgmentReviewCommand
+
+Payload 必填：`judgment_review_id, expected_revision, result_type, reason, affected_claim_version_ids, recommended_next_step`；可选：`new_research_run_id`。
+
+前置条件：Review 当前为可完成状态；目标 JudgmentCard version 与触发依据仍匹配；`new_research_run_id` 如存在必须属于同一 Case。命令校验 JudgmentReview revision。
+
+成功时 Review 进入 completed、ReviewResult 创建并追加同一因果链的 TraceEvent，三者原子提交；固定 data 见 2.4.1。拒绝原因固定为 `review_not_completable|judgment_version_mismatch|research_run_mismatch|concurrency_conflict`，映射为 409。若结果建议重新研究或改变处置，`follow_up_commands` 只返回命令引用，不在本事务中静默创建新 Run 或 Proposal。
+
+### 6.6 内部命令共同规则
+
+- 每个命令使用独立内部幂等身份；重放不重复创建领域对象或 TraceEvent。
+- 每个成功结果返回 `command`、`consistency.primary_aggregate` 和所有 `affected_aggregates`。
+- 只有 Domain Module 可以形成权威状态；Worker、HTTP Adapter 和 CandidateResult 不得直接写 Repository。
+- 内部命令产生的 TraceEvent 必须包含 correlation、causation、已认证 actor、聚合 revision 和 payload hash。
 
 ## 7. Outcome、错误与降级
 
@@ -658,12 +823,14 @@ Handler 必须重新校验版本、Scope、生命周期、幂等、Tombstone 和
 | 409 | idempotency_conflict | 同一 Key 使用不同请求体 |
 | 409 | concurrency_conflict | expected_revision 不匹配 |
 | 409 | version_conflict | version ID 非 current 或上游版本不匹配 |
+| 409 | source_binding_conflict | Binding 与 SourceResolution 的作品、版本或访问政策不一致 |
 | 409 | lifecycle_conflict | 当前状态不允许该命令 |
 | 409 | projection_not_ready | 投影未达到 minimum revision/checkpoint |
 | 409 | decision_fitness_violation | 用途或风险超过 DecisionFitness |
 | 409 | warning_acknowledgement_required | 缺少有效 warning 确认 |
 | 422 | validation_error | JSON、枚举或字段类型错误 |
 | 422 | condition_required | 条件必填字段缺失或互斥字段冲突 |
+| 422 | invalid_cursor | cursor 无效、过期或与主体、筛选、排序不匹配 |
 | 503 | async_execution_unavailable | 请求异步但能力未启用 |
 | 503 | dependency_unavailable | 命令接受前所需依赖不可用 |
 
@@ -705,6 +872,35 @@ git status --short
 git diff --check -- docs/API_CONTRACTS.md
 git diff --name-only
 rg -n "^(<<<<<<<|=======|>>>>>>>)" docs/API_CONTRACTS.md
+
+$legacyTerms = @(
+  "Research" + "Task",
+  "Research" + "Answer",
+  "Audit" + "Report",
+  "Ministry" + "Report",
+  "Chancellor" + "Briefing",
+  "Episode" + "Spec",
+  "实现" + "说明",
+  "implementation" + " note"
+)
+$legacyHits = Select-String -Path docs/API_CONTRACTS.md -Pattern $legacyTerms
+if ($legacyHits) { $legacyHits; throw "发现旧契约残留" }
+
+$requiredTerms = @(
+  "ResearchCase", "KnowledgeScope", "ResearchRunOutcome",
+  "JudgmentCard", "DecisionFitness", "DispositionProposal",
+  "expected_revision", "Idempotency-Key",
+  "KnowledgeContributionCandidate", "SubmitCandidateResultCommand"
+)
+foreach ($term in $requiredTerms) {
+  if (-not (Select-String -Path docs/API_CONTRACTS.md -SimpleMatch $term)) {
+    throw "缺少关键契约：$term"
+  }
+}
+
+$ambiguousStatus = @("200" + " 或 " + "201", "200" + "/" + "201", "视情况" + "返回")
+$ambiguousHits = Select-String -Path docs/API_CONTRACTS.md -Pattern $ambiguousStatus
+if ($ambiguousHits) { $ambiguousHits; throw "发现模糊成功状态码" }
 ```
 
 人工验收：
@@ -715,4 +911,7 @@ rg -n "^(<<<<<<<|=======|>>>>>>>)" docs/API_CONTRACTS.md
 - 异步响应返回 ResearchRun，不出现通用任务对象；
 - SourceResolution 与 RunOutcome 不被映射成 HTTP 404/503；
 - 行动与知识命令绑定 JudgmentCard version、DecisionFitness 和 warning；
+- 3.5 至 3.8 覆盖所有公开和 Developer 查询资源，不存在“实现时再补 Schema”的保留条款；
+- 每个跨聚合命令具有固定 data 键、primary aggregate 与 affected aggregates；
+- 内部 HTTP Payload 不含自声明身份或重复幂等键；
 - 仅 `docs/API_CONTRACTS.md` 发生变化。
