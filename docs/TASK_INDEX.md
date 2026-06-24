@@ -161,7 +161,7 @@ flowchart TB
 
 ### A0-GATE-001：阶段0冻结审查
 
-- 状态：`pending`。
+- 状态：`blocked`。
 - 价值：确认文档能够作为实现稳定上游。
 - 依赖：A0-DOC-005-R1.1.2、A0-DOC-006、A0-EVAL-001。
 - 允许修改范围：在 `docs/ROADMAP.md` 第 2.1 节追加 Gate Record，并更新 `docs/TASK_INDEX.md` 任务状态。

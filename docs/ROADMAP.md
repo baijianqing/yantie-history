@@ -56,6 +56,27 @@ Non-Goals：不修改代码、迁移、依赖、Streamlit、Worker、索引或 `
 
 A0-GATE-001 执行时在本节追加唯一审查记录，至少包含：审查日期、业务/技术/领域/API/检索/评测文档版本、审查结论、未决风险和首个获授权实现任务。未形成该记录时，阶段0不得视为完成。
 
+#### A0-GATE-001 首次审查记录
+
+- 审查日期：`2026-06-24`。
+- 审查结论：`blocked`。阶段0尚未退出，不授权阶段1实现。
+- 上游版本与提交：
+  - 业务架构 `A0-DOC-001-R7.1`：`78883fb`。
+  - 技术架构 `A0-DOC-002-R4.1`：`1cb4682`。
+  - 领域模型 `A0-DOC-003-R1.2.2`：`58cde24`。
+  - API 契约 `A0-DOC-004-R1.2.1`：`686437a`。
+  - 检索策略 `A0-DOC-006-R1.3`：`97cc475`。
+  - 评测契约 `A0-EVAL-001-R1.1`：`0aa203e`。
+- 阻断项：
+  1. `docs/TECHNICAL_ARCHITECTURE.md` 在“架构定位”“JudgmentCard”“Audit 与 DecisionFitness”“API 架构”“降级与失败类型”“可观测性、质量门与业务不变量控制”中，仍以 `ready` 表达 JudgmentCard 或核心 Claim 状态；`docs/DOMAIN_MODEL.md` 对判断只冻结 `acceptable / provisionally_acceptable / blocked` 等精确审计状态。该术语差异会重新引入未定义的判断状态。
+  2. 本章“剩余交付”仍将任务索引中已经完成的 `A0-DOC-006` 和 `A0-EVAL-001` 列为未完成，阶段0状态表达不一致。
+- 未决风险：若直接进入实现，Contract、Audit、UI 和评测可能分别把 `ready` 映射成不同状态；Roadmap 与任务索引也会对阶段0进度给出不同结论。
+- 阶段1授权：无。`A1-CONTRACT-001A` 保持 `pending`，不得启动。
+- 建议修复：
+  1. 建立技术架构机械勘误，将 JudgmentCard/Claim 的 `ready` 替换为领域模型的精确审计状态表达；`IndexGeneration.status=ready` 保留。
+  2. 机械同步本章阶段0交付状态，不改变阶段划分或任务语义。
+  3. 修复完成后重新执行 `A0-GATE-001`，形成新的审查记录；本记录不得覆盖或删除。
+
 ## 3. Core Alpha Minimum Slice
 
 核心命题：用户主动提出问题后，MetaOS 能在明确来源范围内形成可定位、可审计、用途受限且由用户确认处置的判断。
