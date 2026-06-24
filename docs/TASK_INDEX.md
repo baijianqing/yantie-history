@@ -146,7 +146,7 @@ flowchart TB
 
 ### A0-EVAL-001：Core Alpha Golden Cases 与指标
 
-- 状态：`pending`。
+- 状态：`completed`。
 - 价值：在实现前固定真实失败案例、分层断言和发布质量门。
 - 依赖：A0-DOC-005-R1.1.2；可与 A0-DOC-006 并行，但最终需同步检索指标。
 - 允许修改范围：新增 `docs/CORE_ALPHA_EVALUATION.md`。
