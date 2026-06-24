@@ -1,306 +1,175 @@
 # MetaOS Alpha 路线图
 
-## 阶段0：仓库审计和架构文档
+状态：阶段0交付路线冻结版
 
-目标：
+任务标识：`A0-DOC-005`
 
-- 不改业务代码。
-- 审计现有架构和运行数据。
-- 文档化 Alpha 范围、业务架构、技术架构、领域模型、API 契约、任务索引和协作规则。
+依赖：业务架构 `A0-DOC-001-R7.1`、技术架构 `A0-DOC-002-R4.1`、领域模型 `A0-DOC-003-R1.2.2`、API 契约 `A0-DOC-004-R1.2.1`
 
-交付：
+本文只维护交付顺序、阶段门和退出条件。业务对象语义、技术承载和 HTTP 契约分别以对应权威文档为准。
 
-- `CURRENT_ARCHITECTURE_AUDIT.md`
-- `AGENTS.md`
-- `ALPHA_SCOPE.md`
-- `BUSINESS_ARCHITECTURE.md`
-- `TECHNICAL_ARCHITECTURE.md`
-- `DOMAIN_MODEL.md`
-- `API_CONTRACTS.md`
-- `ROADMAP.md`
-- `TASK_INDEX.md`
+## 1. 交付原则
 
-完成后等待人工审查。
+MetaOS 按以下层级交付：
 
-## 阶段1：用户主权层
+```text
+阶段0：冻结契约与评测基线
+-> Core Alpha Minimum Slice：可靠判断最小闭环
+-> Core Alpha Complete：注意力、复核、行动与知识沉淀
+-> Extended Alpha：意图显影、认知视角、画像与有限榜单
+-> Beta Ready：稳定性、隐私、成本和统一体验
+```
 
-目标：
+任何后置能力失败不得破坏已经交付的前置闭环。现有代码中的旧对象、旧路由或旧阶段名称不代表新路线图已经完成。
 
-- 实现 `CognitiveConstitution`。
-- 实现 `Intent`。
-- 实现 `CurrentRole`。
-- 实现 `AttentionBudget`。
-- 实现 `NotToDoItem`。
+## 2. 阶段0：契约与评测冻结
 
-验收：
+目标：在不修改业务代码和运行态数据的前提下，冻结 Core Alpha 的价值边界、领域模型、技术控制、API 和实施顺序。
 
-- 可创建、读取、更新当前意图和角色。
-- 可设置注意力预算和不做清单。
-- 后续研究任务能关联当前意图。
+已完成：
 
-## 阶段2：每日认知账本
+- 业务架构：三项一级能力、Minimum Slice 与 Complete 边界、业务不变量和验收场景。
+- 技术架构：模块化单体、统一命令入口、Outbox、幂等、并发、出站治理和证据生命周期。
+- 领域模型：聚合、对象、字段、状态、版本、证据、审计、用途与用户确认。
+- API 契约：公开、Developer、Internal 三层路由与精确 JSON 契约。
 
-目标：
+剩余交付：
 
-- 实现 `DailyPlan`、`WorkEvent`、`Advice`、`Decision`、`Action`、`AttentionDrift`、`DailyReview`。
-- 支持采集 Git 提交。
-- 支持采集 Markdown 变更。
-- 生成 `DailySummary`。
+- `A0-DOC-005`：同步本路线图与任务索引。
+- `A0-DOC-006`：冻结来源感知检索与上下文打包策略。
+- `A0-EVAL-001`：建立 Golden Cases、fixture、指标口径和发布门禁。
 
-验收：
+退出条件：
 
-- 每日记录可回放。
-- `DailySummary` 区分事实、判断、反思和行动。
+- 权威文档之间不存在旧对象、旧路由和状态语义冲突。
+- Minimum Slice 的任务 DAG、输入输出、允许修改范围和回滚方式明确。
+- 真实失败案例形成可执行评测规范。
+- 人工确认阶段0完成后，才允许开始公共 Schema、迁移或业务实现。
 
-## 阶段3：内容工坊
+Non-Goals：不修改代码、迁移、依赖、Streamlit、Worker、索引或 `library/` 数据。
 
-目标：
+## 3. Core Alpha Minimum Slice
 
-- 实现 `EpisodeSpec`。
-- 生成脚本、旁白、字幕、图卡。
-- 接入 Remotion 模板和 FFmpeg 渲染。
-- 支持人工审核和 MP4 导出。
+核心命题：用户主动提出问题后，MetaOS 能在明确来源范围内形成可定位、可审计、用途受限且由用户确认处置的判断。
 
-验收：
+主链：
 
-- 从 `DailySummary` 到可审核视频闭环可运行。
-- 未审核不得导出正式 MP4。
+```text
+ResearchCase
+-> SourceResolution
+-> KnowledgeScope
+-> ResearchPlan
+-> ResearchRun / ResearchAttempt / RetrievalRun
+-> EvidenceUnit / ResearchEvidenceUse
+-> Claim / JudgmentRationale / JudgmentCard
+-> JudgmentAudit / DecisionFitness
+-> DispositionProposal
+-> 用户确认
+-> ResearchDisposition 或 ResearchRunOutcome
+```
 
-## 阶段4：知识底座标准化
+### 3.1 基础契约映射
 
-目标：
+- 将冻结领域对象映射为 Pydantic Schema。
+- 建立聚合 revision、双 ID 版本、命令幂等和统一事件信封。
+- 建立逻辑持久化集合、Repository Port 和最小迁移。
 
-- 标准化 `Source`、`DocumentVersion`、`Chunk`。
-- 引入稳定 ID。
-- 支持父子块、前后块。
-- 引入索引版本。
-- 支持增量入库。
+阶段门：Schema 校验、Repository 并发、幂等重放和迟到结果测试通过。
 
-验收：
+### 3.2 Case、来源与研究计划
 
-- 新主题不需要重切块。
-- 文档更新只影响变更范围。
-- chunk 可回链原文位置。
+- 实现 ResearchCase 与 ResearchQuestion。
+- 实现 SourceResolution、KnowledgeScope 版本和 ResearchPlan 版本。
+- 显式来源解析失败、歧义或不可用时不得静默回退全库。
 
-## 阶段5：检索增强
+阶段门：指定、比较、排除和版本选择均有契约测试；旧 Scope/Plan 版本不可原地修改。
 
-目标：
+### 3.3 研究执行与来源感知检索
 
-- 实现全文检索。
-- 保留现有向量检索。
-- 实现元数据过滤。
-- 实现 RRF 融合。
-- 实现引用回链。
-- 建立回归评测。
+- 实现 Run、Attempt、零或多个 RetrievalRun、Outcome 与 Trace。
+- 有锚点时在指定来源内检索；无锚点时先做来源级路由。
+- 支持 `fact_lookup / source_interpretation / compare_sources / enumerate_pattern / claim_evaluation` 的差异化执行。
+- 形成 ResearchEvidenceUse，区分证据产生关系与本次使用关系。
 
-验收：
+阶段门：短资料公平性、required 独立报告、excluded 污染、零检索证据复用和失败降级评测通过。
 
-- 多路检索结果可解释。
-- 每个结果可回链原文。
-- 检索回归测试可重复运行。
+### 3.4 判断、审计与处置
 
-## 阶段6：议题编译器和认知算子
+- 实现 EvidenceUnit、ClaimEvidenceLink、JudgmentRationale、Claim 和 JudgmentCard。
+- 实现确定性预检、语义审计和确定性 Decision Gate。
+- 实现 WarningAcknowledgement、DecisionFitness、DispositionProposal 和 ResearchDisposition。
+- blocked、证据不足、用户终止和执行失败只形成真实 Outcome，不伪造可靠处置。
 
-目标：
+阶段门：核心 Claim 证据覆盖、理由链裁剪、阻断不可覆盖、用途越级和用户接受不改变证据状态等评测通过。
 
-- 把自然语言问题转换为 `ResearchTask`、`CognitiveOperator`、`ThemeSpec`、`EvidenceRequirement`、`ResearchScope`。
-- 实现首版认知算子。
+### 3.5 Minimum Slice 工作台
 
-验证主题：
+- Streamlit 第一屏支持提问、来源约束、研究状态、判断、证据、警告和处置确认。
+- 默认隐藏 Provider、索引、Prompt 和底层降级细节；Developer 视图可查看技术 Trace。
+- 草稿、审计中、可采纳、阻断和失效状态视觉上可区分。
 
-- 功高震主。
-- 小人得志陷害忠良。
-- 听信谗言。
-- 功成身退。
-- 角色转换失败。
+Minimum Slice 退出条件：
 
-验收：
+- 正式回答全部关联 ResearchCase 和 ResearchTrace。
+- required source compliance 为 100%，excluded source violation 为 0。
+- ready 核心 Claim 证据覆盖率为 100%，unsupported ready 核心 Claim 为 0。
+- 用户能确认、调整或拒绝处置；未确认 Proposal 不成为最终事实。
+- 固定 Golden Cases 回归通过，旧 RAG 与 Streamlit 基础能力无明显回归。
 
-- 五个主题共用同一套代码。
-- 新主题只改变 `ThemeSpec` 数据。
+Non-Goals：不实现画像、三部榜单、LensSkill、知识图谱、复杂行动工作流或自动知识合并。
 
-## 阶段7：研究执行器
+## 4. Core Alpha Complete
 
-目标：
+在 Minimum Slice 稳定后，按独立纵向切片增加：
 
-- 候选召回。
-- 证据矩阵。
-- 缺失证据检测。
-- 补充检索。
-- 反证。
-- 评分。
-- 分类。
-- 带引用回答。
-- 进度展示。
+### 4.1 注意力约束
 
-验收：
+- ResearchTriage 只建议研究深度、预算和执行策略。
+- AttentionBacklogItem 管理未激活问题、Case、缺口、复核建议和外部线索。
+- 在办上限采用可追溯软门禁，用户始终可以暂停、延后或显式覆盖。
 
-- 研究结果区分事实、推断、争议、反思。
-- 无来源结论被明确标记。
-- 研究结果生成 Action 或“不行动”。
+### 4.2 判断复核
 
-## 阶段8：实体、事件、主张和多级摘要
+- 用户主动发起 JudgmentReview。
+- 证据删除、定位失效、内容变化或确认历史缺陷时提示复核。
+- ReviewResult 不直接覆盖原处置；需要改变处置时重新生成 Proposal 并确认。
 
-目标：
+### 4.3 低风险行动闭环
 
-- 实现 `Entity`、`Alias`、`Event`、`Claim`、`EvidenceLink`。
-- 实现多级摘要。
+- 只有 `proceed_to_action` 处置可以创建 ActionProposal。
+- ActionRiskProfile 与 DecisionFitness 共同限制用途和风险。
+- 用户接受后才形成 ActionCommitment；ActionReview 可触发判断复核。
 
-验收：
+### 4.4 最小知识沉淀
 
-- 研究可按实体、事件和主张组织证据。
-- 主张支持证据和反证链接。
+- 可靠判断可选地产生 KnowledgeContributionCandidate。
+- 用户确认、调整或拒绝候选；语义或证据关系变化必须重新校验。
+- KnowledgeAsset 是可撤回的证据支持知识笔记，不成为新的独立原始证据。
+- 校验失败内容只能进入 UserNote 或继续研究。
 
-## 阶段9：御史台
+Core Alpha Complete 退出条件：四个新增切片均可独立关闭或失败而不破坏 Minimum Slice；用户主权、证据状态和审计门禁保持不变。
 
-目标：
+## 5. Extended Alpha
 
-- 检查引用。
-- 检查范围。
-- 检查反证。
-- 检查证据完整性。
-- 检查确认偏误。
-- 检查研究成本。
+方向性能力：IntentTrace、BookProfile/CognitiveLens、认知画像与更新候选、InformationIntake 和三部有限榜单。
 
-验收：
+这些能力在进入实施前必须另立 ADR、任务和评测，不沿用 Core Alpha 的字段推测。三部每部最多 3 条、总数最多 5 条；无足够价值时返回“今日无事上奏”。画像只提供先验，不能覆盖当前问题。
 
-- 研究回答必须经过审计或明确标记未审计。
-- 审计失败阻止进入最终结论。
+## 6. Beta Ready
 
-## 阶段10：三部有限推荐
+只处理产品化收敛：性能、稳定性、隐私、出站治理、移动端、备份恢复、可观测性和失败降级，不新增核心业务闭环。
 
-目标：
+退出条件：关键路径 P95、成本、幂等、并发、删除防复活、数据出站、恢复演练和 Golden Cases 回归达到发布门禁。
 
-- 实现技术部、认知部、商业部。
-- 每部每日最多 3 条，整体最多 5 条。
-- 支持“今日无事上奏”。
+## 7. 全局阶段门
 
-验收：
+每个阶段和任务必须提供：
 
-- 推荐不形成无限信息流。
-- 每条推荐有目标关联、阅读成本、不读损失、建议行动和有效期。
+- 进入条件与依赖。
+- 明确输入、输出和接口。
+- 允许与禁止修改范围。
+- 自动化测试与 Golden Cases。
+- 失败降级和回滚方式。
+- 对权威文档的同步要求。
 
-## 阶段11：宰相和完整闭环
-
-目标：
-
-- 结合当前 `Intent`、角色、时间预算和研究结果输出今日重点。
-- 输出暂缓事项、应忽略事项和认知陷阱提醒。
-- 形成季度意图到周报的完整闭环。
-
-验收：
-
-- 季度意图 -> 今日重点 -> 研究/开发 -> 证据与结论 -> 行动 -> 每日复盘 -> 视频 -> 每周报告可运行。
-
-## 已完成任务状态
-
-### A3-WORKSHOP-003：EpisodeSpec 同步 API
-
-- 已新增 `POST /alpha/workshop/episodes`，通过 FastAPI 把结构化 `DailySummary` 转换为草稿 `EpisodeSpec`。
-- 接口保留事实、判断、反思、行动和引用，并把资产生成、审核、渲染和持久化 RQ 编排留给后续独立任务。
-- 测试命令：`python -m pytest test/test_alpha_workshop_api.py`。
-
-### A3-WORKSHOP-004：Episode 审核同步 API
-
-- 已新增 `PATCH /alpha/workshop/episodes/{episode_id}/review`，通过 FastAPI 暴露同步人工审核入口。
-- 接口要求路径 ID 与提交的 Episode ID 一致，并复用终态审核必须具备 reviewer 元数据的 schema 门禁。
-- 测试命令：`python -m pytest test/test_alpha_workshop_api.py`。
-
-### A3-WORKSHOP-005：Episode 资产同步 API
-
-- 已新增 `POST /alpha/workshop/episodes/{episode_id}/assets`，通过 FastAPI 暴露同步可审核资产生成入口。
-- 接口写出脚本、旁白文本、SRT 字幕、图卡 JSON 和 Remotion props，并返回 `WorkshopAssetBundle` JSON；MP4 渲染仍由后续独立接口处理。
-- 测试命令：`python -m pytest test/test_alpha_workshop_api.py`。
-
-### A3-WORKSHOP-006：Episode MP4 同步渲染 API
-
-- 已新增 `POST /alpha/workshop/episodes/{episode_id}/render`，通过 FastAPI 暴露同步 MP4 渲染入口。
-- 接口要求路径 ID 同时匹配 `EpisodeSpec.id` 和 `WorkshopAssetBundle.episode_spec_id`，并复用审核后才能正式导出的领域门禁。
-- 接口返回 `VideoExport` JSON；持久化 RQ 渲染 job 仍由后续独立任务处理。
-- 测试命令：`python -m pytest test/test_alpha_workshop_api.py test/test_workshop_render.py`。
-
-### A5-SEARCH-003：向量检索适配器
-
-- 已新增向量检索适配器，把现有 Chroma/Ollama `RetrievalService.search` 结果转换为 Alpha `SearchCandidate`，并保留引用回链和元数据过滤能力。
-- 稠密向量结果现在可以和全文检索结果进入同一条 RRF 融合链路。
-- 测试命令：`python -m pytest test/test_vector_search.py`。
-
-### A5-SEARCH-004：混合证据检索入口
-
-- 已新增 `hybrid_search`，作为 Alpha 证据检索的统一入口，支持全文、向量、元数据过滤和 RRF 融合。
-- 研究执行器现在可以消费统一的 `EvidenceCandidate` 列表，同时保留各检索通道的排名、分数和引用回链。
-- 测试命令：`python -m pytest test/test_hybrid_search.py`。
-
-### A5-SEARCH-005：Alpha 搜索接口
-
-- 已新增 `POST /alpha/search`，通过 FastAPI 暴露全文、向量和 RRF 融合后的证据检索结果，并支持元数据过滤和引用回链。
-- 接口支持 `include_vector=false`，测试和轻量调用可以在不构造向量检索的情况下只走全文检索。
-- 测试命令：`python -m pytest test/test_alpha_search_api.py`。
-
-### A6-COMPILER-003：Alpha 研究编译接口
-
-- 已新增 `POST /alpha/research/compile`，通过 FastAPI 暴露运行时 IssueCompiler 输出。
-- 接口返回通过 schema 校验的 `ResearchCompilation` JSON，并把无效 provider 输出映射为 HTTP 400。
-- 测试命令：`python -m pytest test/test_alpha_research_compile_api.py`。
-
-### A7-RESEARCH-003：研究候选证据召回服务
-
-- 已新增面向 `ResearchCompilation` 的计划驱动候选召回，在证据矩阵构建前为候选证据标记需求 ID、需求类型、查询和支持/反驳立场。
-- 研究执行器现在可以调用混合检索并返回 `ResearchExecutionDraft`，不再要求调用方预先标注候选证据。
-- 测试命令：`python -m pytest test/test_research_service.py`。
-
-### A7-RESEARCH-004：研究执行轨迹
-
-- 已新增 `ResearchExecutionReport`，记录执行版本、检索运行记录、进度事件、召回候选和证据矩阵输出。
-- 研究执行现在具备面向进度展示、日志和后续 RQ/API 持久化的结构化数据，同时不改变答案起草和审计策略。
-- 测试命令：`python -m pytest test/test_research_service.py`。
-
-### A10-MIN-002：三部推荐同步 API
-
-- 已新增 `POST /alpha/ministries/daily-reports`，通过 FastAPI 暴露同步三部推荐生成入口。
-- 接口返回三个 schema 合法的 `MinistryReport` JSON，复用每部最多 3 条、整体最多 5 条、Intent/预算过滤和空部“今日无事上奏”规则。
-- 持久化 RQ job 编排仍作为后续独立任务处理。
-- 测试命令：`python -m pytest test/test_alpha_ministries_api.py`。
-
-### A11-OPS-001：任务重试元数据
-
-- 已新增 `JobRepository.retry_failed`，可把失败任务重置为 pending，并追加可审计的 `result.retry_history` 记录。
-- 这为后续 RQ/API 重新入队提供了已测试的重试状态基础，不改变当前 worker 行为。
-- 测试命令：`python -m pytest test/test_job_repository_retry.py`。
-
-### A11-OPS-002：RQ 重试入队
-
-- 已新增 `enqueue_retry_job`，可通过原始 RQ 任务路径重新入队支持重试的失败任务，同时保留原 job id 和重试历史。
-- 重试分发已覆盖 RAG、OCR PDF 分页重试、不支持的任务类型和非失败任务，并且测试不依赖真实 Redis。
-- 测试命令：`python -m pytest test/test_queueing_retry.py`。
-
-### A11-OPS-003：任务重试接口
-
-- 已新增 `POST /jobs/{job_id}/retry`，通过 FastAPI 暴露失败任务重试能力。
-- 路由把不存在的任务映射为 404，把无效重试状态或 Redis 入队失败映射为 400。
-- 测试命令：`python -m pytest test/test_job_retry_api.py`。
-
-### A11-CHAN-002：宰相今日简报同步 API
-
-- 已新增 `POST /alpha/chancellor/daily-briefings`，通过 FastAPI 暴露同步今日简报生成入口。
-- 接口返回 schema 合法的 `ChancellorBriefing` JSON，并保留 `/alpha/chancellor/daily/jobs` 作为后续持久化 RQ 编排入口。
-- 测试命令：`python -m pytest test/test_alpha_chancellor_api.py`。
-
-### A11-WEEKLY-001：周报打包
-
-- 已新增 `WeeklyReport` 和 `generate_weekly_report(...)`，把周内 DailySummary、ResearchAnswer、ChancellorBriefing 和 VideoExport 聚合为结构化周报。
-- 闭环测试现在覆盖每日复盘、视频导出到周报来源回链。
-- 测试命令：`python -m pytest test/test_weekly_report.py test/test_alpha_end_to_end.py`。
-
-### A11-WEEKLY-002：周报同步 API
-
-- 已新增 `POST /alpha/chancellor/weekly-reports`，通过 FastAPI 暴露同步周报生成入口。
-- 接口返回 schema 合法的 `WeeklyReport` JSON，并把非法周范围映射为 HTTP 400；持久化 RQ job 编排仍作为后续独立任务处理。
-- 测试命令：`python -m pytest test/test_alpha_weekly_report_api.py`。
-
-### A11-CLOSE-001：完整闭环验收
-
-- 已新增服务级 Alpha 闭环回归测试，覆盖从主权记录、运行时议题编译、标准化知识、全文与向量 RRF 检索、证据矩阵、带引用答案、御史台审计、有限推荐、宰相简报、DailySummary、可审核 EpisodeSpec、人工批准到 MP4 导出的完整链路。
-- 闭环测试确认新主题由 `ThemeSpec` 数据驱动，不需要新增主题专用 Python 分支、重新分块或重建索引。
-- 持久化 HTTP/RQ 编排等外围能力仍保留在 API 契约中，后续应作为独立窄任务实现。
-- 测试命令：`python -m pytest test/test_alpha_end_to_end.py`。
+不得以“已有类似代码”替代契约验收，也不得为了通过完成率而降低审计、来源边界或用户确认标准。
