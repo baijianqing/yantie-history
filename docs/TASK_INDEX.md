@@ -2,7 +2,7 @@
 
 状态：阶段0任务 DAG 冻结版
 
-任务标识：`A0-DOC-005`
+任务标识：`A0-DOC-005-R1.1`
 
 本文是任务编号、依赖、修改边界和验收入口的权威来源。旧实现中的主权账本、内容工坊、议题编译器、御史台、三部或宰相任务不属于当前冻结路线，不得据此继续排期。
 
@@ -13,6 +13,8 @@
 - 公共 Schema、迁移、根配置和 `AGENTS.md` 不得由并行任务同时修改。
 - 任务完成不等于对象可用；只有满足所属阶段退出条件并通过 Golden Cases，能力才可对用户标记为已交付。
 - 现有代码与冻结文档不一致是阶段0允许状态；进入实现后，代码必须向冻结契约收敛，不得反向恢复旧对象。
+- 阶段1只允许修正冻结文档中的拼写、字段遗漏、引用错误和无法实现的机械矛盾。新增对象、改变状态机、放宽审计门禁、改变用户确认或阶段边界时，任务必须暂停，建立 ADR，并重新执行 A0-GATE-001。
+- Feature Flag 由 A1-COMMAND-001 维护注册表、默认值和审计事实；A1-API-001 Epic 负责暴露只读能力状态。Flag 不得改写领域历史，Core Alpha Complete 四项能力必须拥有独立开关。
 
 状态值：`completed / in_progress / pending / blocked / superseded`。
 
@@ -20,28 +22,61 @@
 
 ```mermaid
 flowchart TB
-    D1["A0-DOC-001..004<br/>冻结架构与契约"] --> D5["A0-DOC-005<br/>Roadmap 与任务 DAG"]
+    D1["A0-DOC-001..004<br/>冻结架构与契约"] --> D5["A0-DOC-005-R1.1<br/>Roadmap 与任务 DAG"]
     D5 --> D6["A0-DOC-006<br/>检索策略"]
     D5 --> E0["A0-EVAL-001<br/>Golden Cases"]
     D6 --> G0["A0-GATE-001<br/>阶段0冻结审查"]
     E0 --> G0
 
-    G0 --> C1["A1-CONTRACT-001<br/>Schema 映射"]
-    C1 --> P1["A1-PERSIST-001<br/>持久化与 Repository"]
-    C1 --> M1["A1-COMMAND-001<br/>命令、幂等与事件"]
-    P1 --> K1["A1-KNOWLEDGE-001<br/>知识身份读取"]
-    P1 --> CA1["A1-CASE-001<br/>ResearchCase"]
+    G0 --> C1A["A1-CONTRACT-001A<br/>公共 Envelope"]
+    C1A --> C1B["001B<br/>Case/Scope/Plan"]
+    C1A --> C1C["001C<br/>Run/Evidence/Judgment"]
+    C1A --> C1D["001D<br/>Decision/Internal"]
+    C1B --> CG["A1-CONTRACT-001<br/>Epic Gate"]
+    C1C --> CG
+    C1D --> CG
+
+    CG --> P1A["A1-PERSIST-001A<br/>Foundation"]
+    P1A --> P1B["001B<br/>Case/Scope"]
+    P1B --> P1C["001C<br/>Run/Evidence"]
+    P1C --> P1D["001D<br/>Judgment/Decision"]
+    P1D --> PG["A1-PERSIST-001<br/>Epic Gate"]
+
+    PG --> M1["A1-COMMAND-001<br/>命令、幂等与事件"]
+    PG --> K1["A1-KNOWLEDGE-001<br/>知识身份读取"]
+    PG --> CA1["A1-CASE-001<br/>ResearchCase"]
+    CG --> M1
+    M1 --> EG1["A1-EGRESS-001<br/>出站策略"]
+    PG --> EG1
     K1 --> S1["A1-SCOPE-001<br/>范围与计划"]
     CA1 --> S1
+    M1 --> S1
     M1 --> X1["A1-EXECUTION-001<br/>Run 生命周期"]
     S1 --> X1
     X1 --> R1["A1-RETRIEVAL-001<br/>来源感知检索"]
+    EG1 --> R1
     D6 --> R1
     R1 --> J1["A1-JUDGMENT-001<br/>证据与判断"]
+    EG1 --> J1
     J1 --> A1["A1-AUDIT-001<br/>审计与用途"]
+    EG1 --> A1
     A1 --> DE1["A1-DECISION-001<br/>用户处置"]
-    DE1 --> API1["A1-API-001<br/>Minimum Slice API"]
-    API1 --> UI1["A1-UI-001<br/>工作台"]
+    CA1 --> API1A["A1-API-001A<br/>Knowledge/Case/Scope"]
+    S1 --> API1A
+    K1 --> API1A
+    X1 --> API1B["A1-API-001B<br/>Run/Judgment/Audit"]
+    A1 --> API1B
+    DE1 --> API1C["A1-API-001C<br/>Decision/Internal"]
+    M1 --> API1C
+    API1A --> API1D["A1-API-001D<br/>Assembly/OpenAPI"]
+    API1B --> API1D
+    API1C --> API1D
+    API1D --> APIG["A1-API-001<br/>Epic Gate"]
+    M1 --> DG1["A1-DIAGNOSTICS-001<br/>Technical Trace"]
+    X1 --> DG1
+    EG1 --> DG1
+    APIG --> UI1["A1-UI-001<br/>工作台"]
+    DG1 --> UI1
     UI1 --> E1["A1-E2E-001<br/>Minimum Slice 验收"]
 
     E1 --> AT2["A2-ATTENTION-001"]
@@ -71,7 +106,7 @@ flowchart TB
 - 回滚方式：逐提交回退对应文档修订。
 - 文档更新：任务本身即文档更新。
 
-### A0-DOC-005：同步 Roadmap 与任务索引
+### A0-DOC-005-R1.1：同步 Roadmap 与任务索引
 
 - 状态：`completed`。
 - 价值：删除旧实施路线，建立从阶段0到 Core Alpha Complete 的唯一任务 DAG。
@@ -90,7 +125,7 @@ flowchart TB
 
 - 状态：`pending`。
 - 价值：把“从哪里找、怎样找、何时停止、如何打包证据”变成可评测策略。
-- 依赖：A0-DOC-005。
+- 依赖：A0-DOC-005-R1.1。
 - 允许修改范围：新增 `docs/RAG_RETRIEVAL_STRATEGY.md`。
 - 禁止修改范围：检索代码、索引、Embedding、Chroma、数据库和运行态数据。
 - 输入：KnowledgeScope、ResearchPlan、五种 research mode、现有检索能力与真实失败案例。
@@ -105,7 +140,7 @@ flowchart TB
 
 - 状态：`pending`。
 - 价值：在实现前固定真实失败案例、分层断言和发布质量门。
-- 依赖：A0-DOC-005；可与 A0-DOC-006 并行，但最终需同步检索指标。
+- 依赖：A0-DOC-005-R1.1；可与 A0-DOC-006 并行，但最终需同步检索指标。
 - 允许修改范围：新增 `docs/CORE_ALPHA_EVALUATION.md`。
 - 禁止修改范围：测试代码、fixture 数据、模型、索引和业务实现。
 - 输入：业务架构冻结验收场景、API Outcome、检索失败案例。
@@ -120,7 +155,7 @@ flowchart TB
 
 - 状态：`pending`。
 - 价值：确认文档能够作为实现稳定上游。
-- 依赖：A0-DOC-005、A0-DOC-006、A0-EVAL-001。
+- 依赖：A0-DOC-005-R1.1、A0-DOC-006、A0-EVAL-001。
 - 允许修改范围：仅更新 `docs/ROADMAP.md` 与 `docs/TASK_INDEX.md` 的阶段状态。
 - 禁止修改范围：架构内容、代码、迁移、配置和运行态数据。
 - 输入：全部阶段0权威文档及 Git 状态。
@@ -135,47 +170,175 @@ flowchart TB
 
 以下任务全部为 `pending`，只有 A0-GATE-001 完成后才能启动。
 
-### A1-CONTRACT-001：冻结对象到 Pydantic Schema 映射
+Contract 子任务不得并行修改共享导出文件或 API 文档；Persistence 子任务因共享迁移链必须按 A -> B -> C -> D 串行执行。API 子任务可以分别实现 router，但公共 app 接线只由专门的 assembly 子任务修改。
 
-- 价值：让领域与 API 契约成为可执行校验，不复用旧对象名称。
+### A1-CONTRACT-001：Schema 映射 Epic Gate
+
+- 价值：确认四组 Pydantic 映射共同覆盖 Minimum Slice 冻结契约。
+- 依赖：A1-CONTRACT-001A、A1-CONTRACT-001B、A1-CONTRACT-001C、A1-CONTRACT-001D。
+- 允许修改范围：contracts 公共导出文件、`test/test_core_alpha_contract_exports.py` 和本 Epic 状态。
+- 禁止修改范围：子模块 Schema 语义、业务代码、API、数据库和冻结语义。
+- 输入：四个子任务的测试与 JSON Schema 导出。
+- 输出：Schema 映射 Gate 结论。
+- 接口：统一 contracts 包导出清单。
+- 验收标准：无重复类型、循环导入、字段漂移或额外字段放行。
+- 测试命令：四个 contract 子任务测试、`python -m pytest test/test_core_alpha_contract_exports.py` 与 JSON Schema 快照检查。
+- 回滚方式：保持 Gate 未完成并退回失败子任务。
+- 文档更新：仅任务状态。
+
+### A1-CONTRACT-001A：公共值对象与 Envelope
+
+- 价值：先冻结所有模块共享的基础 JSON/Python 类型。
 - 依赖：A0-GATE-001。
-- 允许修改范围：新增一个 Core Alpha contracts 模块、`test/test_core_alpha_contracts.py`、`docs/API_CONTRACTS.md` 的直接勘误。
-- 禁止修改范围：数据库、路由、Worker、检索、UI、根配置和旧模块重构。
-- 输入：DOMAIN_MODEL R1.2.2 与 API_CONTRACTS R1.2.1。
-- 输出：Minimum Slice Pydantic request/response/value-object Schema。
-- 接口：稳定 Python 导入路径和 JSON Schema 导出。
-- 验收标准：双 ID、条件必填、状态正交、服务端拥有字段和严格额外字段校验通过。
-- 测试命令：`python -m pytest test/test_core_alpha_contracts.py`。
-- 回滚方式：删除新增 contracts 模块与测试。
-- 文档更新：仅记录实现映射勘误，不改变业务语义。
+- 允许修改范围：Core Alpha contracts 公共模块、`test/test_core_alpha_contract_common.py`、API 契约机械勘误。
+- 禁止修改范围：领域资源 Schema、数据库、路由和业务实现。
+- 输入：OpenCodeValue、ResourceReference、CommandContext、Error、Consistency、分页和幂等契约。
+- 输出：公共值对象、请求/响应 Envelope 与 JSON Schema。
+- 接口：contracts 公共导入路径。
+- 验收标准：严格额外字段、UTC、Hash、cursor、revision 与多聚合 consistency 校验通过。
+- 测试命令：`python -m pytest test/test_core_alpha_contract_common.py`。
+- 回滚方式：删除公共 contracts 模块和测试。
+- 文档更新：仅 API 契约机械勘误。
 
-### A1-PERSIST-001：聚合持久化与 Repository Port
+### A1-CONTRACT-001B：Case、Scope 与 Plan Schema
 
-- 价值：为权威状态、版本、revision 和 current pointer 提供事务边界。
+- 价值：把问题、来源、范围与研究计划变成可执行契约。
+- 依赖：A1-CONTRACT-001A。
+- 允许修改范围：contracts 的 Case/Scope/Plan 模块、`test/test_core_alpha_contract_scope.py`、API 契约机械勘误。
+- 禁止修改范围：Run、Judgment、数据库、路由和业务实现。
+- 输入：ResearchCase、Question、SourceResolution、KnowledgeScope、ResearchPlan 领域定义。
+- 输出：对应 request/response Schema。
+- 接口：Case/Scope/Plan contracts 导出。
+- 验收标准：双 ID、SourceBinding 一致性、条件必填与版本字段测试通过。
+- 测试命令：`python -m pytest test/test_core_alpha_contract_scope.py`。
+- 回滚方式：删除该 contracts 子模块和测试。
+- 文档更新：仅 API 契约机械勘误。
+
+### A1-CONTRACT-001C：Run、Evidence 与 Judgment Schema
+
+- 价值：冻结执行、证据、理由链、Claim、判断和审计表示。
+- 依赖：A1-CONTRACT-001A。
+- 允许修改范围：contracts 的 execution/judgment 模块、`test/test_core_alpha_contract_judgment.py`、API 契约机械勘误。
+- 禁止修改范围：Decision、数据库、路由和业务实现。
+- 输入：Run、Evidence、Judgment、Audit、DecisionFitness 领域定义。
+- 输出：对应 request/response Schema 与判别联合 Rationale。
+- 接口：execution/judgment contracts 导出。
+- 验收标准：状态维度分离、Outcome 条件、EvidenceUse 和 Rationale profile 测试通过。
+- 测试命令：`python -m pytest test/test_core_alpha_contract_judgment.py`。
+- 回滚方式：删除该 contracts 子模块和测试。
+- 文档更新：仅 API 契约机械勘误。
+
+### A1-CONTRACT-001D：Decision 与 Internal Command Schema
+
+- 价值：冻结用户处置、内部候选提交与命令结果边界。
+- 依赖：A1-CONTRACT-001A。
+- 允许修改范围：contracts 的 decision/internal 模块、`test/test_core_alpha_contract_decision.py`、API 契约机械勘误。
+- 禁止修改范围：Action、知识贡献、数据库、路由和业务实现。
+- 输入：Disposition、Internal Command、Idempotency 与 Outcome 契约。
+- 输出：Decision request/response 和 Internal command Schema。
+- 接口：decision/internal contracts 导出。
+- 验收标准：用户决定、证据状态、命令上下文和 Payload 不混用。
+- 测试命令：`python -m pytest test/test_core_alpha_contract_decision.py`。
+- 回滚方式：删除该 contracts 子模块和测试。
+- 文档更新：仅 API 契约机械勘误。
+
+### A1-PERSIST-001：Persistence Epic Gate
+
+- 价值：确认四个持久化切片共同满足聚合事务与版本不变量。
+- 依赖：A1-PERSIST-001A、A1-PERSIST-001B、A1-PERSIST-001C、A1-PERSIST-001D。
+- 允许修改范围：仅更新 `docs/TASK_INDEX.md` 中本 Epic 状态。
+- 禁止修改范围：Repository、迁移、业务代码和冻结语义。
+- 输入：四个持久化子任务的迁移、测试和回滚记录。
+- 输出：Persistence Gate 结论。
+- 接口：Repository Port 完整清单。
+- 验收标准：事务边界、外键、revision、不可变记录和 current pointer 一致。
+- 测试命令：全部 persistence 子任务测试与迁移往返检查。
+- 回滚方式：保持 Gate 未完成并退回失败子任务。
+- 文档更新：仅任务状态。
+
+### A1-PERSIST-001A：Persistence Foundation
+
+- 价值：建立 SQLite 短事务、迁移基线和 Repository 公共机制。
 - 依赖：A1-CONTRACT-001。
-- 允许修改范围：一个 Core Alpha persistence 模块、一个迁移、`test/test_core_alpha_repositories.py`、`docs/TECHNICAL_ARCHITECTURE.md` 直接勘误。
-- 禁止修改范围：API、检索、Worker、Streamlit、旧表数据迁移和根配置。
-- 输入：聚合边界、逻辑持久化集合和 Schema。
-- 输出：ResearchCase、ResearchRun、Evidence、Judgment、Decision 的 Repository Port 与 SQLite 实现。
-- 接口：create/get/current/list/compare-and-swap；不提供通用 `update_status`。
-- 验收标准：短事务、WAL 兼容、revision 冲突、版本原子切换和不可变记录测试通过。
-- 测试命令：`python -m pytest test/test_core_alpha_repositories.py`。
-- 回滚方式：回退模块、测试和本任务迁移。
-- 文档更新：技术架构中的物理映射记录。
+- 允许修改范围：Core Alpha persistence foundation、一个迁移、`test/test_core_alpha_persistence_foundation.py`、技术架构机械勘误。
+- 禁止修改范围：具体聚合 Repository、API、Worker 和旧数据迁移。
+- 输入：通用 ID、revision、版本、事件和事务契约。
+- 输出：连接/事务管理、迁移、Repository base 与 compare-and-swap。
+- 接口：UnitOfWork 与 Repository 基础 Port。
+- 验收标准：WAL、短事务、并发冲突和迁移回滚测试通过。
+- 测试命令：`python -m pytest test/test_core_alpha_persistence_foundation.py`。
+- 回滚方式：回退 foundation、测试和本任务迁移。
+- 文档更新：仅技术架构机械勘误。
+
+### A1-PERSIST-001B：Case 与 Scope Repository
+
+- 价值：持久化 Case 聚合中的问题、解析、范围和计划版本。
+- 依赖：A1-PERSIST-001A、A1-CONTRACT-001B。
+- 允许修改范围：Case/Scope Repository、一个迁移、`test/test_core_alpha_case_scope_repository.py`、技术架构机械勘误。
+- 禁止修改范围：Run、Judgment、API 和业务 Handler。
+- 输入：Case/Scope/Plan Schema 与聚合边界。
+- 输出：Case/Scope Repository 实现。
+- 接口：create/get/current/list/compare-and-swap。
+- 验收标准：版本原子切换、current pointer 和不可变问题/解析记录测试通过。
+- 测试命令：`python -m pytest test/test_core_alpha_case_scope_repository.py`。
+- 回滚方式：回退 Repository、测试和本任务迁移。
+- 文档更新：仅技术架构机械勘误。
+
+### A1-PERSIST-001C：Run 与 Evidence Repository
+
+- 价值：持久化执行、检查点、Outcome、Trace 和证据使用关系。
+- 依赖：A1-PERSIST-001B、A1-CONTRACT-001C。
+- 允许修改范围：Run/Evidence Repository、一个迁移、`test/test_core_alpha_run_evidence_repository.py`、技术架构机械勘误。
+- 禁止修改范围：Judgment、Decision、API 和业务 Handler。
+- 输入：Run/Evidence Schema 与聚合边界。
+- 输出：Run/Evidence Repository 实现。
+- 接口：Run append、Outcome commit、Evidence revision 与 use 查询。
+- 验收标准：终态 Outcome 原子性、Evidence 不可变身份和 use 快照测试通过。
+- 测试命令：`python -m pytest test/test_core_alpha_run_evidence_repository.py`。
+- 回滚方式：回退 Repository、测试和本任务迁移。
+- 文档更新：仅技术架构机械勘误。
+
+### A1-PERSIST-001D：Judgment 与 Decision Repository
+
+- 价值：持久化判断版本、审计、用途、Proposal 与用户处置。
+- 依赖：A1-PERSIST-001C、A1-CONTRACT-001C、A1-CONTRACT-001D。
+- 允许修改范围：Judgment/Decision Repository、一个迁移、`test/test_core_alpha_judgment_decision_repository.py`、技术架构机械勘误。
+- 禁止修改范围：Run、API 和业务 Handler。
+- 输入：Judgment/Decision Schema 与聚合边界。
+- 输出：Judgment/Decision Repository 实现。
+- 接口：version/current、audit append、fitness、proposal/confirmation 查询。
+- 验收标准：版本、审计与用户确认状态不复用；跨聚合事实原子提交。
+- 测试命令：`python -m pytest test/test_core_alpha_judgment_decision_repository.py`。
+- 回滚方式：回退 Repository、测试和本任务迁移。
+- 文档更新：仅技术架构机械勘误。
 
 ### A1-COMMAND-001：命令、幂等、事件与 Outbox
 
 - 价值：统一 API 与 Worker 写入路径，防止重复事实和迟到结果复活。
 - 依赖：A1-CONTRACT-001、A1-PERSIST-001。
-- 允许修改范围：一个 application command 模块、`test/test_core_alpha_commands.py`、`docs/TECHNICAL_ARCHITECTURE.md` 直接勘误。
+- 允许修改范围：一个 application command 模块、`test/test_core_alpha_commands.py`、`docs/TECHNICAL_ARCHITECTURE.md` 机械勘误。
 - 禁止修改范围：业务能力 Handler、公开 API、物理队列拓扑和 UI。
 - 输入：CommandContext、consistency envelope、TraceEvent、Tombstone 与 Outbox 契约。
-- 输出：命令分发、幂等存储、事件追加、Outbox 和并发令牌校验。
-- 接口：Application Command Handler 与 Internal Result Adapter Port。
-- 验收标准：相同请求重放、Key 冲突、至少一次投递、过期 Worker 结果和删除防复活测试通过。
+- 输出：命令分发、幂等存储、事件追加、Outbox、并发令牌校验和 Feature Flag 注册表。
+- 接口：Application Command Handler、Internal Result Adapter Port 与只读 Capability/Flag Port。
+- 验收标准：相同请求重放、Key 冲突、至少一次投递、过期 Worker 结果、删除防复活、默认关闭和 Flag 不改写历史测试通过。
 - 测试命令：`python -m pytest test/test_core_alpha_commands.py`。
 - 回滚方式：回退命令模块和测试，不删除既有业务数据。
 - 文档更新：技术架构实现映射。
+
+### A1-EGRESS-001：出站策略与调用审计
+
+- 价值：确保任何外部 Provider 调用在发送资料前经过可拒绝、可审计的统一策略。
+- 依赖：A1-CONTRACT-001、A1-PERSIST-001、A1-COMMAND-001。
+- 允许修改范围：一个 Outbound Data Policy 模块、`test/test_data_egress.py`、`docs/TECHNICAL_ARCHITECTURE.md` 机械勘误。
+- 禁止修改范围：具体检索排序、Prompt 业务内容、Provider 凭据、根配置和第三方遥测启用。
+- 输入：调用目的、材料引用、敏感级别、KnowledgeScope、Provider 与可信 CommandContext。
+- 输出：Provider Invocation Port、fail-closed Egress Policy、MaterialManifest 和脱敏/拒绝结果。
+- 接口：LLM、Embedding、Reranker、OCR、Tool 和 Telemetry Adapter 的共享包装 Port。
+- 验收标准：未判定材料不得出站；excluded 内容被阻断；Manifest 不保存完整私有正文、Prompt 或凭据；correlation/causation 可追踪。
+- 测试命令：`python -m pytest test/test_data_egress.py`。
+- 回滚方式：关闭外部 Provider Adapter，保留本地路径和拒绝记录。
+- 文档更新：仅技术架构机械勘误。
 
 ### A1-KNOWLEDGE-001：Knowledge Catalog 身份读取
 
@@ -195,7 +358,7 @@ flowchart TB
 
 - 价值：建立用户侧长期研究聚合，不再以聊天或单次任务代替研究项目。
 - 依赖：A1-PERSIST-001、A1-COMMAND-001。
-- 允许修改范围：一个 Case Management 模块、`test/test_research_case.py`、`docs/DOMAIN_MODEL.md` 直接勘误。
+- 允许修改范围：一个 Case Management 模块、`test/test_research_case.py`、`docs/DOMAIN_MODEL.md` 机械勘误。
 - 禁止修改范围：Scope、Run、检索、判断、API 和 UI。
 - 输入：创建、追问、归档、重开和派生命令。
 - 输出：ResearchCase、ResearchQuestion 与 Case 活动事件。
@@ -203,13 +366,13 @@ flowchart TB
 - 验收标准：派生不移动历史；归档/重开受 revision 控制；问题角色校验通过。
 - 测试命令：`python -m pytest test/test_research_case.py`。
 - 回滚方式：回退模块和测试。
-- 文档更新：领域模型直接勘误。
+- 文档更新：仅领域模型机械勘误；语义变更必须走 ADR 与阶段0 Gate。
 
 ### A1-SCOPE-001：来源解析、KnowledgeScope 与 ResearchPlan
 
 - 价值：同时解决“从哪里找”和“怎样找”。
-- 依赖：A1-CASE-001、A1-KNOWLEDGE-001。
-- 允许修改范围：一个 Scope Governance 模块、`test/test_scope_governance.py`、`docs/RAG_RETRIEVAL_STRATEGY.md` 直接勘误。
+- 依赖：A1-CASE-001、A1-KNOWLEDGE-001、A1-COMMAND-001。
+- 允许修改范围：一个 Scope Governance 模块、`test/test_scope_governance.py`、`docs/RAG_RETRIEVAL_STRATEGY.md` 机械勘误。
 - 禁止修改范围：实际检索、模型生成、Run、API 和 UI。
 - 输入：ResearchQuestion、SourceAnchor、Catalog、研究模式和证据要求。
 - 输出：SourceResolution、版本化 KnowledgeScope、EvidenceRequirement 和 ResearchPlan。
@@ -217,13 +380,13 @@ flowchart TB
 - 验收标准：required/excluded 互斥、Binding 一致性、歧义不回退、历史版本不可改。
 - 测试命令：`python -m pytest test/test_scope_governance.py`。
 - 回滚方式：回退模块和测试。
-- 文档更新：检索策略直接勘误。
+- 文档更新：仅检索策略机械勘误；策略语义变化必须走 ADR 与阶段0 Gate。
 
 ### A1-EXECUTION-001：ResearchRun 生命周期
 
 - 价值：让研究执行、重试、取消、失败和结束具有可审计语义。
 - 依赖：A1-SCOPE-001、A1-COMMAND-001。
-- 允许修改范围：一个 Research Execution 模块、`test/test_research_run.py`、`docs/TECHNICAL_ARCHITECTURE.md` 直接勘误。
+- 允许修改范围：一个 Research Execution 模块、`test/test_research_run.py`、`docs/TECHNICAL_ARCHITECTURE.md` 机械勘误。
 - 禁止修改范围：具体检索算法、Claim 生成、审计、公开 API 和 UI。
 - 输入：固定 Scope/Plan、execution mode 和 RunExecutionSpec。
 - 输出：ResearchRun、Attempt、RetrievalRun 记录、Outcome、Checkpoint 和 Public Trace。
@@ -231,13 +394,13 @@ flowchart TB
 - 验收标准：终态与唯一 Outcome 原子提交；基础设施重投不创建新 Attempt；零 RetrievalRun 路径合法。
 - 测试命令：`python -m pytest test/test_research_run.py`。
 - 回滚方式：回退模块和测试。
-- 文档更新：技术架构直接勘误。
+- 文档更新：仅技术架构机械勘误；边界变化必须走 ADR 与阶段0 Gate。
 
 ### A1-RETRIEVAL-001：来源感知检索与证据使用
 
 - 价值：消除 Chunk 数量霸权，并形成可追溯的本次证据使用事实。
-- 依赖：A1-EXECUTION-001、A0-DOC-006。
-- 允许修改范围：一个 Knowledge Access/检索编排模块、`test/test_source_aware_retrieval.py`、`docs/RAG_RETRIEVAL_STRATEGY.md` 直接勘误。
+- 依赖：A1-EXECUTION-001、A1-EGRESS-001、A0-DOC-006。
+- 允许修改范围：一个 Knowledge Access/检索编排模块、`test/test_source_aware_retrieval.py`、`docs/RAG_RETRIEVAL_STRATEGY.md` 机械勘误。
 - 禁止修改范围：重切块、全量重建索引、Judgment、Audit、API 和 UI。
 - 输入：KnowledgeScope、ResearchPlan、Catalog、现有全文与向量检索 Port。
 - 输出：RetrievalRun、候选融合、Context 包、EvidenceUnit 提取和 ResearchEvidenceUse。
@@ -245,13 +408,13 @@ flowchart TB
 - 验收标准：required 独立报告、excluded 零污染、短书公平、稳定排序、双预算和反证召回通过。
 - 测试命令：`python -m pytest test/test_source_aware_retrieval.py`。
 - 回滚方式：关闭新策略开关并回退模块和测试。
-- 文档更新：检索策略直接勘误。
+- 文档更新：仅检索策略机械勘误；策略语义变化必须走 ADR 与阶段0 Gate。
 
 ### A1-JUDGMENT-001：Evidence、Rationale、Claim 与 JudgmentCard
 
 - 价值：把证据和推理组织为可逐条审计的判断。
-- 依赖：A1-RETRIEVAL-001。
-- 允许修改范围：一个 Judgment 模块、`test/test_judgment_domain.py`、`docs/DOMAIN_MODEL.md` 直接勘误。
+- 依赖：A1-RETRIEVAL-001、A1-EGRESS-001。
+- 允许修改范围：一个 Judgment 模块、`test/test_judgment_domain.py`、`docs/DOMAIN_MODEL.md` 机械勘误。
 - 禁止修改范围：Audit Gate、Decision、Action、API 和 UI。
 - 输入：ResearchEvidenceUse、研究模式和结构化模型候选。
 - 输出：ClaimEvidenceLink、JudgmentRationale、版本化 Claim 与 JudgmentCard 草稿。
@@ -259,13 +422,13 @@ flowchart TB
 - 验收标准：事实/解释/推断/假设/建议理由链裁剪正确；用户态度不改变证据状态；重复证据不增计。
 - 测试命令：`python -m pytest test/test_judgment_domain.py`。
 - 回滚方式：回退模块和测试，保留原 Trace。
-- 文档更新：领域模型直接勘误。
+- 文档更新：仅领域模型机械勘误；语义变更必须走 ADR 与阶段0 Gate。
 
 ### A1-AUDIT-001：Audit Pipeline 与 DecisionFitness
 
 - 价值：阻止无证据、来源越界或用途过强的判断被展示为可靠。
-- 依赖：A1-JUDGMENT-001。
-- 允许修改范围：Judgment 模块内审计子模块、`test/test_judgment_audit.py`、`docs/TECHNICAL_ARCHITECTURE.md` 直接勘误。
+- 依赖：A1-JUDGMENT-001、A1-EGRESS-001。
+- 允许修改范围：Judgment 模块内审计子模块、`test/test_judgment_audit.py`、`docs/TECHNICAL_ARCHITECTURE.md` 机械勘误。
 - 禁止修改范围：Decision、Action、检索策略、API 和 UI。
 - 输入：JudgmentCard version、Finding 候选、策略版本和降级能力记录。
 - 输出：JudgmentAudit、AuditFinding、WarningAcknowledgement 和 DecisionFitness。
@@ -273,13 +436,13 @@ flowchart TB
 - 验收标准：blocking 不可确认放行；warning 确认可追溯；LLM 不单独决定 ready；用途越级被拒绝。
 - 测试命令：`python -m pytest test/test_judgment_audit.py`。
 - 回滚方式：回退审计子模块和测试，默认保持判断不可采纳。
-- 文档更新：技术架构直接勘误。
+- 文档更新：仅技术架构机械勘误；边界变化必须走 ADR 与阶段0 Gate。
 
 ### A1-DECISION-001：DispositionProposal 与 ResearchDisposition
 
 - 价值：让用户而不是系统决定研究如何结束。
 - 依赖：A1-AUDIT-001。
-- 允许修改范围：一个 Decision 模块、`test/test_research_disposition.py`、`docs/DOMAIN_MODEL.md` 直接勘误。
+- 允许修改范围：一个 Decision 模块、`test/test_research_disposition.py`、`docs/DOMAIN_MODEL.md` 机械勘误。
 - 禁止修改范围：Action、Knowledge Contribution、API 和 UI。
 - 输入：可采纳 JudgmentCard、DecisionFitness、有效 warning 确认和用户决定。
 - 输出：版本化 DispositionProposal 与不可变 ResearchDisposition。
@@ -287,27 +450,97 @@ flowchart TB
 - 验收标准：未确认不形成处置；blocked/证据不足不伪装处置；条件字段和用途匹配。
 - 测试命令：`python -m pytest test/test_research_disposition.py`。
 - 回滚方式：回退模块和测试。
-- 文档更新：领域模型直接勘误。
+- 文档更新：仅领域模型机械勘误；语义变更必须走 ADR 与阶段0 Gate。
 
-### A1-API-001：Minimum Slice HTTP API
+### A1-API-001：Minimum Slice API Epic Gate
 
-- 价值：按冻结契约暴露完整可靠判断闭环。
-- 依赖：A1-DECISION-001、A1-COMMAND-001。
-- 允许修改范围：一个 Core Alpha API router、`test/test_core_alpha_api.py`、`docs/API_CONTRACTS.md` 直接勘误。
-- 禁止修改范围：领域规则、旧路由删除、Streamlit、Worker 和根配置。
-- 输入：Application Command/Query Handlers 与 R1.2.1 API Schema。
-- 输出：Minimum Slice `/alpha` 与受限 `/internal/alpha` 路由。
+- 价值：确认三个路由切片共同实现冻结公开与 Internal API。
+- 依赖：A1-API-001A、A1-API-001B、A1-API-001C、A1-API-001D。
+- 允许修改范围：仅更新 `docs/TASK_INDEX.md` 中本 Epic 状态。
+- 禁止修改范围：路由、领域规则和 API 契约语义。
+- 输入：三个 API 子任务的 OpenAPI、契约测试和回滚记录。
+- 输出：Minimum Slice API Gate 结论。
 - 接口：API_CONTRACTS 第 2、4、6、7 章。
-- 验收标准：状态码、幂等、revision、current、Outcome、权限和 consistency 契约测试通过。
-- 测试命令：`python -m pytest test/test_core_alpha_api.py`。
-- 回滚方式：移除新 router 接线并回退测试。
-- 文档更新：API 契约仅记实现勘误。
+- 验收标准：路由无重复、Envelope 一致、权限边界清晰且 OpenAPI 可生成。
+- 测试命令：三个 API 子任务测试与 OpenAPI 快照检查。
+- 回滚方式：保持 Gate 未完成并退回失败子任务。
+- 文档更新：仅任务状态。
+
+### A1-API-001A：Knowledge、Case 与 Scope API
+
+- 价值：暴露知识身份、研究项目、来源解析、范围和计划入口。
+- 依赖：A1-KNOWLEDGE-001、A1-CASE-001、A1-SCOPE-001、A1-CONTRACT-001。
+- 允许修改范围：一个 Core Alpha API router 子模块、`test/test_core_alpha_api_scope.py`、API 契约机械勘误。
+- 禁止修改范围：Run、Judgment、Decision、Developer API 和 UI。
+- 输入：对应 Query/Command Handler 与冻结 API Schema。
+- 输出：API_CONTRACTS 4.1 至 4.5 路由。
+- 接口：Knowledge Catalog、ResearchCase、SourceResolution、KnowledgeScope、ResearchPlan。
+- 验收标准：状态码、幂等、version/current、SourceBinding 和读后写契约通过。
+- 测试命令：`python -m pytest test/test_core_alpha_api_scope.py`。
+- 回滚方式：移除该 router 子模块和测试。
+- 文档更新：仅 API 契约机械勘误。
+
+### A1-API-001B：Run、Evidence、Judgment 与 Audit API
+
+- 价值：暴露研究执行、证据、判断、审计和用途读取/确认入口。
+- 依赖：A1-EXECUTION-001、A1-JUDGMENT-001、A1-AUDIT-001、A1-CONTRACT-001。
+- 允许修改范围：一个 Core Alpha API router 子模块、`test/test_core_alpha_api_judgment.py`、API 契约机械勘误。
+- 禁止修改范围：Decision、Developer API、Worker 和 UI。
+- 输入：对应 Query/Command Handler 与冻结 API Schema。
+- 输出：API_CONTRACTS 4.6、4.7、4.9 路由。
+- 接口：ResearchRun、Evidence、Judgment、Audit、Public Trace。
+- 验收标准：同步/异步、Outcome、warning、user attitude 和 Public Trace 脱敏契约通过。
+- 测试命令：`python -m pytest test/test_core_alpha_api_judgment.py`。
+- 回滚方式：移除该 router 子模块和测试。
+- 文档更新：仅 API 契约机械勘误。
+
+### A1-API-001C：Decision 与 Internal API
+
+- 价值：暴露用户处置并接收受信 Worker 候选，不混用普通用户权限。
+- 依赖：A1-DECISION-001、A1-COMMAND-001、A1-CONTRACT-001。
+- 允许修改范围：一个 Decision/Internal router 子模块、`test/test_core_alpha_api_decision.py`、API 契约机械勘误。
+- 禁止修改范围：Developer API、Action、知识贡献和 UI。
+- 输入：Decision Handler、Internal Result Adapter 与冻结 API Schema。
+- 输出：API_CONTRACTS 4.8、6、7 章路由。
+- 接口：DispositionProposal、ResearchDisposition、SubmitCandidateResultCommand。
+- 验收标准：用户确认、服务身份、幂等重放、并发与受限网络边界测试通过。
+- 测试命令：`python -m pytest test/test_core_alpha_api_decision.py`。
+- 回滚方式：移除该 router 子模块和测试。
+- 文档更新：仅 API 契约机械勘误。
+
+### A1-API-001D：API Assembly、Feature 状态与 OpenAPI
+
+- 价值：在单一所有者下完成 router 接线和目标 OpenAPI 汇总，避免并行任务修改公共入口。
+- 依赖：A1-API-001A、A1-API-001B、A1-API-001C。
+- 允许修改范围：FastAPI 公共接线文件、`test/test_core_alpha_openapi.py`、API 契约机械勘误。
+- 禁止修改范围：子路由业务逻辑、领域规则、Developer API 和 UI。
+- 输入：三个已测试 router 与 A1-COMMAND-001 的只读 Capability/Flag Port。
+- 输出：统一 `/alpha`、`/internal/alpha` 接线、只读 Feature 状态和 OpenAPI 文档。
+- 接口：API router registry、Capability/Flag query 与 OpenAPI schema。
+- 验收标准：无重复 route ID；默认关闭策略正确；OpenAPI 与冻结路由/Schema 一致。
+- 测试命令：`python -m pytest test/test_core_alpha_openapi.py`。
+- 回滚方式：移除统一 router 注册，不改子模块。
+- 文档更新：仅 API 契约机械勘误。
+
+### A1-DIAGNOSTICS-001：技术 Trace 与 Developer API
+
+- 价值：为调试、降级和审计提供受限技术视图，同时保持普通 Trace 脱敏。
+- 依赖：A1-COMMAND-001、A1-EXECUTION-001、A1-EGRESS-001。
+- 允许修改范围：一个 Diagnostics/Projection 模块、Developer router、`test/test_core_alpha_diagnostics.py`、API 契约机械勘误。
+- 禁止修改范围：普通产品 API、领域状态、Provider 凭据和完整私有正文保存。
+- 输入：TraceEvent、RunExecutionSpec、MaterialManifest、IndexGeneration、预算和 projection checkpoint。
+- 输出：DeveloperResearchTrace、CaseActivityLog、MaterialManifest 查询和 projection status。
+- 接口：API_CONTRACTS 第 8 章；独立 developer access policy。
+- 验收标准：普通/Developer Trace 隔离；敏感字段不返回；lag、失败和材料出站可追踪。
+- 测试命令：`python -m pytest test/test_core_alpha_diagnostics.py`。
+- 回滚方式：移除 Developer router 并关闭 Diagnostics Feature Flag。
+- 文档更新：仅 API 契约机械勘误。
 
 ### A1-UI-001：Minimum Slice 认知工作台
 
 - 价值：让用户实际提出问题、治理来源、审阅判断并确认处置。
-- 依赖：A1-API-001。
-- 允许修改范围：Streamlit 中一个 Core Alpha 工作台页面、一个 UI 测试目录、`docs/BUSINESS_ARCHITECTURE.md` 直接勘误。
+- 依赖：A1-API-001、A1-DIAGNOSTICS-001。
+- 允许修改范围：Streamlit 中一个 Core Alpha 工作台页面、一个 UI 测试目录、`docs/BUSINESS_ARCHITECTURE.md` 机械勘误。
 - 禁止修改范围：领域、API、检索、旧页面删除和全局视觉重构。
 - 输入：Minimum Slice API。
 - 输出：工作台、证据/Claim 展示、审计状态、处置确认与 Developer 跳转。
@@ -315,7 +548,7 @@ flowchart TB
 - 验收标准：桌面与移动关键视口无重叠；草稿/阻断/可采纳区分；excluded/required 可见；确认动作不混用。
 - 测试命令：UI 单测、Playwright 关键路径与截图检查。
 - 回滚方式：移除新页面入口，保留旧 Streamlit。
-- 文档更新：业务架构直接勘误。
+- 文档更新：仅业务架构机械勘误；价值或阶段边界变化必须走 ADR 与阶段0 Gate。
 
 ### A1-E2E-001：Minimum Slice 发布门
 
@@ -339,7 +572,7 @@ flowchart TB
 
 - 价值：约束研究投入而不替用户关闭问题。
 - 依赖：A1-E2E-001。
-- 允许修改范围：Case Management 的 Triage/Backlog 子模块、对应测试、API 契约直接勘误。
+- 允许修改范围：Case Management 的 Triage/Backlog 子模块、对应测试、API 契约机械勘误。
 - 禁止修改范围：画像、榜单、行动、知识贡献。
 - 输入：ResearchCase、初步来源解析、注意力上限和用户决定。
 - 输出：ResearchTriage、AttentionBacklogItem 和软门禁事件。
@@ -347,13 +580,13 @@ flowchart TB
 - 验收标准：达到上限不丢问题、不自动关 Case；覆盖可追溯。
 - 测试命令：对应 schema、repository、API 与软门禁测试。
 - 回滚方式：关闭注意力门禁 Feature Flag。
-- 文档更新：API 或业务架构直接勘误。
+- 文档更新：仅 API 或业务架构机械勘误；语义变更必须走 ADR 与阶段0 Gate。
 
 ### A2-REVIEW-001：JudgmentReview
 
 - 价值：使证据失效和已知系统缺陷能够触发可审计复核。
 - 依赖：A1-E2E-001。
-- 允许修改范围：Judgment 模块复核子模块、对应测试、领域模型直接勘误。
+- 允许修改范围：Judgment 模块复核子模块、对应测试、领域模型机械勘误。
 - 禁止修改范围：自动外部监控、定时提醒、Action 和知识贡献。
 - 输入：JudgmentCard version、触发原因和当前证据状态。
 - 输出：JudgmentReview、ReviewResult 与重新研究/处置建议。
@@ -361,13 +594,13 @@ flowchart TB
 - 验收标准：不覆盖历史判断或处置；改变处置必须二次确认。
 - 测试命令：复核领域、并发、API 和失效传播测试。
 - 回滚方式：关闭复核入口，保留历史记录。
-- 文档更新：领域模型直接勘误。
+- 文档更新：仅领域模型机械勘误；语义变更必须走 ADR 与阶段0 Gate。
 
 ### A2-ACTION-001：低风险行动与复盘
 
 - 价值：把适用判断转成用户确认的小步行动，并用结果反查前提。
 - 依赖：A1-E2E-001。
-- 允许修改范围：一个 Action 模块、对应测试、API 契约直接勘误。
+- 允许修改范围：一个 Action 模块、对应测试、API 契约机械勘误。
 - 禁止修改范围：高风险自动执行、外部系统写操作、画像和知识贡献。
 - 输入：`proceed_to_action` 处置、DecisionFitness、风险输入和用户决定。
 - 输出：ActionProposal、RiskProfile、Commitment、Review。
@@ -375,13 +608,13 @@ flowchart TB
 - 验收标准：越级风险被拒绝；Proposal 不等于 Commitment；复盘可触发 Review 建议。
 - 测试命令：行动领域、风险、API 和复盘测试。
 - 回滚方式：关闭 Action Feature Flag，不影响处置闭环。
-- 文档更新：API 契约直接勘误。
+- 文档更新：仅 API 契约机械勘误；语义变更必须走 ADR 与阶段0 Gate。
 
 ### A2-KNOWLEDGE-001：最小知识贡献
 
 - 价值：把可靠判断可选地沉淀为可撤回、可追溯的知识笔记。
 - 依赖：A1-E2E-001。
-- 允许修改范围：一个 Knowledge Contribution 模块、对应测试、API 契约直接勘误。
+- 允许修改范围：一个 Knowledge Contribution 模块、对应测试、API 契约机械勘误。
 - 禁止修改范围：知识图谱、自动合并、原始资料入库和复杂关系编辑器。
 - 输入：可采纳 JudgmentCard、EvidenceUnit、用户决定和校验结果。
 - 输出：Candidate、KnowledgeAsset 或 UserNote。
@@ -389,7 +622,7 @@ flowchart TB
 - 验收标准：blocked 不沉淀；调整后重校验；派生知识不循环举证；拒绝保持知识体系不变。
 - 测试命令：知识贡献领域、API、失效传播和证据去重测试。
 - 回滚方式：关闭贡献入口，保留判断与处置。
-- 文档更新：API 契约直接勘误。
+- 文档更新：仅 API 契约机械勘误；语义变更必须走 ADR 与阶段0 Gate。
 
 ### A2-E2E-001：Core Alpha Complete 发布门
 

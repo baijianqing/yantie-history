@@ -2,7 +2,7 @@
 
 状态：阶段0交付路线冻结版
 
-任务标识：`A0-DOC-005`
+任务标识：`A0-DOC-005-R1.1`
 
 依赖：业务架构 `A0-DOC-001-R7.1`、技术架构 `A0-DOC-002-R4.1`、领域模型 `A0-DOC-003-R1.2.2`、API 契约 `A0-DOC-004-R1.2.1`
 
@@ -33,11 +33,15 @@ MetaOS 按以下层级交付：
 - 领域模型：聚合、对象、字段、状态、版本、证据、审计、用途与用户确认。
 - API 契约：公开、Developer、Internal 三层路由与精确 JSON 契约。
 
+已完成同步：
+
+- `A0-DOC-005-R1.1`：Roadmap 与任务索引已切换到冻结 Core Alpha 主线，并补齐实施依赖。
+
 剩余交付：
 
-- `A0-DOC-005`：同步本路线图与任务索引。
 - `A0-DOC-006`：冻结来源感知检索与上下文打包策略。
 - `A0-EVAL-001`：建立 Golden Cases、fixture、指标口径和发布门禁。
+- `A0-GATE-001`：完成阶段0人工冻结审查并授权首个实现任务。
 
 退出条件：
 
@@ -63,16 +67,25 @@ ResearchCase
 -> EvidenceUnit / ResearchEvidenceUse
 -> Claim / JudgmentRationale / JudgmentCard
 -> JudgmentAudit / DecisionFitness
--> DispositionProposal
--> 用户确认
--> ResearchDisposition 或 ResearchRunOutcome
+-> ResearchRunOutcome
 ```
+
+当 Outcome 表明已经形成可采纳判断时，才进入用户处置支线：
+
+```text
+-> DispositionProposal
+-> 用户接受 / 调整 / 拒绝
+-> ResearchDisposition 或不形成处置
+```
+
+ResearchRunOutcome 只表达研究如何结束；ResearchDisposition 只表达用户如何处理判断。blocked、证据不足、取消和执行失败不得伪造为用户处置。
 
 ### 3.1 基础契约映射
 
 - 将冻结领域对象映射为 Pydantic Schema。
 - 建立聚合 revision、双 ID 版本、命令幂等和统一事件信封。
 - 建立逻辑持久化集合、Repository Port 和最小迁移。
+- 所有外部 Provider 调用经过共享出站策略，并形成 MaterialManifest。
 
 阶段门：Schema 校验、Repository 并发、幂等重放和迟到结果测试通过。
 
@@ -106,6 +119,7 @@ ResearchCase
 
 - Streamlit 第一屏支持提问、来源约束、研究状态、判断、证据、警告和处置确认。
 - 默认隐藏 Provider、索引、Prompt 和底层降级细节；Developer 视图可查看技术 Trace。
+- Developer 后端提供 Technical Trace、CaseActivityLog、MaterialManifest 和 projection status，并使用独立访问策略。
 - 草稿、审计中、可采纳、阻断和失效状态视觉上可区分。
 
 Minimum Slice 退出条件：
