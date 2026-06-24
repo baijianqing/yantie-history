@@ -4,11 +4,11 @@
 
 任务标识：`A0-DOC-006`
 
-修订标识：`A0-DOC-006-R1.2`
+修订标识：`A0-DOC-006-R1.3`
 
-策略版本：`core-alpha-v1.2-candidate`
+策略版本：`core-alpha-v1.3-candidate`
 
-参数集版本：`core-alpha-v1.2-defaults`
+参数集版本：`core-alpha-v1.3-defaults`
 
 依赖：`A0-DOC-005-R1.1.2`、业务架构 `A0-DOC-001-R7.1`、技术架构 `A0-DOC-002-R4.1`、领域模型 `A0-DOC-003-R1.2.2`、API 契约 `A0-DOC-004-R1.2.1`
 
@@ -40,7 +40,7 @@
 本文区分两类权威内容：
 
 1. **策略不变量**：来源优先于 Chunk、显式约束不可替代、先来源路由再来源内检索、required 独立报告、excluded 零内容污染、证据分组去重、Chunk 与 Token 双预算、停止原因可解释。改变这些不变量必须修改本文、升级 `retrieval_policy_version` 并重新执行 `A0-GATE-001`。
-2. **Alpha 默认参数集**：本文第 5 章给出的数值与算法标识属于 `core-alpha-v1.2-defaults`。`A0-EVAL-001` 只能提供调整证据，不能在评测文档中直接产生新参数。任何参数调整必须回写本文、升级 `parameter_set_version`，并重新通过 A0 Gate。
+2. **Alpha 默认参数集**：本文第 5 章给出的数值与算法标识属于 `core-alpha-v1.3-defaults`。`A0-EVAL-001` 只能提供调整证据，不能在评测文档中直接产生新参数。任何参数调整必须回写本文、升级 `parameter_set_version`，并重新通过 A0 Gate。
 
 同一 ResearchRun 必须在不可变 `RunExecutionSpec` 中固定实际使用的策略版本和参数集版本。运行中的 Run 不因本文后续修改而改变行为。
 
@@ -97,17 +97,34 @@
 - `KnowledgeItem` 的 ID、标题、别名和语言。
 - 当前可用 `KnowledgeItemVersion` 的 ID 与可用性。
 - 可用于路由的摘要、主题词和章节标题结构。
-- 当前 `IndexGeneration`、chunk strategy version、active Chunk 数量和 Token 估算。
-- 可选的来源级全文与向量信号。
+- 各通道对应的 `IndexGeneration`、chunk strategy version、active Chunk 数量和 Token 估算。
+- 来源元数据、标题/别名、结构、来源级全文和来源级向量信号；每个信号分别记录 `valid / stale / unavailable`、信号版本和适用 IndexGeneration。
 - projection version、生成时间和输入版本集合。
 
 投影规则：
 
-- 它只能由权威 KnowledgeItem、KnowledgeItemVersion、Chunk 和有效 IndexGeneration 重建。
+- 它只能由权威 KnowledgeItem、KnowledgeItemVersion、Chunk 和各通道可用的 IndexGeneration 重建。
 - 它不能覆盖、改写或替代显式 `SourceResolution`。
 - 投影缺失时，可以从权威标题、别名、语言、版本可用性和结构元数据临时构建最小视图；不得退化为全库 Chunk 直接竞争。
-- 投影过期但所引用 KnowledgeItemVersion 与 IndexGeneration 仍有效时，可以降级使用，并记录 warning、投影年龄和质量影响。
-- 投影引用的版本或 IndexGeneration 已失效时，不得继续使用；必须重建，或报告来源路由能力不可用。
+- KnowledgeItemVersion 失效时，整个来源视图不可用于检索或自动路由。
+- 某个 IndexGeneration 失效时，只把依赖它的 FTS、vector 或其他通道信号标为 unavailable；不得连带使来源元数据、标题/别名、结构或其他有效通道失效。
+- stale 信号默认不参与 `core-alpha-source-admission-v1` 的准入和 RRF；只有 RunExecutionSpec 明确允许的版本化 fallback 才能使用，并记录 warning、投影年龄和质量影响。
+- 移除无效或 stale 信号后，只要剩余信号仍满足 source admission，就可以继续路由；只有所有必要路由信号不可用，且无法从权威元数据构建最小视图时，才报告来源路由能力不可用。
+- Trace 必须记录每个信号的状态、实际参与 RRF 的信号集合及被排除原因。
+
+### 2.4 策略快照到 RunExecutionSpec 的映射
+
+“进入 RunExecutionSpec”表示策略信息能够由该不可变执行规范唯一解析和复现，不要求为每个策略值增加新的顶层领域字段。映射固定如下：
+
+| 策略信息 | 既有承载位置 |
+| --- | --- |
+| retrieval policy、source/candidate admission、normalization、similarity 与 grouping 版本 | `retrieval_strategy_version` 对应的不可变策略快照 |
+| ContextPack、Chunk/Token、来源集中度观测和预算预留/结算规则 | `context_strategy_version` 对应的不可变参数快照 |
+| tokenizer、Embedding、全文、reranker 与模型版本 | 对应 Capability / provider contract |
+| system evidence budget、per-invocation cap、Run total token 与 cost 上限 | `system_safety_limits` |
+| 实际策略快照 Hash | RunExecutionSpec 的版本身份或关联的不可变技术记录 |
+
+策略快照必须包含本文引用的 policy/parameter 版本及其完整判定表。实现可以将其内嵌或按内容 Hash 引用，但不得只保存一个无法解析的自由文本标签，也不得借本文反向扩张冻结领域模型或 API Schema。
 
 ## 3. 来源路由
 
@@ -162,14 +179,35 @@ source_rrf_score(source)
 - 不得累加同一来源所有 Chunk 的分数、相似度或命中数。
 - 缺失某个可选通道时，在剩余通道上计算，并记录 missing capability 与质量影响；不得为缺失通道伪造最低分。
 
-`source_admission_policy_version=core-alpha-source-admission-v1`。来源进入自动路由候选前至少满足一项可解释准入条件：
+`source_admission_policy_version=core-alpha-source-admission-v1`。文本准入统一使用 `source-routing-tokenization-v1`：Unicode NFKC、拉丁字母小写、统一换行与空白；拉丁字母数字串按词切分，去除空白和标点后的连续中文生成重叠字符 2-gram，查询单元去重。`lexical_coverage` 等于候选文本命中的不同查询单元数除以查询不同单元总数；没有有效查询单元时 lexical 规则不通过。
 
-- 标题或别名精确查询命中。
-- 至少一个来源级通道达到该通道在当前 admission policy 中登记的最低相关性要求。
-- 命中 ResearchPlan 预先固定的来源选择条件。
-- 命中由 A0-EVAL 提出、回写本文并升级版本的其他可解释规则。
+来源进入自动路由候选前，至少通过下表一项：
 
-`max_routed_sources` 是上限，不是必须填满的配额。没有来源通过准入时，记录 `no_admissible_source`、各通道最高候选和拒绝理由，并进入澄清或证据不足路径；不得从全库中强行选择“最不差”的来源。通道相关性门槛必须由 admission policy 与 Capability 版本共同固定在 RunExecutionSpec 中，不能在一次 Run 内动态放宽。
+| admission rule | 输入 | 准入判定 | 失败原因 |
+| --- | --- | --- | --- |
+| `exact-title` | 标题、别名、原始查询 | 使用 `source-title-normalization-v1` 做 NFKC、拉丁小写、折叠空白并移除成对书名号后全文相等 | `no_exact_match` |
+| `plan-selector` | ResearchPlan 的版本化来源选择条件 | 对当前来源元数据执行条件得到 true | `plan_condition_mismatch` |
+| `metadata-lexical` | 摘要、主题词、章节标题的来源级排名与 lexical_coverage | rank <= `source_admission_top_n` (20) 且 coverage >= `source_metadata_lexical_floor` (0.25) | `below_metadata_floor` |
+| `source-fts` | 来源级全文排名与最佳合法命中片段的 lexical_coverage | rank <= `source_admission_top_n` (20) 且 coverage >= `source_fts_lexical_floor` (0.20) | `below_fts_floor` |
+| `source-vector` | evidence_query 与来源路由文本的 cosine similarity | rank <= `source_admission_top_n` (20) 且 cosine >= `source_vector_cosine_floor` (0.45) | `below_vector_floor` |
+
+规则边界：
+
+- source-vector 只接受声明为 cosine 的相似度；若 Provider 返回 cosine distance，按 `1 - distance` 转换。其他度量没有版本化转换时，该信号为 unavailable，不得猜测换算。
+- Source RRF 只对已经通过至少一项准入规则的来源排序，RRF 分数本身不能让未准入来源进入候选。
+- `core-alpha-source-admission-v1` 对五种 research mode 使用相同数值门槛；模式差异由 Plan、来源数量和 Coverage 控制，不得暗中放宽准入。
+- Capability 升级如果改变分词、分数尺度或相似度含义，必须升级 admission/Capability 版本并重新评测；不能沿用未经兼容验证的旧阈值。
+- A0-EVAL 可以提出新规则或阈值，但只有回写本文并升级版本后才生效。
+
+`max_routed_sources` 是上限，不是必须填满的配额。没有来源通过准入时，记录 `no_admissible_source`、各通道最高候选和拒绝理由；不得从全库中强行选择“最不差”的来源。通道准入判定、失败原因、policy 与 Capability 版本必须固定在 RunExecutionSpec 可解析的策略快照中，不能在一次 Run 内动态放宽。
+
+`no_admissible_source` 的执行语义固定为：
+
+- 来源路由正常完成但无来源通过准入时，不创建伪 RetrievalRun；当前 Attempt 可以具有 0 个 RetrievalRun。
+- ResearchTrace 记录 `stop_reason=no_admissible_source`，Coverage 将 mandatory Requirement 保持为未满足，并保留所有来源拒绝原因。
+- Research Execution 通常据此形成 `insufficient_evidence`。
+- 只有来源路由所需的全部必要 Capability 均不可用，且无法从权威元数据构建最小 SourceRoutingView 时，才形成 routing capability failure，并在没有合法复用证据时映射为 `execution_failed`。
+- 只有 ResearchPlan 已明确规定“缺少来源或问题歧义时需要用户澄清”，执行层才进入 awaiting_user；Retrieval Router 不得自行创建 ResearchQuestion 或澄清问题。
 
 来源稳定排序固定为：
 
@@ -281,12 +319,12 @@ QueryVariant 是一轮检索所使用的结构化查询变体，至少标识：
 
 ## 5. Alpha 默认参数集
 
-以下参数属于 `parameter_set_version=core-alpha-v1.2-defaults`：
+以下参数属于 `parameter_set_version=core-alpha-v1.3-defaults`：
 
 | 参数 | 默认值 | 作用域 |
 | --- | ---: | --- |
-| `retrieval_policy_version` | `core-alpha-v1.2-candidate` | 策略不变量版本 |
-| `parameter_set_version` | `core-alpha-v1.2-defaults` | Alpha 默认参数版本 |
+| `retrieval_policy_version` | `core-alpha-v1.3-candidate` | 策略不变量版本 |
+| `parameter_set_version` | `core-alpha-v1.3-defaults` | Alpha 默认参数版本 |
 | `rrf_k` | 60 | 来源路由与来源内 RRF |
 | `source_chunk_signal_top_m` | 3 | Chunk 信号折叠到来源时的同分参考 |
 | `full_scan_chunk_threshold` | 32 | 允许全扫描的 active Chunk 上限 |
@@ -300,13 +338,25 @@ QueryVariant 是一轮检索所使用的结构化查询变体，至少标识：
 | `provider_unknown_context_limit` | 8000 | Provider 未声明窗口时的保守能力默认值 |
 | `minimum_executable_evidence_tokens` | 512 | 允许发起模型调用的最低 Evidence Token 预算 |
 | `background_token_ratio` | 0.20 | background 使用单个 ContextPack Evidence Token 的上限 |
-| `no_gain_round_limit` | 2 | 连续无新增独立证据组的停止阈值 |
+| `no_coverage_gain_round_limit` | 2 | 连续既无新证据组也无 Coverage 改善的停止阈值 |
 | `adjacent_context_chunks` | 前后各 1 | source_interpretation 默认相邻窗口 |
 | `evidence_normalization_version` | `core-alpha-normalization-v1` | 证据文本规范化规则版本 |
 | `evidence_similarity_metric` | `character-3gram-jaccard-v1` | 同章节连续文本相似度算法 |
 | `evidence_grouping_policy_version` | `core-alpha-grouping-v1` | 位置重叠、相似度和分组顺序版本 |
 | `source_admission_policy_version` | `core-alpha-source-admission-v1` | 自动来源准入规则版本 |
 | `candidate_admission_policy_version` | `core-alpha-candidate-admission-v1` | 来源内证据候选准入规则版本 |
+| `source_routing_tokenization_version` | `source-routing-tokenization-v1` | 来源词法覆盖分词与规范化版本 |
+| `source_title_normalization_version` | `source-title-normalization-v1` | 标题与别名精确匹配规范化版本 |
+| `source_admission_top_n` | 20 | metadata/FTS/vector 来源准入排名上限 |
+| `source_metadata_lexical_floor` | 0.25 | 来源元数据 lexical_coverage 下限 |
+| `source_fts_lexical_floor` | 0.20 | 来源全文 lexical_coverage 下限 |
+| `source_vector_cosine_floor` | 0.45 | 来源向量 cosine similarity 下限 |
+| `candidate_admission_top_n` | 40 | FTS/vector 证据候选准入排名上限 |
+| `candidate_fts_lexical_floor` | 0.20 | 证据候选 lexical_coverage 下限 |
+| `candidate_vector_cosine_floor` | 0.50 | 证据候选 cosine similarity 下限 |
+| `candidate_reranker_top_n` | 20 | reranker 证据候选准入排名上限 |
+| `candidate_reranker_floor` | 0.60 | calibrated reranker score 下限 |
+| `max_source_context_ratio_candidate` | 0.60 | 一般多来源综合的来源集中度评测候选线，不是 R1.3 硬门禁 |
 
 `max_routed_sources` 和 `max_rounds` 按第 3.3 节模式表取值。
 
@@ -401,7 +451,19 @@ EvidenceRequirement match DESC
 -> evidence group id ASC
 ```
 
-`candidate_admission_policy_version=core-alpha-candidate-admission-v1`，并由 RunExecutionSpec 固定。证据组进入来源候选池前必须：来源和定位有效、符合 KnowledgeScope，并与至少一个 EvidenceRequirement 具有可解释匹配；匹配理由、Requirement ID 和 admission policy version 必须进入 Trace。
+`candidate_admission_policy_version=core-alpha-candidate-admission-v1`，并由 RunExecutionSpec 固定。所有候选首先必须满足来源版本有效、定位可验证、符合 KnowledgeScope 且不来自 excluded 来源。随后，它必须针对 QueryVariant 指向的至少一个 EvidenceRequirement 通过下表一项匹配规则：
+
+| admission rule | 输入 | 准入判定 | 失败原因 |
+| --- | --- | --- | --- |
+| `exact-evidence-phrase` | evidence_query/Requirement 中的非空规范化短语与证据组文本 | 使用 `core-alpha-normalization-v1` 后存在完整短语命中 | `no_exact_evidence_match` |
+| `plan-locator` | ResearchPlan 固定的章节、页码或 canonical range | 候选定位落在计划范围内 | `outside_plan_locator` |
+| `candidate-fts` | 当前 QueryVariant 的来源内 FTS rank 与 lexical_coverage | rank <= `candidate_admission_top_n` (40) 且 coverage >= `candidate_fts_lexical_floor` (0.20) | `below_candidate_fts_floor` |
+| `candidate-vector` | 当前 QueryVariant 与证据组文本的 cosine similarity | rank <= `candidate_admission_top_n` (40) 且 cosine >= `candidate_vector_cosine_floor` (0.50) | `below_candidate_vector_floor` |
+| `candidate-reranker` | 版本化 reranker 的 calibrated score 与 rank | score >= `candidate_reranker_floor` (0.60) 且 rank <= `candidate_reranker_top_n` (20) | `below_reranker_floor` |
+
+`lexical_coverage` 复用 `source-routing-tokenization-v1`；vector 的度量与转换限制复用 source admission。candidate-reranker 只有在 RunExecutionSpec 固定模型、输入 Schema、score calibration version 和阈值兼容性时才可准入；未启用或未校准时该规则 unavailable。`core-alpha-candidate-admission-v1` 不允许由自由模型判断“相关”后单独放行候选。
+
+匹配记录必须包含 Requirement ID、query_family、evidence_purpose、通过的规则、原始 rank/score、policy/Capability 版本和失败原因。这样“可解释匹配”由固定规则判断，而不是实现者临时选择 Embedding、reranker 或模型。
 
 每个来源最多保留 12 个候选组。`min_source_candidate_groups=4` 只适用于已经通过候选准入的合法证据；来源只有 1 个合格组时就只保留 1 个。禁止为了填满 4 个而降低相关性、证据用途、定位、有效性或 Scope 要求，也不得复制候选凑配额。
 
@@ -444,8 +506,10 @@ UNION
 required coverage need DESC
 -> source selection priority
 -> analysis role priority
--> counterevidence need DESC
--> evidence relevance DESC
+-> unmet mandatory Requirement match DESC
+-> current evidence purpose match DESC
+-> reranker rank ASC（启用时）
+-> source-internal RRF rank ASC
 -> automatically routed source_rrf_score DESC（仅自动路由来源）
 -> knowledge_item_version_id ASC
 -> canonical location ASC
@@ -458,7 +522,13 @@ required coverage need DESC
 2. `explicit_plan_selected_allowed`。
 3. `automatically_routed`。
 
-`explicit_plan_selected_allowed` 包括由 allowed + primary 默认规则、ResearchPlan、EvidenceRequirement 或显式比较计划选中执行的 allowed 来源。显式来源不需要伪造 `source_rrf_score`，该值保持不适用；只有自动路由来源之间才比较 source_rrf_score。显式 allowed 的剩余候选按 source selection priority、analysis role、counterevidence need 和 evidence relevance 排序。analysis role priority 固定为 `primary > comparison > background`；未设置角色的 allowed 来源位于 comparison 与 background 之间，只参与剩余槽位竞争。
+`required coverage need` 是布尔值：候选仍被某个 required 来源的受保护最低槽位需要时为 true，槽位满足后为 false。所有进入全局池的候选都具有 source selection type；不得使用 null 临时绕过优先级。
+
+`unmet mandatory Requirement match` 只在候选已通过 candidate admission 且能满足当前未满足的强制 Requirement 时为 true；`current evidence purpose match` 只在候选的 evidence_purpose 与本次打包需要一致时为 true。二者都不是自由模型分数。
+
+reranker 未启用或整体不可用时，全局跳过 reranker rank 这一排序维度；启用时未获得合法 reranker 结果的候选按 null last。source-internal RRF rank 始终使用来源内融合后的稳定名次，数值越小越优先。本文不定义额外的 `evidence_relevance_score`，也不允许实现自行混合向量、FTS 和 reranker 原始分数。
+
+`explicit_plan_selected_allowed` 包括由 allowed + primary 默认规则、ResearchPlan、EvidenceRequirement 或显式比较计划选中执行的 allowed 来源。显式来源不需要伪造 `source_rrf_score`，该值保持不适用；只有自动路由来源之间才比较 source_rrf_score。显式 allowed 的剩余候选按上述离散字段和稳定 rank 排序。analysis role priority 固定为 `primary > comparison > background`；未设置角色的 allowed 来源位于 comparison 与 background 之间，只参与剩余槽位竞争。
 
 可选 reranker 只在来源最低覆盖已保留后重排剩余候选。它不得：
 
@@ -469,6 +539,8 @@ required coverage need DESC
 - 通过单个长资料的密集相似片段占满 ContextPack。
 
 reranker 不可用但规则/RRF 可用时属于可记录降级，不是检索失败。
+
+一般多来源综合还必须记录每个来源进入候选池和 ContextPack 的证据组、Chunk 与 Evidence Token 比例。`max_source_context_ratio_candidate=0.60` 只是一条 A0-EVAL 集中度观测候选线：超过时记录 `source_context_concentration`，R1.3 不据此硬删除证据。compare_sources 使用来源独立 ContextPack，可豁免单包比例线，但仍必须保持比较维度覆盖。评测需要解释集中度来自证据相关性还是原始 Chunk 数量。
 
 ## 8. 五种研究模式契约
 
@@ -571,9 +643,16 @@ Coverage 不是新的领域状态。ResearchRun 结束时，由领域模型已�
 - 排序、最低覆盖、截断和丢弃理由。
 - provider、tokenizer/估算方式和 MaterialManifest 引用。
 
-### 10.2 Evidence Token 预算
+### 10.2 Evidence 与 Run 总预算
 
-Minimum Slice 必须由 RunExecutionSpec 提供 `system_evidence_budget` 或等价系统安全上限。用户预算是可选输入；未提供用户预算不等于无限预算。多个 ContextPack 共享同一份 Run 总预算，不能让每次调用重新获得完整额度。
+Minimum Slice 必须由 RunExecutionSpec 的 system_safety_limits 提供 Evidence Token、Run total token 和 cost 安全上限。用户预算是可选输入；未提供用户预算不等于无限预算。多个 ContextPack、结构化中间矩阵、综合调用和输出共享同一份 Run 总预算，不能让每次调用重新获得完整额度。
+
+策略维护两个独立 Token 账本：
+
+- `EvidenceTokenBudget`：只计进入 Provider 的原始证据与经验证证据摘要，防止 ContextPack 膨胀。
+- `RunTotalTokenBudget`：计 system prompt、query/instruction、工具与 Schema、中间矩阵、全部输入、模型输出，以及失败调用已发生的输入/输出 Token。
+
+它们是策略上的逻辑账本维度，不是新增领域聚合；Minimum Slice 由 RunExecutionSpec、执行技术记录和 system_safety_limits 承载，Core Alpha Complete 可由冻结领域模型中的正式预算记录提供投影。Cost Budget 与 RunTotalTokenBudget 同作用域并独立校验，不能用 Token 余额替代成本余额。
 
 每次构建 ContextPack 前先计算剩余预算：
 
@@ -596,6 +675,16 @@ min(
   remaining_user_evidence_budget,
   per_invocation_evidence_cap
 )
+
+remaining_run_total_token_budget =
+run_total_token_budget
+- consumed_run_total_tokens
+- reserved_run_total_tokens
+
+remaining_cost_budget =
+run_cost_budget
+- consumed_cost
+- reserved_cost
 ```
 
 单次调用的 `max_context_tokens` 再动态计算为：
@@ -604,6 +693,9 @@ min(
 evidence_token_budget =
 min(
   effective_evidence_budget,
+  remaining_run_total_token_budget
+  - estimated_non_evidence_input_tokens
+  - output_reserve,
   provider_input_limit
   - system_prompt_reserve
   - output_reserve
@@ -613,16 +705,18 @@ min(
 )
 ```
 
+一次调用只有同时满足以下条件才可开始：remaining Evidence Token 足够、remaining Run total token 足够、remaining cost 足够、Provider context window 足够。Provider contract 必须给出本次调用的成本估算规则；本地零费用 Provider 的 cost 可以为 0，但仍受两个 Token 账本约束。
+
 规则：
 
 - 优先使用实际 Provider tokenizer。
 - 没有 tokenizer 时使用保守估算，并记录估算器版本和误差来源。
-- RunExecutionSpec 的系统安全预算始终存在；用户预算只能收紧该安全边界，不能放宽它。
+- RunExecutionSpec 的 Evidence、Run total token 和 cost 安全预算始终存在；用户预算只能收紧这些边界，不能放宽它们。
 - Core Alpha Complete 的 ResearchBudgetGuard 可以依据剩余总预算进一步收紧本次调用，但不能突破 RunExecutionSpec 的系统安全上限。
-- ContextPack 构建前必须从权威 Run 执行记录读取剩余量，并以乐观并发令牌原子预留“估算 Token + safety margin”；并发调用不得同时占用同一份剩余预算。
-- 调用完成后以 Provider 实际 Token 使用量原子结算预留：实际消耗较低时释放差额；实际消耗较高时扣除差额。
+- ContextPack 构建前必须从权威 Run 执行记录读取剩余量，并以乐观并发令牌在同一操作中原子预留 Evidence Token、总输入/输出 Token 和 cost；并发调用不得同时占用同一份剩余预算。
+- 调用完成后以 Provider 实际使用量原子结算三个预留：Evidence 账本记录实际证据 Token，Run total 账本记录完整输入加输出 Token，cost 账本记录实际费用；实际消耗较低时释放差额，较高时扣除差额。
 - 估算不足导致实际消耗超过预留时，必须记录 `budget_estimation_overrun`、估算器版本和差额。若差额使 Run 达到或超过硬上限，将剩余预算视为 0、禁止后续调用并保留本次已发生消费；不得通过负预算继续执行。
-- Provider 调用失败但已经产生可计量 Token 消耗时，实际消耗仍计入 Run 总预算。
+- Provider 调用失败但已经产生可计量 Token 或费用时，实际消耗仍计入相应账本；Provider 不返回实际值时使用调用前保守预留结算并记录估算来源。
 - Provider 未声明上下文窗口时，`provider_unknown_context_limit=8000` 是保守输入能力默认值，不是 Evidence Token 预算本身。
 - 计算结果为负数或低于 `minimum_executable_evidence_tokens=512` 时，不得发起模型调用。
 - background 的 20% 是上限，不是必须占满；未使用预算回流给高优先级证据。
@@ -651,7 +745,7 @@ min(
 
 ## 11. 停止条件
 
-停止条件分为成功停止、无增益停止和强制停止，三者不得混为“任意命中即成功”。
+停止条件分为成功停止、Coverage 无增益停止和强制停止，三者不得混为“任意命中即成功”。
 
 ### 11.1 成功停止
 
@@ -666,18 +760,27 @@ AND 当前 research_mode 的最小覆盖要求已满足
 
 成功停止只说明检索计划完成，不自动代表 JudgmentCard 可采纳。Claim 生成、审计和 DecisionFitness 仍由下游领域规则决定。
 
-### 11.2 无增益停止
+### 11.2 Coverage 无增益停止
 
-连续 `no_gain_round_limit=2` 轮没有新增 IndependentEvidenceGroup 时停止继续自动检索。检索层只输出：
+一轮存在 Coverage gain，当且仅当至少发生一项：
 
-- `stop_reason=no_gain`。
+- 新增合法 IndependentEvidenceGroup。
+- 新增对此前未满足 EvidenceRequirement 的有效映射。
+- mandatory Coverage 从未满足变为满足。
+- required 来源从未执行或失败状态进入新的有效终态，例如 no_evidence 或 evidence_found。
+- 新完成强制 counterevidence、alternative_interpretation 或 failure_condition 检索。
+- 已有证据的有效性或定位得到确认，使其首次通过 candidate admission 或 completion condition。
+
+连续 `no_coverage_gain_round_limit=2` 轮既没有新增独立证据组，也没有上述 Coverage 改善时停止继续自动检索。检索层只输出：
+
+- `stop_reason=no_coverage_gain`。
 - 当前 EvidenceRequirementCoverage。
 - required 来源终态和 retrieval quality facts。
 - 尚未满足的 Requirement 与降级影响。
 
 Coverage 满足最低条件时，结果交给后续 Claim/Judgment/Audit 流水线；Coverage 不足时，Research Execution 依据领域命令形成相应 Run 结束结果。检索层不能直接创建 `completed_with_judgment` 或 `audit_blocked`，后者只有 JudgmentCard 已形成并完成审计后才能确定。
 
-无增益不等于穷尽整个知识库，也不得在枚举结果中表述为“已找到全部案例”。
+Coverage 无增益不等于穷尽整个知识库，也不得在枚举结果中表述为“已找到全部案例”。
 
 ### 11.3 强制停止
 
@@ -696,6 +799,8 @@ Coverage 满足最低条件时，结果交给后续 Claim/Judgment/Audit 流水�
 
 | 情况 | 领域记录或结果 | 说明 |
 | --- | --- | --- |
+| 来源路由正常完成但无来源通过准入 | 0 个 RetrievalRun；Trace `stop_reason=no_admissible_source`；通常 `ResearchRunOutcome.outcome_type=insufficient_evidence` | Router 不创建澄清问题；Plan 明确要求时由执行层进入 awaiting_user |
+| 全部必要路由 Capability 不可用且无法构建最小 SourceRoutingView | 路由能力失败；无合法复用时 `ResearchRunOutcome.outcome_type=execution_failed` | 与正常的 no_admissible_source 分离 |
 | SourceResolution 阶段来源未找到、歧义或没有可用版本 | `SourceResolution.resolution_status=not_found / ambiguous / unavailable` | 不启动该来源的 RetrievalRun |
 | Run 已绑定的 KnowledgeItemVersion 在执行时失效 | `RetrievalRun.status=completed`、`retrieval_outcome=source_unavailable` | 来源内容版本不可继续使用 |
 | 当前通道所需 IndexGeneration 缺失或失效 | `RetrievalRun.status=failed`、`retrieval_outcome=failed`、`failure_category=index_unavailable` | 只影响该通道；其他可用通道继续执行 |
@@ -748,18 +853,18 @@ Coverage 满足最低条件时，结果交给后续 Claim/Judgment/Audit 流水�
 
 本文不重复定义 TraceEvent Schema，但要求 ResearchTrace 至少能够还原以下策略事实：
 
-1. `retrieval_policy_version`、`parameter_set_version`、`source_admission_policy_version` 和 `candidate_admission_policy_version`。
+1. `retrieval_policy_version`、`parameter_set_version`、source/candidate admission、source routing tokenization、title normalization 版本和实际策略快照 Hash。
 2. original question、resolved anchor spans、evidence query 和 transformation version。
-3. SourceRoutingView version、生成时间和输入版本。
-4. 每个来源的 selection type、准入结果与理由、路由排名、`exact_title_query_match`、各通道 rank 和折叠信号；显式路径另记录 `resolved_source_anchor_match`。
+3. SourceRoutingView version、生成时间、输入版本、每个路由信号的 valid/stale/unavailable 状态和实际参与 RRF 的信号集合。
+4. 每个来源的 selection type、准入结果与理由、原始 rank/score、适用 floor、路由排名、`exact_title_query_match` 和折叠信号；显式路径另记录 `resolved_source_anchor_match`。
 5. 每轮 QueryVariant、来源集合、目标 Requirement 和生成原因。
 6. 各通道 requested/available/missing capability、实现版本和 fallback。
 7. `evidence_normalization_version`、`evidence_similarity_metric`、`evidence_grouping_policy_version`，每个证据组的 candidate admission 结果与理由，以及每个来源去重前候选数、去重后 IndependentEvidenceGroup 数和保留数。
 8. required 来源及 EvidenceRequirementCoverage 的逐轮变化。
 9. 是否使用 reranker、作用范围和降级原因。
-10. 每个 ContextPack 的证据、顺序、Token/Chunk 使用、构建前剩余预算、预留量、实际结算量、估算差额和保留理由。
+10. 每个 ContextPack 的证据、顺序、Token/Chunk 使用，Evidence/RunTotal/Cost 三类构建前剩余预算、预留量、实际结算量、估算差额和保留理由。
 11. 每个被丢弃候选的主要原因，例如 excluded、invalid、duplicate、quota、token_budget、lower_priority。
-12. 命中的成功、无增益或强制停止条件。
+12. 每轮 Coverage gain 事实，以及命中的成功、no_coverage_gain 或强制停止条件。
 13. fallback path、missing capability 和 quality impact。
 14. 最终领域映射所依据的策略事实。
 
@@ -830,7 +935,7 @@ allowed 与 excluded 来源包含相同文本时：
 
 同输入、同版本、同候选集重复执行时，来源、证据组和 ContextPack 顺序一致；若 Capability 返回概率性分数，进入稳定排序前必须固定候选集合和 tie-break，并记录实现版本。
 
-### 16.9 R1.2 勘误评测输入
+### 16.9 Gate 勘误评测输入
 
 `A0-EVAL-001` 至少将以下情况纳入 fixture 规范：
 
@@ -841,7 +946,14 @@ allowed 与 excluded 来源包含相同文本时：
 5. required + primary + 多个 Requirement 的最低覆盖按不同证据组集合并集计算，不重复计数。
 6. 古文短句在字符 3-gram 分组下的错误合并与错误拆分。
 7. 显式来源与自动路由来源共同竞争剩余槽位时排序稳定，显式来源不伪造 source_rrf_score。
-8. 无增益停止后，检索层不越权创建 audit_blocked 或 completed_with_judgment。
+8. Coverage 无增益停止后，检索层不越权创建 audit_blocked 或 completed_with_judgment。
+9. source/candidate admission 各阈值边界的刚好通过、刚好拒绝、缺失分数与不兼容度量。
+10. 向量路由信号 unavailable 而标题、结构或 FTS 信号有效时，SourceRoutingView 继续使用剩余信号。
+11. 候选集合相同时，启用、禁用和部分缺失 reranker 的全局排序均遵守固定缺失值规则。
+12. 没有新增证据组但新增 mandatory Requirement 映射或 required 来源终态时，不计为 no_coverage_gain。
+13. system prompt、中间矩阵、输出和失败调用消耗会减少 RunTotalTokenBudget，而不只减少 EvidenceTokenBudget。
+14. no_admissible_source 形成 0 RetrievalRun 和 insufficient_evidence；全部路由能力不可用则走不同的 execution_failed 路径。
+15. 一般多来源综合记录来源 ContextPack 集中度，并检验其能由证据匹配而非原始 Chunk 数量解释。
 
 ## 17. Non-Goals
 
@@ -852,7 +964,7 @@ allowed 与 excluded 来源包含相同文本时：
 - 不引入知识图谱、专用 reranker 模型、OpenSearch、Neo4j 或新工作流引擎。
 - 不把 SourceRoutingView、IndependentEvidenceGroup、ContextPack 或 Coverage 提升为领域聚合。
 - 不冻结数据库表、Pydantic 类名、HTTP Schema 或物理队列。
-- 不在本文定义 Golden Case fixture 文件和具体评测阈值。
+- 不在本文定义 Golden Case fixture 文件和发布通过阈值；Admission 的候选默认值属于策略参数，不是评测发布线。
 - 不允许 A0-EVAL-001 在其他文档中静默覆盖本文参数。
 
 ## 18. Validation
@@ -869,7 +981,7 @@ rg -n "^(<<<<<<<|=======|>>>>>>>)" docs/RAG_RETRIEVAL_STRATEGY.md
 术语闭合检查：
 
 ```powershell
-rg -n "SourceRoutingView|QueryVariant|query_family|evidence_purpose|IndependentEvidenceGroup|EvidenceRequirementCoverage|ContextPack|ResearchEvidenceUse|retrieval_policy_version|parameter_set_version|source_admission_policy_version|candidate_admission_policy_version" docs/RAG_RETRIEVAL_STRATEGY.md
+rg -n "SourceRoutingView|QueryVariant|query_family|evidence_purpose|IndependentEvidenceGroup|EvidenceRequirementCoverage|ContextPack|ResearchEvidenceUse|retrieval_policy_version|parameter_set_version|source_admission_policy_version|candidate_admission_policy_version|no_coverage_gain|RunTotalTokenBudget|no_admissible_source" docs/RAG_RETRIEVAL_STRATEGY.md
 ```
 
 领域枚举映射检查：
@@ -890,6 +1002,11 @@ rg -n "completed_with_candidates|no_evidence|source_unavailable|insufficient_evi
 - `max_routed_sources` 与 `min_source_candidate_groups` 都是上限/保留规则，不会强行填充低相关来源或证据。
 - IndexGeneration 故障只影响依赖它的通道，不自动把 KnowledgeItemVersion 标记为不可用。
 - 检索停止只输出 stop_reason、Coverage 和质量事实，最终 Outcome 仍由执行、判断和审计领域产生。
+- 每个 `*_policy_version` 都能指向本文中的完整输入、判定、阈值、缺失值和失败原因。
+- 每个全局排序字段都有数据来源、方向和缺失值处理，不存在未定义的综合 relevance 分数。
+- 每个 stop_reason 都有执行层映射；每个预算名词都明确单次调用或整个 Run 的作用域。
+- 所有要求进入 RunExecutionSpec 的策略值都能通过第 2.4 节映射到既有字段或不可变关联记录，不要求新增顶层领域字段。
+- 不存在“达到最低相关性”或“具有可解释匹配”但没有指定判断规则、阈值和版本的表述。
 - 本次勘误只修改 `docs/RAG_RETRIEVAL_STRATEGY.md`；首次交付允许同时机械更新 `docs/TASK_INDEX.md` 的任务状态。除此之外不得出现文件变化。
 
 ## 19. 完成条件
