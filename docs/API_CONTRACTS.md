@@ -2,7 +2,7 @@
 
 状态：Core Alpha 目标 API 契约冻结候选
 
-任务标识：`A0-DOC-004-R1`
+任务标识：`A0-DOC-004-R1.1`
 
 依赖：业务架构 `A0-DOC-001-R7.1`、技术架构 `A0-DOC-002-R4.1`、领域模型 `A0-DOC-003-R1.2.2`
 
@@ -37,13 +37,13 @@
 
 | 场景 | HTTP |
 | --- | ---: |
-| 创建资源或新聚合 | 201 |
-| 同步领域命令完成 | 200 |
+| 集合资源创建端点 | 201 |
+| `/commands/*` 同步命令端点 | 200，即使命令原子创建下游资源 |
 | 异步执行被接受 | 202 |
 | 查询成功 | 200 |
 | 幂等重放 | 首次请求的原始状态码 |
 
-所有成功命令均返回响应体，不使用空响应表示成功。
+状态码按“异步接受 > 命令端点 > 集合创建端点 > 查询”判定，每条路由只允许一个同步成功状态码。所有成功命令均返回响应体，不使用空响应表示成功。
 
 ### 2.3 服务端拥有字段
 
@@ -71,7 +71,18 @@
   },
   "consistency": {
     "source": "authoritative_store",
-    "aggregate_revision": 7,
+    "primary_aggregate": {
+      "aggregate_type": "disposition_proposal",
+      "aggregate_id": "dp_...",
+      "revision": 7
+    },
+    "affected_aggregates": [
+      {
+        "aggregate_type": "research_case",
+        "aggregate_id": "case_...",
+        "revision": 12
+      }
+    ],
     "projection_checkpoint": null,
     "is_stale": false,
     "observed_at": "2026-06-24T01:00:00Z"
@@ -79,7 +90,7 @@
 }
 ```
 
-命令响应直接返回本次事务形成的权威资源。`aggregate_revision` 是命令完成后的聚合 revision。
+命令响应直接返回本次事务形成的权威资源。`primary_aggregate` 表示命令的主要并发边界；同一事务改变的其他聚合放入 `affected_aggregates`。新建且不拥有 revision 的不可变事实可省略两者，只返回资源 ID。跨聚合命令不得用一个 revision 代表多个聚合。
 
 ### 2.5 查询响应与分页
 
@@ -90,7 +101,12 @@
   "data": {},
   "consistency": {
     "source": "authoritative_store",
-    "aggregate_revision": 7,
+    "primary_aggregate": {
+      "aggregate_type": "research_case",
+      "aggregate_id": "case_...",
+      "revision": 7
+    },
+    "affected_aggregates": [],
     "projection_checkpoint": null,
     "is_stale": false,
     "observed_at": "2026-06-24T01:00:00Z"
@@ -108,7 +124,8 @@
   },
   "consistency": {
     "source": "projection",
-    "aggregate_revision": null,
+    "primary_aggregate": null,
+    "affected_aggregates": [],
     "projection_checkpoint": "cursor_...",
     "is_stale": false,
     "observed_at": "2026-06-24T01:00:00Z"
@@ -118,9 +135,12 @@
 
 - 单聚合或明确聚合范围查询可以使用 `minimum_revision`。
 - 列表投影使用 `minimum_checkpoint`，不得把多个聚合压缩为一个 revision。
+- 使用 `minimum_revision` 或 `minimum_checkpoint` 时可传 `consistency_wait_ms`；默认 `0`，最大 `5000`。
 - 权威存储响应必须为 `source=authoritative_store` 且 `is_stale=false`。
-- 投影无法在等待窗口内达到要求时返回 `409 projection_not_ready`，不得返回旧数据冒充满足一致性要求。
-- 列表使用不透明 cursor；`limit` 默认 50，最大 200。
+- 投影无法在等待窗口内达到要求时返回 `409 projection_not_ready`，不得返回旧数据冒充满足一致性要求；错误 details 必须返回目标 checkpoint/revision、当前值和实际等待毫秒数。
+- 列表使用不透明、签名 cursor；`limit` 默认 50，最大 200。cursor 绑定认证主体、筛选条件、排序和快照水位，默认稳定排序为 `created_at DESC, resource_id DESC`。
+- cursor 不使用数据库 offset。无效、过期或与当前主体、筛选、排序不匹配时返回 `422 invalid_cursor`。
+- 同一分页会话固定快照水位，防止翻页时重复或漏读；水位后新增记录只在新的分页会话中出现。
 
 ### 2.6 幂等
 
@@ -196,6 +216,117 @@ excluded 绑定可以省略版本和分析角色；required/allowed 必须绑定
 }
 ```
 
+### 3.5 规范 JSON 类型
+
+- ID、Hash、时间和开放代码值均序列化为 JSON string；时间必须是 UTC ISO 8601，Hash 使用带算法前缀的小写十六进制，例如 `sha256:...`。
+- 枚举使用本文或 `docs/DOMAIN_MODEL.md` 冻结的英文代码值，不返回显示文案代替代码值。
+- 资源间关系默认使用 ID，不嵌套另一份权威资源；需要显示信息时可附加非权威的 `display` 对象。
+- `nullable` 字段必须显式返回 `null`；未声明为 nullable 的必填字段不得省略。列表字段始终返回数组，无值时返回 `[]`。
+- 开放代码值表示为 `{ "code": "...", "registry_version": "..." }`。`location` 表示为 `{ "section_path": [], "page": null, "timestamp_seconds": null, "start_offset": null, "end_offset": null }`，至少一个定位维度非空。
+- 普通用户响应不返回 `storage_ref`、完整 Chunk 文本、完整私有原文、完整 Prompt、认证材料、Provider 配置或内部策略载荷；Developer API 也受第 8 章约束。
+
+下列字段表是资源响应的规范表示。`R` 表示必填且非 null，`N` 表示必填但可为 null，`C` 表示满足领域条件时必填；未列字段不得出现在该资源的普通响应中。
+
+#### KnowledgeItemResponse 与 KnowledgeItemVersionResponse
+
+| 类型 | 字段 |
+| --- | --- |
+| `KnowledgeItemResponse` | R: `knowledge_item_id, title, item_type, language, owner_scope, lifecycle_status, revision, created_at, updated_at`；N: `current_knowledge_item_version_id` |
+| `KnowledgeItemVersionResponse` | R: `knowledge_item_version_id, knowledge_item_id, version, content_hash, structure_hash, parser_version, language, availability_status, created_at`；N: `previous_version_id` |
+
+`item_type` 使用开放代码对象；`lifecycle_status=active|archived|deleted`；`availability_status=available|unavailable|withdrawn`。`storage_ref` 不进入普通响应。
+
+#### ResearchCaseResponse
+
+R: `research_case_id, title, root_question_id, current_question_id, lifecycle_status, attention_status, revision, created_at, updated_at`。N: `current_knowledge_scope_version_id, current_judgment_card_version_id, current_research_disposition_id, parent_research_case_id, archived_at`。
+
+`lifecycle_status=open|archived`；`attention_status=saved|active|paused|observing|deferred|closed`。
+
+#### KnowledgeScopeVersionResponse 与 ResearchPlanVersionResponse
+
+| 类型 | 字段 |
+| --- | --- |
+| `KnowledgeScopeVersionResponse` | R: `knowledge_scope_id, knowledge_scope_version_id, research_case_id, version, lifecycle_status, scope_mode, default_access_policy, source_bindings, created_by, created_at`；N: `previous_version_id` |
+| `ResearchPlanVersionResponse` | R: `research_plan_id, research_plan_version_id, research_case_id, knowledge_scope_version_id, version, lifecycle_status, research_mode, primary_objective, evidence_requirements, minimum_completion_condition, created_at`；N: `previous_version_id, stop_conditions, research_budget` |
+
+`source_bindings` 的每项完整返回 `knowledge_scope_source_binding_id, source_resolution_id, knowledge_item_id, knowledge_item_version_id, access_policy, analysis_role, created_at`，其中 excluded 绑定的版本和分析角色为 null。Plan 的 `research_mode=fact_lookup|source_interpretation|compare_sources|enumerate_pattern|claim_evaluation`；每项 EvidenceRequirement 完整返回其 ID、类型、说明、required binding IDs、反证要求、替代解释要求、完成条件和 nullable `minimum_count`。
+
+#### ResearchRunResponse 与 ResearchRunOutcomeResponse
+
+| 类型 | 字段 |
+| --- | --- |
+| `ResearchRunResponse` | R: `research_run_id, research_case_id, research_question_id, knowledge_scope_version_id, research_plan_version_id, run_execution_spec_id, status, revision, created_at`；N: `started_at, ended_at, superseded_by_run_id` |
+| `ResearchRunOutcomeResponse` | R: `research_run_outcome_id, research_run_id, outcome_type, reason_code, reason_summary, created_at`；N: `judgment_card_version_id` |
+
+Run `status=created|running|awaiting_user|completed|failed|cancelled|superseded`。Outcome `outcome_type=completed_with_judgment|insufficient_evidence|audit_blocked|execution_failed|cancelled_by_user|deferred_before_judgment|superseded_by_new_run`；`reason_code` 使用开放代码对象。
+
+同步创建 Run 的 `data` 固定为：
+
+```json
+{
+  "research_run": {},
+  "research_run_outcome": null,
+  "judgment_card": null
+}
+```
+
+同步流程终止时 `research_run_outcome` 必须非 null；仅在 Outcome 引用判断时返回对应 `judgment_card`。异步 `202` 使用相同结构，但后两项均为 null。
+
+#### EvidenceUnitResponse 与 ResearchEvidenceUseResponse
+
+| 类型 | 字段 |
+| --- | --- |
+| `EvidenceUnitResponse` | R: `evidence_unit_id, knowledge_item_id, knowledge_item_version_id, location, excerpt, content_hash, origin_type, validity_status, revision, created_at, updated_at`；N: `chunk_id, origin_retrieval_run_id` |
+| `ResearchEvidenceUseResponse` | R: `research_evidence_use_id, research_run_id, research_attempt_id, evidence_unit_id, evidence_revision, knowledge_scope_version_id, use_type, validity_checked_at, validity_result, created_at`；N: `retrieval_run_id` |
+
+普通响应中的 `excerpt` 按访问策略脱敏并限制长度，但不得改变 `content_hash` 所指向的原始证据身份。`origin_type` 使用开放代码对象；`validity_status` 与 `validity_result=valid|needs_review|invalid`；`use_type=retrieved|reused`。
+
+#### JudgmentCardVersionResponse 与 ClaimVersionResponse
+
+| 类型 | 字段 |
+| --- | --- |
+| `JudgmentCardVersionResponse` | R: `judgment_card_id, judgment_card_version_id, research_case_id, research_run_id, version, revision, claim_version_ids, summary, uncertainties, evidence_gaps, audit_status, validity_status, lifecycle_status, created_at`；N: `previous_version_id, current_judgment_audit_id, decision_fitness_id` |
+| `ClaimVersionResponse` | R: `claim_id, claim_version_id, judgment_card_version_id, claim_text, epistemic_type, expression_role, evidence_status, importance, confidence_level, lifecycle_status, user_attitude, version, created_at`；N: `judgment_rationale_id, previous_version_id` |
+
+Judgment `audit_status=pending|auditing|provisionally_acceptable|acceptable|blocked`、`validity_status=valid|needs_review|invalid`、`lifecycle_status=draft|current|superseded|archived`。Claim 的枚举值完全采用领域模型；`user_attitude` 与 `evidence_status` 必须分别返回。
+
+#### DispositionProposalVersionResponse 与 ResearchDispositionResponse
+
+| 类型 | 字段 |
+| --- | --- |
+| `DispositionProposalVersionResponse` | R: `disposition_proposal_id, disposition_proposal_version_id, research_case_id, judgment_card_version_id, decision_fitness_id, proposed_disposition_type, reason, user_decision_status, lifecycle_status, version, revision, created_at`；N: `previous_version_id, expires_at, defer_until, observation_condition`；R list: `warning_acknowledgement_ids` |
+| `ResearchDispositionResponse` | R: `research_disposition_id, research_case_id, source_disposition_proposal_version_id, judgment_card_version_id, decision_fitness_id, disposition_type, confirmed_by, confirmed_at`；N: `supersedes_disposition_id, defer_until, observation_condition` |
+
+处置类型为 `proceed_to_action|continue_research|defer_decision|observe|discard|explicit_no_action|knowledge_only_closure`；defer 和 observe 的条件字段按领域模型条件必填。
+
+#### ActionProposalVersionResponse 与 ActionCommitmentResponse
+
+| 类型 | 字段 |
+| --- | --- |
+| `ActionProposalVersionResponse` | R: `action_proposal_id, action_proposal_version_id, research_case_id, research_disposition_id, judgment_card_version_id, decision_fitness_id, goal, proposed_steps, expected_benefit, stop_conditions, action_risk_profile, user_decision_status, lifecycle_status, version, revision, created_at`；N: `review_at, previous_version_id, expires_at`；R list: `audit_finding_ids, warning_acknowledgement_ids` |
+| `ActionCommitmentResponse` | R: `action_commitment_id, action_proposal_version_id, status, committed_by, committed_at, revision`；N: `started_at, completed_at, deferred_until` |
+
+`action_risk_profile` 内嵌该 Proposal version 的不可变风险快照：`action_risk_profile_id, cost_level, reversibility, time_commitment, external_impact, maximum_acceptable_loss, dependency_uncertainty, expert_review_required, risk_level, created_at`。Commitment `status=planned|in_progress|blocked|completed|cancelled|deferred`。
+
+#### KnowledgeContributionCandidateVersionResponse
+
+R: `knowledge_contribution_candidate_id, knowledge_contribution_candidate_version_id, research_case_id, judgment_card_version_id, contribution_type, proposed_content, evidence_unit_ids, validation_status, user_decision_status, lifecycle_status, version, revision, created_at, audit_finding_ids, warning_acknowledgement_ids`。N: `target_knowledge_asset_id, previous_version_id`。
+
+`contribution_type=claim|evidence|gap`；`validation_status=not_required|pending|passed|failed`；`user_decision_status=pending|accepted_as_knowledge|saved_as_note|rejected`；`lifecycle_status=current|superseded|closed`。
+
+#### KnowledgeAssetResponse 与 UserNoteResponse
+
+| 类型 | 字段 |
+| --- | --- |
+| `KnowledgeAssetResponse` | R: `knowledge_asset_id, source_knowledge_contribution_candidate_version_id, asset_type, title, content, judgment_card_version_id, evidence_unit_ids, validity_status, lifecycle_status, revision, created_by, created_at, audit_finding_ids, warning_acknowledgement_ids`；N: `withdrawn_at` |
+| `UserNoteResponse` | R: `user_note_id, source_knowledge_contribution_candidate_version_id, research_case_id, title, content, note_type, lifecycle_status, revision, created_by, created_at` |
+
+Asset `asset_type=claim_note|evidence_note|knowledge_gap`、`validity_status=valid|needs_review|invalid`、`lifecycle_status=active|withdrawn|archived`。Note `note_type=personal_note|user_viewpoint`、`lifecycle_status=active|withdrawn|archived`；UserNote 响应不得含有“系统验证”标志。
+
+### 3.6 其他资源表示
+
+未在 3.5 单列的资源仍须完整返回 `docs/DOMAIN_MODEL.md` 中该对象的全部公开字段，并遵守相同的 R/N/C、枚举、ID 引用和隐藏字段规则。接口实现前必须把对应表示加入本章；路由表中的自然语言输出说明不能替代规范 Schema。
+
 ## 4. Minimum Slice API
 
 ### 4.1 Knowledge Catalog
@@ -237,7 +368,7 @@ excluded 绑定可以省略版本和分析角色；required/allowed 必须绑定
 | `POST /alpha/research-cases/{research_case_id}/questions` | 201 | expected_revision、question_text、question_role、parent_question_id 可选 |
 | `POST /alpha/research-cases/{research_case_id}/commands/archive` | 200 | expected_revision |
 | `POST /alpha/research-cases/{research_case_id}/commands/reopen` | 200 | expected_revision |
-| `POST /alpha/research-cases/{research_case_id}/commands/derive` | 201 | expected_revision、source_question_id 或 judgment_card_version_id、title、question_text |
+| `POST /alpha/research-cases/{research_case_id}/commands/derive` | 200 | expected_revision、source_question_id 或 judgment_card_version_id、title、question_text；data 返回新 Case |
 
 question_role 为 `root / follow_up / clarification / derived`。derive 创建新 Case，不移动原 Case 历史。
 
@@ -282,9 +413,10 @@ question_role 为 `root / follow_up / clarification / derived`。derive 创建�
 | 方法与路由 | 成功 | 行为 |
 | --- | ---: | --- |
 | `POST /alpha/research-cases/{research_case_id}/research-plans` | 201 | 创建初始计划版本 |
-| `GET /alpha/research-cases/{research_case_id}/research-plans/current` | 200 | 读取 current 版本 |
-| `GET /alpha/research-plans/{research_plan_version_id}` | 200 | 读取指定版本 |
-| `POST /alpha/research-plans/{research_plan_version_id}/commands/adjust` | 200 | 创建新版本并 supersede 旧版本 |
+| `GET /alpha/research-cases/{research_case_id}/research-plans` | 200 | 列出该 Case 的逻辑 Plan 与版本引用 |
+| `GET /alpha/research-plans/{research_plan_id}/current` | 200 | 读取该逻辑 Plan 的 current 版本 |
+| `GET /alpha/research-plan-versions/{research_plan_version_id}` | 200 | 读取指定版本 |
+| `POST /alpha/research-plan-versions/{research_plan_version_id}/commands/adjust` | 200 | 创建新版本并 supersede 旧版本 |
 
 请求字段：`expected_revision`、`knowledge_scope_version_id`、`research_mode`、`primary_objective`、`evidence_requirements`、`minimum_completion_condition`；stop conditions 与正式预算为 Core Complete 可选字段。
 
@@ -334,24 +466,28 @@ execution_mode 为 `synchronous / asynchronous`，默认 synchronous。
 | `GET /alpha/judgment-cards/{judgment_card_version_id}/claims` | 200 | Claim、Rationale、ClaimEvidenceLink；Link 保留 research_evidence_use_id |
 | `GET /alpha/claims/{claim_id}/current` | 200 | Claim 当前语义版本 |
 | `GET /alpha/claim-versions/{claim_version_id}` | 200 | Claim 指定历史版本 |
-| `GET /alpha/judgment-cards/{judgment_card_version_id}/audit` | 200 | JudgmentAudit 与 Finding |
-| `GET /alpha/judgment-cards/{judgment_card_version_id}/decision-fitness` | 200 | DecisionFitness |
-| `POST /alpha/audit-findings/{audit_finding_id}/commands/acknowledge` | 201 | 创建 WarningAcknowledgement；expected_revision、judgment_card_version_id、acknowledgement_note |
+| `GET /alpha/judgment-cards/{judgment_card_version_id}/audits` | 200 | 该判断版本的审计列表 |
+| `GET /alpha/judgment-cards/{judgment_card_version_id}/audits/current` | 200 | 当前被领域规则接纳的审计或 null |
+| `GET /alpha/judgment-audits/{judgment_audit_id}` | 200 | 指定 JudgmentAudit 与 Finding |
+| `GET /alpha/judgment-cards/{judgment_card_version_id}/decision-fitness/current` | 200 | 当前被领域规则接纳的 DecisionFitness 或 null |
+| `GET /alpha/decision-fitness/{decision_fitness_id}` | 200 | 指定 DecisionFitness |
+| `POST /alpha/audit-findings/{audit_finding_id}/commands/acknowledge` | 200 | 创建 WarningAcknowledgement；expected_revision、judgment_card_version_id、acknowledgement_note |
 | `POST /alpha/claims/{claim_version_id}/commands/set-user-attitude` | 200 | expected_revision、user_attitude |
 
 blocking Finding 不允许 acknowledge。修改 user attitude 不改变 evidence status 或 Claim 语义版本。
 
 ### 4.8 Decision
 
-DispositionProposal 在 JudgmentAudit 与 DecisionFitness 完成后，由内部 `CreateDispositionProposalCommand` 生成，不提供公开创建路由。
+DispositionProposal 在 JudgmentAudit 与 DecisionFitness 完成后，由内部 `CreateDispositionProposalCommand` 生成，不提供公开创建路由。“current”表示当前被领域规则接纳的版本，不表示按时间排序的最新记录。
 
 | 方法与路由 | 成功 | 行为 |
 | --- | ---: | --- |
-| `GET /alpha/research-cases/{research_case_id}/disposition-proposals/current` | 200 | 当前 Proposal 或 null |
-| `GET /alpha/disposition-proposals/{disposition_proposal_version_id}` | 200 | 指定版本 |
-| `POST /alpha/disposition-proposals/{disposition_proposal_version_id}/commands/accept` | 200 | 形成 ResearchDisposition |
-| `POST /alpha/disposition-proposals/{disposition_proposal_version_id}/commands/adjust` | 200 | 形成新 Proposal 版本 |
-| `POST /alpha/disposition-proposals/{disposition_proposal_version_id}/commands/reject` | 200 | 记录拒绝，不形成 Disposition |
+| `GET /alpha/research-cases/{research_case_id}/disposition-proposals` | 200 | Case 下 Proposal 列表，可按 lifecycle_status 筛选 |
+| `GET /alpha/disposition-proposals/{disposition_proposal_id}/current` | 200 | 逻辑 Proposal 当前版本或 null |
+| `GET /alpha/disposition-proposal-versions/{disposition_proposal_version_id}` | 200 | 指定版本 |
+| `POST /alpha/disposition-proposal-versions/{disposition_proposal_version_id}/commands/accept` | 200 | 形成 ResearchDisposition |
+| `POST /alpha/disposition-proposal-versions/{disposition_proposal_version_id}/commands/adjust` | 200 | 形成新 Proposal 版本 |
+| `POST /alpha/disposition-proposal-versions/{disposition_proposal_version_id}/commands/reject` | 200 | 记录拒绝，不形成 Disposition |
 | `GET /alpha/research-dispositions/{research_disposition_id}` | 200 | 最终处置事实 |
 
 三个决定命令都包含 DispositionProposal 聚合的 `expected_revision`。accept 还包含 `judgment_card_version_id`、`decision_fitness_id` 和有效 `warning_acknowledgement_ids`；adjust 还包含新的 disposition type、reason 及 defer/observe 条件。
@@ -381,7 +517,7 @@ DispositionProposal 在 JudgmentAudit 与 DecisionFitness 完成后，由内部 
 | `POST /alpha/attention-backlog-items` | 201 | 保存问题、Case 引用、知识缺口、复核建议或外部线索 |
 | `GET /alpha/attention-backlog-items` | 200 | cursor 列表查询 |
 | `GET /alpha/attention-backlog-items/{attention_backlog_item_id}` | 200 | 单项查询 |
-| `POST /alpha/attention-backlog-items/{attention_backlog_item_id}/commands/activate` | 200 或 201 | 激活并关联或创建 Case |
+| `POST /alpha/attention-backlog-items/{attention_backlog_item_id}/commands/activate` | 200 | 激活并关联或创建 Case；data 返回 `activation_result=associated_existing_case|created_new_case` 与 research_case_id |
 | `POST /alpha/attention-backlog-items/{attention_backlog_item_id}/commands/discard` | 200 | 丢弃 |
 | `POST /alpha/attention-backlog-items/{attention_backlog_item_id}/commands/archive` | 200 | 归档 |
 
@@ -401,7 +537,7 @@ DispositionProposal 在 JudgmentAudit 与 DecisionFitness 完成后，由内部 
 
 #### 创建与调整 ActionProposal
 
-`POST /alpha/research-dispositions/{research_disposition_id}/commands/create-action-proposal` 返回 `201`。
+`POST /alpha/research-dispositions/{research_disposition_id}/commands/create-action-proposal` 返回 `200`；它是命令端点，即使原子创建 ActionProposal 也不改用 201。
 
 请求包含 `expected_revision`（目标为 ResearchCase）、`judgment_card_version_id`、`decision_fitness_id`、目标、步骤、预期收益、停止条件、复盘时间、风险输入和 warning acknowledgements。
 
@@ -409,11 +545,12 @@ DispositionProposal 在 JudgmentAudit 与 DecisionFitness 完成后，由内部 
 
 | 方法与路由 | 成功 | 行为 |
 | --- | ---: | --- |
-| `GET /alpha/research-cases/{research_case_id}/action-proposals/current` | 200 | 当前 ActionProposal 或 null |
-| `GET /alpha/action-proposals/{action_proposal_version_id}` | 200 | 指定版本 |
-| `POST /alpha/action-proposals/{action_proposal_version_id}/commands/adjust` | 200 | 新版本、重新风险和用途校验 |
-| `POST /alpha/action-proposals/{action_proposal_version_id}/commands/accept` | 200 | 创建 ActionCommitment |
-| `POST /alpha/action-proposals/{action_proposal_version_id}/commands/reject` | 200 | 记录拒绝 |
+| `GET /alpha/research-dispositions/{research_disposition_id}/action-proposals/current` | 200 | 该处置下当前被领域规则接纳的 ActionProposal 或 null |
+| `GET /alpha/research-cases/{research_case_id}/action-proposals` | 200 | Case 下 Proposal 列表，可按 research_disposition_id、lifecycle_status 筛选 |
+| `GET /alpha/action-proposal-versions/{action_proposal_version_id}` | 200 | 指定版本 |
+| `POST /alpha/action-proposal-versions/{action_proposal_version_id}/commands/adjust` | 200 | 新版本、重新风险和用途校验 |
+| `POST /alpha/action-proposal-versions/{action_proposal_version_id}/commands/accept` | 200 | 创建 ActionCommitment |
+| `POST /alpha/action-proposal-versions/{action_proposal_version_id}/commands/reject` | 200 | 记录拒绝 |
 
 #### ActionCommitment 与复盘
 
@@ -446,7 +583,7 @@ KnowledgeContributionCandidate 由内部 `CreateKnowledgeContributionCandidateCo
 | `POST /alpha/knowledge-contribution-candidate-versions/{knowledge_contribution_candidate_version_id}/commands/save-as-note` | 200 | 创建 UserNote |
 | `POST /alpha/knowledge-contribution-candidate-versions/{knowledge_contribution_candidate_version_id}/commands/reject` | 200 | 关闭候选 |
 
-命令包含 `expected_revision`、`judgment_card_version_id`、EvidenceUnit 引用和 warning acknowledgements。validation failed 不能接受为知识，但可以保存为笔记。
+adjust 命令包含 `expected_revision`、当前 Candidate version ID、修订后的内容或证据关系，并产生新版本与重新校验。accept-as-knowledge、save-as-note、reject 只提交 `expected_revision`、`judgment_card_version_id` 和适用的 `warning_acknowledgement_ids`；它们使用当前 Candidate version 已冻结的 `evidence_unit_ids`，不得在决定命令中替换证据。若客户端额外提交证据引用，必须与当前版本完全一致，否则返回 `409 version_conflict`。validation failed 不能接受为知识，但可以保存为笔记。
 
 ### 5.6 KnowledgeAsset 与 UserNote
 
