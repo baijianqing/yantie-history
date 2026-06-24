@@ -2,7 +2,7 @@
 
 状态：阶段0交付路线冻结版
 
-任务标识：`A0-DOC-005-R1.1`
+任务标识：`A0-DOC-005-R1.1.1`
 
 依赖：业务架构 `A0-DOC-001-R7.1`、技术架构 `A0-DOC-002-R4.1`、领域模型 `A0-DOC-003-R1.2.2`、API 契约 `A0-DOC-004-R1.2.1`
 
@@ -35,12 +35,12 @@ MetaOS 按以下层级交付：
 
 已完成同步：
 
-- `A0-DOC-005-R1.1`：Roadmap 与任务索引已切换到冻结 Core Alpha 主线，并补齐实施依赖。
+- `A0-DOC-005-R1.1.1`：Roadmap 与任务索引已切换到冻结 Core Alpha 主线，并完成排期一致性勘误。
 
 剩余交付：
 
 - `A0-DOC-006`：冻结来源感知检索与上下文打包策略。
-- `A0-EVAL-001`：建立 Golden Cases、fixture、指标口径和发布门禁。
+- `A0-EVAL-001`：建立 Golden Cases、fixture 规范、指标口径和发布门禁。
 - `A0-GATE-001`：完成阶段0人工冻结审查并授权首个实现任务。
 
 退出条件：
@@ -51,6 +51,10 @@ MetaOS 按以下层级交付：
 - 人工确认阶段0完成后，才允许开始公共 Schema、迁移或业务实现。
 
 Non-Goals：不修改代码、迁移、依赖、Streamlit、Worker、索引或 `library/` 数据。
+
+### 2.1 Gate Record
+
+A0-GATE-001 执行时在本节追加唯一审查记录，至少包含：审查日期、业务/技术/领域/API/检索/评测文档版本、审查结论、未决风险和首个获授权实现任务。未形成该记录时，阶段0不得视为完成。
 
 ## 3. Core Alpha Minimum Slice
 
@@ -126,7 +130,8 @@ Minimum Slice 退出条件：
 
 - 正式回答全部关联 ResearchCase 和 ResearchTrace。
 - required source compliance 为 100%，excluded source violation 为 0。
-- ready 核心 Claim 证据覆盖率为 100%，unsupported ready 核心 Claim 为 0。
+- 对 `audit_status=acceptable` 或 `provisionally_acceptable` 且用途匹配的 JudgmentCard，核心 Claim 证据覆盖率为 100%。
+- 不存在缺少匹配证据或理由链、却被标记为可采纳的核心 Claim。
 - 用户能确认、调整或拒绝处置；未确认 Proposal 不成为最终事实。
 - 固定 Golden Cases 回归通过，旧 RAG 与 Streamlit 基础能力无明显回归。
 
