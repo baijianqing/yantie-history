@@ -131,7 +131,7 @@ flowchart TB
 
 ### A0-DOC-006：冻结来源感知检索策略
 
-- 状态：`pending`。
+- 状态：`completed`。
 - 价值：把“从哪里找、怎样找、何时停止、如何打包证据”变成可评测策略。
 - 依赖：A0-DOC-005-R1.1.2。
 - 允许修改范围：新增 `docs/RAG_RETRIEVAL_STRATEGY.md`。
