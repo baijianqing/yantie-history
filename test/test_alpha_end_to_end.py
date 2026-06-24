@@ -103,6 +103,7 @@ class AlphaEndToEndTests(unittest.TestCase):
     @unittest.skipIf(shutil.which("ffmpeg") is None, "ffmpeg is required for MP4 closure test")
     def test_alpha_service_loop_runs_from_intent_to_reviewable_video(self) -> None:
         today = date(2026, 6, 15)
+        fixture_timestamp = datetime(2026, 6, 15, 10, tzinfo=timezone.utc)
         constitution = CognitiveConstitution(
             principles=["Intent constrains attention before questions are answered."],
             decision_rules=["Separate cited facts, inference, dispute, and reflection."],
@@ -222,6 +223,7 @@ class AlphaEndToEndTests(unittest.TestCase):
                 action_title="Review Alpha closure evidence and plan HTTP/RQ wiring",
                 personal_reflections=["Keep the next task small and independently reversible."],
             )
+            answer = answer.model_copy(update={"created_at": fixture_timestamp})
             self.assertEqual(answer.actions[0].status, ActionStatus.proposed)
             self.assertEqual(answer.actions[0].intent_id, intent.id)
             self.assertTrue(answer.fact_statements)
@@ -290,6 +292,9 @@ class AlphaEndToEndTests(unittest.TestCase):
                 review_notes="Approved for Alpha closure artifact.",
             )
             export = render_episode_video(approved_episode, assets, root / "exports")
+            export = export.model_copy(
+                update={"created_at": fixture_timestamp, "updated_at": fixture_timestamp}
+            )
             self.assertEqual(export.render_status, VideoRenderStatus.succeeded)
             self.assertIsNotNone(export.mp4_path)
             assert export.mp4_path is not None
