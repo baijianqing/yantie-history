@@ -2,7 +2,7 @@
 
 状态：阶段0交付路线冻结版
 
-任务标识：`A0-DOC-005-R1.1.1`
+任务标识：`A0-DOC-005-R1.1.2`
 
 依赖：业务架构 `A0-DOC-001-R7.1`、技术架构 `A0-DOC-002-R4.1`、领域模型 `A0-DOC-003-R1.2.2`、API 契约 `A0-DOC-004-R1.2.1`
 
@@ -35,7 +35,7 @@ MetaOS 按以下层级交付：
 
 已完成同步：
 
-- `A0-DOC-005-R1.1.1`：Roadmap 与任务索引已切换到冻结 Core Alpha 主线，并完成排期一致性勘误。
+- `A0-DOC-005-R1.1.2`：Roadmap 与任务索引已切换到冻结 Core Alpha 主线，并完成实施责任归属勘误。
 
 剩余交付：
 
@@ -123,7 +123,7 @@ ResearchRunOutcome 只表达研究如何结束；ResearchDisposition 只表达�
 
 - Streamlit 第一屏支持提问、来源约束、研究状态、判断、证据、警告和处置确认。
 - 默认隐藏 Provider、索引、Prompt 和底层降级细节；Developer 视图可查看技术 Trace。
-- Developer 后端提供 Technical Trace、CaseActivityLog、MaterialManifest 和 projection status，并使用独立访问策略。
+- Developer 后端提供 Run 级 Technical Trace、MaterialManifest、IndexGeneration metadata 和 projection status，并使用独立访问策略。
 - 草稿、审计中、可采纳、阻断和失效状态视觉上可区分。
 
 Minimum Slice 退出条件：
@@ -167,6 +167,8 @@ Non-Goals：不实现画像、三部榜单、LensSkill、知识图谱、复杂�
 - 校验失败内容只能进入 UserNote 或继续研究。
 
 Core Alpha Complete 退出条件：四个新增切片均可独立关闭或失败而不破坏 Minimum Slice；用户主权、证据状态和审计门禁保持不变。
+
+Complete Diagnostics 扩展在四个业务 Epic 后统一增加 CaseActivityLog 与正式预算/消费诊断；这些能力不得反向成为 Minimum Slice 工作台或发布门的前置依赖。
 
 ## 5. Extended Alpha
 
