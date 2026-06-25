@@ -503,6 +503,24 @@ class ResearchDispositionQueryHandler:
     def __init__(self, database: CoreAlphaDatabase):
         self.database = database
 
+    def list_current_disposition_proposals_for_case(
+        self,
+        research_case_id: str,
+    ) -> list[DispositionProposalVersionResponse]:
+        with UnitOfWork(self.database, write=False) as uow:
+            return uow.judgment_decision.list_current_disposition_proposals_for_case(
+                research_case_id,
+            )
+
+    def get_current_disposition_proposal(
+        self,
+        disposition_proposal_id: str,
+    ) -> DispositionProposalVersionResponse:
+        with UnitOfWork(self.database, write=False) as uow:
+            return uow.judgment_decision.get_current_disposition_proposal(
+                disposition_proposal_id,
+            )
+
     def get_disposition_proposal_version(
         self,
         disposition_proposal_version_id: str,

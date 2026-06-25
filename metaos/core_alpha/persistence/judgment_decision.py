@@ -480,6 +480,29 @@ class JudgmentDecisionRepository(RepositoryBase):
             )
         return self.get_disposition_proposal_version(row["current_version_id"])
 
+    def list_current_disposition_proposals_for_case(
+        self,
+        research_case_id: str,
+    ) -> list[DispositionProposalVersionResponse]:
+        case = self.connection.execute(
+            "SELECT 1 FROM core_alpha_research_cases WHERE research_case_id = ?",
+            (research_case_id,),
+        ).fetchone()
+        if case is None:
+            raise RecordNotFoundError(f"research case not found: {research_case_id}")
+        rows = self.connection.execute(
+            """
+            SELECT versions.*
+            FROM core_alpha_disposition_proposals proposals
+            JOIN core_alpha_disposition_proposal_versions versions
+              ON versions.disposition_proposal_version_id = proposals.current_version_id
+            WHERE proposals.research_case_id = ?
+            ORDER BY versions.created_at, versions.disposition_proposal_version_id
+            """,
+            (research_case_id,),
+        ).fetchall()
+        return [self._disposition_proposal(row) for row in rows]
+
     def accept_disposition_proposal(
         self,
         *,
