@@ -70,6 +70,34 @@ class CoreAlphaPersistenceFoundationTests(unittest.TestCase):
         self.assertIn("core_alpha_outbox_records", tables)
         self.assertIn("core_alpha_tombstones", tables)
         self.assertIn("core_alpha_research_cases", tables)
+        self.assertIn("core_alpha_research_runs", tables)
+
+        self.assertEqual(self.database.rollback_last_migration(), 3)
+        connection = self.database.connect()
+        try:
+            run_table = connection.execute(
+                """
+                SELECT 1 FROM sqlite_master
+                WHERE type = 'table' AND name = 'core_alpha_research_runs'
+                """
+            ).fetchone()
+            case_table = connection.execute(
+                """
+                SELECT 1 FROM sqlite_master
+                WHERE type = 'table' AND name = 'core_alpha_research_cases'
+                """
+            ).fetchone()
+            foundation_table = connection.execute(
+                """
+                SELECT 1 FROM sqlite_master
+                WHERE type = 'table' AND name = 'core_alpha_idempotency_records'
+                """
+            ).fetchone()
+        finally:
+            connection.close()
+        self.assertIsNone(run_table)
+        self.assertIsNotNone(case_table)
+        self.assertIsNotNone(foundation_table)
 
         self.assertEqual(self.database.rollback_last_migration(), 2)
         connection = self.database.connect()

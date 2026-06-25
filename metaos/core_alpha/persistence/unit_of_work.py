@@ -7,6 +7,7 @@ from types import TracebackType
 
 from metaos.core_alpha.persistence.database import CoreAlphaDatabase
 from metaos.core_alpha.persistence.case_scope import CaseScopeRepository
+from metaos.core_alpha.persistence.run_evidence import RunEvidenceRepository
 from metaos.core_alpha.persistence.repositories import (
     EventStore,
     IdempotencyStore,
@@ -78,6 +79,10 @@ class UnitOfWork:
     @property
     def case_scope(self) -> CaseScopeRepository:
         return CaseScopeRepository(self.connection)
+
+    @property
+    def run_evidence(self) -> RunEvidenceRepository:
+        return RunEvidenceRepository(self.connection)
 
     def commit(self) -> None:
         if self._finished:

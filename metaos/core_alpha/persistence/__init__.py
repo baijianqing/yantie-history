@@ -3,6 +3,7 @@
 from metaos.core_alpha.persistence.database import CoreAlphaDatabase
 from metaos.core_alpha.persistence.case_scope import CaseScopeRepository
 from metaos.core_alpha.persistence.migration import Migration, MigrationRunner
+from metaos.core_alpha.persistence.run_evidence import RunEvidenceRepository
 from metaos.core_alpha.persistence.repositories import (
     ConcurrencyConflictError,
     EventStore,
@@ -45,6 +46,7 @@ __all__ = [
     "ProjectionCheckpointRepository",
     "RecordNotFoundError",
     "RepositoryBase",
+    "RunEvidenceRepository",
     "StaleLifecycleError",
     "TombstoneRecord",
     "TraceEventRecord",
