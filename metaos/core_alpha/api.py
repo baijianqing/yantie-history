@@ -67,6 +67,43 @@ def create_core_alpha_app(
     return app
 
 
+def create_core_alpha_app_with_developer_diagnostics(
+    *,
+    database: CoreAlphaDatabase,
+    catalog: KnowledgeCatalogAdapter,
+    feature_flags: FeatureFlagReader | None = None,
+) -> FastAPI:
+    """Create a Core Alpha app with the Minimum Slice developer extension registered."""
+
+    return create_core_alpha_app(
+        database=database,
+        catalog=catalog,
+        feature_flags=feature_flags,
+        developer_extensions=create_default_developer_extension_registry(
+            database=database,
+            catalog=catalog,
+        ),
+    )
+
+
+def create_default_developer_extension_registry(
+    *,
+    database: CoreAlphaDatabase,
+    catalog: KnowledgeCatalogAdapter,
+) -> DeveloperExtensionRegistry:
+    """Register Minimum Slice developer diagnostics without changing query logic."""
+
+    from metaos.core_alpha.diagnostics import register_diagnostics_developer_routes
+
+    registry = DeveloperExtensionRegistry()
+    register_diagnostics_developer_routes(
+        registry,
+        database=database,
+        catalog=catalog,
+    )
+    return registry
+
+
 def create_core_alpha_api_router(
     *,
     database: CoreAlphaDatabase,
@@ -138,6 +175,8 @@ def _feature_snapshot(snapshot: FeatureFlagSnapshot) -> dict[str, object]:
 __all__ = [
     "DeveloperExtensionRegistry",
     "DeveloperRouterExtension",
+    "create_core_alpha_app_with_developer_diagnostics",
     "create_core_alpha_api_router",
     "create_core_alpha_app",
+    "create_default_developer_extension_registry",
 ]

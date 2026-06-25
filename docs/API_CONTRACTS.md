@@ -852,14 +852,25 @@ Payload 必填：`judgment_review_id, expected_revision, result_type, reason, af
 
 Developer API 使用独立访问策略，不属于普通产品 API。
 
+### 8.1 Minimum Slice Developer API
+
 | 方法与路由 | 输出 |
 | --- | --- |
 | `GET /alpha/developer/research-runs/{research_run_id}/trace` | `DeveloperResearchTraceResponse` |
-| `GET /alpha/developer/research-cases/{research_case_id}/activity` | CaseActivityLog |
 | `GET /alpha/developer/material-manifests` | 按 Run、Provider、purpose 查询 MaterialManifest |
 | `GET /alpha/developer/index-generations` | IndexGeneration metadata |
-| `GET /alpha/developer/research-runs/{research_run_id}/budget` | `ResearchBudgetStatusResponse` |
 | `GET /alpha/developer/projections/status` | checkpoint、lag 和失败摘要 |
+
+Minimum Slice 不注册 CaseActivityLog 与预算诊断路由，也不得返回伪造的空活动投影或 BudgetSnapshot。
+
+### 8.2 Core Alpha Complete Developer API
+
+| 方法与路由 | 输出 |
+| --- | --- |
+| `GET /alpha/developer/research-cases/{research_case_id}/activity` | CaseActivityLog |
+| `GET /alpha/developer/research-runs/{research_run_id}/budget` | `ResearchBudgetStatusResponse` |
+
+这两类路由只能在 Complete 对象和预算记录正式存在后由 Complete Diagnostics 扩展注册。
 
 默认只返回对象引用、Hash、版本和脱敏摘要。不返回完整 Prompt、完整私有原文、API Key 或认证 Header。
 
