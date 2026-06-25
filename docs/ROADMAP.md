@@ -177,6 +177,15 @@ Minimum Slice 退出条件：
 - 用户能确认、调整或拒绝处置；未确认 Proposal 不成为最终事实。
 - 固定 Golden Cases 回归通过，旧 RAG 与 Streamlit 基础能力无明显回归。
 
+#### A1-E2E-001 发布门记录
+
+- 审查日期：`2026-06-26`。
+- 审查结论：`blocked`。
+- 已通过：本地 Core Alpha API 入口、公开 API 创建 ResearchCase、SourceResolution 领域失败记录、工作台快照读取路径、Developer Diagnostics 权限边界、桌面与移动工作台冒烟检查。
+- 阻断原因：`docs/CORE_ALPHA_EVALUATION.md` 定义的完整 Golden Cases runner、固定 fixture、CaseExecutionRecord 和 51 个 Minimum Slice blocking 案例尚未执行。
+- 阶段发布授权：无；Minimum Slice 不得以本次冒烟检查作为发布通过。
+- 报告位置：`docs/reports/A1-E2E-001.md`。
+
 Non-Goals：不实现画像、三部榜单、LensSkill、知识图谱、复杂行动工作流或自动知识合并。
 
 ## 4. Core Alpha Complete
