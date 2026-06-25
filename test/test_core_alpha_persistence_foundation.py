@@ -52,7 +52,7 @@ class CoreAlphaPersistenceFoundationTests(unittest.TestCase):
         self.temp_dir.cleanup()
 
     def test_migration_enables_wal_and_can_roll_back_then_reapply(self) -> None:
-        self.assertEqual(self.database.initialize(), [1])
+        self.assertEqual(self.database.initialize(), [migration.version for migration in MIGRATIONS])
         self.assertEqual(self.database.initialize(), [])
         self.assertEqual(self.database.journal_mode(), "wal")
 
@@ -69,6 +69,27 @@ class CoreAlphaPersistenceFoundationTests(unittest.TestCase):
         self.assertIn("core_alpha_idempotency_records", tables)
         self.assertIn("core_alpha_outbox_records", tables)
         self.assertIn("core_alpha_tombstones", tables)
+        self.assertIn("core_alpha_research_cases", tables)
+
+        self.assertEqual(self.database.rollback_last_migration(), 2)
+        connection = self.database.connect()
+        try:
+            case_table = connection.execute(
+                """
+                SELECT 1 FROM sqlite_master
+                WHERE type = 'table' AND name = 'core_alpha_research_cases'
+                """
+            ).fetchone()
+            foundation_table = connection.execute(
+                """
+                SELECT 1 FROM sqlite_master
+                WHERE type = 'table' AND name = 'core_alpha_idempotency_records'
+                """
+            ).fetchone()
+        finally:
+            connection.close()
+        self.assertIsNone(case_table)
+        self.assertIsNotNone(foundation_table)
 
         self.assertEqual(self.database.rollback_last_migration(), 1)
         connection = self.database.connect()
@@ -82,12 +103,12 @@ class CoreAlphaPersistenceFoundationTests(unittest.TestCase):
         finally:
             connection.close()
         self.assertIsNone(missing)
-        self.assertEqual(self.database.initialize(), [1])
+        self.assertEqual(self.database.initialize(), [migration.version for migration in MIGRATIONS])
 
     def test_failed_migration_is_transactionally_rolled_back(self) -> None:
         self.database.initialize()
         failing = Migration(
-            version=2,
+            version=max(migration.version for migration in MIGRATIONS) + 1,
             name="failing_test",
             up_statements=(
                 "CREATE TABLE should_rollback (id TEXT PRIMARY KEY)",
@@ -107,7 +128,7 @@ class CoreAlphaPersistenceFoundationTests(unittest.TestCase):
                 """
             ).fetchone()
             self.assertIsNone(table)
-            self.assertNotIn(2, runner.applied_versions())
+            self.assertNotIn(failing.version, runner.applied_versions())
         finally:
             connection.close()
 
