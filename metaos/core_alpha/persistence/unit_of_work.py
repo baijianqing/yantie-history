@@ -8,6 +8,7 @@ from types import TracebackType
 from metaos.core_alpha.persistence.database import CoreAlphaDatabase
 from metaos.core_alpha.persistence.case_scope import CaseScopeRepository
 from metaos.core_alpha.persistence.judgment_decision import JudgmentDecisionRepository
+from metaos.core_alpha.persistence.material_manifest import MaterialManifestRepository
 from metaos.core_alpha.persistence.run_evidence import RunEvidenceRepository
 from metaos.core_alpha.persistence.repositories import (
     EventStore,
@@ -88,6 +89,10 @@ class UnitOfWork:
     @property
     def judgment_decision(self) -> JudgmentDecisionRepository:
         return JudgmentDecisionRepository(self.connection)
+
+    @property
+    def material_manifests(self) -> MaterialManifestRepository:
+        return MaterialManifestRepository(self.connection)
 
     def commit(self) -> None:
         if self._finished:

@@ -3,6 +3,7 @@
 from metaos.core_alpha.persistence.database import CoreAlphaDatabase
 from metaos.core_alpha.persistence.case_scope import CaseScopeRepository
 from metaos.core_alpha.persistence.judgment_decision import JudgmentDecisionRepository
+from metaos.core_alpha.persistence.material_manifest import MaterialManifestRepository
 from metaos.core_alpha.persistence.migration import Migration, MigrationRunner
 from metaos.core_alpha.persistence.run_evidence import RunEvidenceRepository
 from metaos.core_alpha.persistence.repositories import (
@@ -38,6 +39,7 @@ __all__ = [
     "JudgmentDecisionRepository",
     "LifecycleRecord",
     "LifecycleRepository",
+    "MaterialManifestRepository",
     "Migration",
     "MigrationRunner",
     "OutboxLeaseError",

@@ -72,6 +72,48 @@ class CoreAlphaPersistenceFoundationTests(unittest.TestCase):
         self.assertIn("core_alpha_research_cases", tables)
         self.assertIn("core_alpha_research_runs", tables)
         self.assertIn("core_alpha_judgment_cards", tables)
+        self.assertIn("core_alpha_material_manifests", tables)
+
+        self.assertEqual(self.database.rollback_last_migration(), MIGRATIONS[-1].version)
+        connection = self.database.connect()
+        try:
+            material_table = connection.execute(
+                """
+                SELECT 1 FROM sqlite_master
+                WHERE type = 'table' AND name = 'core_alpha_material_manifests'
+                """
+            ).fetchone()
+            judgment_table = connection.execute(
+                """
+                SELECT 1 FROM sqlite_master
+                WHERE type = 'table' AND name = 'core_alpha_judgment_cards'
+                """
+            ).fetchone()
+            run_table = connection.execute(
+                """
+                SELECT 1 FROM sqlite_master
+                WHERE type = 'table' AND name = 'core_alpha_research_runs'
+                """
+            ).fetchone()
+            case_table = connection.execute(
+                """
+                SELECT 1 FROM sqlite_master
+                WHERE type = 'table' AND name = 'core_alpha_research_cases'
+                """
+            ).fetchone()
+            foundation_table = connection.execute(
+                """
+                SELECT 1 FROM sqlite_master
+                WHERE type = 'table' AND name = 'core_alpha_idempotency_records'
+                """
+            ).fetchone()
+        finally:
+            connection.close()
+        self.assertIsNone(material_table)
+        self.assertIsNotNone(judgment_table)
+        self.assertIsNotNone(run_table)
+        self.assertIsNotNone(case_table)
+        self.assertIsNotNone(foundation_table)
 
         self.assertEqual(self.database.rollback_last_migration(), 4)
         connection = self.database.connect()

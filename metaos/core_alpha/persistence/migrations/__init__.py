@@ -10,12 +10,16 @@ from metaos.core_alpha.persistence.migrations.v0003_run_evidence import (
 from metaos.core_alpha.persistence.migrations.v0004_judgment_decision import (
     MIGRATION as JUDGMENT_DECISION_MIGRATION,
 )
+from metaos.core_alpha.persistence.migrations.v0005_material_manifest import (
+    MIGRATION as MATERIAL_MANIFEST_MIGRATION,
+)
 
 MIGRATIONS = (
     MIGRATION,
     CASE_SCOPE_MIGRATION,
     RUN_EVIDENCE_MIGRATION,
     JUDGMENT_DECISION_MIGRATION,
+    MATERIAL_MANIFEST_MIGRATION,
 )
 
 __all__ = ["MIGRATIONS"]
