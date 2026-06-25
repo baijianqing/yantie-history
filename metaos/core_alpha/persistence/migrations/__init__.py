@@ -7,7 +7,15 @@ from metaos.core_alpha.persistence.migrations.v0002_case_scope import (
 from metaos.core_alpha.persistence.migrations.v0003_run_evidence import (
     MIGRATION as RUN_EVIDENCE_MIGRATION,
 )
+from metaos.core_alpha.persistence.migrations.v0004_judgment_decision import (
+    MIGRATION as JUDGMENT_DECISION_MIGRATION,
+)
 
-MIGRATIONS = (MIGRATION, CASE_SCOPE_MIGRATION, RUN_EVIDENCE_MIGRATION)
+MIGRATIONS = (
+    MIGRATION,
+    CASE_SCOPE_MIGRATION,
+    RUN_EVIDENCE_MIGRATION,
+    JUDGMENT_DECISION_MIGRATION,
+)
 
 __all__ = ["MIGRATIONS"]
