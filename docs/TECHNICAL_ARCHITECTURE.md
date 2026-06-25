@@ -381,6 +381,8 @@ Application Query Handler 负责：
 
 模块内部可以存在多个类或函数，但本文档不承诺每个对象对应一个独立 Service。
 
+阶段1实现映射：`A1-KNOWLEDGE-001` 以 `metaos/knowledge/catalog.py` 作为只读 Knowledge Catalog Port，从现有 workspace SQLite 的 KnowledgeItem、Asset 与 Chunk 元数据投影 KnowledgeItemVersion、Chunk 和 IndexGeneration metadata。该适配器不得写入 `library/`、重新切块、重建索引或静默替换来源版本；它只为 SourceResolution、KnowledgeScope 和后续检索提供稳定身份读取。
+
 阶段边界：Minimum Slice 只要求 Case Management、Scope Governance、Research Execution、Judgment 和 Decision 的最小纵向链，并通过一次 Full SourceResolution 建立 Scope；Preliminary Parsing、ResearchTriage、在办软门禁、JudgmentReview、Action 和 Knowledge Contribution 属于 Core Alpha Complete。模块可以提前存在接口，但不得成为 Minimum Slice 的运行依赖。
 
 ### 4.4 Extended Alpha 隔离
