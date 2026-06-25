@@ -129,7 +129,7 @@ class JudgmentAuditCommandHandler:
     ) -> CommandExecution:
         body = request.model_dump(mode="json")
         return self.command_handler.execute(
-            scope=f"{context.actor_id}:POST:/internal/alpha/audit-findings/{audit_finding_id}/acknowledge",
+            scope=f"{context.actor_id}:POST:/alpha/audit-findings/{audit_finding_id}/commands/acknowledge",
             idempotency_key=context.idempotency_key,
             request_body=body,
             context=context,
@@ -473,6 +473,40 @@ class JudgmentAuditQueryHandler:
         with UnitOfWork(self.database, write=False) as uow:
             return uow.judgment_decision.get_judgment_audit(judgment_audit_id)
 
+    def list_judgment_audits(
+        self,
+        judgment_card_version_id: str,
+    ) -> list[JudgmentAuditResponse]:
+        with UnitOfWork(self.database, write=False) as uow:
+            uow.judgment_decision.get_judgment_card_version(judgment_card_version_id)
+            rows = uow.connection.execute(
+                """
+                SELECT judgment_audit_id
+                FROM core_alpha_judgment_audits
+                WHERE judgment_card_version_id = ?
+                ORDER BY created_at, judgment_audit_id
+                """,
+                (judgment_card_version_id,),
+            ).fetchall()
+            return [
+                uow.judgment_decision.get_judgment_audit(row["judgment_audit_id"])
+                for row in rows
+            ]
+
+    def get_current_judgment_audit(
+        self,
+        judgment_card_version_id: str,
+    ) -> JudgmentAuditResponse | None:
+        with UnitOfWork(self.database, write=False) as uow:
+            judgment = uow.judgment_decision.get_judgment_card_version(
+                judgment_card_version_id
+            )
+            if judgment.current_judgment_audit_id is None:
+                return None
+            return uow.judgment_decision.get_judgment_audit(
+                judgment.current_judgment_audit_id
+            )
+
     def list_audit_findings(self, judgment_audit_id: str) -> list[AuditFindingResponse]:
         with UnitOfWork(self.database, write=False) as uow:
             return uow.judgment_decision.list_audit_findings(judgment_audit_id)
@@ -480,6 +514,18 @@ class JudgmentAuditQueryHandler:
     def get_decision_fitness(self, decision_fitness_id: str) -> DecisionFitnessResponse:
         with UnitOfWork(self.database, write=False) as uow:
             return uow.judgment_decision.get_decision_fitness(decision_fitness_id)
+
+    def get_current_decision_fitness(
+        self,
+        judgment_card_version_id: str,
+    ) -> DecisionFitnessResponse | None:
+        with UnitOfWork(self.database, write=False) as uow:
+            judgment = uow.judgment_decision.get_judgment_card_version(
+                judgment_card_version_id
+            )
+            if judgment.decision_fitness_id is None:
+                return None
+            return uow.judgment_decision.get_decision_fitness(judgment.decision_fitness_id)
 
 
 __all__ = [

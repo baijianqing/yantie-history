@@ -172,7 +172,7 @@ class JudgmentDomainCommandHandler:
     ) -> CommandExecution:
         body = request.model_dump(mode="json")
         return self.command_handler.execute(
-            scope=f"{context.actor_id}:POST:/internal/alpha/claims/{claim_version_id}/user-attitude",
+            scope=f"{context.actor_id}:POST:/alpha/claim-versions/{claim_version_id}/commands/set-user-attitude",
             idempotency_key=context.idempotency_key,
             request_body=body,
             context=context,
@@ -393,9 +393,49 @@ class JudgmentDomainQueryHandler:
         with UnitOfWork(self.database, write=False) as uow:
             return uow.judgment_decision.get_judgment_card_version(judgment_card_version_id)
 
+    def get_current_judgment_card_for_case(
+        self,
+        research_case_id: str,
+    ) -> JudgmentCardVersionResponse | None:
+        with UnitOfWork(self.database, write=False) as uow:
+            uow.case_scope.get_case(research_case_id)
+            row = uow.connection.execute(
+                """
+                SELECT current_version_id
+                FROM core_alpha_judgment_cards
+                WHERE research_case_id = ?
+                ORDER BY rowid DESC
+                LIMIT 1
+                """,
+                (research_case_id,),
+            ).fetchone()
+            if row is None:
+                return None
+            return uow.judgment_decision.get_judgment_card_version(row["current_version_id"])
+
     def list_claims(self, judgment_card_version_id: str) -> list[ClaimVersionResponse]:
         with UnitOfWork(self.database, write=False) as uow:
             return uow.judgment_decision.list_claims(judgment_card_version_id)
+
+    def get_claim_version(self, claim_version_id: str) -> ClaimVersionResponse:
+        with UnitOfWork(self.database, write=False) as uow:
+            return uow.judgment_decision.get_claim(claim_version_id)
+
+    def get_current_claim(self, claim_id: str) -> ClaimVersionResponse:
+        with UnitOfWork(self.database, write=False) as uow:
+            row = uow.connection.execute(
+                """
+                SELECT claim_version_id
+                FROM core_alpha_claim_versions
+                WHERE claim_id = ? AND lifecycle_status = 'current'
+                ORDER BY version DESC, claim_version_id DESC
+                LIMIT 1
+                """,
+                (claim_id,),
+            ).fetchone()
+            if row is None:
+                raise RecordNotFoundError(f"claim not found: {claim_id}")
+            return uow.judgment_decision.get_claim(row["claim_version_id"])
 
     def list_claim_evidence_links(
         self,

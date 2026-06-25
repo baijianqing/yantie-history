@@ -799,6 +799,22 @@ class ResearchExecutionQueryHandler:
             uow.run_evidence.get_attempt(research_attempt_id)
             return uow.run_evidence.list_retrieval_runs(research_attempt_id)
 
+    def get_evidence_unit(self, evidence_unit_id: str) -> Any:
+        with UnitOfWork(self.database, write=False) as uow:
+            return uow.run_evidence.get_evidence_unit(evidence_unit_id)
+
+    def get_research_evidence_use(self, research_evidence_use_id: str) -> Any:
+        with UnitOfWork(self.database, write=False) as uow:
+            return uow.run_evidence.get_research_evidence_use(research_evidence_use_id)
+
+    def list_research_evidence_uses(
+        self,
+        research_run_id: str,
+    ) -> list[Any]:
+        with UnitOfWork(self.database, write=False) as uow:
+            uow.run_evidence.get_research_run(research_run_id)
+            return uow.run_evidence.list_research_evidence_uses(research_run_id)
+
     def get_outcome(self, research_run_id: str) -> ResearchRunOutcomeResponse | None:
         with UnitOfWork(self.database, write=False) as uow:
             try:
