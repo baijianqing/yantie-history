@@ -47,6 +47,11 @@ class MinimumSuite(str, Enum):
     ui_end_to_end = "ui_end_to_end"
 
 
+class ProfileRequirement(StrictContractModel):
+    execution_profile: ExecutionProfile
+    repeat_policy: RepeatPolicy
+
+
 class LayerAssertionResult(StrictContractModel):
     layer: str
     result: CaseResult
@@ -65,8 +70,9 @@ class CaseManifestEntry(StrictContractModel):
     case_id: str
     delivery_layer: str = "minimum_slice"
     severity: str = "blocking"
-    repeat_policy: RepeatPolicy
-    execution_profiles: list[ExecutionProfile] = Field(min_length=1)
+    profile_requirements: list[ProfileRequirement] | None = None
+    repeat_policy: RepeatPolicy | None = None
+    execution_profiles: list[ExecutionProfile] | None = None
     fixture_refs: list[str] = Field(min_length=1)
     metric_ids: list[str] = Field(min_length=1)
     start_layer: str
@@ -77,7 +83,24 @@ class CaseManifestEntry(StrictContractModel):
             raise ValueError("this runner only accepts minimum_slice cases")
         if self.severity != "blocking":
             raise ValueError("minimum_slice cases must be blocking")
-        if len(self.execution_profiles) != len(set(self.execution_profiles)):
+        if self.profile_requirements is None:
+            if self.repeat_policy is None or self.execution_profiles is None:
+                raise ValueError(
+                    "manifest entries require profile_requirements or legacy "
+                    "repeat_policy + execution_profiles"
+                )
+            self.profile_requirements = [
+                ProfileRequirement(
+                    execution_profile=profile,
+                    repeat_policy=self.repeat_policy,
+                )
+                for profile in self.execution_profiles
+            ]
+        profile_ids = [
+            requirement.execution_profile
+            for requirement in self.profile_requirements
+        ]
+        if len(profile_ids) != len(set(profile_ids)):
             raise ValueError("execution profiles must be unique")
         if self.start_layer not in SEVEN_ASSERTION_LAYERS:
             raise ValueError(f"unknown start layer: {self.start_layer}")
@@ -167,6 +190,21 @@ def minimum_slice_case_ids() -> tuple[str, ...]:
     )
 
 
+def default_minimum_slice_manifest() -> list[CaseManifestEntry]:
+    entries = [
+        CaseManifestEntry(
+            case_id=case_id,
+            profile_requirements=_default_profile_requirements(case_id),
+            fixture_refs=_default_fixture_refs(case_id),
+            metric_ids=_default_metric_ids(case_id),
+            start_layer=_default_start_layer(case_id),
+        )
+        for case_id in minimum_slice_case_ids()
+    ]
+    validate_minimum_slice_manifest(entries)
+    return entries
+
+
 def minimum_slice_suite_for_case(case_id: str) -> MinimumSuite:
     prefix = _case_prefix(case_id)
     if prefix in {"GC-SRC", "GC-RET", "GC-MODE", "GC-JDG", "GC-DEC"}:
@@ -201,16 +239,16 @@ def aggregate_case_result(
     profile_results = [
         _aggregate_profile(
             case_id=entry.case_id,
-            profile=profile,
-            repeat_policy=entry.repeat_policy,
+            profile=requirement.execution_profile,
+            repeat_policy=requirement.repeat_policy,
             records=[
                 record
                 for record in records
                 if record.case_id == entry.case_id
-                and record.execution_profile == profile
+                and record.execution_profile == requirement.execution_profile
             ],
         )
-        for profile in entry.execution_profiles
+        for requirement in entry.profile_requirements or []
     ]
     result = _worst_result(profile.result for profile in profile_results)
     return CaseEvaluation(
@@ -281,6 +319,46 @@ def evaluate_minimum_slice_gate(
         missing_case_ids=missing,
         unexpected_case_ids=unexpected,
     )
+
+
+def evaluate_default_minimum_slice_gate(
+    records: list[CaseExecutionRecord],
+) -> GateEvaluation:
+    return evaluate_minimum_slice_gate(default_minimum_slice_manifest(), records)
+
+
+def render_gate_evaluation_markdown(evaluation: GateEvaluation) -> str:
+    lines = [
+        "# Core Alpha Minimum Slice Gate Report",
+        "",
+        f"Gate result: `{evaluation.result.value}`",
+        f"Release authorized: `{'yes' if evaluation.is_release_authorized else 'no'}`",
+        "",
+        "## Suites",
+        "",
+        "| Suite | Result | Passed / Total | Blocking cases |",
+        "| --- | --- | ---: | --- |",
+    ]
+    for suite in evaluation.suite_results:
+        blocking_cases = ", ".join(suite.blocking_case_ids) or "-"
+        lines.append(
+            "| "
+            f"{suite.suite.value} | "
+            f"`{suite.result.value}` | "
+            f"{suite.passed_cases} / {suite.total_cases} | "
+            f"{blocking_cases} |"
+        )
+    if evaluation.missing_case_ids or evaluation.unexpected_case_ids:
+        lines.extend(
+            [
+                "",
+                "## Manifest Issues",
+                "",
+                f"- Missing: {', '.join(evaluation.missing_case_ids) or '-'}",
+                f"- Unexpected: {', '.join(evaluation.unexpected_case_ids) or '-'}",
+            ]
+        )
+    return "\n".join(lines) + "\n"
 
 
 def _aggregate_profile(
@@ -364,3 +442,159 @@ def _case_prefix(case_id: str) -> str:
     if len(parts) != 3:
         raise ValueError(f"invalid case id: {case_id}")
     return f"{parts[0]}-{parts[1]}"
+
+
+def _default_profile_requirements(case_id: str) -> list[ProfileRequirement]:
+    requirements: list[ProfileRequirement] = []
+    if case_id in _controlled_contract_case_ids():
+        requirements.append(
+            ProfileRequirement(
+                execution_profile=ExecutionProfile.controlled_contract,
+                repeat_policy=RepeatPolicy.once,
+            )
+        )
+    if case_id in _integrated_retrieval_case_ids():
+        requirements.append(
+            ProfileRequirement(
+                execution_profile=ExecutionProfile.integrated_retrieval,
+                repeat_policy=RepeatPolicy.three_runs,
+            )
+        )
+    if case_id in _end_to_end_case_ids():
+        requirements.append(
+            ProfileRequirement(
+                execution_profile=ExecutionProfile.end_to_end,
+                repeat_policy=RepeatPolicy.three_runs,
+            )
+        )
+    if not requirements:
+        raise ValueError(f"no execution profile requirements configured for {case_id}")
+    return requirements
+
+
+def _default_fixture_refs(case_id: str) -> list[str]:
+    fixtures_by_case = {
+        "GC-SRC-001": ["FX-KNOW-001", "FX-KNOW-002"],
+        "GC-SRC-002": ["FX-KNOW-001", "FX-KNOW-002"],
+        "GC-SRC-003": ["FX-KNOW-003"],
+        "GC-SRC-004": ["FX-KNOW-001", "FX-KNOW-002"],
+        "GC-SRC-005": ["FX-KNOW-005"],
+        "GC-SRC-006": ["FX-KNOW-006"],
+        "GC-SRC-007": ["FX-KNOW-009"],
+        "GC-SRC-008": ["FX-KNOW-009"],
+        "GC-RET-001": ["FX-KNOW-001", "FX-KNOW-002"],
+        "GC-RET-002": ["FX-KNOW-010"],
+        "GC-RET-003": ["FX-KNOW-007"],
+        "GC-RET-004": ["FX-KNOW-008"],
+        "GC-RET-005": ["FX-KNOW-011"],
+        "GC-RET-006": ["FX-KNOW-011"],
+        "GC-RET-007": ["FX-KNOW-012"],
+        "GC-RET-008": ["FX-KNOW-013"],
+        "GC-RET-009": ["FX-KNOW-013"],
+        "GC-RET-010": ["FX-KNOW-013"],
+        "GC-RET-011": ["FX-KNOW-014"],
+        "GC-RET-012": ["FX-KNOW-004"],
+        "GC-RET-013": ["FX-KNOW-001"],
+        "GC-RET-014": ["FX-KNOW-001", "FX-KNOW-002", "FX-KNOW-003"],
+        "GC-MODE-001": ["FX-KNOW-004"],
+        "GC-MODE-002": ["FX-KNOW-004"],
+        "GC-MODE-003": ["FX-KNOW-001", "FX-KNOW-002", "FX-KNOW-003"],
+        "GC-JDG-001": ["FX-STATE-001", "FX-STATE-002"],
+        "GC-JDG-002": ["FX-STATE-001"],
+        "GC-JDG-003": ["FX-STATE-001"],
+        "GC-JDG-004": ["FX-STATE-001", "FX-KNOW-004"],
+        "GC-JDG-005": ["FX-STATE-001", "FX-STATE-002"],
+        "GC-JDG-006": ["FX-STATE-001"],
+        "GC-JDG-007": ["FX-STATE-001", "FX-KNOW-012"],
+        "GC-JDG-008": ["FX-STATE-001", "FX-STATE-002"],
+        "GC-DEC-001": ["FX-STATE-001"],
+        "GC-DEC-002": ["FX-STATE-001"],
+        "GC-DEC-003": ["FX-STATE-001"],
+        "GC-DEC-004": ["FX-STATE-001"],
+        "GC-API-001": ["FX-CMD-001"],
+        "GC-API-002": ["FX-CMD-001"],
+        "GC-API-003": ["FX-CMD-001"],
+        "GC-CMD-001": ["FX-CMD-001"],
+        "GC-CMD-002": ["FX-CMD-001"],
+        "GC-CMD-003": ["FX-CMD-001"],
+        "GC-CMD-004": ["FX-CMD-001"],
+        "GC-CMD-005": ["FX-CMD-001"],
+        "GC-OUT-001": ["FX-CMD-001"],
+        "GC-EGR-001": ["FX-EGR-001"],
+        "GC-EGR-002": ["FX-EGR-001"],
+        "GC-EGR-003": ["FX-EGR-001"],
+        "GC-UI-001": ["FX-UI-001"],
+        "GC-UI-002": ["FX-UI-001"],
+    }
+    return fixtures_by_case[case_id]
+
+
+def _default_metric_ids(case_id: str) -> list[str]:
+    prefix = _case_prefix(case_id)
+    metric_by_prefix = {
+        "GC-SRC": "M-SRC-REQ",
+        "GC-RET": "M-EVD-TRACE",
+        "GC-MODE": "M-COUNTER",
+        "GC-JDG": "M-AUDIT",
+        "GC-DEC": "M-DISPOSITION",
+        "GC-API": "M-API",
+        "GC-CMD": "M-IDEMPOTENCY",
+        "GC-OUT": "M-OUTCOME",
+        "GC-EGR": "M-EGRESS-VIOLATION",
+        "GC-UI": "M-UI-STATE",
+    }
+    return ["M-GC-PASS", metric_by_prefix[prefix]]
+
+
+def _default_start_layer(case_id: str) -> str:
+    prefix = _case_prefix(case_id)
+    start_layer_by_prefix = {
+        "GC-SRC": "source_resolution",
+        "GC-RET": "retrieval_execution",
+        "GC-MODE": "retrieval_execution",
+        "GC-JDG": "judgment",
+        "GC-DEC": "outcome_api",
+        "GC-API": "outcome_api",
+        "GC-CMD": "outcome_api",
+        "GC-OUT": "outcome_api",
+        "GC-EGR": "outcome_api",
+        "GC-UI": "outcome_api",
+    }
+    return start_layer_by_prefix[prefix]
+
+
+def _controlled_contract_case_ids() -> set[str]:
+    return {
+        "GC-SRC-006",
+        "GC-SRC-008",
+        *_range_ids("GC-RET", 2, 7),
+        *_range_ids("GC-RET", 11, 13),
+        *_range_ids("GC-JDG", 1, 8),
+        *_range_ids("GC-DEC", 1, 4),
+        *_range_ids("GC-API", 1, 3),
+        *_range_ids("GC-CMD", 1, 5),
+        "GC-OUT-001",
+        *_range_ids("GC-EGR", 1, 3),
+    }
+
+
+def _integrated_retrieval_case_ids() -> set[str]:
+    return {
+        *_range_ids("GC-SRC", 1, 5),
+        "GC-SRC-007",
+        "GC-RET-001",
+        "GC-RET-004",
+        *_range_ids("GC-RET", 8, 14),
+        *_range_ids("GC-MODE", 1, 3),
+        "GC-JDG-004",
+        "GC-JDG-007",
+    }
+
+
+def _end_to_end_case_ids() -> set[str]:
+    return {
+        *_range_ids("GC-DEC", 1, 4),
+        "GC-OUT-001",
+        *_range_ids("GC-EGR", 1, 3),
+        *_range_ids("GC-UI", 1, 2),
+    }

@@ -13,11 +13,15 @@ from metaos.evaluation.core_alpha import (
     ExecutionProfile,
     LayerAssertionResult,
     MinimumSuite,
+    ProfileRequirement,
     RepeatPolicy,
     aggregate_case_result,
+    default_minimum_slice_manifest,
+    evaluate_default_minimum_slice_gate,
     evaluate_minimum_slice_gate,
     minimum_slice_case_ids,
     minimum_slice_suite_for_case,
+    render_gate_evaluation_markdown,
     validate_minimum_slice_manifest,
 )
 
@@ -59,6 +63,43 @@ def test_manifest_validation_rejects_missing_or_unexpected_cases() -> None:
 
     with pytest.raises(ValueError, match="unexpected"):
         validate_minimum_slice_manifest(manifest + [_entry("GC-UNKNOWN-001")])
+
+
+def test_default_minimum_slice_manifest_expands_profiles_and_fixtures() -> None:
+    manifest = default_minimum_slice_manifest()
+    by_case_id = {entry.case_id: entry for entry in manifest}
+
+    validate_minimum_slice_manifest(manifest)
+
+    assert len(manifest) == 51
+    assert by_case_id["GC-SRC-001"].fixture_refs == ["FX-KNOW-001", "FX-KNOW-002"]
+    assert by_case_id["GC-RET-001"].profile_requirements == [
+        ProfileRequirement(
+            execution_profile=ExecutionProfile.integrated_retrieval,
+            repeat_policy=RepeatPolicy.three_runs,
+        )
+    ]
+    assert by_case_id["GC-RET-004"].profile_requirements == [
+        ProfileRequirement(
+            execution_profile=ExecutionProfile.controlled_contract,
+            repeat_policy=RepeatPolicy.once,
+        ),
+        ProfileRequirement(
+            execution_profile=ExecutionProfile.integrated_retrieval,
+            repeat_policy=RepeatPolicy.three_runs,
+        ),
+    ]
+    assert by_case_id["GC-DEC-001"].profile_requirements == [
+        ProfileRequirement(
+            execution_profile=ExecutionProfile.controlled_contract,
+            repeat_policy=RepeatPolicy.once,
+        ),
+        ProfileRequirement(
+            execution_profile=ExecutionProfile.end_to_end,
+            repeat_policy=RepeatPolicy.three_runs,
+        ),
+    ]
+    assert by_case_id["GC-UI-001"].start_layer == "outcome_api"
 
 
 def test_case_execution_record_requires_exactly_seven_layers() -> None:
@@ -127,6 +168,34 @@ def test_gate_blocks_when_any_case_is_missing_or_not_run() -> None:
     assert not evaluation.is_release_authorized
     assert evaluation.missing_case_ids == []
     assert all(suite.result == CaseResult.failed for suite in evaluation.suite_results)
+
+
+def test_default_gate_report_blocks_when_all_cases_are_not_run() -> None:
+    evaluation = evaluate_default_minimum_slice_gate(records=[])
+    markdown = render_gate_evaluation_markdown(evaluation)
+
+    assert evaluation.result == CaseResult.failed
+    assert not evaluation.is_release_authorized
+    assert "Release authorized: `no`" in markdown
+    assert "semantic" in markdown
+    assert "GC-SRC-001" in markdown
+
+
+def test_default_gate_passes_only_with_all_profile_records() -> None:
+    manifest = default_minimum_slice_manifest()
+    records: list[CaseExecutionRecord] = []
+    for entry in manifest:
+        for requirement in entry.profile_requirements or []:
+            required_count = 1 if requirement.repeat_policy == RepeatPolicy.once else 3
+            records.extend(
+                _record(entry.case_id, profile=requirement.execution_profile)
+                for _ in range(required_count)
+            )
+
+    evaluation = evaluate_minimum_slice_gate(manifest, records)
+
+    assert evaluation.result == CaseResult.passed
+    assert evaluation.is_release_authorized
 
 
 def test_gate_passes_only_when_all_required_records_pass() -> None:
