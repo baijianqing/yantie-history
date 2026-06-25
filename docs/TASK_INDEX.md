@@ -464,6 +464,7 @@ Contract 子任务 B/C/D 可以并行，但只能修改各自模块、测试和�
 
 ### A1-API-001：Minimum Slice API Epic Gate
 
+- 状态：`completed`。
 - 价值：确认三个路由切片加一个 Assembly/OpenAPI 子任务共同实现冻结公开与 Internal API。
 - 依赖：A1-API-001A、A1-API-001B、A1-API-001C、A1-API-001D。
 - 允许修改范围：仅更新 `docs/TASK_INDEX.md` 中本 Epic 状态。
