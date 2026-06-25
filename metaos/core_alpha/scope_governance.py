@@ -139,7 +139,7 @@ class ScopeGovernanceCommandHandler:
         new_version_id = _new_id("ksv")
         body = request.model_dump(mode="json")
         return self.command_handler.execute(
-            scope=f"{context.actor_id}:POST:/alpha/knowledge-scopes/{current_knowledge_scope_version_id}/commands/adjust",
+            scope=f"{context.actor_id}:POST:/alpha/knowledge-scope-versions/{current_knowledge_scope_version_id}/commands/adjust",
             idempotency_key=context.idempotency_key,
             request_body=body,
             context=context,
@@ -190,7 +190,7 @@ class ScopeGovernanceCommandHandler:
         new_version_id = _new_id("rpv")
         body = request.model_dump(mode="json")
         return self.command_handler.execute(
-            scope=f"{context.actor_id}:POST:/alpha/research-plans/{current_research_plan_version_id}/commands/adjust",
+            scope=f"{context.actor_id}:POST:/alpha/research-plan-versions/{current_research_plan_version_id}/commands/adjust",
             idempotency_key=context.idempotency_key,
             request_body=body,
             context=context,
@@ -732,6 +732,13 @@ class ScopeGovernanceQueryHandler:
     def get_current_research_plan(self, research_plan_id: str) -> ResearchPlanVersionResponse:
         with UnitOfWork(self.database, write=False) as uow:
             return uow.case_scope.get_current_research_plan(research_plan_id)
+
+    def list_research_plans_for_case(
+        self,
+        research_case_id: str,
+    ) -> list[ResearchPlanVersionResponse]:
+        with UnitOfWork(self.database, write=False) as uow:
+            return uow.case_scope.list_research_plans_for_case(research_case_id)
 
 
 __all__ = [

@@ -95,6 +95,35 @@ class CaseScopeRepository(RepositoryBase):
             raise RecordNotFoundError(f"research case not found: {research_case_id}")
         return self._case(row)
 
+    def list_cases(
+        self,
+        *,
+        limit: int = 50,
+        lifecycle_status: str | None = None,
+        attention_status: str | None = None,
+    ) -> list[ResearchCaseResponse]:
+        if limit < 1 or limit > 200:
+            raise ValueError("limit must be between 1 and 200")
+        clauses: list[str] = []
+        parameters: list[Any] = []
+        if lifecycle_status is not None:
+            clauses.append("lifecycle_status = ?")
+            parameters.append(lifecycle_status)
+        if attention_status is not None:
+            clauses.append("attention_status = ?")
+            parameters.append(attention_status)
+        where = f"WHERE {' AND '.join(clauses)}" if clauses else ""
+        rows = self.connection.execute(
+            f"""
+            SELECT * FROM core_alpha_research_cases
+            {where}
+            ORDER BY created_at DESC, research_case_id DESC
+            LIMIT ?
+            """,
+            (*parameters, limit),
+        ).fetchall()
+        return [self._case(row) for row in rows]
+
     def get_question(self, research_question_id: str) -> ResearchQuestionResponse:
         row = self.connection.execute(
             "SELECT * FROM core_alpha_research_questions WHERE research_question_id = ?",
@@ -368,6 +397,21 @@ class CaseScopeRepository(RepositoryBase):
         if row is None:
             raise RecordNotFoundError(f"research plan not found: {research_plan_id}")
         return self.get_research_plan_version(row["current_version_id"])
+
+    def list_research_plans_for_case(
+        self,
+        research_case_id: str,
+    ) -> list[ResearchPlanVersionResponse]:
+        self.get_case(research_case_id)
+        rows = self.connection.execute(
+            """
+            SELECT current_version_id FROM core_alpha_research_plans
+            WHERE research_case_id = ?
+            ORDER BY research_plan_id
+            """,
+            (research_case_id,),
+        ).fetchall()
+        return [self.get_research_plan_version(row["current_version_id"]) for row in rows]
 
     def _insert_question(self, question: ResearchQuestionResponse) -> None:
         self.connection.execute(

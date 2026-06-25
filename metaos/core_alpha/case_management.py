@@ -395,6 +395,20 @@ class ResearchCaseQueryHandler:
         with UnitOfWork(self.database, write=False) as uow:
             return uow.case_scope.get_case(research_case_id)
 
+    def list_cases(
+        self,
+        *,
+        limit: int = 50,
+        lifecycle_status: str | None = None,
+        attention_status: str | None = None,
+    ) -> list[ResearchCaseResponse]:
+        with UnitOfWork(self.database, write=False) as uow:
+            return uow.case_scope.list_cases(
+                limit=limit,
+                lifecycle_status=lifecycle_status,
+                attention_status=attention_status,
+            )
+
     def list_questions(self, research_case_id: str) -> list[ResearchQuestionResponse]:
         with UnitOfWork(self.database, write=False) as uow:
             uow.case_scope.get_case(research_case_id)
