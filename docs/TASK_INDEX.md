@@ -253,6 +253,7 @@ Contract 子任务 B/C/D 可以并行，但只能修改各自模块、测试和�
 
 ### A1-PERSIST-001：Persistence Epic Gate
 
+- 状态：`completed`。
 - 价值：确认四个持久化切片共同满足聚合事务与版本不变量。
 - 依赖：A1-PERSIST-001A、A1-PERSIST-001B、A1-PERSIST-001C、A1-PERSIST-001D。
 - 允许修改范围：仅更新 `docs/TASK_INDEX.md` 中本 Epic 状态。
