@@ -10,6 +10,11 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, build_opener
 
+from metaos.knowledge.core_alpha_ingest import (
+    SUPPORTED_CORE_ALPHA_UPLOAD_EXTENSIONS,
+    ingest_uploaded_text_document,
+)
+
 
 class CoreAlphaApiError(RuntimeError):
     """Raised when the public Core Alpha API returns an error envelope."""
@@ -644,7 +649,7 @@ def render_core_alpha_workbench(
                     "已创建 ResearchCase。",
                 )
 
-    tabs = st.tabs(["知识范围", "判断与证据", "处置", "知识目录"])
+    tabs = st.tabs(["知识范围", "判断与证据", "处置", "知识入库", "知识目录"])
     with tabs[0]:
         _render_scope_tab(st, api_client, snapshot)
     with tabs[1]:
@@ -652,6 +657,8 @@ def render_core_alpha_workbench(
     with tabs[2]:
         _render_decision_tab(st, api_client, snapshot)
     with tabs[3]:
+        _render_ingest_tab(st)
+    with tabs[4]:
         _render_catalog_tab(st, snapshot)
 
 
@@ -810,6 +817,52 @@ def _render_catalog_tab(st: Any, snapshot: WorkbenchSnapshot) -> None:
         for item in snapshot.knowledge_items
     ]
     _dataframe_or_empty(st, rows, "暂无 KnowledgeItem。")
+
+
+def _render_ingest_tab(st: Any) -> None:
+    st.subheader("知识入库")
+    st.caption(
+        "当前入口用于 Core Alpha 调试：文本或 Markdown 会形成可版本化的 "
+        "KnowledgeItemVersion、ChunkSet 和 IndexGeneration manifest。PDF/OCR "
+        "和向量索引构建仍属于后续知识底座任务。"
+    )
+    supported_types = sorted(
+        extension.lstrip(".") for extension in SUPPORTED_CORE_ALPHA_UPLOAD_EXTENSIONS
+    )
+    with st.form("core_alpha_ingest_upload"):
+        uploaded = st.file_uploader("上传文本或 Markdown", type=supported_types)
+        title = st.text_input("标题（可选）")
+        submitted = st.form_submit_button("入库")
+        if not submitted:
+            return
+        if uploaded is None:
+            st.warning("请先选择一个文本或 Markdown 文件。")
+            return
+        try:
+            result = ingest_uploaded_text_document(
+                filename=uploaded.name,
+                content=uploaded.getvalue(),
+                title=title.strip() or None,
+            )
+        except ValueError as exc:
+            st.error(str(exc))
+            return
+        except Exception as exc:  # pragma: no cover - UI safety boundary
+            st.error(f"入库失败：{exc}")
+            return
+        st.success("已完成 Core Alpha 知识入库。")
+        st.json(
+            {
+                "title": result.title,
+                "knowledge_item_id": result.knowledge_item_id,
+                "knowledge_item_version_id": result.knowledge_item_version_id,
+                "active_chunk_count": result.active_chunk_count,
+                "chunk_set_manifest_id": result.chunk_set_manifest_id,
+                "index_generation_ids": result.index_generation_ids,
+            },
+            expanded=False,
+        )
+        st.caption("入库后刷新页面，可在知识目录中查看新条目。")
 
 
 def _run_ui_command(st: Any, callback: Any, success_message: str) -> None:

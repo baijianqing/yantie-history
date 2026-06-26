@@ -168,6 +168,35 @@ class KnowledgeCatalogAdapter:
         knowledge_item_version_id: str,
     ) -> list[IndexGenerationMetadata]:
         version = self.get_version(knowledge_item_version_id)
+        item = self._get_item(version.knowledge_item_id)
+        manifest_generations = item.metadata.get("index_generations")
+        if isinstance(manifest_generations, list) and manifest_generations:
+            return [
+                IndexGenerationMetadata(
+                    index_generation_id=str(generation["id"]),
+                    index_type=str(generation["index_type"]),
+                    knowledge_item_version_id=str(generation["knowledge_item_version_id"]),
+                    chunk_strategy_version=version.chunker_version,
+                    index_strategy_version=str(generation["index_strategy_version"]),
+                    status=str(generation["status"]),
+                    expected_item_count=int(generation["expected_item_count"]),
+                    actual_item_count=int(generation["actual_item_count"]),
+                    validation_summary=str(generation["validation_summary"]),
+                    created_at=_parse_datetime(generation.get("created_at")) or version.created_at,
+                    embedding_model=(
+                        str(generation["embedding_model"])
+                        if generation.get("embedding_model") is not None
+                        else None
+                    ),
+                    embedding_dimension=(
+                        int(generation["embedding_dimension"])
+                        if generation.get("embedding_dimension") is not None
+                        else None
+                    ),
+                    ready_at=_parse_datetime(generation.get("ready_at")),
+                )
+                for generation in manifest_generations
+            ]
         chunks = self.list_chunks(knowledge_item_version_id, limit=10000)
         index_id = stable_prefixed_id(
             "idxgen",
@@ -248,14 +277,17 @@ class KnowledgeCatalogAdapter:
                 index_version,
             ],
         )
+        version_id = str(item.metadata.get("knowledge_item_version_id") or version_id)
+        projected_content_hash = str(item.metadata.get("content_hash") or f"sha256:{content_hash}")
+        projected_structure_hash = str(item.metadata.get("structure_hash") or f"sha256:{structure_hash}")
         storage_ref = str(asset.path) if asset else None
         availability = "available" if asset is not None and asset.path.exists() else "unavailable"
         return KnowledgeCatalogVersion(
             knowledge_item_version_id=version_id,
             knowledge_item_id=item.id,
             version=1,
-            content_hash=f"sha256:{content_hash}",
-            structure_hash=f"sha256:{structure_hash}",
+            content_hash=projected_content_hash,
+            structure_hash=projected_structure_hash,
             parser_version=parser_version,
             language=str(item.metadata.get("language") or "und"),
             availability_status=availability,
@@ -365,6 +397,16 @@ def _utc(value: datetime) -> datetime:
     if value.tzinfo is None:
         return value.replace(tzinfo=timezone.utc)
     return value.astimezone(timezone.utc)
+
+
+def _parse_datetime(value: object) -> datetime | None:
+    if value is None:
+        return None
+    if isinstance(value, datetime):
+        return _utc(value)
+    if isinstance(value, str):
+        return _utc(datetime.fromisoformat(value))
+    return None
 
 
 __all__ = [

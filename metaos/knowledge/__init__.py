@@ -32,12 +32,18 @@ from metaos.knowledge.versioning import (
     build_versioned_knowledge_foundation,
     standardize_document,
 )
+from metaos.knowledge.core_alpha_ingest import (
+    CoreAlphaIngestResult,
+    SUPPORTED_CORE_ALPHA_UPLOAD_EXTENSIONS,
+    ingest_uploaded_text_document,
+)
 
 __all__ = [
     "Claim",
     "ClaimStance",
     "ClaimType",
     "CHUNK_SET_MANIFEST_VERSION",
+    "CoreAlphaIngestResult",
     "DEFAULT_INDEX_VERSION",
     "DOCUMENT_STANDARD_VERSION",
     "INDEX_GENERATION_MANIFEST_VERSION",
@@ -56,10 +62,12 @@ __all__ = [
     "StableChunk",
     "StandardizedDocument",
     "SummaryLevel",
+    "SUPPORTED_CORE_ALPHA_UPLOAD_EXTENSIONS",
     "VersionedKnowledgeFoundation",
     "build_chunk_set_manifest",
     "build_index_generation_manifest",
     "build_versioned_knowledge_foundation",
     "extract_knowledge_foundation",
+    "ingest_uploaded_text_document",
     "standardize_document",
 ]
