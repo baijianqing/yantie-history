@@ -418,7 +418,10 @@ Contract 子任务 B/C/D 可以并行，但只能修改各自模块、测试和�
 
 ### A1-KNOWLEDGE-002：版本化 ChunkSet 与 IndexGeneration 底座
 
-- 状态：`pending`。
+- 状态：`completed`。
+- 完成提交：`4097496`。
+- 验收命令：`python -m pytest test/test_versioned_knowledge_foundation.py`；`python -m pytest test`。
+- 验收报告：无单独报告；全量测试 `290 passed, 2 warnings`。
 - 价值：在复用旧上传、OCR、切片和索引执行代码的同时，为 Core Alpha 提供可版本化、可对比、可回滚的知识底座，避免检索调试受 mutable Chunk / Index 漂移影响。
 - 依赖：A1-KNOWLEDGE-001、A1-PERSIST-001、A1-COMMAND-001。
 - 允许修改范围：一个 Knowledge Ingestion/Index Generation 适配模块、必要的专属持久化/Repository 接线、`test/test_versioned_knowledge_foundation.py`、`docs/TECHNICAL_ARCHITECTURE.md` 或 `docs/RAG_RETRIEVAL_STRATEGY.md` 机械勘误。
