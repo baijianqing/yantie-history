@@ -2,7 +2,7 @@
 
 状态：阶段0冻结审查已通过
 
-任务标识：`A0-DOC-005-R1.1.2`
+任务标识：`A0-DOC-005-R1.1.3`
 
 依赖：业务架构 `A0-DOC-001-R7.1`、技术架构 `A0-DOC-002-R4.1`、领域模型 `A0-DOC-003-R1.2.2`、API 契约 `A0-DOC-004-R1.2.1`
 
@@ -35,9 +35,9 @@ MetaOS 按以下层级交付：
 
 已完成同步：
 
-- `A0-DOC-005-R1.1.2`：Roadmap 与任务索引已切换到冻结 Core Alpha 主线，并完成实施责任归属勘误。
+- `A0-DOC-005-R1.1.3`：Roadmap 与任务索引已切换到冻结 Core Alpha 主线，并完成实施责任归属、知识底座前置和评测基础设施勘误。
 - `A0-DOC-006-R1.3`：来源感知检索、上下文打包、预算、停止与降级策略已形成冻结候选，并经 `A0-GATE-001` 确认。
-- `A0-EVAL-001-R1.1`：Golden Cases、fixture 规范、四类发布套件、指标与质量门已形成冻结候选，并经 `A0-GATE-001` 确认。
+- `A0-EVAL-001-R1.2`：Golden Cases、fixture 规范、Baseline Manifest、四类发布套件、指标与质量门已形成冻结候选。
 - `A0-GATE-001`：阶段0权威文档、任务 DAG 与质量门已通过严格冻结审查。
 
 剩余交付：
@@ -184,9 +184,11 @@ Minimum Slice 退出条件：
 - 审查日期：`2026-06-26`。
 - 审查结论：`blocked`。
 - 已通过：本地 Core Alpha API 入口、公开 API 创建 ResearchCase、SourceResolution 领域失败记录、工作台快照读取路径、Developer Diagnostics 权限边界、桌面与移动工作台冒烟检查。
-- 阻断原因：`docs/CORE_ALPHA_EVALUATION.md` 定义的完整 Golden Cases runner、固定 fixture、CaseExecutionRecord 和 51 个 Minimum Slice blocking 案例尚未执行。
+- 阻断原因：评测基础设施 Epic 尚未完成；Golden Cases runner、CaseExecutionRecord、固定知识 fixture、EvaluationBaselineManifest、故障注入和 51 个 Minimum Slice blocking 案例尚未在同一可验证基线上执行。
 - 阶段发布授权：无；Minimum Slice 不得以本次冒烟检查作为发布通过。
 - 报告位置：`docs/reports/A1-E2E-001.md`。
+
+A1-E2E-001 只负责运行发布验证和记录 Gate Record，不负责现场创建 runner、修改 fixture 期望、调整检索参数或修复产品行为。正式运行前必须完成 Preflight：baseline manifest、fixture hash、runner 自测、CaseExecutionRecord 持久化、故障注入、Provider、出站策略、Developer Trace、UI 自动化环境和测试命名空间隔离均通过。Preflight 失败时结论为 `blocked`；Preflight 通过但产品违反冻结契约时结论为 `failed`；全部 blocking cases、硬指标、UI/API/Trace/领域记录一致性和旧能力回归均满足时才可记为 `passed`。
 
 Non-Goals：不实现画像、三部榜单、LensSkill、知识图谱、复杂行动工作流或自动知识合并。
 

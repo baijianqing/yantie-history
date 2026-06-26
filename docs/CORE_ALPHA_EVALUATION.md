@@ -4,9 +4,9 @@
 
 任务标识：`A0-EVAL-001`
 
-修订标识：`A0-EVAL-001-R1.1`
+修订标识：`A0-EVAL-001-R1.2`
 
-评测契约版本：`core-alpha-eval-v1.1-candidate`
+评测契约版本：`core-alpha-eval-v1.2-candidate`
 
 依赖：业务架构 `A0-DOC-001-R7.1`、技术架构 `A0-DOC-002-R4.1`、领域模型 `A0-DOC-003-R1.2.2`、API 契约 `A0-DOC-004-R1.2.1`、检索策略 `A0-DOC-006-R1.3`
 
@@ -25,12 +25,12 @@
 任务契约：
 
 - 价值：在实现前固定真实失败案例，防止为了通过测试而降低来源、证据、审计或用户确认标准。
-- 允许修改范围：首次交付新增本文并机械更新 `docs/TASK_INDEX.md` 中 `A0-EVAL-001` 状态；本次 R1.1 勘误只修改本文。
+- 允许修改范围：首次交付新增本文并机械更新 `docs/TASK_INDEX.md` 中 `A0-EVAL-001` 状态；后续勘误只修改本文。
 - 禁止修改范围：测试代码、fixture 数据、模型、索引、数据库、迁移、业务实现、配置和运行态数据。
 - 输入：业务冻结场景、领域状态机、API Outcome、检索 R1.3 和真实失败案例。
 - 输出：Golden Case 契约、fixture 规范、指标口径、执行记录契约及 Minimum Slice/Core Complete 发布门。
 - 接口：后续 fixture builder、evaluation runner、人工语义复核和发布报告的文档契约。
-- 回滚：首次交付可删除本文并恢复任务状态；R1.1 只回滚本文对应勘误提交，不改变已完成任务状态；均不涉及运行态回滚。
+- 回滚：首次交付可删除本文并恢复任务状态；后续勘误只回滚本文对应勘误提交，不改变已完成任务状态；均不涉及运行态回滚。
 
 本文完成只表示评测规范已冻结，不表示案例已经执行。实际 fixture 文件、runner、快照和评测报告在阶段1任务中实现。
 
@@ -108,6 +108,22 @@ Minimum Slice 每个案例都必须覆盖：
 - feature flag、execution mode 和系统安全预算。
 
 版本变化必须形成新批次，不得把不同版本的结果直接聚合成同一分母。
+
+### 3.1.1 EvaluationBaselineManifest
+
+Minimum Slice 发布套件必须先生成并验证 `EvaluationBaselineManifest`。它是一次评测批次的基线封条，不是领域对象，也不替代 CaseExecutionRecord。Manifest 至少包含：
+
+- fixture manifest version 与内容 Hash。
+- 每个 fixture 的 KnowledgeItemVersion ID。
+- chunk strategy version、active Chunk 集合 Hash 与数量。
+- FTS IndexGeneration ID、状态和校验摘要。
+- vector IndexGeneration ID、状态和校验摘要。
+- Embedding、tokenizer、reranker、Provider contract、Prompt 和输出 Schema 版本。
+- retrieval policy、parameter set、Audit、DecisionFitness 和 Egress policy 版本。
+- 系统 Token、成本和调用预算。
+- 实现 Git commit 与数据库迁移版本。
+
+E2E Preflight 必须验证当前运行环境与 `EvaluationBaselineManifest` 一致。Chunk 数量、active Chunk 集合 Hash、current generation pointer、OCR/解析内容、索引代际、策略参数、模型、Prompt、Provider contract 或迁移版本任一发生变化时，不得继续聚合进原批次；需要生成新的 Manifest 和新的评测批次。无法形成或验证 Manifest 时，A1-E2E-001 结论只能是 `blocked`，不能把未执行案例记为 failed 或 passed。
 
 ### 3.2 重复与人工复核
 

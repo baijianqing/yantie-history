@@ -2,7 +2,7 @@
 
 状态：阶段0 Gate 已通过，阶段1任务 DAG 冻结版
 
-任务标识：`A0-DOC-005-R1.1.2`
+任务标识：`A0-DOC-005-R1.1.3`
 
 本文是任务编号、依赖、修改边界和验收入口的权威来源。旧实现中的主权账本、内容工坊、议题编译器、御史台、三部或宰相任务不属于当前冻结路线，不得据此继续排期。
 
@@ -22,7 +22,7 @@
 
 ```mermaid
 flowchart TB
-    D1["A0-DOC-001..004<br/>冻结架构与契约"] --> D5["A0-DOC-005-R1.1.2<br/>Roadmap 与任务 DAG"]
+    D1["A0-DOC-001..004<br/>冻结架构与契约"] --> D5["A0-DOC-005-R1.1.3<br/>Roadmap 与任务 DAG"]
     D5 --> D6["A0-DOC-006<br/>检索策略"]
     D5 --> E0["A0-EVAL-001<br/>Golden Cases"]
     D6 --> G0["A0-GATE-001<br/>阶段0冻结审查"]
@@ -81,8 +81,14 @@ flowchart TB
     APIG --> UI1["A1-UI-001<br/>工作台"]
     APIG --> DG2["A1-DIAGNOSTICS-002<br/>Developer Assembly"]
     DG1 --> DG2
+    E0 --> EV1A["A1-EVAL-001A<br/>Runner/Records"]
+    E0 --> EV1B["A1-EVAL-001B<br/>Fixture/Baseline"]
+    K2 --> EV1B
+    EV1A --> EVG["A1-EVAL-001<br/>Epic Gate"]
+    EV1B --> EVG
     UI1 --> E1["A1-E2E-001<br/>Minimum Slice 验收"]
     DG2 --> E1
+    EVG --> E1
 
     E1 --> AT2["A2-ATTENTION-001"]
     E1 --> RV2["A2-REVIEW-001"]
@@ -116,10 +122,10 @@ flowchart TB
 - 回滚方式：逐提交回退对应文档修订。
 - 文档更新：任务本身即文档更新。
 
-### A0-DOC-005-R1.1.2：同步 Roadmap 与任务索引
+### A0-DOC-005-R1.1.3：同步 Roadmap、任务索引与评测基础设施
 
 - 状态：`completed`。
-- 价值：删除旧实施路线，建立从阶段0到 Core Alpha Complete 的唯一任务 DAG。
+- 价值：删除旧实施路线，建立从阶段0到 Core Alpha Complete 的唯一任务 DAG，并补齐评测基础设施、Baseline Manifest 与发布门状态表达。
 - 依赖：A0-DOC-001..004。
 - 允许修改范围：`docs/ROADMAP.md`、`docs/TASK_INDEX.md`。
 - 禁止修改范围：其他文档、代码、测试、迁移、配置和 `library/`。
@@ -135,7 +141,7 @@ flowchart TB
 
 - 状态：`completed`。
 - 价值：把“从哪里找、怎样找、何时停止、如何打包证据”变成可评测策略。
-- 依赖：A0-DOC-005-R1.1.2。
+- 依赖：A0-DOC-005-R1.1.3。
 - 允许修改范围：新增 `docs/RAG_RETRIEVAL_STRATEGY.md`。
 - 禁止修改范围：检索代码、索引、Embedding、Chroma、数据库和运行态数据。
 - 输入：KnowledgeScope、ResearchPlan、五种 research mode、现有检索能力与真实失败案例。
@@ -150,7 +156,7 @@ flowchart TB
 
 - 状态：`completed`。
 - 价值：在实现前固定真实失败案例、分层断言和发布质量门。
-- 依赖：A0-DOC-005-R1.1.2；可与 A0-DOC-006 并行，但最终需同步检索指标。
+- 依赖：A0-DOC-005-R1.1.3；可与 A0-DOC-006 并行，但最终需同步检索指标。
 - 允许修改范围：新增 `docs/CORE_ALPHA_EVALUATION.md`。
 - 禁止修改范围：测试代码、fixture 数据、模型、索引和业务实现。
 - 输入：业务架构冻结验收场景、API Outcome、检索失败案例。
@@ -165,7 +171,7 @@ flowchart TB
 
 - 状态：`completed`。
 - 价值：确认文档能够作为实现稳定上游。
-- 依赖：A0-DOC-005-R1.1.2、A0-DOC-006、A0-EVAL-001。
+- 依赖：A0-DOC-005-R1.1.3、A0-DOC-006、A0-EVAL-001。
 - 允许修改范围：在 `docs/ROADMAP.md` 第 2.1 节追加 Gate Record，并更新 `docs/TASK_INDEX.md` 任务状态。
 - 禁止修改范围：架构内容、代码、迁移、配置和运行态数据。
 - 输入：全部阶段0权威文档及 Git 状态。
@@ -199,6 +205,10 @@ Contract 子任务 B/C/D 可以并行，但只能修改各自模块、测试和�
 
 ### A1-CONTRACT-001A：公共值对象与 Envelope
 
+- 状态：`completed`。
+- 完成提交：`c8d9212`。
+- 验收命令：`python -m pytest test/test_core_alpha_contract_common.py`。
+- 验收报告：无单独报告；由 `A1-CONTRACT-001` Epic Gate 汇总。
 - 价值：先冻结所有模块共享的基础 JSON/Python 类型。
 - 依赖：A0-GATE-001。
 - 允许修改范围：Core Alpha contracts 公共模块、`test/test_core_alpha_contract_common.py`、`docs/errata/A1-CONTRACT-001A.md`。
@@ -213,6 +223,10 @@ Contract 子任务 B/C/D 可以并行，但只能修改各自模块、测试和�
 
 ### A1-CONTRACT-001B：Case、Scope 与 Plan Schema
 
+- 状态：`completed`。
+- 完成提交：`9ce06d0`。
+- 验收命令：`python -m pytest test/test_core_alpha_contract_scope.py`。
+- 验收报告：无单独报告；由 `A1-CONTRACT-001` Epic Gate 汇总。
 - 价值：把问题、来源、范围与研究计划变成可执行契约。
 - 依赖：A1-CONTRACT-001A。
 - 允许修改范围：contracts 的 Case/Scope/Plan 模块、`test/test_core_alpha_contract_scope.py`、`docs/errata/A1-CONTRACT-001B.md`。
@@ -227,6 +241,10 @@ Contract 子任务 B/C/D 可以并行，但只能修改各自模块、测试和�
 
 ### A1-CONTRACT-001C：Run、Evidence 与 Judgment Schema
 
+- 状态：`completed`。
+- 完成提交：`bb0aaa6`。
+- 验收命令：`python -m pytest test/test_core_alpha_contract_judgment.py`。
+- 验收报告：无单独报告；由 `A1-CONTRACT-001` Epic Gate 汇总。
 - 价值：冻结执行、证据、理由链、Claim、判断和审计表示。
 - 依赖：A1-CONTRACT-001A。
 - 允许修改范围：contracts 的 execution/judgment 模块、`test/test_core_alpha_contract_judgment.py`、`docs/errata/A1-CONTRACT-001C.md`。
@@ -241,6 +259,10 @@ Contract 子任务 B/C/D 可以并行，但只能修改各自模块、测试和�
 
 ### A1-CONTRACT-001D：Decision 与 Internal Command Schema
 
+- 状态：`completed`。
+- 完成提交：`3c798a2`。
+- 验收命令：`python -m pytest test/test_core_alpha_contract_decision.py`。
+- 验收报告：无单独报告；由 `A1-CONTRACT-001` Epic Gate 汇总。
 - 价值：冻结用户处置、内部候选提交与命令结果边界。
 - 依赖：A1-CONTRACT-001A。
 - 允许修改范围：contracts 的 decision/internal 模块、`test/test_core_alpha_contract_decision.py`、`docs/errata/A1-CONTRACT-001D.md`。
@@ -270,6 +292,10 @@ Contract 子任务 B/C/D 可以并行，但只能修改各自模块、测试和�
 
 ### A1-PERSIST-001A：Persistence Foundation
 
+- 状态：`completed`。
+- 完成提交：`d6f7534`。
+- 验收命令：`python -m pytest test/test_core_alpha_persistence_foundation.py`。
+- 验收报告：无单独报告；由 `A1-PERSIST-001` Epic Gate 汇总。
 - 价值：建立 SQLite 短事务、迁移基线和 Repository 公共机制。
 - 依赖：A1-CONTRACT-001。
 - 允许修改范围：Core Alpha persistence foundation、一个迁移、`test/test_core_alpha_persistence_foundation.py`、技术架构机械勘误。
@@ -284,6 +310,10 @@ Contract 子任务 B/C/D 可以并行，但只能修改各自模块、测试和�
 
 ### A1-PERSIST-001B：Case 与 Scope Repository
 
+- 状态：`completed`。
+- 完成提交：`960546d`。
+- 验收命令：`python -m pytest test/test_core_alpha_case_scope_repository.py`。
+- 验收报告：无单独报告；由 `A1-PERSIST-001` Epic Gate 汇总。
 - 价值：持久化 Case 聚合中的问题、解析、范围和计划版本。
 - 依赖：A1-PERSIST-001A、A1-CONTRACT-001B。
 - 允许修改范围：Case/Scope Repository、一个迁移、`test/test_core_alpha_case_scope_repository.py`、技术架构机械勘误。
@@ -298,6 +328,10 @@ Contract 子任务 B/C/D 可以并行，但只能修改各自模块、测试和�
 
 ### A1-PERSIST-001C：Run 与 Evidence Repository
 
+- 状态：`completed`。
+- 完成提交：`28c9327`。
+- 验收命令：`python -m pytest test/test_core_alpha_run_evidence_repository.py`。
+- 验收报告：无单独报告；由 `A1-PERSIST-001` Epic Gate 汇总。
 - 价值：持久化执行、检查点、Outcome、Trace 和证据使用关系。
 - 依赖：A1-PERSIST-001B、A1-CONTRACT-001C。
 - 允许修改范围：Run/Evidence Repository、一个迁移、`test/test_core_alpha_run_evidence_repository.py`、技术架构机械勘误。
@@ -312,6 +346,10 @@ Contract 子任务 B/C/D 可以并行，但只能修改各自模块、测试和�
 
 ### A1-PERSIST-001D：Judgment 与 Decision Repository
 
+- 状态：`completed`。
+- 完成提交：`a73fa36`。
+- 验收命令：`python -m pytest test/test_core_alpha_judgment_decision_repository.py`。
+- 验收报告：无单独报告；由 `A1-PERSIST-001` Epic Gate 汇总。
 - 价值：持久化判断版本、审计、用途、Proposal 与用户处置。
 - 依赖：A1-PERSIST-001C、A1-CONTRACT-001C、A1-CONTRACT-001D。
 - 允许修改范围：Judgment/Decision Repository、一个迁移、`test/test_core_alpha_judgment_decision_repository.py`、技术架构机械勘误。
@@ -326,6 +364,10 @@ Contract 子任务 B/C/D 可以并行，但只能修改各自模块、测试和�
 
 ### A1-COMMAND-001：命令、幂等、事件与 Outbox
 
+- 状态：`completed`。
+- 完成提交：`111bba1`。
+- 验收命令：`python -m pytest test/test_core_alpha_commands.py`。
+- 验收报告：无单独报告。
 - 价值：统一 API 与 Worker 写入路径，防止重复事实和迟到结果复活。
 - 依赖：A1-CONTRACT-001、A1-PERSIST-001。
 - 允许修改范围：一个 application command 模块、`test/test_core_alpha_commands.py`、`docs/TECHNICAL_ARCHITECTURE.md` 机械勘误。
@@ -340,6 +382,10 @@ Contract 子任务 B/C/D 可以并行，但只能修改各自模块、测试和�
 
 ### A1-EGRESS-001：出站策略与调用审计
 
+- 状态：`completed`。
+- 完成提交：`04cb697`。
+- 验收命令：`python -m pytest test/test_data_egress.py`。
+- 验收报告：无单独报告。
 - 价值：确保任何外部 Provider 调用在发送资料前经过可拒绝、可审计的统一策略。
 - 依赖：A1-CONTRACT-001、A1-PERSIST-001、A1-COMMAND-001。
 - 允许修改范围：一个 Outbound Data Policy 模块、MaterialManifest Repository、一个专属迁移、`test/test_data_egress.py`、`docs/TECHNICAL_ARCHITECTURE.md` 机械勘误。
@@ -354,6 +400,10 @@ Contract 子任务 B/C/D 可以并行，但只能修改各自模块、测试和�
 
 ### A1-KNOWLEDGE-001：Knowledge Catalog 身份读取
 
+- 状态：`completed`。
+- 完成提交：`375a590`。
+- 验收命令：`python -m pytest test/test_core_alpha_knowledge_catalog.py`。
+- 验收报告：无单独报告。
 - 价值：把现有资料映射为稳定 KnowledgeItem、Version 与 Chunk 身份，为 SourceResolution 提供依据。
 - 依赖：A1-PERSIST-001。
 - 允许修改范围：`metaos/knowledge` 内一个适配器、`test/test_core_alpha_knowledge_catalog.py`、一份直接相关技术文档。
@@ -368,6 +418,7 @@ Contract 子任务 B/C/D 可以并行，但只能修改各自模块、测试和�
 
 ### A1-KNOWLEDGE-002：版本化 ChunkSet 与 IndexGeneration 底座
 
+- 状态：`pending`。
 - 价值：在复用旧上传、OCR、切片和索引执行代码的同时，为 Core Alpha 提供可版本化、可对比、可回滚的知识底座，避免检索调试受 mutable Chunk / Index 漂移影响。
 - 依赖：A1-KNOWLEDGE-001、A1-PERSIST-001、A1-COMMAND-001。
 - 允许修改范围：一个 Knowledge Ingestion/Index Generation 适配模块、必要的专属持久化/Repository 接线、`test/test_versioned_knowledge_foundation.py`、`docs/TECHNICAL_ARCHITECTURE.md` 或 `docs/RAG_RETRIEVAL_STRATEGY.md` 机械勘误。
@@ -382,6 +433,10 @@ Contract 子任务 B/C/D 可以并行，但只能修改各自模块、测试和�
 
 ### A1-CASE-001：ResearchCase 与 ResearchQuestion
 
+- 状态：`completed`。
+- 完成提交：`77338bb`。
+- 验收命令：`python -m pytest test/test_research_case.py`。
+- 验收报告：无单独报告。
 - 价值：建立用户侧长期研究聚合，不再以聊天或单次任务代替研究项目。
 - 依赖：A1-PERSIST-001、A1-COMMAND-001。
 - 允许修改范围：一个 Case Management 模块、`test/test_research_case.py`、`docs/DOMAIN_MODEL.md` 机械勘误。
@@ -396,6 +451,10 @@ Contract 子任务 B/C/D 可以并行，但只能修改各自模块、测试和�
 
 ### A1-SCOPE-001：来源解析、KnowledgeScope 与 ResearchPlan
 
+- 状态：`completed`。
+- 完成提交：`f4389e5`。
+- 验收命令：`python -m pytest test/test_scope_governance.py`。
+- 验收报告：无单独报告。
 - 价值：同时解决“从哪里找”和“怎样找”。
 - 依赖：A1-CASE-001、A1-KNOWLEDGE-001、A1-COMMAND-001。
 - 允许修改范围：一个 Scope Governance 模块、`test/test_scope_governance.py`、`docs/RAG_RETRIEVAL_STRATEGY.md` 机械勘误。
@@ -410,6 +469,10 @@ Contract 子任务 B/C/D 可以并行，但只能修改各自模块、测试和�
 
 ### A1-EXECUTION-001：ResearchRun 生命周期
 
+- 状态：`completed`。
+- 完成提交：`385116c`。
+- 验收命令：`python -m pytest test/test_research_run.py`。
+- 验收报告：无单独报告。
 - 价值：让研究执行、重试、取消、失败和结束具有可审计语义。
 - 依赖：A1-SCOPE-001、A1-COMMAND-001。
 - 允许修改范围：一个 Research Execution 模块、`test/test_research_run.py`、`docs/TECHNICAL_ARCHITECTURE.md` 机械勘误。
@@ -424,6 +487,10 @@ Contract 子任务 B/C/D 可以并行，但只能修改各自模块、测试和�
 
 ### A1-RETRIEVAL-001：来源感知检索与证据使用
 
+- 状态：`completed`。
+- 完成提交：`8c48777`。
+- 验收命令：`python -m pytest test/test_source_aware_retrieval.py`。
+- 验收报告：无单独报告；新增 `A1-KNOWLEDGE-002` 后，发布门仍需在固定知识底座上重新验证。
 - 价值：消除 Chunk 数量霸权，并形成可追溯的本次证据使用事实。
 - 依赖：A1-EXECUTION-001、A1-KNOWLEDGE-002、A1-EGRESS-001、A0-DOC-006。
 - 允许修改范围：一个 Knowledge Access/检索编排模块、`test/test_source_aware_retrieval.py`、`docs/RAG_RETRIEVAL_STRATEGY.md` 机械勘误。
@@ -438,6 +505,10 @@ Contract 子任务 B/C/D 可以并行，但只能修改各自模块、测试和�
 
 ### A1-JUDGMENT-001：Evidence、Rationale、Claim 与 JudgmentCard
 
+- 状态：`completed`。
+- 完成提交：`4830119`。
+- 验收命令：`python -m pytest test/test_judgment_domain.py`。
+- 验收报告：无单独报告。
 - 价值：把证据和推理组织为可逐条审计的判断。
 - 依赖：A1-RETRIEVAL-001、A1-EGRESS-001。
 - 允许修改范围：一个 Judgment 模块、`test/test_judgment_domain.py`、`docs/DOMAIN_MODEL.md` 机械勘误。
@@ -452,6 +523,10 @@ Contract 子任务 B/C/D 可以并行，但只能修改各自模块、测试和�
 
 ### A1-AUDIT-001：Audit Pipeline 与 DecisionFitness
 
+- 状态：`completed`。
+- 完成提交：`e9cb305`。
+- 验收命令：`python -m pytest test/test_judgment_audit.py`。
+- 验收报告：无单独报告。
 - 价值：阻止无证据、来源越界或用途过强的判断被展示为可靠。
 - 依赖：A1-JUDGMENT-001、A1-EGRESS-001。
 - 允许修改范围：Judgment 模块内审计子模块、`test/test_judgment_audit.py`、`docs/TECHNICAL_ARCHITECTURE.md` 机械勘误。
@@ -466,6 +541,10 @@ Contract 子任务 B/C/D 可以并行，但只能修改各自模块、测试和�
 
 ### A1-DECISION-001：DispositionProposal 与 ResearchDisposition
 
+- 状态：`completed`。
+- 完成提交：`7da6cbd`。
+- 验收命令：`python -m pytest test/test_research_disposition.py`。
+- 验收报告：无单独报告。
 - 价值：让用户而不是系统决定研究如何结束。
 - 依赖：A1-AUDIT-001。
 - 允许修改范围：一个 Decision 模块、`test/test_research_disposition.py`、`docs/DOMAIN_MODEL.md` 机械勘误。
@@ -495,6 +574,10 @@ Contract 子任务 B/C/D 可以并行，但只能修改各自模块、测试和�
 
 ### A1-API-001A：Knowledge、Case 与 Scope API
 
+- 状态：`completed`。
+- 完成提交：`f1a3228`。
+- 验收命令：`python -m pytest test/test_core_alpha_api_scope.py`。
+- 验收报告：无单独报告；由 `A1-API-001` Epic Gate 汇总。
 - 价值：暴露知识身份、研究项目、来源解析、范围和计划入口。
 - 依赖：A1-KNOWLEDGE-001、A1-CASE-001、A1-SCOPE-001、A1-CONTRACT-001。
 - 允许修改范围：一个 Core Alpha API router 子模块、`test/test_core_alpha_api_scope.py`、`docs/errata/A1-API-001A.md`。
@@ -509,6 +592,10 @@ Contract 子任务 B/C/D 可以并行，但只能修改各自模块、测试和�
 
 ### A1-API-001B：Run、Evidence、Judgment 与 Audit API
 
+- 状态：`completed`。
+- 完成提交：`be1a8c0`。
+- 验收命令：`python -m pytest test/test_core_alpha_api_judgment.py`。
+- 验收报告：无单独报告；由 `A1-API-001` Epic Gate 汇总。
 - 价值：暴露研究执行、证据、判断、审计和用途读取/确认入口。
 - 依赖：A1-EXECUTION-001、A1-JUDGMENT-001、A1-AUDIT-001、A1-CONTRACT-001。
 - 允许修改范围：一个 Core Alpha API router 子模块、`test/test_core_alpha_api_judgment.py`、`docs/errata/A1-API-001B.md`。
@@ -523,6 +610,10 @@ Contract 子任务 B/C/D 可以并行，但只能修改各自模块、测试和�
 
 ### A1-API-001C：Decision 与 Internal API
 
+- 状态：`completed`。
+- 完成提交：`bd95c7a`。
+- 验收命令：`python -m pytest test/test_core_alpha_api_decision.py`。
+- 验收报告：无单独报告；由 `A1-API-001` Epic Gate 汇总。
 - 价值：暴露用户处置并接收受信 Worker 候选，不混用普通用户权限。
 - 依赖：A1-DECISION-001、A1-COMMAND-001、A1-CONTRACT-001。
 - 允许修改范围：一个 Decision/Internal router 子模块、`test/test_core_alpha_api_decision.py`、`docs/errata/A1-API-001C.md`。
@@ -537,6 +628,10 @@ Contract 子任务 B/C/D 可以并行，但只能修改各自模块、测试和�
 
 ### A1-API-001D：API Assembly、Feature 状态与 OpenAPI
 
+- 状态：`completed`。
+- 完成提交：`4d4cf65`。
+- 验收命令：`python -m pytest test/test_core_alpha_openapi.py`。
+- 验收报告：无单独报告；由 `A1-API-001` Epic Gate 汇总。
 - 价值：在单一所有者下完成 router 接线和目标 OpenAPI 汇总，避免并行任务修改公共入口。
 - 依赖：A1-API-001A、A1-API-001B、A1-API-001C。
 - 允许修改范围：FastAPI 公共接线文件、Developer Router 扩展挂载点、`test/test_core_alpha_openapi.py`、`docs/API_CONTRACTS.md` 机械勘误。
@@ -551,6 +646,10 @@ Contract 子任务 B/C/D 可以并行，但只能修改各自模块、测试和�
 
 ### A1-DIAGNOSTICS-001：技术 Trace 与 Developer API
 
+- 状态：`completed`。
+- 完成提交：`895836f`。
+- 验收命令：`python -m pytest test/test_core_alpha_diagnostics.py`。
+- 验收报告：无单独报告。
 - 价值：为调试、降级和审计提供受限技术视图，同时保持普通 Trace 脱敏。
 - 依赖：A1-COMMAND-001、A1-EXECUTION-001、A1-EGRESS-001、A1-KNOWLEDGE-002。
 - 允许修改范围：一个 Diagnostics/Projection 模块、Developer router 注册模块、`test/test_core_alpha_diagnostics.py`、`docs/errata/A1-DIAGNOSTICS-001.md`。
@@ -567,6 +666,10 @@ Minimum Slice 不注册 CaseActivityLog 与 `/alpha/developer/research-runs/{id}
 
 ### A1-DIAGNOSTICS-002：Developer API Assembly
 
+- 状态：`completed`。
+- 完成提交：`612fbef`。
+- 验收命令：`python -m pytest test/test_core_alpha_developer_openapi.py`。
+- 验收报告：无单独报告。
 - 价值：在不让 Diagnostics 修改公共 app 文件的前提下，完成 Developer router 的最终挂载和契约合并。
 - 依赖：A1-API-001、A1-DIAGNOSTICS-001。
 - 允许修改范围：Developer extension registry 接线、`test/test_core_alpha_developer_openapi.py`、`docs/API_CONTRACTS.md` 机械勘误。
@@ -581,6 +684,10 @@ Minimum Slice 不注册 CaseActivityLog 与 `/alpha/developer/research-runs/{id}
 
 ### A1-UI-001：Minimum Slice 认知工作台
 
+- 状态：`completed`。
+- 完成提交：`4656549`。
+- 验收命令：UI 单测、Playwright 关键路径与截图检查。
+- 验收报告：无单独报告；截图检查记录在任务执行上下文。
 - 价值：让用户实际提出问题、治理来源、审阅判断并确认处置。
 - 依赖：A1-API-001。
 - 允许修改范围：Streamlit 中一个 Core Alpha 工作台页面、一个 UI 测试目录、`docs/BUSINESS_ARCHITECTURE.md` 机械勘误。
@@ -593,19 +700,88 @@ Minimum Slice 不注册 CaseActivityLog 与 `/alpha/developer/research-runs/{id}
 - 回滚方式：移除新页面入口，保留旧 Streamlit。
 - 文档更新：仅业务架构机械勘误；价值或阶段边界变化必须走 ADR 与阶段0 Gate。
 
+### A1-EVAL-001A：Runner、CaseExecutionRecord 与指标计算
+
+- 状态：`pending`。
+- 价值：证明 Golden Cases runner、CaseExecutionRecord 和指标计算本身可信，避免发布门边造工具边判定产品质量。
+- 依赖：A0-EVAL-001。
+- 允许修改范围：一个 evaluation runner 模块、CaseExecutionRecord 持久化/序列化、指标计算器、`test/test_core_alpha_evaluation_runner.py`、`docs/CORE_ALPHA_EVALUATION.md` 机械勘误。
+- 禁止修改范围：产品业务实现、检索参数、fixture 期望、审计门禁、UI 和运行态 `library/` 数据。
+- 输入：`docs/CORE_ALPHA_EVALUATION.md`、默认 Golden Case manifest、API/Trace/领域记录读取契约。
+- 输出：可重复执行的 runner、CaseExecutionRecord、指标聚合、blocked/failed/passed 计算和报告生成入口。
+- 接口：run manifest、record result、aggregate metrics、render report。
+- 验收标准：runner 自测通过；not_run、inconclusive、blocked、failed、passed 可区分；指标分母稳定；同一输入重复执行不重复写事实。
+- 测试命令：`python -m pytest test/test_core_alpha_evaluation_runner.py`。
+- 回滚方式：删除 runner 模块、测试和评测记录写入。
+- 文档更新：仅评测契约机械勘误。
+
+### A1-EVAL-001B：固定知识 Fixture、故障注入与基线 Manifest
+
+- 状态：`pending`。
+- 价值：把被测知识底座、索引代际、策略版本和运行环境封装成可验证基线，确保 E2E 不是在漂移的 Chunk 或索引上运行。
+- 依赖：A0-EVAL-001、A1-KNOWLEDGE-002。
+- 允许修改范围：fixture 构建/校验模块、故障注入适配器、EvaluationBaselineManifest 生成与验证、`test/test_core_alpha_evaluation_baseline.py`、一份评测 fixture 规范文档。
+- 禁止修改范围：修改 Golden Case 期望、产品业务实现、检索策略参数、审计门禁、旧 `library/` 真实用户数据。
+- 输入：fixture 规范、KnowledgeItemVersion、Chunk 集合、FTS/vector IndexGeneration、策略/Prompt/Provider/Schema 版本、Git commit 和迁移版本。
+- 输出：EvaluationBaselineManifest、fixture 完整性校验、故障注入可重复性检查和测试命名空间隔离。
+- 接口：create baseline、verify baseline、inject fixture failure、reset test namespace。
+- 验收标准：Chunk 数量、Hash、current generation pointer、策略参数、模型/Prompt、迁移版本或 Provider contract 变化时拒绝聚合进原批次；无法形成 baseline 时 E2E blocked。
+- 测试命令：`python -m pytest test/test_core_alpha_evaluation_baseline.py`。
+- 回滚方式：删除 fixture/baseline 模块和测试命名空间数据。
+- 文档更新：仅评测契约或检索策略机械勘误。
+
+### A1-EVAL-001：评测基础设施 Epic Gate
+
+- 状态：`pending`。
+- 价值：确认 runner 与固定知识基线共同满足 Minimum Slice 发布门的评测前置条件。
+- 依赖：A1-EVAL-001A、A1-EVAL-001B。
+- 允许修改范围：仅更新 `docs/TASK_INDEX.md` 中本 Epic 状态、评测基础设施报告。
+- 禁止修改范围：runner 逻辑、fixture 内容、产品实现、检索参数和 Golden Case 期望。
+- 输入：Runner 自测结果、EvaluationBaselineManifest 校验结果和故障注入记录。
+- 输出：评测基础设施 Gate 结论。
+- 接口：Evaluation runner CLI、Baseline verification CLI、报告生成入口。
+- 验收标准：runner、CaseExecutionRecord、指标计算、fixture hash、baseline manifest、故障注入和测试命名空间隔离均通过。
+- 测试命令：`python -m pytest test/test_core_alpha_evaluation_runner.py test/test_core_alpha_evaluation_baseline.py`。
+- 回滚方式：保持 Gate pending 并退回失败子任务。
+- 文档更新：仅任务状态与评测基础设施报告。
+
 ### A1-E2E-001：Minimum Slice 发布门
 
+- 状态：`blocked`。
+- 阻断项：`A1-EVAL-001` 未完成，完整 Golden Cases 尚未在可验证基线上执行。
+- 解除条件：评测基础设施完成，Preflight 全部通过，并成功执行全部 Minimum Slice blocking cases。
 - 价值：证明新闭环比普通 Top-K RAG 更可靠，而不是只完成对象搭建。
-- 依赖：A1-UI-001、A1-DIAGNOSTICS-002、A0-EVAL-001。
-- 允许修改范围：一个 Core Alpha 端到端测试目录、评测报告、`docs/ROADMAP.md` 状态。
-- 禁止修改范围：为通过测试修改业务规则、降低审计标准或改写 fixture 期望。
-- 输入：Golden Cases、固定知识 fixture 和运行服务。
-- 输出：来源、检索、判断、审计、API 和 UI 回归报告。
+- 依赖：A1-EVAL-001、A1-UI-001、A1-DIAGNOSTICS-002。
+- 允许修改范围：端到端测试编排、运行配置、评测报告、`docs/ROADMAP.md` Gate Record。
+- 禁止修改范围：fixture 期望、评测指标、产品业务实现、检索参数、知识版本、审计门禁和用户确认规则。
+- 输入：Golden Cases、EvaluationBaselineManifest、固定知识 fixture、运行服务、Developer Trace 和工作台。
+- 输出：来源、检索、判断、审计、API、Trace 和 UI 回归报告。
 - 接口：公开 API 与工作台用户路径。
 - 验收标准：ROADMAP 第 3 章退出条件全部满足。
 - 测试命令：Minimum Slice 单测、契约测试、Golden Cases runner 与 UI 检查。
 - 回滚方式：不发布新入口，保持 Feature Flag 关闭。
 - 文档更新：Roadmap 记录验收结果。
+
+E2E 结论规则：
+
+- `blocked`：无法得到可信测试结论，例如 fixture 未完成、runner 未验证、baseline 无法固定、环境/Provider/浏览器能力缺失、关键 Trace 无法读取或案例未运行完。
+- `failed`：评测正常运行，但产品行为违反冻结契约，例如 required 未独立报告、excluded 进入上下文、索引代际静默替换、blocked 判断显示为可采纳、预算绕过或未确认就形成 ResearchDisposition。
+- `passed`：Preflight 全部通过，所有 blocking cases 通过，硬指标达到目标，没有 inconclusive 或 not_run，UI/API/Trace/领域记录一致，旧 RAG/Streamlit 无不可接受回归。
+
+E2E Preflight 不可跳过，至少包含：
+
+1. Baseline Manifest 可验证。
+2. fixture 完整性和 Hash 正确。
+3. runner 自测通过。
+4. CaseExecutionRecord 可持久化。
+5. 故障注入可重复。
+6. required Provider 或本地模型可用。
+7. 数据出站策略启用。
+8. Developer Trace 可查询。
+9. UI 自动化环境可执行。
+10. 测试命名空间为空或已隔离。
+
+Preflight 失败时，`A1-E2E-001` 只能记录为 `blocked`，不得把未运行案例记为 failed，也不得按适用案例通过率发布。发现问题后必须退回责任任务：知识底座问题退回 `A1-KNOWLEDGE-002`，检索问题退回 `A1-RETRIEVAL-001`，处置问题退回 `A1-DECISION-001`，runner 问题退回 `A1-EVAL-001A`，fixture/baseline 问题退回 `A1-EVAL-001B`。
 
 ## 5. Core Alpha Complete 任务
 

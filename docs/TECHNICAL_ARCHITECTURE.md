@@ -310,7 +310,7 @@ Streamlit 继续作为 Alpha 本地工作台，FastAPI 继续作为本地 API �
 - 工作台：提出问题、管理 ResearchCase、指定范围、查看 JudgmentCard、DecisionFitness、ResearchRunOutcome、DispositionProposal、JudgmentReview 和 ActionProposal。
 - 知识：查看作品、版本、结构、引用记录、SourceResolution 结果、KnowledgeContributionCandidate 和证据支持的知识笔记。
 - 复盘：查看 ResearchDisposition、JudgmentReview、ActionReview 和画像更新候选。
-- 开发者：查看 ResearchTrace、CaseActivityLog、RetrievalRun、EvidenceUnit、AuditFinding、MaterialManifest、成本和失败原因。
+- 开发者：Minimum Slice 查看 ResearchTrace、RetrievalRun、EvidenceUnit、AuditFinding、MaterialManifest、IndexGeneration metadata、projection status 和失败原因；Core Alpha Complete 再增加 CaseActivityLog 与正式预算/消费诊断。
 
 入口适配层原则：
 
@@ -362,7 +362,7 @@ Application Query Handler 负责：
 查询一致性分为两类：
 
 - 强一致当前状态：当前 ResearchCase、KnowledgeScope、JudgmentCard、DecisionFitness、DispositionProposal、ResearchDisposition、ActionProposal，以及用户刚完成的确认结果。优先读取领域持久化集合和 current pointer；使用 Read Model 时，其 projection version 必须不早于请求携带的 minimum command version，否则回退到领域 Repository。
-- 最终一致诊断：ResearchTrace、CaseActivityLog、统计、成本汇总、长期时间线和开发者诊断投影。允许延迟，但 DTO 必须暴露 projection version、updated at 和 lagging 语义。
+- 最终一致诊断：Minimum Slice 包含 ResearchTrace、Technical Trace、MaterialManifest、IndexGeneration metadata 和 projection status；Core Alpha Complete 增加 CaseActivityLog、统计、成本汇总和长期时间线。允许延迟，但 DTO 必须暴露 projection version、updated at 和 lagging 语义。
 
 命令响应直接返回本次事务形成的权威结果及 command version。随后当前状态查询不得展示早于该版本的投影；`minimum_projection_version` 只是契约语义，具体字段由 API 契约定义。
 
@@ -372,7 +372,7 @@ Application Query Handler 负责：
 
 - Case Management：管理 Question、ResearchCase、ResearchTriage、用户 Triage 决定、Case 归档和派生。
 - Scope Governance：管理 Preliminary Source Anchor Parsing、Full SourceResolution、KnowledgeScope 的访问政策与分析角色、来源版本、显式排除和范围校验。
-- Research Execution：管理 ResearchPlan、ResearchRun、RunExecutionSpec、ResearchAttempt、RetrievalRun、ResearchBudgetGuard、持久化检查点、ResearchRunOutcome、reuse_existing_evidence 和 ResearchTrace 写入。
+- Research Execution：Minimum Slice 管理 ResearchPlan、ResearchRun、RunExecutionSpec、ResearchAttempt、RetrievalRun、system_safety_limits、持久化检查点、ResearchRunOutcome、reuse_existing_evidence 和 ResearchTrace 写入；Core Alpha Complete 增加正式 ResearchBudgetGuard、BudgetSnapshot 与 BudgetConsumptionRecord。
 - Judgment：管理 EvidenceUnit、JudgmentRationale、Claim、JudgmentCard、Audit、DecisionFitness、JudgmentReview 和 Evidence Validity Checker。
 - Decision：管理 DispositionProposal 和 ResearchDisposition。
 - Action：管理 ActionProposal、ActionCommitment 和 ActionReview。
@@ -513,8 +513,8 @@ EvidenceUnit 有两类关系：
 
 Core Alpha 需要两类查询投影：
 
-- ResearchTrace：Run 级执行因果投影，解释一次 ResearchRun 为什么得到某个结果。
-- CaseActivityLog：Case 级长期活动投影，解释一个 ResearchCase 后续发生了什么。
+- ResearchTrace：Run 级执行因果投影，解释一次 ResearchRun 为什么得到某个结果；Minimum Slice 必须提供。
+- CaseActivityLog：Case 级长期活动投影，解释一个 ResearchCase 后续发生了什么；Core Alpha Complete 提供，Minimum Slice 不注册为普通发布前置。
 
 统一事件语义：
 
@@ -734,7 +734,7 @@ Run started
 
 ### 7.6 ResearchBudgetGuard
 
-ResearchBudgetGuard 属于 Core Alpha Complete 的 Research Execution 控制点，由确定性代码执行，不依赖模型自觉遵守。
+Minimum Slice 只要求 `system_safety_limits`、RunExecutionSpec 总预算字段和调用前的基础上限校验，确保不会无界消耗。正式 `BudgetSnapshot`、`BudgetConsumptionRecord` 与 ResearchBudgetGuard 属于 Core Alpha Complete 的 Research Execution 控制点，由确定性代码执行，不依赖模型自觉遵守。
 
 至少检查：
 
