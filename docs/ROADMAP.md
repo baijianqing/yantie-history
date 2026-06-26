@@ -140,17 +140,19 @@ ResearchRunOutcome 只表达研究如何结束；ResearchDisposition 只表达�
 - 实现 ResearchCase 与 ResearchQuestion。
 - 实现 SourceResolution、KnowledgeScope 版本和 ResearchPlan 版本。
 - 显式来源解析失败、歧义或不可用时不得静默回退全库。
+- SourceResolution 可以先依赖只读 Knowledge Catalog 身份读取；真正进入检索评测前，必须完成版本化知识底座，确保 ResearchRun 绑定固定 KnowledgeItemVersion、chunk strategy 和 IndexGeneration。
 
 阶段门：指定、比较、排除和版本选择均有契约测试；旧 Scope/Plan 版本不可原地修改。
 
 ### 3.3 研究执行与来源感知检索
 
+- 在来源感知检索前实现 A1-KNOWLEDGE-002：复用旧上传、OCR、切片和索引生成执行能力，但对 Core Alpha 暴露不可原地覆盖的 KnowledgeItemVersion、Chunk 集合和 IndexGeneration 代际。
 - 实现 Run、Attempt、零或多个 RetrievalRun、Outcome 与 Trace。
 - 有锚点时在指定来源内检索；无锚点时先做来源级路由。
 - 支持 `fact_lookup / source_interpretation / compare_sources / enumerate_pattern / claim_evaluation` 的差异化执行。
 - 形成 ResearchEvidenceUse，区分证据产生关系与本次使用关系。
 
-阶段门：短资料公平性、required 独立报告、excluded 污染、零检索证据复用和失败降级评测通过。
+阶段门：同一检索评测绑定固定 KnowledgeItemVersion、chunk strategy、IndexGeneration 和策略版本；短资料公平性、required 独立报告、excluded 污染、零检索证据复用和失败降级评测通过。
 
 ### 3.4 判断、审计与处置
 

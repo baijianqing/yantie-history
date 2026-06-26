@@ -383,6 +383,8 @@ Application Query Handler 负责：
 
 阶段1实现映射：`A1-KNOWLEDGE-001` 以 `metaos/knowledge/catalog.py` 作为只读 Knowledge Catalog Port，从现有 workspace SQLite 的 KnowledgeItem、Asset 与 Chunk 元数据投影 KnowledgeItemVersion、Chunk 和 IndexGeneration metadata。该适配器不得写入 `library/`、重新切块、重建索引或静默替换来源版本；它只为 SourceResolution、KnowledgeScope 和后续检索提供稳定身份读取。
 
+`A1-KNOWLEDGE-002` 在此基础上建立版本化知识底座：可以复用旧服务中的文件上传、PDF/OCR 转换、Markdown 解析、`build_chunks`、Embedding 和 Chroma/FTS upsert 等执行能力，但不得复用旧路径的“删除现有 Chunk 后覆盖当前索引”作为 Core Alpha 语义。进入 Core Alpha 的结果必须形成可寻址的 KnowledgeItemVersion、按 chunk strategy 固定的 Chunk 集合、IndexGeneration 代际、构建校验和 current generation pointer；不同分块策略、OCR 修正、重新解析或索引重建必须产生新版本或新代际。旧 Streamlit/RAG 可以继续使用既有路径，但来源感知检索和 Golden Cases 只能读取已经固定的版本与代际。
+
 阶段边界：Minimum Slice 只要求 Case Management、Scope Governance、Research Execution、Judgment 和 Decision 的最小纵向链，并通过一次 Full SourceResolution 建立 Scope；Preliminary Parsing、ResearchTriage、在办软门禁、JudgmentReview、Action 和 Knowledge Contribution 属于 Core Alpha Complete。模块可以提前存在接口，但不得成为 Minimum Slice 的运行依赖。
 
 ### 4.4 Extended Alpha 隔离

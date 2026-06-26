@@ -74,6 +74,8 @@
 
 任何输入版本与 RunExecutionSpec 不一致时，不得继续本次 Attempt。变更 Scope、Plan、核心证据要求或研究目标必须产生新 ResearchRun，而不是在当前 Run 内悄然采用新策略输入。
 
+检索调试与 Golden Cases 评测必须在版本化知识底座上执行：同一批评测固定 KnowledgeItemVersion、chunk strategy version、active Chunk 集合、IndexGeneration、检索策略版本和参数集版本。若上传、OCR、重新解析、分块策略或索引生成发生变化，必须产生新的版本或代际，并作为新的评测基线记录；不得在可变旧 Chunk 集合或被原地覆盖的索引上判断检索策略优劣。
+
 ### 2.2 策略输出
 
 检索策略输出不是一段自由文本，而是一组可追踪事实：

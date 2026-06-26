@@ -44,6 +44,7 @@ flowchart TB
 
     PG --> M1["A1-COMMAND-001<br/>命令、幂等与事件"]
     PG --> K1["A1-KNOWLEDGE-001<br/>知识身份读取"]
+    K1 --> K2["A1-KNOWLEDGE-002<br/>版本化知识底座"]
     PG --> CA1["A1-CASE-001<br/>ResearchCase"]
     CG --> M1
     M1 --> EG1["A1-EGRESS-001<br/>出站策略"]
@@ -54,6 +55,7 @@ flowchart TB
     M1 --> X1["A1-EXECUTION-001<br/>Run 生命周期"]
     S1 --> X1
     X1 --> R1["A1-RETRIEVAL-001<br/>来源感知检索"]
+    K2 --> R1
     EG1 --> R1
     D6 --> R1
     R1 --> J1["A1-JUDGMENT-001<br/>证据与判断"]
@@ -75,7 +77,7 @@ flowchart TB
     M1 --> DG1["A1-DIAGNOSTICS-001<br/>Technical Trace"]
     X1 --> DG1
     EG1 --> DG1
-    K1 --> DG1
+    K2 --> DG1
     APIG --> UI1["A1-UI-001<br/>工作台"]
     APIG --> DG2["A1-DIAGNOSTICS-002<br/>Developer Assembly"]
     DG1 --> DG2
@@ -364,6 +366,20 @@ Contract 子任务 B/C/D 可以并行，但只能修改各自模块、测试和�
 - 回滚方式：删除适配器和测试。
 - 文档更新：技术架构或检索策略的实现映射。
 
+### A1-KNOWLEDGE-002：版本化 ChunkSet 与 IndexGeneration 底座
+
+- 价值：在复用旧上传、OCR、切片和索引执行代码的同时，为 Core Alpha 提供可版本化、可对比、可回滚的知识底座，避免检索调试受 mutable Chunk / Index 漂移影响。
+- 依赖：A1-KNOWLEDGE-001、A1-PERSIST-001、A1-COMMAND-001。
+- 允许修改范围：一个 Knowledge Ingestion/Index Generation 适配模块、必要的专属持久化/Repository 接线、`test/test_versioned_knowledge_foundation.py`、`docs/TECHNICAL_ARCHITECTURE.md` 或 `docs/RAG_RETRIEVAL_STRATEGY.md` 机械勘误。
+- 禁止修改范围：公开 API、检索编排、Judgment、Audit、UI、全库强制重切块、删除既有 `library/` 运行态数据、破坏旧 Streamlit/RAG 入库能力。
+- 输入：旧文件上传、OCR/PDF 转换、`build_chunks`、Embedding 与 Chroma/FTS upsert 能力，以及 A1-KNOWLEDGE-001 暴露的知识身份读取。
+- 输出：可寻址的 KnowledgeItemVersion 内容身份、按 chunk strategy 固定的 Chunk 集合、IndexGeneration 代际记录、current generation pointer、构建校验和失效过滤依据。
+- 接口：create/version ingest adapter、chunk strategy execution adapter、index generation builder、generation validation query；对 Retrieval 只暴露固定 KnowledgeItemVersion + chunk strategy + IndexGeneration。
+- 验收标准：同一原文不同分块策略可并存；重建索引产生新 IndexGeneration 而非原地覆盖；旧 Chunk 不因新策略被删除；Chroma/FTS 结果可回 SQLite 校验；旧服务复用路径不绕过版本和代际记录。
+- 测试命令：`python -m pytest test/test_versioned_knowledge_foundation.py`；相关旧知识入库回归测试。
+- 回滚方式：关闭新版本化底座开关，保留旧入库路径；回退适配模块、测试和专属持久化接线。
+- 文档更新：仅技术架构或检索策略机械勘误；若要改变 KnowledgeItemVersion、Chunk 或 IndexGeneration 领域语义，必须走 ADR 与阶段0 Gate。
+
 ### A1-CASE-001：ResearchCase 与 ResearchQuestion
 
 - 价值：建立用户侧长期研究聚合，不再以聊天或单次任务代替研究项目。
@@ -409,7 +425,7 @@ Contract 子任务 B/C/D 可以并行，但只能修改各自模块、测试和�
 ### A1-RETRIEVAL-001：来源感知检索与证据使用
 
 - 价值：消除 Chunk 数量霸权，并形成可追溯的本次证据使用事实。
-- 依赖：A1-EXECUTION-001、A1-EGRESS-001、A0-DOC-006。
+- 依赖：A1-EXECUTION-001、A1-KNOWLEDGE-002、A1-EGRESS-001、A0-DOC-006。
 - 允许修改范围：一个 Knowledge Access/检索编排模块、`test/test_source_aware_retrieval.py`、`docs/RAG_RETRIEVAL_STRATEGY.md` 机械勘误。
 - 禁止修改范围：重切块、全量重建索引、Judgment、Audit、API 和 UI。
 - 输入：KnowledgeScope、ResearchPlan、Catalog、现有全文与向量检索 Port。
@@ -536,7 +552,7 @@ Contract 子任务 B/C/D 可以并行，但只能修改各自模块、测试和�
 ### A1-DIAGNOSTICS-001：技术 Trace 与 Developer API
 
 - 价值：为调试、降级和审计提供受限技术视图，同时保持普通 Trace 脱敏。
-- 依赖：A1-COMMAND-001、A1-EXECUTION-001、A1-EGRESS-001、A1-KNOWLEDGE-001。
+- 依赖：A1-COMMAND-001、A1-EXECUTION-001、A1-EGRESS-001、A1-KNOWLEDGE-002。
 - 允许修改范围：一个 Diagnostics/Projection 模块、Developer router 注册模块、`test/test_core_alpha_diagnostics.py`、`docs/errata/A1-DIAGNOSTICS-001.md`。
 - 禁止修改范围：FastAPI 公共接线文件、新迁移或自建 checkpoint 表、普通产品 API、领域状态、Provider 凭据和完整私有正文保存。
 - 输入：TraceEvent、RunExecutionSpec、MaterialManifest、IndexGeneration，以及 A1-PERSIST-001A 的 ProjectionCheckpointRepository。
