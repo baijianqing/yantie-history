@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from metaos.core.schemas import Job, JobStatus, JobType
@@ -14,6 +15,7 @@ from metaos.app.core_alpha_workbench import (
     judgment_state,
     load_workbench_snapshot,
     processing_job_rows,
+    recent_finished_processing_jobs,
     visible_processing_jobs,
 )
 
@@ -195,6 +197,38 @@ def test_visible_processing_jobs_hide_history_by_default() -> None:
 
     assert visible_processing_jobs([active, history]) == [active]
     assert visible_processing_jobs([active, history], include_history=True) == [active, history]
+
+
+def test_recent_finished_processing_jobs_sort_and_limit() -> None:
+    now = datetime(2026, 6, 24, tzinfo=UTC)
+    active = Job(
+        id="job_running",
+        type=JobType.ocr_document,
+        status=JobStatus.running,
+        updated_at=now + timedelta(minutes=3),
+    )
+    newest = Job(
+        id="job_newest",
+        type=JobType.index_knowledge,
+        status=JobStatus.succeeded,
+        updated_at=now + timedelta(minutes=2),
+    )
+    oldest = Job(
+        id="job_oldest",
+        type=JobType.index_knowledge,
+        status=JobStatus.failed,
+        updated_at=now,
+    )
+    middle = Job(
+        id="job_middle",
+        type=JobType.index_knowledge,
+        status=JobStatus.canceled,
+        updated_at=now + timedelta(minutes=1),
+    )
+
+    jobs = recent_finished_processing_jobs([active, oldest, newest, middle], limit=2)
+
+    assert [job.id for job in jobs] == ["job_newest", "job_middle"]
 
 
 def test_api_client_uses_public_route_and_idempotency_for_create_case() -> None:
