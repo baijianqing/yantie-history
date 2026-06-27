@@ -14,6 +14,7 @@ from metaos.app.core_alpha_workbench import (
     judgment_state,
     load_workbench_snapshot,
     processing_job_rows,
+    visible_processing_jobs,
 )
 
 
@@ -176,6 +177,24 @@ def test_processing_job_rows_show_progress_and_child_jobs() -> None:
     assert rows[0]["asset_id"] == "asset_1"
     assert rows[0]["child_job_id"] == "job_index"
     assert rows[1]["status"] == "succeeded"
+
+
+def test_visible_processing_jobs_hide_history_by_default() -> None:
+    active = Job(
+        id="job_running",
+        type=JobType.ocr_document,
+        status=JobStatus.running,
+        progress=0.2,
+    )
+    history = Job(
+        id="job_succeeded",
+        type=JobType.index_knowledge,
+        status=JobStatus.succeeded,
+        progress=1,
+    )
+
+    assert visible_processing_jobs([active, history]) == [active]
+    assert visible_processing_jobs([active, history], include_history=True) == [active, history]
 
 
 def test_api_client_uses_public_route_and_idempotency_for_create_case() -> None:

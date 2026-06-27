@@ -621,6 +621,12 @@ def has_active_processing_jobs(jobs: list[Job]) -> bool:
     return any(job.status in ACTIVE_JOB_STATUSES for job in jobs)
 
 
+def visible_processing_jobs(jobs: list[Job], *, include_history: bool = False) -> list[Job]:
+    if include_history:
+        return jobs
+    return [job for job in jobs if job.status in ACTIVE_JOB_STATUSES]
+
+
 def _job_payload_or_result(job: Job, key: str, *, fallback_key: str | None = None) -> str:
     value = _job_value(job, key)
     if value is None and fallback_key:
@@ -943,6 +949,11 @@ def _render_reprocess_panel(st: Any, snapshot: WorkbenchSnapshot) -> None:
 
 def _render_processing_jobs(st: Any) -> None:
     st.subheader("处理进度")
+    include_history = st.checkbox(
+        "显示历史处理记录",
+        value=False,
+        help="默认只显示 pending / running 任务，避免旧完成记录干扰当前 Golden Case 调试。",
+    )
     try:
         jobs = [
             job
@@ -952,7 +963,9 @@ def _render_processing_jobs(st: Any) -> None:
     except Exception as exc:  # noqa: BLE001 - show user-facing failure
         st.warning(f"读取处理进度失败：{exc}")
         return
-    _dataframe_or_empty(st, processing_job_rows(jobs), "暂无知识处理任务。")
+    visible_jobs = visible_processing_jobs(jobs, include_history=include_history)
+    empty_message = "暂无知识处理任务。" if include_history else "暂无正在处理的知识任务。"
+    _dataframe_or_empty(st, processing_job_rows(visible_jobs), empty_message)
     if has_active_processing_jobs(jobs):
         st.caption("有任务正在处理，页面会每 5 秒刷新一次。")
         st.markdown(
