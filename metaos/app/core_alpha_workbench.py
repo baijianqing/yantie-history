@@ -10,9 +10,23 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, build_opener
 
-from metaos.knowledge.core_alpha_ingest import (
-    SUPPORTED_CORE_ALPHA_UPLOAD_EXTENSIONS,
-    ingest_uploaded_text_document,
+from metaos.core.schemas import Job, JobStatus, JobType
+from metaos.ingest.service import DOCUMENT_MIME_TYPES, IngestService
+from metaos.tasks.pipeline import OCR_EXTENSIONS, enqueue_document_pipeline
+from metaos.tasks.queueing import enqueue_rebuild_chunks
+from metaos.workspace.jobs import JobRepository
+
+
+KNOWLEDGE_PROCESSING_JOB_TYPES = {
+    JobType.ingest_document,
+    JobType.pdf_route,
+    JobType.ocr_document,
+    JobType.rebuild_chunks,
+    JobType.index_knowledge,
+}
+ACTIVE_JOB_STATUSES = {JobStatus.pending, JobStatus.running}
+SUPPORTED_ASYNC_UPLOAD_EXTENSIONS = tuple(
+    sorted(extension.lstrip(".") for extension in DOCUMENT_MIME_TYPES)
 )
 
 
@@ -579,6 +593,48 @@ def proposal_rows(proposals: list[dict[str, Any]]) -> list[dict[str, Any]]:
     ]
 
 
+def processing_job_rows(jobs: list[Job]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for job in jobs:
+        rows.append(
+            {
+                "job_id": job.id,
+                "type": job.type.value,
+                "status": job.status.value,
+                "progress": f"{job.progress:.0%}",
+                "message": job.message or "-",
+                "knowledge_item_id": _job_payload_or_result(job, "knowledge_item_id"),
+                "asset_id": _job_payload_or_result(job, "asset_id"),
+                "child_job_id": _job_payload_or_result(
+                    job,
+                    "child_job_id",
+                    fallback_key="index_job_id",
+                ),
+                "error": job.error or "-",
+                "updated_at": job.updated_at.isoformat(),
+            }
+        )
+    return rows
+
+
+def has_active_processing_jobs(jobs: list[Job]) -> bool:
+    return any(job.status in ACTIVE_JOB_STATUSES for job in jobs)
+
+
+def _job_payload_or_result(job: Job, key: str, *, fallback_key: str | None = None) -> str:
+    value = _job_value(job, key)
+    if value is None and fallback_key:
+        value = _job_value(job, fallback_key)
+    return str(value) if value is not None else "-"
+
+
+def _job_value(job: Job, key: str) -> Any | None:
+    value = job.result.get(key)
+    if value is None:
+        value = job.payload.get(key)
+    return value
+
+
 def feature_enabled(features: list[dict[str, Any]], flag_key: str) -> bool:
     return any(
         feature.get("flag_key") == flag_key and bool(feature.get("enabled"))
@@ -657,7 +713,7 @@ def render_core_alpha_workbench(
     with tabs[2]:
         _render_decision_tab(st, api_client, snapshot)
     with tabs[3]:
-        _render_ingest_tab(st)
+        _render_ingest_tab(st, snapshot)
     with tabs[4]:
         _render_catalog_tab(st, snapshot)
 
@@ -819,50 +875,90 @@ def _render_catalog_tab(st: Any, snapshot: WorkbenchSnapshot) -> None:
     _dataframe_or_empty(st, rows, "暂无 KnowledgeItem。")
 
 
-def _render_ingest_tab(st: Any) -> None:
+def _render_ingest_tab(st: Any, snapshot: WorkbenchSnapshot) -> None:
     st.subheader("知识入库")
     st.caption(
-        "当前入口用于 Core Alpha 调试：文本或 Markdown 会形成可版本化的 "
-        "KnowledgeItemVersion、ChunkSet 和 IndexGeneration manifest。PDF/OCR "
-        "和向量索引构建仍属于后续知识底座任务。"
-    )
-    supported_types = sorted(
-        extension.lstrip(".") for extension in SUPPORTED_CORE_ALPHA_UPLOAD_EXTENSIONS
+        "支持文本、Markdown、PDF 和图片。上传后会提交异步处理任务：PDF 会先路由，"
+        "扫描件或图片进入 OCR 队列，文本化后入库、切块并提交索引。OCR 需要单独启动 "
+        "OCR worker。"
     )
     with st.form("core_alpha_ingest_upload"):
-        uploaded = st.file_uploader("上传文本或 Markdown", type=supported_types)
-        title = st.text_input("标题（可选）")
-        submitted = st.form_submit_button("入库")
-        if not submitted:
-            return
-        if uploaded is None:
-            st.warning("请先选择一个文本或 Markdown 文件。")
-            return
-        try:
-            result = ingest_uploaded_text_document(
-                filename=uploaded.name,
-                content=uploaded.getvalue(),
-                title=title.strip() or None,
-            )
-        except ValueError as exc:
-            st.error(str(exc))
-            return
-        except Exception as exc:  # pragma: no cover - UI safety boundary
-            st.error(f"入库失败：{exc}")
-            return
-        st.success("已完成 Core Alpha 知识入库。")
-        st.json(
-            {
-                "title": result.title,
-                "knowledge_item_id": result.knowledge_item_id,
-                "knowledge_item_version_id": result.knowledge_item_version_id,
-                "active_chunk_count": result.active_chunk_count,
-                "chunk_set_manifest_id": result.chunk_set_manifest_id,
-                "index_generation_ids": result.index_generation_ids,
-            },
-            expanded=False,
+        uploaded = st.file_uploader(
+            "上传文件",
+            type=list(SUPPORTED_ASYNC_UPLOAD_EXTENSIONS),
         )
-        st.caption("入库后刷新页面，可在知识目录中查看新条目。")
+        title = st.text_input("标题（可选）")
+        submitted = st.form_submit_button("提交处理")
+        if not submitted:
+            pass
+        elif uploaded is None:
+            st.warning("请先选择一个文件。")
+        else:
+            try:
+                source, asset = IngestService().add_bytes(
+                    filename=uploaded.name,
+                    content=uploaded.getvalue(),
+                    title=title.strip() or None,
+                    note="Submitted from Core Alpha workbench.",
+                )
+                job = enqueue_document_pipeline(source, asset)
+            except Exception as exc:  # noqa: BLE001 - show user-facing failure
+                st.error(f"提交处理失败：{exc}")
+            else:
+                st.success(f"已提交处理任务：{job.id}")
+                if asset.path.suffix.lower() == ".pdf":
+                    st.caption("PDF 会先分析页面类型；扫描 PDF 需要 OCR worker。")
+                elif asset.path.suffix.lower() in OCR_EXTENSIONS:
+                    st.caption("图片类文件需要 OCR worker。")
+
+    _render_reprocess_panel(st, snapshot)
+    _render_processing_jobs(st)
+
+
+def _render_reprocess_panel(st: Any, snapshot: WorkbenchSnapshot) -> None:
+    st.subheader("重新处理已有知识条目")
+    st.caption("重新处理会重新生成知识块，并在完成后提交当前条目的索引任务。")
+    if not snapshot.knowledge_items:
+        st.info("暂无可重新处理的 KnowledgeItem。")
+        return
+    item_by_id = {
+        str(item["knowledge_item_id"]): item
+        for item in snapshot.knowledge_items
+        if item.get("knowledge_item_id")
+    }
+    selected_item_id = st.selectbox(
+        "选择知识条目",
+        options=list(item_by_id),
+        format_func=lambda item_id: str(item_by_id[item_id].get("title") or item_id),
+        key="core_alpha_reprocess_item",
+    )
+    if st.button("重新处理：切块并索引", key="core_alpha_reprocess_button"):
+        try:
+            job = enqueue_rebuild_chunks(selected_item_id)
+        except Exception as exc:  # noqa: BLE001 - show user-facing failure
+            st.error(f"提交重新处理失败：{exc}")
+        else:
+            st.success(f"已提交重新处理任务：{job.id}")
+
+
+def _render_processing_jobs(st: Any) -> None:
+    st.subheader("处理进度")
+    try:
+        jobs = [
+            job
+            for job in JobRepository().list(limit=100)
+            if job.type in KNOWLEDGE_PROCESSING_JOB_TYPES
+        ]
+    except Exception as exc:  # noqa: BLE001 - show user-facing failure
+        st.warning(f"读取处理进度失败：{exc}")
+        return
+    _dataframe_or_empty(st, processing_job_rows(jobs), "暂无知识处理任务。")
+    if has_active_processing_jobs(jobs):
+        st.caption("有任务正在处理，页面会每 5 秒刷新一次。")
+        st.markdown(
+            "<script>setTimeout(() => window.location.reload(), 5000);</script>",
+            unsafe_allow_html=True,
+        )
 
 
 def _run_ui_command(st: Any, callback: Any, success_message: str) -> None:

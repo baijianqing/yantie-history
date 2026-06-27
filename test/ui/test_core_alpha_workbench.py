@@ -2,15 +2,18 @@ from __future__ import annotations
 
 from typing import Any
 
+from metaos.core.schemas import Job, JobStatus, JobType
 from metaos.app.core_alpha_workbench import (
     CoreAlphaApiClient,
     WorkbenchSnapshot,
     binding_rows,
     claim_rows,
     feature_enabled,
+    has_active_processing_jobs,
     is_adoptable_judgment,
     judgment_state,
     load_workbench_snapshot,
+    processing_job_rows,
 )
 
 
@@ -141,6 +144,38 @@ def test_feature_enabled_requires_matching_enabled_flag() -> None:
         [{"flag_key": "core_alpha.developer_diagnostics", "enabled": True}],
         "core_alpha.developer_diagnostics",
     ) is True
+
+
+def test_processing_job_rows_show_progress_and_child_jobs() -> None:
+    jobs = [
+        Job(
+            id="job_ingest",
+            type=JobType.ingest_document,
+            status=JobStatus.running,
+            progress=0.55,
+            message="生成知识条目和知识块",
+            payload={"asset_id": "asset_1"},
+            result={"knowledge_item_id": "ki_1", "index_job_id": "job_index"},
+        ),
+        Job(
+            id="job_done",
+            type=JobType.index_knowledge,
+            status=JobStatus.succeeded,
+            progress=1,
+            message="索引完成",
+            payload={"knowledge_item_id": "ki_1"},
+        ),
+    ]
+
+    rows = processing_job_rows(jobs)
+
+    assert has_active_processing_jobs(jobs)
+    assert rows[0]["job_id"] == "job_ingest"
+    assert rows[0]["progress"] == "55%"
+    assert rows[0]["knowledge_item_id"] == "ki_1"
+    assert rows[0]["asset_id"] == "asset_1"
+    assert rows[0]["child_job_id"] == "job_index"
+    assert rows[1]["status"] == "succeeded"
 
 
 def test_api_client_uses_public_route_and_idempotency_for_create_case() -> None:
