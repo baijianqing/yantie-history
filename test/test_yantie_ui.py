@@ -22,6 +22,7 @@ class YantieWebUiTests(unittest.TestCase):
         self.assertIn('id="hanMapScene"', html)
         self.assertIn('id="courtScene"', html)
         self.assertIn('id="powerNetworkScene"', html)
+        self.assertIn('id="debateHud"', html)
         self.assertIn('id="evidenceRibbon"', html)
         self.assertIn('id="judgmentForm"', html)
         self.assertIn('id="soundToggle"', html)
@@ -32,13 +33,34 @@ class YantieWebUiTests(unittest.TestCase):
         self.assertIn('id="advanceScene"', html)
         self.assertIn('id="revealEvidence"', html)
         self.assertIn('id="rewindScene"', html)
-        self.assertIn('const scenes = [', html)
+        self.assertIn("const debateRounds = [", html)
+        self.assertIn("const scenes = debateRounds;", html)
         self.assertIn('"map"', html)
         self.assertIn('"court"', html)
         self.assertIn('"network"', html)
         self.assertIn('"judgment"', html)
         self.assertNotIn('class="tabs"', html)
         self.assertNotIn('id="claimTabs"', html)
+
+    def test_yantie_page_stages_five_debate_rounds_with_evidence(self) -> None:
+        html = self.client.get("/yantie").text
+
+        for keyword in ["边费", "与民争利", "义利", "霍光", "退朝"]:
+            self.assertIn(keyword, html)
+
+        for visual_mode in [
+            "map-pressure",
+            "seat-opposition",
+            "value-clash",
+            "power-shadow",
+            "archive-closure",
+        ]:
+            self.assertIn(visual_mode, html)
+
+        self.assertEqual(html.count("visualMode:"), 5)
+        self.assertGreaterEqual(html.count("evidence: ["), 5)
+        self.assertIn("evidence-seal", html)
+        self.assertIn("退朝案牍", html)
 
     def test_yantie_page_uses_only_yantie_api_surface_and_local_audio(self) -> None:
         html = self.client.get("/yantie").text
