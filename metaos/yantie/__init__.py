@@ -15,6 +15,7 @@ from metaos.yantie.search import (
     normalize_filters,
     search_evidence,
 )
+from metaos.yantie.web import create_yantie_web_app, create_yantie_web_router
 from metaos.yantie.schemas import (
     Actor,
     AuthorityLevel,
@@ -93,6 +94,8 @@ __all__ = [
     "ThemeSpec",
     "Topic",
     "create_yantie_api_router",
+    "create_yantie_web_app",
+    "create_yantie_web_router",
     "load_default_evidence_pack",
     "normalize_filters",
     "search_evidence",
