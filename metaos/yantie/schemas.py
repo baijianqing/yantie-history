@@ -114,6 +114,7 @@ class ClaimStance(str, Enum):
 class DisplayZone(str, Enum):
     meeting = "meeting"
     map = "map"
+    evidence_room = "evidence_room"
     power_network = "power_network"
     later_echo = "later_echo"
     judgment_card = "judgment_card"
