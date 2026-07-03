@@ -450,7 +450,6 @@ YANTIE_HTML = """<!doctype html>
       bottom: 18px;
       z-index: 12;
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
       gap: 6px;
       pointer-events: none;
     }
@@ -679,6 +678,35 @@ YANTIE_HTML = """<!doctype html>
       animationTick: 0
     };
 
+    const historicalPrelude = [
+      {
+        key: "map",
+        kicker: "历史背景一 · 武帝余响",
+        title: "财政机器已经转动多年",
+        copy: "盐铁会议不是突然发生的争吵。武帝以来的边防、盐铁、均输和平准，早已把国家财政和民间生计拧在一起。",
+        quote: "盐铁官、均输、平准，皆以给边费、平物价为名进入制度。",
+        speaker: "历史背景",
+        stance: "财政扩张",
+        line: "在始元六年开口之前，边塞、市场和官府已经先把问题推到了长安。",
+        visualMode: "background-map",
+        tension: { fiscal: 82, virtue: 28, people: 42, power: 52 },
+        evidence: ["ev:src_shiji_pingzhun:juan030:salt_iron_offices:3344bbcc", "ev:src_shiji_pingzhun:juan030:sang_equal_transport:5e6f7081"]
+      },
+      {
+        key: "court",
+        kicker: "历史背景二 · 诏问民疾苦",
+        title: "会议因民间疾苦而开",
+        copy: "朝廷召集贤良文学，不只是听政策建议，也是把各地对盐铁、榷酤、均输的痛感带进朝堂。",
+        quote: "问郡国所举贤良文学民所疾苦。议罢盐铁榷酤",
+        speaker: "诏令背景",
+        stance: "会议缘起",
+        line: "这场会议从民所疾苦开始，但它很快会撞上财政、价值和权力。",
+        visualMode: "meeting-open",
+        tension: { fiscal: 58, virtue: 68, people: 80, power: 60 },
+        evidence: ["ev:src_yantielun:juan01_benyi:meeting_opening:a1b2c3d4", "ev:src_hanshu_zhaodi:juan007:meeting_edict:ccddeeff"]
+      }
+    ];
+
     const debateRounds = [
       {
         key: "map",
@@ -695,7 +723,20 @@ YANTIE_HTML = """<!doctype html>
       },
       {
         key: "court",
-        kicker: "第二回合 · 与民争利",
+        kicker: "第二回合 · 废止之请",
+        title: "第一刀落在官营制度上",
+        copy: "贤良文学把盐铁、酒榷、均输一并提出，认为官府不该把民间交易变成财政汲取。",
+        quote: "今郡国有盐、铁、酒榷，均输，与民争利",
+        speaker: "贤良文学",
+        stance: "罢官营",
+        line: "若国家亲自逐利，百姓面对的不只是价格，而是权力伸进日用之物。",
+        visualMode: "seat-opposition",
+        tension: { fiscal: 46, virtue: 90, people: 86, power: 54 },
+        evidence: ["ev:src_yantielun:juan01_benyi:literati_abolish:0a1b2c3d", "ev:src_yantielun:juan01_benyi:virtue_vs_profit:44556677"]
+      },
+      {
+        key: "court",
+        kicker: "第三回合 · 与民争利",
         title: "民生痛感开始反击",
         copy: "贤良文学不先争算法，而是先争治理的正当性：国家进入市场时，百姓感到的是秩序，还是盘剥。",
         quote: "今郡国有盐、铁、酒榷，均输，与民争利",
@@ -708,10 +749,23 @@ YANTIE_HTML = """<!doctype html>
       },
       {
         key: "court",
-        kicker: "第三回合 · 义利相击",
+        kicker: "第四回合 · 均输之辩",
+        title: "便利百姓，还是官吏盘剥",
+        copy: "大夫一方说均输平准可以平物价、通财货；贤良文学则把同一制度看成官府压低民间交易的入口。",
+        quote: "平准、均输，所以平万物而便百姓",
+        speaker: "双方交锋",
+        stance: "制度效果",
+        line: "同一个制度，一方看见调度能力，另一方看见官吏压价和民间失血。",
+        visualMode: "value-clash",
+        tension: { fiscal: 78, virtue: 72, people: 82, power: 58 },
+        evidence: ["ev:src_yantielun:juan01_benyi:great_officer_equal_transport:77889900", "ev:src_yantielun:juan01_benyi:literati_equal_transport_abuse:abcd5678"]
+      },
+      {
+        key: "court",
+        kicker: "第五回合 · 义利相击",
         title: "财政理由撞上德治判断",
         copy: "一方说边防不能空，一方说国家不应与民争利。争论的锋刃，不在盐铁本身，而在国家该怎样使用力量。",
-        quote: "今郡国有盐、铁、酒榷，均输，与民争利",
+        quote: "诸侯不言利害，大夫不言得丧",
         speaker: "双方交锋",
         stance: "义利冲突",
         line: "财政说必要，儒生问边界；真正相撞的，是国家能力能否越过德治。",
@@ -720,8 +774,21 @@ YANTIE_HTML = """<!doctype html>
         evidence: ["ev:src_yantielun:juan01_benyi:virtue_vs_profit:44556677", "ev:src_yantielun:juan01_benyi:military_strategy_reply:55667788", "ev:src_yantielun:juan01_jingeng:agriculture_base:88990011"]
       },
       {
+        key: "court",
+        kicker: "第六回合 · 本末之争",
+        title: "农桑、商工与国家秩序",
+        copy: "贤良文学守住农桑为本，大夫一方则强调商工和流通对国家运行的必要。儒法之争在这里变成社会组织方式之争。",
+        quote: "衣食者民之本，稼穑者民之务也",
+        speaker: "双方交锋",
+        stance: "本末秩序",
+        line: "一个世界把农桑当作根本，另一个世界已经离不开商工和转运。",
+        visualMode: "value-clash",
+        tension: { fiscal: 70, virtue: 82, people: 76, power: 52 },
+        evidence: ["ev:src_yantielun:juan01_jingeng:agriculture_base:88990011", "ev:src_yantielun:juan01_benyi:commerce_utility:66778899", "ev:src_yantielun:juan01_jingeng:market_cities:bb11cc22"]
+      },
+      {
         key: "network",
-        kicker: "第四回合 · 霍光阴影",
+        kicker: "第七回合 · 霍光阴影",
         title: "政策之后，是权力",
         copy: "盐铁会议不是悬浮的公共辩论。桑弘羊、上官桀、燕王旦和霍光的关系，会在会后一年的政治危机里显出血色。",
         quote: "桑弘羊怨霍光，与上官桀等相结",
@@ -734,7 +801,7 @@ YANTIE_HTML = """<!doctype html>
       },
       {
         key: "judgment",
-        kicker: "第五回合 · 退朝余波",
+        kicker: "退朝余波 · 有限结果",
         title: "榷酤可罢，盐铁未废",
         copy: "退朝之后，史书留下有限的结果：道德批判进入记录，财政机器仍然运转。此刻才轮到你的案牍。",
         quote: "后罢榷酤，而盐、铁则如旧",
@@ -746,7 +813,7 @@ YANTIE_HTML = """<!doctype html>
         evidence: ["ev:src_hanshu_zhaodi:juan007:abolish_liquor_office:ddccbbaa", "ev:src_yantielun_siku:preface:partial_result:1234abcd"]
       }
     ];
-    const scenes = debateRounds;
+    const scenes = [...historicalPrelude, ...debateRounds];
 
     async function boot() {
       const [manifest, actors, events, claims, relations, mapLayers] = await Promise.all([
@@ -785,6 +852,7 @@ YANTIE_HTML = """<!doctype html>
     }
 
     function renderRail() {
+      document.getElementById("timelineRail").style.gridTemplateColumns = `repeat(${scenes.length}, minmax(0, 1fr))`;
       document.getElementById("timelineRail").innerHTML = scenes.map((scene, index) =>
         `<div class="rail-step" data-step="${index}"><span></span></div>`
       ).join("");
@@ -843,7 +911,7 @@ YANTIE_HTML = """<!doctype html>
     function renderMap(scene) {
       const svg = document.getElementById("hanMapScene");
       const features = state.mapLayers.flatMap(layer => layer.features.map(feature => ({ layer, feature })));
-      const pressureOpacity = scene.visualMode === "map-pressure" ? 0.96 : 0.46;
+      const pressureOpacity = scene.visualMode === "map-pressure" ? 0.96 : scene.visualMode === "background-map" ? 0.72 : 0.42;
       svg.innerHTML = `
         <defs>
           <linearGradient id="mapLand" x1="0" x2="1">
@@ -897,6 +965,11 @@ YANTIE_HTML = """<!doctype html>
         ["actor_yan_wang_dan", 720, 542, "#64748b"]
       ];
       const activeActors = activeCourtActors(scene);
+      const openingLayer = scene.visualMode === "meeting-open" ? `
+        <path d="M500 102 C448 196 400 292 255 382" fill="none" stroke="#f3c46d" stroke-width="8" stroke-linecap="round" opacity="0.48"/>
+        <path d="M500 102 C554 196 600 292 745 382" fill="none" stroke="#f3c46d" stroke-width="8" stroke-linecap="round" opacity="0.48"/>
+        <text x="500" y="284" text-anchor="middle" fill="#ffe7b0" font-size="34">诏问民疾苦</text>
+      ` : "";
       const oppositionLayer = scene.visualMode === "seat-opposition" ? `
         <path d="M745 382 C654 304 521 276 363 332" fill="none" stroke="#2c7a66" stroke-width="12" stroke-linecap="round" opacity="0.62"/>
         <text x="744" y="284" text-anchor="middle" fill="#dcf7df" font-size="34">民生</text>
@@ -914,6 +987,7 @@ YANTIE_HTML = """<!doctype html>
         <path d="M140 608 L860 608" stroke="rgba(255,236,188,0.22)" stroke-width="4"/>
         <path d="M500 125 L500 608" stroke="rgba(255,236,188,0.16)" stroke-width="3"/>
         <path d="M292 382 C400 300 600 300 708 382" fill="none" stroke="#f3c46d" stroke-width="5" stroke-dasharray="14 16"/>
+        ${openingLayer}
         ${oppositionLayer}
         ${clashLayer}
         ${seats.map(([actorId, x, y, color]) => {
@@ -932,6 +1006,7 @@ YANTIE_HTML = """<!doctype html>
     }
 
     function activeCourtActors(scene) {
+      if (scene.visualMode === "meeting-open") return ["actor_zhao_di", "actor_huo_guang", "actor_literati", "actor_sang_hongyang", "actor_che_qianqiu"];
       if (scene.visualMode === "seat-opposition") return ["actor_literati"];
       if (scene.visualMode === "value-clash") return ["actor_sang_hongyang", "actor_literati"];
       return [];
@@ -1091,6 +1166,8 @@ YANTIE_HTML = """<!doctype html>
       const osc = context.createOscillator();
       const gain = context.createGain();
       const freqs = {
+        "background-map": 88,
+        "meeting-open": 118,
         "map-pressure": 92,
         "seat-opposition": 146,
         "value-clash": 188,

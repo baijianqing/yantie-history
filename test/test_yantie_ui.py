@@ -33,8 +33,9 @@ class YantieWebUiTests(unittest.TestCase):
         self.assertIn('id="advanceScene"', html)
         self.assertIn('id="revealEvidence"', html)
         self.assertIn('id="rewindScene"', html)
+        self.assertIn("const historicalPrelude = [", html)
         self.assertIn("const debateRounds = [", html)
-        self.assertIn("const scenes = debateRounds;", html)
+        self.assertIn("const scenes = [...historicalPrelude, ...debateRounds];", html)
         self.assertIn('"map"', html)
         self.assertIn('"court"', html)
         self.assertIn('"network"', html)
@@ -42,13 +43,15 @@ class YantieWebUiTests(unittest.TestCase):
         self.assertNotIn('class="tabs"', html)
         self.assertNotIn('id="claimTabs"', html)
 
-    def test_yantie_page_stages_five_debate_rounds_with_evidence(self) -> None:
+    def test_yantie_page_stages_background_before_extended_debate(self) -> None:
         html = self.client.get("/yantie").text
 
-        for keyword in ["边费", "与民争利", "义利", "霍光", "退朝"]:
+        for keyword in ["武帝余响", "诏问民疾苦", "边费", "与民争利", "均输之辩", "本末之争", "义利", "霍光", "退朝"]:
             self.assertIn(keyword, html)
 
         for visual_mode in [
+            "background-map",
+            "meeting-open",
             "map-pressure",
             "seat-opposition",
             "value-clash",
@@ -57,8 +60,8 @@ class YantieWebUiTests(unittest.TestCase):
         ]:
             self.assertIn(visual_mode, html)
 
-        self.assertEqual(html.count("visualMode:"), 5)
-        self.assertGreaterEqual(html.count("evidence: ["), 5)
+        self.assertEqual(html.count("visualMode:"), 10)
+        self.assertGreaterEqual(html.count("evidence: ["), 10)
         self.assertIn("evidence-seal", html)
         self.assertIn("退朝案牍", html)
 
