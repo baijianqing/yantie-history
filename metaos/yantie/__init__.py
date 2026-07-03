@@ -1,5 +1,15 @@
 """Yantie meeting reconstruction package contracts."""
 
+from metaos.yantie.search import (
+    DEFAULT_EVIDENCE_PACK_PATH,
+    EvidenceSearchFilters,
+    EvidenceSearchResult,
+    SearchArchiveStatus,
+    SearchResultList,
+    load_default_evidence_pack,
+    normalize_filters,
+    search_evidence,
+)
 from metaos.yantie.schemas import (
     Actor,
     AuthorityLevel,
@@ -47,10 +57,13 @@ __all__ = [
     "CuratedPathStep",
     "DeliveryPolicy",
     "DisplayZone",
+    "DEFAULT_EVIDENCE_PACK_PATH",
     "EvidenceKind",
     "EvidencePack",
     "EvidencePackMeta",
     "EvidenceRequirementSpec",
+    "EvidenceSearchFilters",
+    "EvidenceSearchResult",
     "EvidenceUnit",
     "Event",
     "EventType",
@@ -65,9 +78,14 @@ __all__ = [
     "RelationStrength",
     "RelationType",
     "ReviewStatus",
+    "SearchArchiveStatus",
+    "SearchResultList",
     "Source",
     "SourceManifestEntry",
     "SourceType",
     "ThemeSpec",
     "Topic",
+    "load_default_evidence_pack",
+    "normalize_filters",
+    "search_evidence",
 ]
