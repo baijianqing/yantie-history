@@ -1,5 +1,10 @@
 """Yantie meeting reconstruction package contracts."""
 
+from metaos.yantie.api import (
+    CreateJudgmentCardRequest,
+    JudgmentDisposition,
+    create_yantie_api_router,
+)
 from metaos.yantie.search import (
     DEFAULT_EVIDENCE_PACK_PATH,
     EvidenceSearchFilters,
@@ -53,6 +58,7 @@ __all__ = [
     "Claim",
     "ClaimStance",
     "ClaimType",
+    "CreateJudgmentCardRequest",
     "CuratedPath",
     "CuratedPathStep",
     "DeliveryPolicy",
@@ -68,6 +74,7 @@ __all__ = [
     "Event",
     "EventType",
     "ExternalReference",
+    "JudgmentDisposition",
     "LexicalIndex",
     "LicenseStatus",
     "MapFeature",
@@ -85,6 +92,7 @@ __all__ = [
     "SourceType",
     "ThemeSpec",
     "Topic",
+    "create_yantie_api_router",
     "load_default_evidence_pack",
     "normalize_filters",
     "search_evidence",
