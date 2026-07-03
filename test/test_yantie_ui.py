@@ -11,29 +11,47 @@ class YantieWebUiTests(unittest.TestCase):
     def setUp(self) -> None:
         self.client = TestClient(create_yantie_web_app())
 
-    def test_yantie_page_serves_playable_experience(self) -> None:
+    def test_yantie_page_serves_immersive_scene_runtime(self) -> None:
         response = self.client.get("/yantie")
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("text/html", response.headers["content-type"])
         html = response.text
-        self.assertIn("<h1>盐铁会议历史复原</h1>", html)
-        self.assertIn('id="hanMap"', html)
-        self.assertIn('id="actorSeats"', html)
-        self.assertIn('id="claimList"', html)
-        self.assertIn('id="evidenceResults"', html)
-        self.assertIn('id="powerNetwork"', html)
-        self.assertIn('id="judgmentOutput"', html)
+        self.assertIn('data-testid="immersive-yantie-scene"', html)
+        self.assertIn('id="sceneCanvas"', html)
+        self.assertIn('id="hanMapScene"', html)
+        self.assertIn('id="courtScene"', html)
+        self.assertIn('id="powerNetworkScene"', html)
+        self.assertIn('id="evidenceRibbon"', html)
+        self.assertIn('id="judgmentForm"', html)
+        self.assertIn('id="soundToggle"', html)
 
-    def test_yantie_page_uses_only_yantie_api_surface(self) -> None:
+    def test_yantie_page_is_guided_not_tab_driven(self) -> None:
+        html = self.client.get("/yantie").text
+
+        self.assertIn('id="advanceScene"', html)
+        self.assertIn('id="revealEvidence"', html)
+        self.assertIn('id="rewindScene"', html)
+        self.assertIn('const scenes = [', html)
+        self.assertIn('"map"', html)
+        self.assertIn('"court"', html)
+        self.assertIn('"network"', html)
+        self.assertIn('"judgment"', html)
+        self.assertNotIn('class="tabs"', html)
+        self.assertNotIn('id="claimTabs"', html)
+
+    def test_yantie_page_uses_only_yantie_api_surface_and_local_audio(self) -> None:
         html = self.client.get("/yantie").text
 
         self.assertIn('const apiBase = "/api/yantie";', html)
-        self.assertIn('getJson("/manifest")', html)
-        self.assertIn('getJson("/claims")', html)
+        self.assertIn('getData("/manifest")', html)
+        self.assertIn('getData("/claims")', html)
         self.assertIn('/judgment-cards"', html)
+        self.assertIn("new AudioContext()", html)
         self.assertNotIn("/alpha/", html)
         self.assertNotIn("zhihu", html.lower())
+        self.assertNotIn("elevenlabs", html.lower())
+        self.assertNotIn("suno", html.lower())
 
     def test_standalone_app_serves_ui_and_api_together(self) -> None:
         ui_response = self.client.get("/")
@@ -44,7 +62,10 @@ class YantieWebUiTests(unittest.TestCase):
         self.assertEqual(manifest.status_code, 200)
         self.assertEqual(manifest.json()["data"]["pack_id"], "yantie_meeting_v1")
 
-        search = self.client.get("/api/yantie/evidence/search", params={"q": "会议 结果", "limit": 3})
+        search = self.client.get(
+            "/api/yantie/evidence/search",
+            params={"q": "\u4f1a\u8bae \u7ed3\u679c", "limit": 3},
+        )
         self.assertEqual(search.status_code, 200)
         self.assertEqual(search.json()["data"]["archive_status"], "ok")
 
