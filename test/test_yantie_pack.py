@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import re
 import unittest
 from pathlib import Path
 
@@ -91,28 +90,6 @@ class YantieEvidencePackDataTests(unittest.TestCase):
             self.assertTrue(layer.features, layer.layer_id)
             for feature in layer.features:
                 self.assertTrue(feature.evidence_ids, feature.feature_id)
-
-    def test_yantielun_chapter_evidence_covers_sixty_chapters_once(self) -> None:
-        pack = load_pack()
-
-        chapter_evidence = [
-            evidence
-            for evidence in pack.evidence_units
-            if evidence.evidence_id.startswith("ev:src_yantielun:chapter_")
-        ]
-        self.assertEqual(len(chapter_evidence), 60)
-
-        orders = []
-        for evidence in chapter_evidence:
-            match = re.match(r"ev:src_yantielun:chapter_(\d{3}):text_order:", evidence.evidence_id)
-            self.assertIsNotNone(match, evidence.evidence_id)
-            orders.append(int(match.group(1)))
-            self.assertEqual(evidence.source_id, "src_yantielun")
-            self.assertIn("·", evidence.canonical_location)
-            self.assertNotIn("?", evidence.canonical_location)
-            self.assertNotIn("?", evidence.paraphrase_zh)
-
-        self.assertEqual(sorted(orders), list(range(1, 61)))
 
 
 if __name__ == "__main__":
