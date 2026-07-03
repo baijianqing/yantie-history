@@ -228,14 +228,15 @@ YANTIE_HTML = """<!doctype html>
     }
 
     .quote-line {
-      min-height: 80px;
+      min-height: 66px;
       margin: 20px 0 0;
-      padding: 16px 18px;
+      padding: 12px 16px;
       border-left: 4px solid var(--blood);
-      background: rgba(9,13,19,0.46);
+      background: rgba(9,13,19,0.22);
       color: #ffe7b0;
-      line-height: 1.8;
-      box-shadow: var(--shadow);
+      line-height: 1.65;
+      box-shadow: 0 12px 34px rgba(0,0,0,0.18);
+      backdrop-filter: blur(3px);
     }
 
     .scene-actions {
@@ -262,7 +263,7 @@ YANTIE_HTML = """<!doctype html>
       min-height: 640px;
       border: 1px solid rgba(255,236,188,0.24);
       border-radius: 10px;
-      background: linear-gradient(180deg, rgba(255,244,214,0.08), rgba(9,13,19,0.4));
+      background: linear-gradient(180deg, rgba(255,244,214,0.04), rgba(9,13,19,0.22));
       overflow: hidden;
       box-shadow: var(--shadow);
     }
@@ -281,13 +282,13 @@ YANTIE_HTML = """<!doctype html>
     .debate-card {
       display: grid;
       gap: 10px;
-      max-width: 620px;
-      padding: 14px 16px;
-      border: 1px solid rgba(255,236,188,0.28);
+      max-width: min(540px, 62%);
+      padding: 12px 14px;
+      border: 1px solid rgba(255,236,188,0.22);
       border-radius: 8px;
-      background: linear-gradient(135deg, rgba(9,13,19,0.84), rgba(9,13,19,0.52));
-      box-shadow: 0 18px 52px rgba(0,0,0,0.28);
-      backdrop-filter: blur(10px);
+      background: linear-gradient(135deg, rgba(9,13,19,0.58), rgba(9,13,19,0.3));
+      box-shadow: 0 16px 42px rgba(0,0,0,0.18);
+      backdrop-filter: blur(5px);
     }
 
     .debate-meta {
@@ -315,8 +316,8 @@ YANTIE_HTML = """<!doctype html>
     .debate-line {
       margin: 0;
       color: #ffe7b0;
-      font-size: clamp(17px, 2vw, 22px);
-      line-height: 1.65;
+      font-size: clamp(15px, 1.55vw, 18px);
+      line-height: 1.58;
     }
 
     .tension-grid {
@@ -413,8 +414,8 @@ YANTIE_HTML = """<!doctype html>
       padding: 12px;
       border: 1px solid rgba(255,236,188,0.26);
       border-radius: 8px;
-      background: rgba(9,13,19,0.74);
-      backdrop-filter: blur(10px);
+      background: rgba(9,13,19,0.58);
+      backdrop-filter: blur(6px);
       transform: translateY(calc(100% + 24px));
       transition: transform 360ms ease;
       pointer-events: auto;
@@ -450,7 +451,7 @@ YANTIE_HTML = """<!doctype html>
       bottom: 18px;
       z-index: 12;
       display: grid;
-      gap: 6px;
+      gap: 2px;
       pointer-events: none;
     }
 
@@ -496,7 +497,7 @@ YANTIE_HTML = """<!doctype html>
       resize: vertical;
       border: 1px solid rgba(255,236,188,0.36);
       border-radius: 8px;
-      background: rgba(9,13,19,0.72);
+      background: rgba(9,13,19,0.48);
       color: #fff4d6;
       padding: 12px;
       line-height: 1.7;
@@ -680,140 +681,1108 @@ YANTIE_HTML = """<!doctype html>
 
     const historicalPrelude = [
       {
-        key: "map",
-        kicker: "历史背景一 · 武帝余响",
-        title: "财政机器已经转动多年",
-        copy: "盐铁会议不是突然发生的争吵。武帝以来的边防、盐铁、均输和平准，早已把国家财政和民间生计拧在一起。",
-        quote: "盐铁官、均输、平准，皆以给边费、平物价为名进入制度。",
-        speaker: "历史背景",
-        stance: "财政扩张",
-        line: "在始元六年开口之前，边塞、市场和官府已经先把问题推到了长安。",
-        visualMode: "background-map",
-        tension: { fiscal: 82, virtue: 28, people: 42, power: 52 },
-        evidence: ["ev:src_shiji_pingzhun:juan030:salt_iron_offices:3344bbcc", "ev:src_shiji_pingzhun:juan030:sang_equal_transport:5e6f7081"]
+            "key": "map",
+            "kicker": "历史背景一 · 武帝余响",
+            "title": "财政机器已经转动多年",
+            "copy": "盐铁会议不是突然发生的争吵。武帝以来的边防、盐铁、均输和平准已经把议题推到长安。",
+            "quote": "使孔仅、东郭咸阳乘传举行天下盐铁",
+            "speaker": "历史背景",
+            "stance": "财政扩张",
+            "line": "在始元六年开口之前，边塞、市场和官府已经先把问题推到长安。",
+            "visualMode": "background-map",
+            "tension": {
+                  "fiscal": 82,
+                  "virtue": 28,
+                  "people": 42,
+                  "power": 52
+            },
+            "evidence": [
+                  "ev:src_shiji_pingzhun:juan030:salt_iron_offices:3344bbcc",
+                  "ev:src_shiji_pingzhun:juan030:sang_equal_transport:5e6f7081"
+            ]
       },
       {
-        key: "court",
-        kicker: "历史背景二 · 诏问民疾苦",
-        title: "会议因民间疾苦而开",
-        copy: "朝廷召集贤良文学，不只是听政策建议，也是把各地对盐铁、榷酤、均输的痛感带进朝堂。",
-        quote: "问郡国所举贤良文学民所疾苦。议罢盐铁榷酤",
-        speaker: "诏令背景",
-        stance: "会议缘起",
-        line: "这场会议从民所疾苦开始，但它很快会撞上财政、价值和权力。",
-        visualMode: "meeting-open",
-        tension: { fiscal: 58, virtue: 68, people: 80, power: 60 },
-        evidence: ["ev:src_yantielun:juan01_benyi:meeting_opening:a1b2c3d4", "ev:src_hanshu_zhaodi:juan007:meeting_edict:ccddeeff"]
+            "key": "court",
+            "kicker": "历史背景二 · 诏问民疾苦",
+            "title": "会议因民间疾苦而开",
+            "copy": "朝廷召集贤良文学，不只是听政策建议，也是把各地对盐铁、榷酤、均输的痛感带进朝堂。",
+            "quote": "问郡国所举贤良文学民所疾苦",
+            "speaker": "诏令背景",
+            "stance": "会议缘起",
+            "line": "这场会议从民所疾苦开始，但它很快会撞上财政、价值和权力。",
+            "visualMode": "meeting-open",
+            "tension": {
+                  "fiscal": 58,
+                  "virtue": 68,
+                  "people": 80,
+                  "power": 60
+            },
+            "evidence": [
+                  "ev:src_hanshu_zhaodi:juan007:recommend_worthy:f00d1234",
+                  "ev:src_hanshu_zhaodi:juan007:meeting_edict:ccddeeff"
+            ]
       }
-    ];
+];
 
-    const debateRounds = [
+    const yantielunChapters = [
       {
-        key: "map",
-        kicker: "第一回合 · 边费压境",
-        title: "国家先把压力推上案前",
-        copy: "边塞军费、山海盐铁、均输路线，一起把始元六年的朝堂推向一场不可回避的财政追问。",
-        quote: "边用度不足，故兴盐、铁，设酒榷，置均输",
-        speaker: "桑弘羊",
-        stance: "国家能力",
-        line: "边费未足，盐铁均输不是奢侈，是国家维持边防的筋骨。",
-        visualMode: "map-pressure",
-        tension: { fiscal: 96, virtue: 32, people: 46, power: 58 },
-        evidence: ["ev:src_yantielun:juan01_benyi:border_finance:1a2b3c4d", "ev:src_shiji_pingzhun:juan030:frontier_supply:66778899"]
+            "order": 1,
+            "title": "本議第一",
+            "speaker": "篇章旁白",
+            "stance": "制度缘起",
+            "key": "court",
+            "visualMode": "value-clash",
+            "tension": {
+                  "fiscal": 82,
+                  "virtue": 68,
+                  "people": 62,
+                  "power": 56
+            },
+            "quote": "惟始元六年，有詔書使丞相、御史與所舉賢良、文學語，問民間所疾苦。文學",
+            "copy": "《盐铁论》本議第一以“惟始元六年，有詔書使丞相、御史與所舉”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_001:text_order:9fb227ef"
       },
       {
-        key: "court",
-        kicker: "第二回合 · 废止之请",
-        title: "第一刀落在官营制度上",
-        copy: "贤良文学把盐铁、酒榷、均输一并提出，认为官府不该把民间交易变成财政汲取。",
-        quote: "今郡国有盐、铁、酒榷，均输，与民争利",
-        speaker: "贤良文学",
-        stance: "罢官营",
-        line: "若国家亲自逐利，百姓面对的不只是价格，而是权力伸进日用之物。",
-        visualMode: "seat-opposition",
-        tension: { fiscal: 46, virtue: 90, people: 86, power: 54 },
-        evidence: ["ev:src_yantielun:juan01_benyi:literati_abolish:0a1b2c3d", "ev:src_yantielun:juan01_benyi:virtue_vs_profit:44556677"]
+            "order": 2,
+            "title": "力耕第二",
+            "speaker": "大夫一方",
+            "stance": "制度缘起",
+            "key": "court",
+            "visualMode": "seat-opposition",
+            "tension": {
+                  "fiscal": 82,
+                  "virtue": 68,
+                  "people": 62,
+                  "power": 56
+            },
+            "quote": "大夫曰：「王者塞天財，禁關市，執準守時，以輕重御民。豐年歲登，則儲積",
+            "copy": "《盐铁论》力耕第二以“大夫曰：「王者塞天財，禁關市，執準守”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_002:text_order:947d2710"
       },
       {
-        key: "court",
-        kicker: "第三回合 · 与民争利",
-        title: "民生痛感开始反击",
-        copy: "贤良文学不先争算法，而是先争治理的正当性：国家进入市场时，百姓感到的是秩序，还是盘剥。",
-        quote: "今郡国有盐、铁、酒榷，均输，与民争利",
-        speaker: "贤良文学",
-        stance: "德治民生",
-        line: "国以义导民；若官府入市逐利，百姓先听见的不是边防，是盘剥。",
-        visualMode: "seat-opposition",
-        tension: { fiscal: 52, virtue: 92, people: 88, power: 48 },
-        evidence: ["ev:src_yantielun:juan01_benyi:literati_abolish:0a1b2c3d", "ev:src_yantielun:juan01_benyi:literati_equal_transport_abuse:abcd5678"]
+            "order": 3,
+            "title": "通有第三",
+            "speaker": "大夫一方",
+            "stance": "制度缘起",
+            "key": "court",
+            "visualMode": "value-clash",
+            "tension": {
+                  "fiscal": 82,
+                  "virtue": 68,
+                  "people": 62,
+                  "power": 56
+            },
+            "quote": "大夫曰：「燕之涿、薊，趙之邯鄲，魏之溫軹，韓之滎陽，齊之臨淄，楚之宛",
+            "copy": "《盐铁论》通有第三以“大夫曰：「燕之涿、薊，趙之邯鄲，魏之”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_003:text_order:0281a6f8"
       },
       {
-        key: "court",
-        kicker: "第四回合 · 均输之辩",
-        title: "便利百姓，还是官吏盘剥",
-        copy: "大夫一方说均输平准可以平物价、通财货；贤良文学则把同一制度看成官府压低民间交易的入口。",
-        quote: "平准、均输，所以平万物而便百姓",
-        speaker: "双方交锋",
-        stance: "制度效果",
-        line: "同一个制度，一方看见调度能力，另一方看见官吏压价和民间失血。",
-        visualMode: "value-clash",
-        tension: { fiscal: 78, virtue: 72, people: 82, power: 58 },
-        evidence: ["ev:src_yantielun:juan01_benyi:great_officer_equal_transport:77889900", "ev:src_yantielun:juan01_benyi:literati_equal_transport_abuse:abcd5678"]
+            "order": 4,
+            "title": "錯幣第四",
+            "speaker": "大夫一方",
+            "stance": "制度缘起",
+            "key": "court",
+            "visualMode": "seat-opposition",
+            "tension": {
+                  "fiscal": 82,
+                  "virtue": 68,
+                  "people": 62,
+                  "power": 56
+            },
+            "quote": "大夫曰：「交幣通施，民事不及，物有所幷也。計本量委，民有饑者，穀有所",
+            "copy": "《盐铁论》錯幣第四以“大夫曰：「交幣通施，民事不及，物有所”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_004:text_order:a6ec58fc"
       },
       {
-        key: "court",
-        kicker: "第五回合 · 义利相击",
-        title: "财政理由撞上德治判断",
-        copy: "一方说边防不能空，一方说国家不应与民争利。争论的锋刃，不在盐铁本身，而在国家该怎样使用力量。",
-        quote: "诸侯不言利害，大夫不言得丧",
-        speaker: "双方交锋",
-        stance: "义利冲突",
-        line: "财政说必要，儒生问边界；真正相撞的，是国家能力能否越过德治。",
-        visualMode: "value-clash",
-        tension: { fiscal: 82, virtue: 86, people: 72, power: 62 },
-        evidence: ["ev:src_yantielun:juan01_benyi:virtue_vs_profit:44556677", "ev:src_yantielun:juan01_benyi:military_strategy_reply:55667788", "ev:src_yantielun:juan01_jingeng:agriculture_base:88990011"]
+            "order": 5,
+            "title": "禁耕第五",
+            "speaker": "大夫一方",
+            "stance": "制度缘起",
+            "key": "court",
+            "visualMode": "value-clash",
+            "tension": {
+                  "fiscal": 82,
+                  "virtue": 68,
+                  "people": 62,
+                  "power": 56
+            },
+            "quote": "大夫曰：「家人有寶器，尚函匣而藏之，況人主之山海乎？夫權利之處，必在",
+            "copy": "《盐铁论》禁耕第五以“大夫曰：「家人有寶器，尚函匣而藏之，”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_005:text_order:3c4ac77a"
       },
       {
-        key: "court",
-        kicker: "第六回合 · 本末之争",
-        title: "农桑、商工与国家秩序",
-        copy: "贤良文学守住农桑为本，大夫一方则强调商工和流通对国家运行的必要。儒法之争在这里变成社会组织方式之争。",
-        quote: "衣食者民之本，稼穑者民之务也",
-        speaker: "双方交锋",
-        stance: "本末秩序",
-        line: "一个世界把农桑当作根本，另一个世界已经离不开商工和转运。",
-        visualMode: "value-clash",
-        tension: { fiscal: 70, virtue: 82, people: 76, power: 52 },
-        evidence: ["ev:src_yantielun:juan01_jingeng:agriculture_base:88990011", "ev:src_yantielun:juan01_benyi:commerce_utility:66778899", "ev:src_yantielun:juan01_jingeng:market_cities:bb11cc22"]
+            "order": 6,
+            "title": "復古第六",
+            "speaker": "大夫一方",
+            "stance": "制度缘起",
+            "key": "court",
+            "visualMode": "seat-opposition",
+            "tension": {
+                  "fiscal": 82,
+                  "virtue": 68,
+                  "people": 62,
+                  "power": 56
+            },
+            "quote": "大夫曰：「故扇水都尉彭祖寧歸，言：『鹽、鐵令品，令品甚明。卒徒衣食縣",
+            "copy": "《盐铁论》復古第六以“大夫曰：「故扇水都尉彭祖寧歸，言：『”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_006:text_order:23f882b0"
       },
       {
-        key: "network",
-        kicker: "第七回合 · 霍光阴影",
-        title: "政策之后，是权力",
-        copy: "盐铁会议不是悬浮的公共辩论。桑弘羊、上官桀、燕王旦和霍光的关系，会在会后一年的政治危机里显出血色。",
-        quote: "桑弘羊怨霍光，与上官桀等相结",
-        speaker: "权力阴影",
-        stance: "权力约束",
-        line: "辩论仍在继续，但谁能决定辩论的边界，已经站在席位之外。",
-        visualMode: "power-shadow",
-        tension: { fiscal: 58, virtue: 48, people: 44, power: 98 },
-        evidence: ["ev:src_hanshu_zhaodi:juan007:huo_in_power:33445566", "ev:src_hanshu_huoguang:juan068:sang_resentment:778899aa", "ev:src_hanshu_zhaodi:juan007:rebellion_record:ddee0011"]
+            "order": 7,
+            "title": "非鞅第七",
+            "speaker": "大夫一方",
+            "stance": "法术与儒议",
+            "key": "court",
+            "visualMode": "value-clash",
+            "tension": {
+                  "fiscal": 74,
+                  "virtue": 78,
+                  "people": 58,
+                  "power": 66
+            },
+            "quote": "大夫曰：「昔商君相秦也，內立法度，嚴刑罰，飭政教，奸偽無所容。外設百",
+            "copy": "《盐铁论》非鞅第七以“大夫曰：「昔商君相秦也，內立法度，嚴”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_007:text_order:4286367e"
       },
       {
-        key: "judgment",
-        kicker: "退朝余波 · 有限结果",
-        title: "榷酤可罢，盐铁未废",
-        copy: "退朝之后，史书留下有限的结果：道德批判进入记录，财政机器仍然运转。此刻才轮到你的案牍。",
-        quote: "后罢榷酤，而盐、铁则如旧",
-        speaker: "退朝旁白",
-        stance: "历史结果",
-        line: "榷酤可罢，盐铁未废；道德批判被记录，财政机器仍然运转。",
-        visualMode: "archive-closure",
-        tension: { fiscal: 76, virtue: 70, people: 60, power: 84 },
-        evidence: ["ev:src_hanshu_zhaodi:juan007:abolish_liquor_office:ddccbbaa", "ev:src_yantielun_siku:preface:partial_result:1234abcd"]
+            "order": 8,
+            "title": "晁錯第八",
+            "speaker": "大夫一方",
+            "stance": "法术与儒议",
+            "key": "court",
+            "visualMode": "value-clash",
+            "tension": {
+                  "fiscal": 74,
+                  "virtue": 78,
+                  "people": 58,
+                  "power": 66
+            },
+            "quote": "大夫曰：「春秋之法，君親無將，將而必誅。故臣罪莫重於弒君，子罪莫重於",
+            "copy": "《盐铁论》晁錯第八以“大夫曰：「春秋之法，君親無將，將而必”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_008:text_order:b900772f"
+      },
+      {
+            "order": 9,
+            "title": "刺權第九",
+            "speaker": "大夫一方",
+            "stance": "法术与儒议",
+            "key": "court",
+            "visualMode": "value-clash",
+            "tension": {
+                  "fiscal": 74,
+                  "virtue": 78,
+                  "people": 58,
+                  "power": 66
+            },
+            "quote": "大夫曰：「今夫越之具區，楚之雲夢，宋之鉅野，齊之孟諸，有國之富而霸王",
+            "copy": "《盐铁论》刺權第九以“大夫曰：「今夫越之具區，楚之雲夢，宋”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_009:text_order:0c197144"
+      },
+      {
+            "order": 10,
+            "title": "刺復第十",
+            "speaker": "大夫一方",
+            "stance": "法术与儒议",
+            "key": "court",
+            "visualMode": "value-clash",
+            "tension": {
+                  "fiscal": 74,
+                  "virtue": 78,
+                  "people": 58,
+                  "power": 66
+            },
+            "quote": "大夫曰為色矜而心不懌，曰：「但居者不知負載之勞，從旁議者與當局者異憂",
+            "copy": "《盐铁论》刺復第十以“大夫曰為色矜而心不懌，曰：「但居者不”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_010:text_order:fd4ba7ba"
+      },
+      {
+            "order": 11,
+            "title": "論儒第十一",
+            "speaker": "篇章旁白",
+            "stance": "法术与儒议",
+            "key": "court",
+            "visualMode": "value-clash",
+            "tension": {
+                  "fiscal": 74,
+                  "virtue": 78,
+                  "people": 58,
+                  "power": 66
+            },
+            "quote": "御史曰：「文學祖述仲尼，稱誦其德，以為自古及今，未之有也。然孔子修道",
+            "copy": "《盐铁论》論儒第十一以“御史曰：「文學祖述仲尼，稱誦其德，以”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_011:text_order:3e09582c"
+      },
+      {
+            "order": 12,
+            "title": "憂邊第十二",
+            "speaker": "大夫一方",
+            "stance": "法术与儒议",
+            "key": "court",
+            "visualMode": "value-clash",
+            "tension": {
+                  "fiscal": 74,
+                  "virtue": 78,
+                  "people": 58,
+                  "power": 66
+            },
+            "quote": "大夫曰：「文學言：『天下不平，庶國不寧，明王之憂也。』故王者之於天下",
+            "copy": "《盐铁论》憂邊第十二以“大夫曰：「文學言：『天下不平，庶國不”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_012:text_order:9320befc"
+      },
+      {
+            "order": 13,
+            "title": "園池第十三",
+            "speaker": "大夫一方",
+            "stance": "山海资源",
+            "key": "map",
+            "visualMode": "map-pressure",
+            "tension": {
+                  "fiscal": 84,
+                  "virtue": 58,
+                  "people": 66,
+                  "power": 72
+            },
+            "quote": "大夫曰：「諸侯以國為家，其憂在內。天子以八極為境，其慮在外。故宇小者",
+            "copy": "《盐铁论》園池第十三以“大夫曰：「諸侯以國為家，其憂在內。天”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_013:text_order:a6336fe1"
+      },
+      {
+            "order": 14,
+            "title": "輕重第十四",
+            "speaker": "篇章旁白",
+            "stance": "山海资源",
+            "key": "map",
+            "visualMode": "map-pressure",
+            "tension": {
+                  "fiscal": 84,
+                  "virtue": 58,
+                  "people": 66,
+                  "power": 72
+            },
+            "quote": "御史進曰：「昔太公封於營丘，辟草萊而居焉。地薄人少，於是通利末之道，",
+            "copy": "《盐铁论》輕重第十四以“御史進曰：「昔太公封於營丘，辟草萊而”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_014:text_order:81b91673"
+      },
+      {
+            "order": 15,
+            "title": "未通第十五",
+            "speaker": "篇章旁白",
+            "stance": "山海资源",
+            "key": "map",
+            "visualMode": "map-pressure",
+            "tension": {
+                  "fiscal": 84,
+                  "virtue": 58,
+                  "people": 66,
+                  "power": 72
+            },
+            "quote": "御史曰：「內郡人眾，水泉薦草，不能相贍，地勢溫濕，不宜牛馬；民跖耒而",
+            "copy": "《盐铁论》未通第十五以“御史曰：「內郡人眾，水泉薦草，不能相”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_015:text_order:78b6f9ac"
+      },
+      {
+            "order": 16,
+            "title": "地廣第十六",
+            "speaker": "大夫一方",
+            "stance": "山海资源",
+            "key": "map",
+            "visualMode": "map-pressure",
+            "tension": {
+                  "fiscal": 84,
+                  "virtue": 58,
+                  "people": 66,
+                  "power": 72
+            },
+            "quote": "大夫曰：「王者包含幷覆，普愛無私，不為近重施，不為遠遺恩。今俱是民也",
+            "copy": "《盐铁论》地廣第十六以“大夫曰：「王者包含幷覆，普愛無私，不”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_016:text_order:2169158a"
+      },
+      {
+            "order": 17,
+            "title": "貧富第十七",
+            "speaker": "大夫一方",
+            "stance": "山海资源",
+            "key": "map",
+            "visualMode": "map-pressure",
+            "tension": {
+                  "fiscal": 84,
+                  "virtue": 58,
+                  "people": 66,
+                  "power": 72
+            },
+            "quote": "大夫曰：「余結髮束修年十三，幸得宿衛，給事輦轂之下，以至卿大夫之位，",
+            "copy": "《盐铁论》貧富第十七以“大夫曰：「余結髮束修年十三，幸得宿衛”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_017:text_order:56770b03"
+      },
+      {
+            "order": 18,
+            "title": "毀學第十八",
+            "speaker": "大夫一方",
+            "stance": "山海资源",
+            "key": "map",
+            "visualMode": "map-pressure",
+            "tension": {
+                  "fiscal": 84,
+                  "virtue": 58,
+                  "people": 66,
+                  "power": 72
+            },
+            "quote": "大夫曰：「夫懷枉而言正，自托於無欲而實不從，此非士之情也？昔李斯與包",
+            "copy": "《盐铁论》毀學第十八以“大夫曰：「夫懷枉而言正，自托於無欲而”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_018:text_order:29ef3931"
+      },
+      {
+            "order": 19,
+            "title": "褒賢第十九",
+            "speaker": "大夫一方",
+            "stance": "山海资源",
+            "key": "map",
+            "visualMode": "map-pressure",
+            "tension": {
+                  "fiscal": 84,
+                  "virtue": 58,
+                  "people": 66,
+                  "power": 72
+            },
+            "quote": "大夫曰：「伯夷以廉饑，尾生以信死。由小器而虧大體，匹夫匹婦之為諒也，",
+            "copy": "《盐铁论》褒賢第十九以“大夫曰：「伯夷以廉饑，尾生以信死。由”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_019:text_order:15df98d4"
+      },
+      {
+            "order": 20,
+            "title": "相刺第二十",
+            "speaker": "大夫一方",
+            "stance": "贤能与吏治",
+            "key": "court",
+            "visualMode": "value-clash",
+            "tension": {
+                  "fiscal": 60,
+                  "virtue": 86,
+                  "people": 76,
+                  "power": 62
+            },
+            "quote": "大夫曰：「古者，經井田，制廛里，丈夫治其田疇，女子治其麻枲，無曠地，",
+            "copy": "《盐铁论》相刺第二十以“大夫曰：「古者，經井田，制廛里，丈夫”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_020:text_order:4f46cdc8"
+      },
+      {
+            "order": 21,
+            "title": "殊路第二十一",
+            "speaker": "大夫一方",
+            "stance": "贤能与吏治",
+            "key": "court",
+            "visualMode": "seat-opposition",
+            "tension": {
+                  "fiscal": 60,
+                  "virtue": 86,
+                  "people": 76,
+                  "power": 62
+            },
+            "quote": "大夫曰：「七十子躬受聖人之術，有名列於孔子之門，皆諸侯卿相之才，可南",
+            "copy": "《盐铁论》殊路第二十一以“大夫曰：「七十子躬受聖人之術，有名列”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_021:text_order:6c6b6279"
+      },
+      {
+            "order": 22,
+            "title": "訟賢第二十二",
+            "speaker": "大夫一方",
+            "stance": "贤能与吏治",
+            "key": "court",
+            "visualMode": "value-clash",
+            "tension": {
+                  "fiscal": 60,
+                  "virtue": 86,
+                  "people": 76,
+                  "power": 62
+            },
+            "quote": "大夫曰：「剛者折，柔者卷。故季由以強梁死，宰我以柔弱殺。使二子不學，",
+            "copy": "《盐铁论》訟賢第二十二以“大夫曰：「剛者折，柔者卷。故季由以強”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_022:text_order:f329e676"
+      },
+      {
+            "order": 23,
+            "title": "遵道第二十三",
+            "speaker": "大夫一方",
+            "stance": "贤能与吏治",
+            "key": "court",
+            "visualMode": "seat-opposition",
+            "tension": {
+                  "fiscal": 60,
+                  "virtue": 86,
+                  "people": 76,
+                  "power": 62
+            },
+            "quote": "大夫曰：「御史！」御史未應。謂丞相史曰：「文學結髮學語，服膺不舍，辭",
+            "copy": "《盐铁论》遵道第二十三以“大夫曰：「御史！」御史未應。謂丞相史”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_023:text_order:ec58468b"
+      },
+      {
+            "order": 24,
+            "title": "論誹第二十四",
+            "speaker": "篇章旁白",
+            "stance": "贤能与吏治",
+            "key": "court",
+            "visualMode": "value-clash",
+            "tension": {
+                  "fiscal": 60,
+                  "virtue": 86,
+                  "people": 76,
+                  "power": 62
+            },
+            "quote": "丞相史曰：「晏子有言：『儒者華於言而寡於實，繁於樂而舒於民，久喪以害",
+            "copy": "《盐铁论》論誹第二十四以“丞相史曰：「晏子有言：『儒者華於言而”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_024:text_order:7a12414a"
+      },
+      {
+            "order": 25,
+            "title": "孝養第二十五",
+            "speaker": "贤良文学",
+            "stance": "贤能与吏治",
+            "key": "court",
+            "visualMode": "seat-opposition",
+            "tension": {
+                  "fiscal": 60,
+                  "virtue": 86,
+                  "people": 76,
+                  "power": 62
+            },
+            "quote": "文學曰：「善養者不必芻豢也，善供服者不必錦繡也。以己之所有盡事其親，",
+            "copy": "《盐铁论》孝養第二十五以“文學曰：「善養者不必芻豢也，善供服者”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_025:text_order:31e3350d"
+      },
+      {
+            "order": 26,
+            "title": "刺議第二十六",
+            "speaker": "篇章旁白",
+            "stance": "贤能与吏治",
+            "key": "court",
+            "visualMode": "value-clash",
+            "tension": {
+                  "fiscal": 60,
+                  "virtue": 86,
+                  "people": 76,
+                  "power": 62
+            },
+            "quote": "丞相史曰：「山陵不讓椒跬，以成其崇；君子不辭負薪之言，以廣其名。故多",
+            "copy": "《盐铁论》刺議第二十六以“丞相史曰：「山陵不讓椒跬，以成其崇；”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_026:text_order:6748d3ee"
+      },
+      {
+            "order": 27,
+            "title": "利議第二十七",
+            "speaker": "大夫一方",
+            "stance": "贤能与吏治",
+            "key": "court",
+            "visualMode": "seat-opposition",
+            "tension": {
+                  "fiscal": 60,
+                  "virtue": 86,
+                  "people": 76,
+                  "power": 62
+            },
+            "quote": "大夫曰：「作世明主，憂勞萬民，思念北邊之未安，故使使者舉賢良、文學高",
+            "copy": "《盐铁论》利議第二十七以“大夫曰：「作世明主，憂勞萬民，思念北”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_027:text_order:ce7cd32e"
+      },
+      {
+            "order": 28,
+            "title": "國疾第二十八",
+            "speaker": "贤良文学",
+            "stance": "贤能与吏治",
+            "key": "court",
+            "visualMode": "value-clash",
+            "tension": {
+                  "fiscal": 60,
+                  "virtue": 86,
+                  "people": 76,
+                  "power": 62
+            },
+            "quote": "文學曰：「國有賢士而不用，非士之過，有國者之恥。孔子大聖也，諸侯莫能",
+            "copy": "《盐铁论》國疾第二十八以“文學曰：「國有賢士而不用，非士之過，”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_028:text_order:b3020679"
+      },
+      {
+            "order": 29,
+            "title": "散不足第二十九",
+            "speaker": "大夫一方",
+            "stance": "贤能与吏治",
+            "key": "court",
+            "visualMode": "seat-opposition",
+            "tension": {
+                  "fiscal": 60,
+                  "virtue": 86,
+                  "people": 76,
+                  "power": 62
+            },
+            "quote": "大夫曰：「吾以賢良為少愈，乃反其幽明，若胡車相隨而鳴。諸生獨不見季夏",
+            "copy": "《盐铁论》散不足第二十九以“大夫曰：「吾以賢良為少愈，乃反其幽明”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_029:text_order:d80874ba"
+      },
+      {
+            "order": 30,
+            "title": "救匱第三十",
+            "speaker": "贤良文学",
+            "stance": "贤能与吏治",
+            "key": "court",
+            "visualMode": "value-clash",
+            "tension": {
+                  "fiscal": 60,
+                  "virtue": 86,
+                  "people": 76,
+                  "power": 62
+            },
+            "quote": "賢良曰：「蓋橈枉者以直，救文者以質。昔者，晏子相齊，一狐裘三十載。故",
+            "copy": "《盐铁论》救匱第三十以“賢良曰：「蓋橈枉者以直，救文者以質。”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_030:text_order:d6027aab"
+      },
+      {
+            "order": 31,
+            "title": "箴石第三十一",
+            "speaker": "篇章旁白",
+            "stance": "贤能与吏治",
+            "key": "court",
+            "visualMode": "seat-opposition",
+            "tension": {
+                  "fiscal": 60,
+                  "virtue": 86,
+                  "people": 76,
+                  "power": 62
+            },
+            "quote": "丞相曰：「吾聞諸鄭長者曰：『君子正顏色，則遠暴嫚；出辭氣，則遠鄙倍矣",
+            "copy": "《盐铁论》箴石第三十一以“丞相曰：「吾聞諸鄭長者曰：『君子正顏”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_031:text_order:fde83baf"
+      },
+      {
+            "order": 32,
+            "title": "除狹第三十二",
+            "speaker": "大夫一方",
+            "stance": "贤能与吏治",
+            "key": "court",
+            "visualMode": "value-clash",
+            "tension": {
+                  "fiscal": 60,
+                  "virtue": 86,
+                  "people": 76,
+                  "power": 62
+            },
+            "quote": "大夫曰：「賢者處大林，遭風雷而不迷。愚者雖處平敞大路，猶暗惑焉。今守",
+            "copy": "《盐铁论》除狹第三十二以“大夫曰：「賢者處大林，遭風雷而不迷。”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_032:text_order:c1218137"
+      },
+      {
+            "order": 33,
+            "title": "疾貪第三十三",
+            "speaker": "大夫一方",
+            "stance": "贤能与吏治",
+            "key": "court",
+            "visualMode": "seat-opposition",
+            "tension": {
+                  "fiscal": 60,
+                  "virtue": 86,
+                  "people": 76,
+                  "power": 62
+            },
+            "quote": "大夫曰：「然。為醫以拙矣，又多求謝。為吏既多不良矣，又侵漁百姓。長吏",
+            "copy": "《盐铁论》疾貪第三十三以“大夫曰：「然。為醫以拙矣，又多求謝。”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_033:text_order:b4633e27"
+      },
+      {
+            "order": 34,
+            "title": "後刑第三十四",
+            "speaker": "大夫一方",
+            "stance": "贤能与吏治",
+            "key": "court",
+            "visualMode": "value-clash",
+            "tension": {
+                  "fiscal": 60,
+                  "virtue": 86,
+                  "people": 76,
+                  "power": 62
+            },
+            "quote": "大夫曰：「古之君子，善善而惡惡。人君不畜惡民，農夫不畜無用之苗。無用",
+            "copy": "《盐铁论》後刑第三十四以“大夫曰：「古之君子，善善而惡惡。人君”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_034:text_order:5d567a2a"
+      },
+      {
+            "order": 35,
+            "title": "授時第三十五",
+            "speaker": "大夫一方",
+            "stance": "贤能与吏治",
+            "key": "court",
+            "visualMode": "seat-opposition",
+            "tension": {
+                  "fiscal": 60,
+                  "virtue": 86,
+                  "people": 76,
+                  "power": 62
+            },
+            "quote": "大夫曰：「共其地，居是世也，非有災害疾疫，獨以貧窮，非惰則奢也；無奇",
+            "copy": "《盐铁论》授時第三十五以“大夫曰：「共其地，居是世也，非有災害”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_035:text_order:0a85f7b7"
+      },
+      {
+            "order": 36,
+            "title": "水旱第三十六",
+            "speaker": "大夫一方",
+            "stance": "贤能与吏治",
+            "key": "court",
+            "visualMode": "value-clash",
+            "tension": {
+                  "fiscal": 60,
+                  "virtue": 86,
+                  "people": 76,
+                  "power": 62
+            },
+            "quote": "大夫曰：「禹、湯聖主，后稷、伊尹賢相也，而有水旱之災。水旱，天之所為",
+            "copy": "《盐铁论》水旱第三十六以“大夫曰：「禹、湯聖主，后稷、伊尹賢相”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_036:text_order:9c0768fb"
+      },
+      {
+            "order": 37,
+            "title": "崇禮第三十七",
+            "speaker": "大夫一方",
+            "stance": "边政攻守",
+            "key": "network",
+            "visualMode": "power-shadow",
+            "tension": {
+                  "fiscal": 78,
+                  "virtue": 64,
+                  "people": 58,
+                  "power": 88
+            },
+            "quote": "大夫曰：「飾几杖，修樽俎，為賓，非為主也。炫耀奇怪，所以陳四夷，非為",
+            "copy": "《盐铁论》崇禮第三十七以“大夫曰：「飾几杖，修樽俎，為賓，非為”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_037:text_order:3915bc13"
+      },
+      {
+            "order": 38,
+            "title": "備胡第三十八",
+            "speaker": "大夫一方",
+            "stance": "边政攻守",
+            "key": "network",
+            "visualMode": "power-shadow",
+            "tension": {
+                  "fiscal": 78,
+                  "virtue": 64,
+                  "people": 58,
+                  "power": 88
+            },
+            "quote": "大夫曰：「鄙語曰：『賢者容不辱。』以世俗言之，鄉曲有桀，人尚辟之。今",
+            "copy": "《盐铁论》備胡第三十八以“大夫曰：「鄙語曰：『賢者容不辱。』以”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_038:text_order:dce6b459"
+      },
+      {
+            "order": 39,
+            "title": "執務第三十九",
+            "speaker": "篇章旁白",
+            "stance": "边政攻守",
+            "key": "network",
+            "visualMode": "power-shadow",
+            "tension": {
+                  "fiscal": 78,
+                  "virtue": 64,
+                  "people": 58,
+                  "power": 88
+            },
+            "quote": "丞相曰：「先王之道，軼久而難復，賢良、文學之言，深遠而難行。夫稱上聖",
+            "copy": "《盐铁论》執務第三十九以“丞相曰：「先王之道，軼久而難復，賢良”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_039:text_order:149d8fea"
+      },
+      {
+            "order": 40,
+            "title": "能言第四十",
+            "speaker": "大夫一方",
+            "stance": "边政攻守",
+            "key": "network",
+            "visualMode": "power-shadow",
+            "tension": {
+                  "fiscal": 78,
+                  "virtue": 64,
+                  "people": 58,
+                  "power": 88
+            },
+            "quote": "大夫曰：「盲者口能言白黑，而無目以別之。儒者口能言治亂，而無能以行之",
+            "copy": "《盐铁论》能言第四十以“大夫曰：「盲者口能言白黑，而無目以別”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_040:text_order:ce92ad30"
+      },
+      {
+            "order": 41,
+            "title": "取下第四十一",
+            "speaker": "大夫一方",
+            "stance": "边政攻守",
+            "key": "network",
+            "visualMode": "power-shadow",
+            "tension": {
+                  "fiscal": 78,
+                  "virtue": 64,
+                  "people": 58,
+                  "power": 88
+            },
+            "quote": "大夫曰：「不軌之民，困橈公利，而欲擅山澤。從文學、賢良之意，則利歸於",
+            "copy": "《盐铁论》取下第四十一以“大夫曰：「不軌之民，困橈公利，而欲擅”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_041:text_order:2a88175a"
+      },
+      {
+            "order": 42,
+            "title": "擊之第四十二",
+            "speaker": "贤良文学",
+            "stance": "边政攻守",
+            "key": "network",
+            "visualMode": "power-shadow",
+            "tension": {
+                  "fiscal": 78,
+                  "virtue": 64,
+                  "people": 58,
+                  "power": 88
+            },
+            "quote": "賢良、文學既拜，咸取列大夫，辭丞相、御史。大夫曰：「前議公事，賢良、",
+            "copy": "《盐铁论》擊之第四十二以“賢良、文學既拜，咸取列大夫，辭丞相、”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_042:text_order:a715de89"
+      },
+      {
+            "order": 43,
+            "title": "結和第四十三",
+            "speaker": "大夫一方",
+            "stance": "边政攻守",
+            "key": "network",
+            "visualMode": "power-shadow",
+            "tension": {
+                  "fiscal": 78,
+                  "virtue": 64,
+                  "people": 58,
+                  "power": 88
+            },
+            "quote": "大夫曰：「漢興以來，修好結和親，所聘遺單于者甚厚；然不紀重質厚賂之故",
+            "copy": "《盐铁论》結和第四十三以“大夫曰：「漢興以來，修好結和親，所聘”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_043:text_order:1ba0a5a7"
+      },
+      {
+            "order": 44,
+            "title": "誅秦第四十四",
+            "speaker": "大夫一方",
+            "stance": "边政攻守",
+            "key": "network",
+            "visualMode": "power-shadow",
+            "tension": {
+                  "fiscal": 78,
+                  "virtue": 64,
+                  "people": 58,
+                  "power": 88
+            },
+            "quote": "大夫曰：「秦、楚、燕、齊、周之封國也；三晉之君，齊之田氏，諸侯家臣也",
+            "copy": "《盐铁论》誅秦第四十四以“大夫曰：「秦、楚、燕、齊、周之封國也”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_044:text_order:8a692fc5"
+      },
+      {
+            "order": 45,
+            "title": "伐功第四十五",
+            "speaker": "大夫一方",
+            "stance": "边政攻守",
+            "key": "network",
+            "visualMode": "power-shadow",
+            "tension": {
+                  "fiscal": 78,
+                  "virtue": 64,
+                  "people": 58,
+                  "power": 88
+            },
+            "quote": "大夫曰：「齊桓公越燕伐山戎，破孤竹，殘令支。趙武靈王踰句註，過代谷，",
+            "copy": "《盐铁论》伐功第四十五以“大夫曰：「齊桓公越燕伐山戎，破孤竹，”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_045:text_order:7c69ce75"
+      },
+      {
+            "order": 46,
+            "title": "西域第四十六",
+            "speaker": "大夫一方",
+            "stance": "边政攻守",
+            "key": "network",
+            "visualMode": "power-shadow",
+            "tension": {
+                  "fiscal": 78,
+                  "virtue": 64,
+                  "people": 58,
+                  "power": 88
+            },
+            "quote": "大夫曰：「往者，匈奴據河、山之險，擅田牧之利，民富兵強，行入為寇，則",
+            "copy": "《盐铁论》西域第四十六以“大夫曰：「往者，匈奴據河、山之險，擅”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_046:text_order:d68f5be9"
+      },
+      {
+            "order": 47,
+            "title": "世務第四十七",
+            "speaker": "大夫一方",
+            "stance": "边政攻守",
+            "key": "network",
+            "visualMode": "power-shadow",
+            "tension": {
+                  "fiscal": 78,
+                  "virtue": 64,
+                  "people": 58,
+                  "power": 88
+            },
+            "quote": "大夫曰：「諸生妄言！議者令可詳用，無徒守椎車之語，滑稽而不可循。夫漢",
+            "copy": "《盐铁论》世務第四十七以“大夫曰：「諸生妄言！議者令可詳用，無”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_047:text_order:0d86550d"
+      },
+      {
+            "order": 48,
+            "title": "和親第四十八",
+            "speaker": "大夫一方",
+            "stance": "边政攻守",
+            "key": "network",
+            "visualMode": "power-shadow",
+            "tension": {
+                  "fiscal": 78,
+                  "virtue": 64,
+                  "people": 58,
+                  "power": 88
+            },
+            "quote": "大夫曰：「昔徐偃王行義而滅，魯哀公好儒而削。知文而不知武，知一而不知",
+            "copy": "《盐铁论》和親第四十八以“大夫曰：「昔徐偃王行義而滅，魯哀公好”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_048:text_order:682a856d"
+      },
+      {
+            "order": 49,
+            "title": "繇役第四十九",
+            "speaker": "大夫一方",
+            "stance": "边政攻守",
+            "key": "network",
+            "visualMode": "power-shadow",
+            "tension": {
+                  "fiscal": 78,
+                  "virtue": 64,
+                  "people": 58,
+                  "power": 88
+            },
+            "quote": "大夫曰：「屠者解分中理，可橫以手而離也；至其抽筋鑿骨，非行金斧不能決",
+            "copy": "《盐铁论》繇役第四十九以“大夫曰：「屠者解分中理，可橫以手而離”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_049:text_order:5a529a3e"
+      },
+      {
+            "order": 50,
+            "title": "險固第五十",
+            "speaker": "大夫一方",
+            "stance": "边政攻守",
+            "key": "network",
+            "visualMode": "power-shadow",
+            "tension": {
+                  "fiscal": 78,
+                  "virtue": 64,
+                  "people": 58,
+                  "power": 88
+            },
+            "quote": "大夫曰：「虎兕所以能執熊羆、服群獸者，爪牙利而攫便也。秦所以超諸侯、",
+            "copy": "《盐铁论》險固第五十以“大夫曰：「虎兕所以能執熊羆、服群獸者”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_050:text_order:6fee881f"
+      },
+      {
+            "order": 51,
+            "title": "論勇第五十一",
+            "speaker": "大夫一方",
+            "stance": "边政攻守",
+            "key": "network",
+            "visualMode": "power-shadow",
+            "tension": {
+                  "fiscal": 78,
+                  "virtue": 64,
+                  "people": 58,
+                  "power": 88
+            },
+            "quote": "大夫曰：「荊軻懷數年之謀而事不就者，尺八匕首不足恃也。秦王憚於不意，",
+            "copy": "《盐铁论》論勇第五十一以“大夫曰：「荊軻懷數年之謀而事不就者，”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_051:text_order:ad7e4a9a"
+      },
+      {
+            "order": 52,
+            "title": "論功第五十二",
+            "speaker": "大夫一方",
+            "stance": "边政攻守",
+            "key": "network",
+            "visualMode": "power-shadow",
+            "tension": {
+                  "fiscal": 78,
+                  "virtue": 64,
+                  "people": 58,
+                  "power": 88
+            },
+            "quote": "大夫曰：「匈奴無城廓之守，溝池之固，修戟強弩之用，倉廩府庫之積，上無",
+            "copy": "《盐铁论》論功第五十二以“大夫曰：「匈奴無城廓之守，溝池之固，”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_052:text_order:2824a19e"
+      },
+      {
+            "order": 53,
+            "title": "論鄒第五十三",
+            "speaker": "大夫一方",
+            "stance": "边政攻守",
+            "key": "network",
+            "visualMode": "power-shadow",
+            "tension": {
+                  "fiscal": 78,
+                  "virtue": 64,
+                  "people": 58,
+                  "power": 88
+            },
+            "quote": "大夫曰：「鄒子疾晚世之儒墨，不知天地之弘，昭曠之道，將一曲而欲道九折",
+            "copy": "《盐铁论》論鄒第五十三以“大夫曰：「鄒子疾晚世之儒墨，不知天地”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_053:text_order:599af8e6"
+      },
+      {
+            "order": 54,
+            "title": "論菑第五十四",
+            "speaker": "大夫一方",
+            "stance": "边政攻守",
+            "key": "network",
+            "visualMode": "power-shadow",
+            "tension": {
+                  "fiscal": 78,
+                  "virtue": 64,
+                  "people": 58,
+                  "power": 88
+            },
+            "quote": "大夫曰：「巫祝不可與並祀，諸生不可與逐語，信往疑今，非人自是。夫道古",
+            "copy": "《盐铁论》論菑第五十四以“大夫曰：「巫祝不可與並祀，諸生不可與”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_054:text_order:35120a57"
+      },
+      {
+            "order": 55,
+            "title": "刑德第五十五",
+            "speaker": "大夫一方",
+            "stance": "刑德终局",
+            "key": "court",
+            "visualMode": "value-clash",
+            "tension": {
+                  "fiscal": 66,
+                  "virtue": 84,
+                  "people": 68,
+                  "power": 78
+            },
+            "quote": "大夫曰：「令者所以教民也，法者所以督奸也。令嚴而民慎，法設而奸禁。罔",
+            "copy": "《盐铁论》刑德第五十五以“大夫曰：「令者所以教民也，法者所以督”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_055:text_order:b8a94ea4"
+      },
+      {
+            "order": 56,
+            "title": "申韓第五十六",
+            "speaker": "篇章旁白",
+            "stance": "刑德终局",
+            "key": "court",
+            "visualMode": "value-clash",
+            "tension": {
+                  "fiscal": 66,
+                  "virtue": 84,
+                  "people": 68,
+                  "power": 78
+            },
+            "quote": "御史曰：「待周公而為相，則世無列國。待孔子而後學，則世無儒、墨。夫衣",
+            "copy": "《盐铁论》申韓第五十六以“御史曰：「待周公而為相，則世無列國。”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_056:text_order:e278f6ba"
+      },
+      {
+            "order": 57,
+            "title": "周秦第五十七",
+            "speaker": "篇章旁白",
+            "stance": "刑德终局",
+            "key": "court",
+            "visualMode": "value-clash",
+            "tension": {
+                  "fiscal": 66,
+                  "virtue": 84,
+                  "people": 68,
+                  "power": 78
+            },
+            "quote": "御史曰：「春秋無名號，謂之雲盜，所以賤刑人而絕之人倫也。故君不臣，士",
+            "copy": "《盐铁论》周秦第五十七以“御史曰：「春秋無名號，謂之雲盜，所以”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_057:text_order:4df2202d"
+      },
+      {
+            "order": 58,
+            "title": "詔聖第五十八",
+            "speaker": "篇章旁白",
+            "stance": "刑德终局",
+            "key": "court",
+            "visualMode": "value-clash",
+            "tension": {
+                  "fiscal": 66,
+                  "virtue": 84,
+                  "people": 68,
+                  "power": 78
+            },
+            "quote": "御史曰：「夏後氏不倍言，殷誓，周盟，德信彌衰。無文、武之人，欲修其法",
+            "copy": "《盐铁论》詔聖第五十八以“御史曰：「夏後氏不倍言，殷誓，周盟，”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_058:text_order:5d0c9d29"
+      },
+      {
+            "order": 59,
+            "title": "大論第五十九",
+            "speaker": "大夫一方",
+            "stance": "刑德终局",
+            "key": "court",
+            "visualMode": "value-clash",
+            "tension": {
+                  "fiscal": 66,
+                  "virtue": 84,
+                  "people": 68,
+                  "power": 78
+            },
+            "quote": "大夫曰：「呻吟槁簡，誦死人之語，則有司不以文學。文學知獄之在廷後而不",
+            "copy": "《盐铁论》大論第五十九以“大夫曰：「呻吟槁簡，誦死人之語，則有”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_059:text_order:09ff8e00"
+      },
+      {
+            "order": 60,
+            "title": "雜論第六十",
+            "speaker": "篇章旁白",
+            "stance": "刑德终局",
+            "key": "court",
+            "visualMode": "value-clash",
+            "tension": {
+                  "fiscal": 66,
+                  "virtue": 84,
+                  "people": 68,
+                  "power": 78
+            },
+            "quote": "客曰：「余睹鹽、鐵之義，觀乎公卿、文學、賢良之論，意指殊路，各有所出",
+            "copy": "《盐铁论》雜論第六十以“客曰：「余睹鹽、鐵之義，觀乎公卿、文”开篇，延续公卿与贤良文学围绕政策、价值或边政的论辩。",
+            "evidenceId": "ev:src_yantielun:chapter_060:text_order:da9d4d53"
       }
-    ];
-    const scenes = [...historicalPrelude, ...debateRounds];
+];
+
+    const debateRounds = yantielunChapters.map(chapter => ({
+      key: chapter.key,
+      kicker: `第${String(chapter.order).padStart(2, "0")}回合 · ${chapter.title}`,
+      title: `第${chapter.order}篇：${chapter.title}`,
+      copy: chapter.copy,
+      quote: chapter.quote,
+      speaker: chapter.speaker,
+      stance: chapter.stance,
+      line: `按《盐铁论》文本顺序进入《${chapter.title}》；此回合只使用本篇证据。`,
+      visualMode: chapter.visualMode,
+      tension: chapter.tension,
+      evidence: [chapter.evidenceId]
+    }));
+
+    const judgmentScene = {
+      "key": "judgment",
+      "kicker": "退朝余波 · 有限结果",
+      "title": "榷酤可罢，盐铁未废",
+      "copy": "退朝之后，史书留下有限的结果：道德批判进入记录，财政机器仍然运转。此刻才轮到你的案牍。",
+      "quote": "后罢榷酤，而盐、铁则如旧",
+      "speaker": "退朝旁白",
+      "stance": "历史结果",
+      "line": "六十篇已过，可被记下的胜利却很有限。",
+      "visualMode": "archive-closure",
+      "tension": {
+            "fiscal": 76,
+            "virtue": 70,
+            "people": 60,
+            "power": 84
+      },
+      "evidence": [
+            "ev:src_hanshu_zhaodi:juan007:abolish_liquor_office:ddccbbaa",
+            "ev:src_yantielun_siku:preface:partial_result:1234abcd"
+      ]
+};
+    const scenes = [...historicalPrelude, ...debateRounds, judgmentScene];
 
     async function boot() {
       const [manifest, actors, events, claims, relations, mapLayers] = await Promise.all([
