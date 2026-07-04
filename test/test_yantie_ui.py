@@ -35,6 +35,49 @@ class YantieWebUiTests(unittest.TestCase):
         self.assertIn('id="judgmentForm"', html)
         self.assertIn('id="soundToggle"', html)
 
+    def test_yantie_page_exposes_v3_court_pressure_opening(self) -> None:
+        html = self.client.get("/yantie").text
+
+        self.assertIn('id="courtPressureOpening"', html)
+        self.assertIn('data-drama-phase="map-pressure"', html)
+        self.assertIn("is-prologue-active", html)
+        self.assertIn("data-testid=\"han-restored-basemap\"", html)
+        self.assertIn("renderHanRestoredBasemap", html)
+        self.assertIn("mapPointForFeature", html)
+        self.assertIn("复原叙事地图", html)
+        self.assertIn("非精确 GIS", html)
+        self.assertIn("进入朝堂", html)
+        self.assertIn("边费", html)
+        self.assertIn("盐铁山海", html)
+        self.assertIn("均输", html)
+        self.assertIn("dramaPhase", html)
+        self.assertIn("sceneProgress", html)
+        self.assertIn("renderDramaOverlay", html)
+        self.assertIn("dramaPhaseFor", html)
+        self.assertIn("v3-map-pressure-routes", html)
+        self.assertIn("v3-court-silhouettes", html)
+        self.assertIn("role-silhouette is-sang", html)
+        self.assertIn("role-silhouette is-huo", html)
+        self.assertIn("role-silhouette is-literati", html)
+        self.assertIn("pressure-route", html)
+        self.assertIn("new AudioContext()", html)
+
+        forbidden_runtime_markers = [
+            "ReactDOM",
+            "from \"react\"",
+            "from 'react'",
+            "createRoot(",
+            "vite/client",
+            "gsap.",
+            "pixi.js",
+            "leaflet",
+            "mapbox",
+            "new THREE",
+            "three.min",
+        ]
+        for marker in forbidden_runtime_markers:
+            self.assertNotIn(marker, html)
+
     def test_yantie_page_is_guided_not_tab_driven(self) -> None:
         html = self.client.get("/yantie").text
 

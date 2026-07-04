@@ -272,6 +272,256 @@ YANTIE_HTML = """<!doctype html>
       box-shadow: var(--shadow);
     }
 
+    .stage.is-prologue-active .scene-shell {
+      grid-template-columns: 1fr;
+      gap: 0;
+      align-items: stretch;
+      padding: 88px clamp(14px, 4vw, 54px) 64px;
+    }
+
+    .stage.is-prologue-active .story-panel {
+      position: fixed;
+      left: clamp(18px, 5vw, 70px);
+      bottom: clamp(22px, 8vh, 82px);
+      z-index: 18;
+      width: min(560px, calc(100vw - 36px));
+      max-width: none;
+      pointer-events: auto;
+    }
+
+    .stage.is-prologue-active .chapter-kicker {
+      margin-bottom: 10px;
+      text-shadow: 0 8px 28px rgba(0,0,0,0.64);
+    }
+
+    .stage.is-prologue-active .scene-title {
+      font-size: clamp(32px, 5vw, 58px);
+      line-height: 1.04;
+      max-width: 12em;
+    }
+
+    .stage.is-prologue-active .scene-copy {
+      max-width: 460px;
+      margin-top: 12px;
+      font-size: clamp(15px, 1.45vw, 18px);
+      line-height: 1.72;
+      text-shadow: 0 8px 24px rgba(0,0,0,0.72);
+    }
+
+    .stage.is-prologue-active .quote-line,
+    .stage.is-prologue-active #revealEvidence,
+    .stage.is-prologue-active #chapterMapToggle,
+    .stage.is-prologue-active #rewindScene,
+    .stage.is-prologue-active #decisionDock,
+    .stage.is-prologue-active #debateHud,
+    .stage.is-prologue-active #timelineRail,
+    .stage.is-prologue-active .scene-footnote {
+      display: none;
+    }
+
+    .stage.is-prologue-active .scene-actions {
+      margin-top: 18px;
+    }
+
+    .stage.is-prologue-active .scene-world {
+      grid-column: 1;
+      grid-row: 1;
+      min-height: calc(100vh - 152px);
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .court-pressure-opening {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .prologue-map-note {
+      position: absolute;
+      right: 22px;
+      bottom: 18px;
+      z-index: 6;
+      max-width: 270px;
+      color: rgba(255,244,214,0.6);
+      font-size: 11px;
+      line-height: 1.55;
+      text-align: right;
+      opacity: 0;
+      transition: opacity 420ms ease;
+    }
+
+    .stage.is-prologue-active .prologue-map-note {
+      opacity: 1;
+    }
+
+    .drama-thread {
+      position: absolute;
+      left: 9%;
+      right: 9%;
+      top: 12%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(243,196,109,0.94), rgba(154,36,28,0.74), transparent);
+      transform-origin: left center;
+      animation: pressureThread 7.2s ease-in-out infinite;
+      opacity: 0.72;
+    }
+
+    .drama-thread.is-second {
+      top: 21%;
+      animation-delay: -2.4s;
+      opacity: 0.48;
+    }
+
+    .drama-thread.is-third {
+      top: 31%;
+      animation-delay: -4.8s;
+      opacity: 0.36;
+    }
+
+    .drama-route-labels {
+      position: absolute;
+      inset: 16px 18px auto 18px;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      color: rgba(255,244,214,0.72);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .drama-route-labels span {
+      border: 1px solid rgba(255,236,188,0.18);
+      border-radius: 999px;
+      padding: 4px 8px;
+      background: rgba(9,13,19,0.36);
+      backdrop-filter: blur(4px);
+    }
+
+    .stage.is-prologue-active .drama-thread,
+    .stage.is-prologue-active .drama-route-labels,
+    .stage.is-prologue-active .role-silhouette-row,
+    .stage.is-prologue-active .drama-progress {
+      display: none;
+    }
+
+    .role-silhouette-row {
+      position: absolute;
+      left: 8%;
+      right: 8%;
+      bottom: 94px;
+      display: grid;
+      grid-template-columns: 1fr 0.7fr 1fr;
+      align-items: end;
+      gap: clamp(10px, 3vw, 34px);
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 520ms ease, transform 700ms ease;
+    }
+
+    .scene-world[data-drama-phase="meeting-threshold"] .role-silhouette-row,
+    .scene-world[data-drama-phase="fiscal-pressure"] .role-silhouette-row,
+    .scene-world[data-drama-phase="livelihood-counter"] .role-silhouette-row,
+    .scene-world[data-drama-phase="power-shadow"] .role-silhouette-row {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .role-silhouette {
+      min-width: 0;
+      display: grid;
+      justify-items: center;
+      gap: 7px;
+      color: rgba(255,244,214,0.78);
+      font-size: 12px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .role-silhouette::before {
+      content: "";
+      display: block;
+      width: min(92px, 22vw);
+      height: min(132px, 26vw);
+      border: 1px solid rgba(255,236,188,0.28);
+      border-radius: 48% 48% 10px 10px;
+      background:
+        radial-gradient(circle at 50% 22%, rgba(255,244,214,0.72) 0 12%, transparent 13%),
+        linear-gradient(180deg, rgba(255,244,214,0.2), rgba(9,13,19,0.78));
+      box-shadow: 0 20px 60px rgba(0,0,0,0.36);
+    }
+
+    .role-silhouette.is-sang::before {
+      background:
+        radial-gradient(circle at 50% 22%, rgba(207,229,255,0.76) 0 12%, transparent 13%),
+        linear-gradient(180deg, rgba(54,81,108,0.62), rgba(9,13,19,0.78));
+      box-shadow: 0 0 42px rgba(54,81,108,0.42);
+    }
+
+    .role-silhouette.is-literati::before {
+      background:
+        radial-gradient(circle at 50% 22%, rgba(220,247,223,0.78) 0 12%, transparent 13%),
+        linear-gradient(180deg, rgba(44,122,102,0.58), rgba(9,13,19,0.78));
+      box-shadow: 0 0 42px rgba(44,122,102,0.36);
+    }
+
+    .role-silhouette.is-huo {
+      align-self: start;
+      color: rgba(255,244,214,0.64);
+    }
+
+    .role-silhouette.is-huo::before {
+      width: min(118px, 24vw);
+      height: min(172px, 32vw);
+      background:
+        radial-gradient(circle at 50% 18%, rgba(154,36,28,0.62) 0 10%, transparent 12%),
+        linear-gradient(180deg, rgba(154,36,28,0.52), rgba(3,6,10,0.92));
+      box-shadow: 0 0 90px rgba(154,36,28,0.45);
+      opacity: 0.82;
+    }
+
+    .drama-progress {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 18px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .drama-step {
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(255,244,214,0.16);
+      overflow: hidden;
+    }
+
+    .drama-step span {
+      display: block;
+      width: 26%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #f3c46d, #9a241c);
+      transition: width 520ms ease;
+    }
+
+    .scene-world[data-drama-phase="meeting-threshold"] .drama-step span { width: 48%; }
+    .scene-world[data-drama-phase="fiscal-pressure"] .drama-step span { width: 68%; }
+    .scene-world[data-drama-phase="livelihood-counter"] .drama-step span { width: 82%; }
+    .scene-world[data-drama-phase="power-shadow"] .drama-step span { width: 100%; }
+
+    @keyframes pressureThread {
+      0% { transform: scaleX(0.18) translateX(-8%); opacity: 0; }
+      18% { opacity: 0.72; }
+      58% { transform: scaleX(0.88) translateX(5%); opacity: 0.86; }
+      100% { transform: scaleX(1) translateX(12%); opacity: 0; }
+    }
+
     .debate-hud {
       position: absolute;
       left: 16px;
@@ -554,6 +804,71 @@ YANTIE_HTML = """<!doctype html>
       width: 100%;
       height: 100%;
       display: block;
+    }
+
+    .han-restored-basemap .region-fill {
+      filter: url(#restoredPaper);
+    }
+
+    .han-restored-basemap .region-boundary {
+      stroke-dasharray: 10 9;
+    }
+
+    .han-restored-basemap .region-label,
+    .han-restored-basemap .route-label,
+    .han-restored-basemap .map-source-label {
+      font-weight: 700;
+      paint-order: stroke;
+      stroke: rgba(9,13,19,0.78);
+      stroke-width: 5px;
+      stroke-linejoin: round;
+    }
+
+    .map-feature-marker text {
+      paint-order: stroke;
+      stroke: rgba(9,13,19,0.74);
+      stroke-width: 5px;
+      stroke-linejoin: round;
+    }
+
+    .stage.is-prologue-active .map-feature-marker text {
+      font-size: 18px;
+      opacity: 0.82;
+    }
+
+    .pressure-route {
+      stroke-dasharray: 18 18;
+      animation: routeMarch 3.8s linear infinite;
+    }
+
+    .capital-pulse,
+    .resource-pulse {
+      transform-origin: center;
+      animation: mapPulse 2.8s ease-in-out infinite;
+    }
+
+    .resource-pulse.is-frontier { animation-delay: -0.8s; }
+    .resource-pulse.is-transport { animation-delay: -1.6s; }
+
+    .court-threshold-wash {
+      opacity: 0;
+      transition: opacity 560ms ease;
+    }
+
+    .scene-world[data-drama-phase="meeting-threshold"] .court-threshold-wash,
+    .scene-world[data-drama-phase="fiscal-pressure"] .court-threshold-wash,
+    .scene-world[data-drama-phase="livelihood-counter"] .court-threshold-wash,
+    .scene-world[data-drama-phase="power-shadow"] .court-threshold-wash {
+      opacity: 0.68;
+    }
+
+    @keyframes routeMarch {
+      to { stroke-dashoffset: -72; }
+    }
+
+    @keyframes mapPulse {
+      0%, 100% { opacity: 0.46; transform: scale(0.92); }
+      50% { opacity: 0.92; transform: scale(1.08); }
     }
 
 
@@ -989,6 +1304,25 @@ YANTIE_HTML = """<!doctype html>
         padding: 126px 14px 42px;
       }
 
+      .stage.is-prologue-active .scene-shell {
+        padding: 94px 0 0;
+      }
+
+      .stage.is-prologue-active .story-panel {
+        left: 16px;
+        right: 16px;
+        bottom: 22px;
+        width: auto;
+      }
+
+      .stage.is-prologue-active .scene-world {
+        min-height: calc(100vh - 94px);
+      }
+
+      .stage.is-prologue-active .scene-title {
+        font-size: 32px;
+      }
+
       .scene-title {
         font-size: 38px;
         line-height: 1.06;
@@ -1006,6 +1340,22 @@ YANTIE_HTML = """<!doctype html>
 
       .scene-world {
         min-height: 440px;
+      }
+
+      .role-silhouette-row {
+        left: 6%;
+        right: 6%;
+        bottom: 74px;
+        gap: 8px;
+      }
+
+      .role-silhouette {
+        font-size: 11px;
+      }
+
+      .drama-route-labels {
+        inset: 12px 10px auto 10px;
+        font-size: 11px;
       }
 
       .debate-hud {
@@ -1096,6 +1446,29 @@ YANTIE_HTML = """<!doctype html>
 
       <section class="scene-world" aria-label="盐铁会议沉浸式场景">
         <div id="debateHud" class="debate-hud" aria-live="polite"></div>
+        <div id="courtPressureOpening" class="court-pressure-opening" data-drama-phase="map-pressure" aria-hidden="true">
+          <div class="drama-thread"></div>
+          <div class="drama-thread is-second"></div>
+          <div class="drama-thread is-third"></div>
+          <div class="drama-route-labels">
+            <span>边塞</span>
+            <span>盐铁</span>
+            <span>均输</span>
+            <span>长安</span>
+          </div>
+          <p class="prologue-map-note">汉昭帝时期复原叙事地图；参考历史地理资料绘制，不作为精确 GIS 边界。</p>
+          <div class="role-silhouette-row">
+            <div class="role-silhouette is-sang">桑弘羊 · 财政国家</div>
+            <div class="role-silhouette is-huo">霍光阴影</div>
+            <div class="role-silhouette is-literati">贤良文学 · 民生德义</div>
+          </div>
+          <div class="drama-progress" aria-hidden="true">
+            <div class="drama-step"><span></span></div>
+            <div class="drama-step"><span></span></div>
+            <div class="drama-step"><span></span></div>
+            <div class="drama-step"><span></span></div>
+          </div>
+        </div>
         <div id="mapScene" class="map-layer is-active" data-scene-layer="map">
           <svg id="hanMapScene" viewBox="0 0 1000 680" role="img" aria-label="动态汉代版图"></svg>
         </div>
@@ -1143,6 +1516,8 @@ YANTIE_HTML = """<!doctype html>
       chapterMapOpen: false,
       audio: null,
       soundEnabled: false,
+      dramaPhase: "map-pressure",
+      sceneProgress: 0,
       animationTick: 0
     };
 
@@ -3460,10 +3835,37 @@ YANTIE_HTML = """<!doctype html>
     }
 
     function renderRoundVisual(scene) {
+      renderDramaOverlay(scene);
       renderMap(scene);
       renderCourt(scene);
       renderNetwork(scene);
       renderJudgmentBackdrop(scene);
+    }
+
+    function dramaPhaseFor(scene) {
+      if (scene.visualMode === "background-map") return "map-pressure";
+      if (scene.visualMode === "meeting-open") return "meeting-threshold";
+      if (scene.visualMode === "fiscal-ascendant") return "fiscal-pressure";
+      if (scene.visualMode === "livelihood-counter") return "livelihood-counter";
+      if (scene.visualMode === "power-shadow") return "power-shadow";
+      if (scene.key === "network") return "power-shadow";
+      return "value-clash";
+    }
+
+    function renderDramaOverlay(scene) {
+      const phase = dramaPhaseFor(scene);
+      state.dramaPhase = phase;
+      state.sceneProgress = scenes.length > 1 ? state.sceneIndex / (scenes.length - 1) : 0;
+      const stage = document.querySelector(".stage");
+      const world = document.querySelector(".scene-world");
+      const opening = document.getElementById("courtPressureOpening");
+      const isPrologueActive = state.sceneIndex === 0 && phase === "map-pressure";
+      stage.classList.toggle("is-prologue-active", isPrologueActive);
+      stage.dataset.prologue = isPrologueActive ? "active" : "complete";
+      world.dataset.dramaPhase = phase;
+      opening.dataset.dramaPhase = phase;
+      opening.dataset.visualMode = scene.visualMode || scene.key;
+      opening.dataset.prologue = isPrologueActive ? "active" : "complete";
     }
 
     function lensMetaFor(evidenceId) {
@@ -3567,48 +3969,89 @@ YANTIE_HTML = """<!doctype html>
       `;
     }
 
+    function mapPointForFeature(feature) {
+      const restoredPoints = {
+        feature_changan: [408, 314],
+        feature_northern_frontier: [506, 132],
+        feature_jincheng: [300, 242],
+        feature_salt_iron_resources: [716, 424],
+        feature_equal_transport_routes: [574, 356]
+      };
+      if (restoredPoints[feature.feature_id]) return restoredPoints[feature.feature_id];
+      const [x, y] = feature.coordinates.length === 2 ? feature.coordinates : [50, 50];
+      return [Math.max(120, Math.min(850, x * 8.6)), Math.max(112, Math.min(560, y * 7.2))];
+    }
+
+    function renderHanRestoredBasemap() {
+      return `
+        <g class="han-restored-basemap" data-testid="han-restored-basemap" aria-label="汉昭帝时期复原叙事地图">
+          <path class="region-fill" d="M132 398 C134 305 190 244 288 226 C344 163 462 140 564 166 C678 158 814 232 856 354 C826 458 712 526 564 516 C474 575 344 562 250 506 C170 494 124 452 132 398 Z"
+            fill="url(#hanLand)" stroke="#5d4327" stroke-width="7" opacity="0.92"/>
+          <path class="region-fill" d="M254 250 C294 210 358 198 420 218 C440 260 430 315 388 344 C326 354 282 326 254 250 Z"
+            fill="rgba(196,146,69,0.22)" stroke="rgba(255,236,188,0.42)" stroke-width="3"/>
+          <path class="region-boundary" d="M236 214 C340 194 440 216 520 186 C606 158 704 186 798 250" fill="none" stroke="rgba(255,236,188,0.34)" stroke-width="3"/>
+          <path class="region-boundary" d="M354 176 C386 266 382 352 424 430 C448 476 506 500 570 516" fill="none" stroke="rgba(255,236,188,0.26)" stroke-width="3"/>
+          <path class="region-boundary" d="M512 226 C606 268 672 338 790 362" fill="none" stroke="rgba(255,236,188,0.28)" stroke-width="3"/>
+          <path d="M204 320 C304 300 386 314 472 288 C580 258 656 282 766 244" fill="none" stroke="rgba(87,126,150,0.7)" stroke-width="5" opacity="0.82"/>
+          <path d="M430 460 C536 496 628 520 764 492" fill="none" stroke="rgba(87,126,150,0.5)" stroke-width="5" opacity="0.56"/>
+          <path d="M190 220 C214 246 228 286 226 336" fill="none" stroke="rgba(255,244,214,0.22)" stroke-width="6" stroke-linecap="round"/>
+          <path d="M304 190 C356 220 374 248 408 314" fill="none" stroke="rgba(255,244,214,0.22)" stroke-width="5" stroke-linecap="round"/>
+          <text class="region-label" x="364" y="266" fill="rgba(255,244,214,0.78)" font-size="24" text-anchor="middle">关中</text>
+          <text class="region-label" x="332" y="182" fill="rgba(255,244,214,0.56)" font-size="18" text-anchor="middle">河西 / 北边</text>
+          <text class="region-label" x="656" y="308" fill="rgba(255,244,214,0.54)" font-size="19" text-anchor="middle">山东腹地</text>
+          <text class="region-label" x="690" y="508" fill="rgba(255,244,214,0.48)" font-size="17" text-anchor="middle">江淮与山海</text>
+          <text class="map-source-label" x="858" y="626" fill="rgba(255,244,214,0.46)" font-size="14" text-anchor="end">复原叙事地图 · 非精确 GIS</text>
+        </g>`;
+    }
+
     function renderMap(scene) {
       const svg = document.getElementById("hanMapScene");
       const features = state.mapLayers.flatMap(layer => layer.features.map(feature => ({ layer, feature })));
-      const pressureOpacity = scene.visualMode === "fiscal-ascendant" ? 0.96 : scene.visualMode === "background-map" ? 0.72 : 0.42;
+      const pressureOpacity = scene.visualMode === "fiscal-ascendant" ? 0.96 : scene.visualMode === "background-map" ? 0.9 : 0.52;
+      const featureElements = features.map(({ layer, feature }) => {
+        const [px, py] = mapPointForFeature(feature);
+        const color = layer.layer_type === "capital" ? "#9a241c" : layer.layer_type === "military_frontier" ? "#36516c" : "#2c7a66";
+        const labelX = feature.feature_id === "feature_changan" ? px + 24 : Math.min(px + 22, 840);
+        const labelY = feature.feature_id === "feature_northern_frontier" ? py - 22 : py - 14;
+        const markerSize = layer.layer_type === "capital" ? 20 : 14;
+        return `<g class="map-feature-marker" filter="url(#softGlow)" data-feature="${escapeHtml(feature.feature_id)}">
+          <circle cx="${px}" cy="${py}" r="${markerSize}" fill="${color}" stroke="#fff4d6" stroke-width="5"/>
+          <text x="${labelX}" y="${labelY}" fill="#fff4d6" font-size="24">${escapeHtml(feature.title)}</text>
+        </g>`;
+      }).join("");
+
       svg.innerHTML = `
         <defs>
-          <linearGradient id="mapLand" x1="0" x2="1">
-            <stop offset="0" stop-color="#d2af70"/>
-            <stop offset="0.55" stop-color="#efcf8e"/>
-            <stop offset="1" stop-color="#b88c53"/>
+          <linearGradient id="hanLand" x1="0" x2="1" y1="0" y2="1">
+            <stop offset="0" stop-color="#7c613e"/>
+            <stop offset="0.42" stop-color="#c49a5f"/>
+            <stop offset="0.72" stop-color="#e0bd78"/>
+            <stop offset="1" stop-color="#8a673e"/>
           </linearGradient>
+          <radialGradient id="capitalGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0" stop-color="rgba(255,244,214,0.36)"/>
+            <stop offset="0.68" stop-color="rgba(243,196,109,0.12)"/>
+            <stop offset="1" stop-color="rgba(243,196,109,0)"/>
+          </radialGradient>
           <filter id="softGlow"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          <filter id="restoredPaper"><feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="81"/><feDisplacementMap in="SourceGraphic" scale="1.4"/></filter>
         </defs>
-        <rect width="1000" height="680" fill="rgba(9,13,19,0.32)"/>
-        <path d="M103 420 C122 239 269 120 470 151 C633 78 844 182 878 365 C825 559 624 607 399 592 C218 607 86 532 103 420 Z"
-          fill="url(#mapLand)" opacity="0.88" stroke="#6e522d" stroke-width="8"/>
-        <path d="M168 426 C306 352 467 373 604 270 C711 191 813 246 874 362"
-          fill="none" stroke="#9b6422" stroke-width="8" stroke-dasharray="18 18" opacity="0.88"/>
-        <path d="M423 148 C474 229 586 279 626 375 C669 477 703 552 801 611"
-          fill="none" stroke="#2c7a66" stroke-width="7" opacity="0.76"/>
-        <g opacity="${pressureOpacity}">
-          <path d="M744 198 C650 252 590 296 500 356 C421 409 312 421 190 451" fill="none" stroke="#9a241c" stroke-width="12" stroke-linecap="round" stroke-dasharray="20 16"/>
-          <circle cx="742" cy="195" r="34" fill="rgba(154,36,28,0.58)" stroke="#fff4d6" stroke-width="3"/>
-          <text x="742" y="204" text-anchor="middle" fill="#fff4d6" font-size="24">边费</text>
-          <circle cx="500" cy="356" r="30" fill="rgba(54,81,108,0.62)" stroke="#fff4d6" stroke-width="3"/>
-          <text x="500" y="365" text-anchor="middle" fill="#fff4d6" font-size="22">均输</text>
-          <circle cx="190" cy="451" r="30" fill="rgba(44,122,102,0.62)" stroke="#fff4d6" stroke-width="3"/>
-          <text x="190" y="460" text-anchor="middle" fill="#fff4d6" font-size="22">盐铁</text>
+        <rect width="1000" height="680" fill="rgba(7,10,15,0.5)"/>
+        ${renderHanRestoredBasemap()}
+        <g data-testid="v3-map-pressure-routes" class="map-narrative-pressure" opacity="${pressureOpacity}">
+          <path class="pressure-route" d="M506 132 C474 190 440 244 408 314" fill="none" stroke="#9a241c" stroke-width="8" stroke-linecap="round"/>
+          <path class="pressure-route" d="M716 424 C642 392 546 350 408 314" fill="none" stroke="#2c7a66" stroke-width="7" stroke-linecap="round" opacity="0.74"/>
+          <path class="pressure-route" d="M574 356 C518 336 462 326 408 314" fill="none" stroke="#f3c46d" stroke-width="6" stroke-linecap="round" opacity="0.78"/>
+          <circle class="resource-pulse is-frontier" cx="506" cy="132" r="38" fill="rgba(154,36,28,0.2)" stroke="rgba(154,36,28,0.68)" stroke-width="3"/>
+          <circle class="resource-pulse" cx="716" cy="424" r="36" fill="rgba(44,122,102,0.2)" stroke="rgba(44,122,102,0.68)" stroke-width="3"/>
+          <circle class="resource-pulse is-transport" cx="574" cy="356" r="34" fill="rgba(243,196,109,0.16)" stroke="rgba(243,196,109,0.62)" stroke-width="3"/>
+          <circle class="capital-pulse" cx="408" cy="314" r="64" fill="url(#capitalGlow)" stroke="rgba(255,244,214,0.62)" stroke-width="4"/>
+          <text class="route-label" x="510" y="96" text-anchor="middle" fill="#ffe7b0" font-size="20">边费</text>
+          <text class="route-label" x="748" y="456" text-anchor="middle" fill="#d8f4dc" font-size="18">盐铁山海</text>
+          <text class="route-label" x="594" y="334" text-anchor="middle" fill="#fff4d6" font-size="17">均输</text>
         </g>
-        <path d="M604 116 C645 151 700 156 742 195" fill="none" stroke="#f5e4ba" stroke-width="3" opacity="0.6"/>
-        <path d="M195 225 C237 201 302 187 359 193" fill="none" stroke="#f5e4ba" stroke-width="3" opacity="0.52"/>
-        ${features.map(({ layer, feature }) => {
-          const [x, y] = feature.coordinates.length === 2 ? feature.coordinates : [50, 50];
-          const px = x * 10;
-          const py = y * 9.2;
-          const color = layer.layer_type === "capital" ? "#9a241c" : layer.layer_type === "military_frontier" ? "#2f4f88" : "#2c7a66";
-          const labelY = py > 560 ? py - 42 : py - 16;
-          return `<g filter="url(#softGlow)" data-feature="${escapeHtml(feature.feature_id)}">
-            <circle cx="${px}" cy="${py}" r="18" fill="${color}" stroke="#fff4d6" stroke-width="6"/>
-            <text x="${Math.min(px + 28, 820)}" y="${labelY}" fill="#fff4d6" font-size="30">${escapeHtml(feature.title)}</text>
-          </g>`;
-        }).join("")}
+        ${featureElements}
+        <rect class="court-threshold-wash" width="1000" height="680" fill="rgba(9,13,19,0.5)"/>
       `;
     }
 
@@ -3624,6 +4067,19 @@ YANTIE_HTML = """<!doctype html>
         ["actor_yan_wang_dan", 720, 542, "#64748b"]
       ];
       const activeActors = activeCourtActors(scene);
+      const courtPressure = scene.visualMode === "fiscal-ascendant" || scene.visualMode === "livelihood-counter" || scene.visualMode === "power-shadow";
+      const v3CourtOpeningLayer = `
+        <g data-testid="v3-court-silhouettes" opacity="${courtPressure || scene.visualMode === "meeting-open" ? 0.96 : 0.62}">
+          <path d="M192 508 C204 432 222 370 260 326 C302 372 318 432 330 508 Z" fill="rgba(54,81,108,0.64)" stroke="rgba(207,229,255,0.58)" stroke-width="3"/>
+          <path d="M670 508 C682 432 700 370 738 326 C780 372 796 432 808 508 Z" fill="rgba(44,122,102,0.64)" stroke="rgba(220,247,223,0.58)" stroke-width="3"/>
+          <path d="M418 278 C438 196 468 150 500 126 C536 156 568 206 590 278 C540 252 474 252 418 278 Z" fill="rgba(154,36,28,0.64)" stroke="rgba(255,244,214,0.36)" stroke-width="3"/>
+          <path d="M500 190 C454 282 386 358 278 434 C452 388 552 388 724 434 C622 358 550 282 500 190 Z"
+            fill="rgba(154,36,28,${scene.visualMode === "power-shadow" ? 0.42 : 0.16})"/>
+          <text x="260" y="545" text-anchor="middle" fill="#cfe5ff" font-size="22">府库与边费</text>
+          <text x="738" y="545" text-anchor="middle" fill="#dcf7df" font-size="22">农桑与疾苦</text>
+          <text x="500" y="314" text-anchor="middle" fill="#ffe7b0" font-size="24">屏风之后</text>
+        </g>
+      `;
       const openingLayer = scene.visualMode === "meeting-open" ? `
         <path d="M500 102 C448 196 400 292 255 382" fill="none" stroke="#f3c46d" stroke-width="8" stroke-linecap="round" opacity="0.48"/>
         <path d="M500 102 C554 196 600 292 745 382" fill="none" stroke="#f3c46d" stroke-width="8" stroke-linecap="round" opacity="0.48"/>
@@ -3646,6 +4102,7 @@ YANTIE_HTML = """<!doctype html>
         <path d="M140 608 L860 608" stroke="rgba(255,236,188,0.22)" stroke-width="4"/>
         <path d="M500 125 L500 608" stroke="rgba(255,236,188,0.16)" stroke-width="3"/>
         <path d="M292 382 C400 300 600 300 708 382" fill="none" stroke="#f3c46d" stroke-width="5" stroke-dasharray="14 16"/>
+        ${v3CourtOpeningLayer}
         ${openingLayer}
         ${oppositionLayer}
         ${clashLayer}
@@ -3812,7 +4269,7 @@ YANTIE_HTML = """<!doctype html>
       document.getElementById("sceneTitle").textContent = scene.title;
       document.getElementById("sceneCopy").textContent = scene.copy;
       document.getElementById("sceneQuote").textContent = scene.quote;
-      document.getElementById("advanceScene").textContent = state.sceneIndex === scenes.length - 1 ? "停在案前" : "继续进入";
+      document.getElementById("advanceScene").textContent = state.sceneIndex === 0 ? "进入朝堂" : state.sceneIndex === scenes.length - 1 ? "停在案前" : "继续进入";
       document.getElementById("rewindScene").style.visibility = state.sceneIndex === 0 ? "hidden" : "visible";
       document.querySelectorAll("[data-scene-layer]").forEach(layer => layer.classList.remove("is-active"));
       const layerId = scene.key === "map" ? "mapScene" : scene.key === "court" ? "courtScene" : scene.key === "network" ? "networkScene" : "judgmentScene";
@@ -4013,6 +4470,9 @@ YANTIE_HTML = """<!doctype html>
       const osc = context.createOscillator();
       const gain = context.createGain();
       const freqs = {
+        "map-pressure": 82,
+        "meeting-threshold": 112,
+        "fiscal-pressure": 76,
         "background-map": 88,
         "meeting-open": 118,
         "fiscal-ascendant": 92,
@@ -4029,14 +4489,14 @@ YANTIE_HTML = """<!doctype html>
         open: 156
       };
       osc.frequency.value = freqs[kind] || 110;
-      osc.type = kind === "power-shadow" || kind === "network" ? "sawtooth" : "sine";
+      osc.type = kind === "power-shadow" || kind === "network" || kind === "fiscal-pressure" ? "sawtooth" : "sine";
       gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.exponentialRampToValueAtTime(kind === "evidence" ? 0.09 : 0.055, now + 0.03);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.72);
+      gain.gain.exponentialRampToValueAtTime(kind === "evidence" ? 0.09 : kind === "power-shadow" ? 0.065 : 0.055, now + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + (kind === "power-shadow" ? 1.1 : 0.72));
       osc.connect(gain);
       gain.connect(master);
       osc.start(now);
-      osc.stop(now + 0.78);
+      osc.stop(now + (kind === "power-shadow" ? 1.16 : 0.78));
     }
 
     function startCanvas() {
@@ -4057,10 +4517,20 @@ YANTIE_HTML = """<!doctype html>
         const width = window.innerWidth;
         const height = window.innerHeight;
         state.animationTick += 0.008;
+        const phase = state.dramaPhase || "map-pressure";
+        const phaseColors = {
+          "map-pressure": ["#101820", "#172438", "#070a0f"],
+          "meeting-threshold": ["#14171f", "#2a1f19", "#090d13"],
+          "fiscal-pressure": ["#121926", "#27131a", "#070a0f"],
+          "livelihood-counter": ["#0f1f21", "#123326", "#070a0f"],
+          "power-shadow": ["#090d13", "#18080b", "#03060a"],
+          "value-clash": ["#111927", "#1f1828", "#070a0f"]
+        };
+        const colors = phaseColors[phase] || phaseColors["map-pressure"];
         const gradient = context.createLinearGradient(0, 0, width, height);
-        gradient.addColorStop(0, "#101820");
-        gradient.addColorStop(0.52, state.sceneIndex >= 3 ? "#180d10" : "#172438");
-        gradient.addColorStop(1, "#070a0f");
+        gradient.addColorStop(0, colors[0]);
+        gradient.addColorStop(0.52, colors[1]);
+        gradient.addColorStop(1, colors[2]);
         context.fillStyle = gradient;
         context.fillRect(0, 0, width, height);
 
@@ -4078,11 +4548,25 @@ YANTIE_HTML = """<!doctype html>
         context.restore();
 
         context.save();
-        context.globalAlpha = 0.18 + Math.sin(state.animationTick * 4) * 0.04;
-        context.fillStyle = state.sceneIndex >= 3 ? "#9a241c" : "#c49245";
+        context.globalAlpha = (phase === "power-shadow" ? 0.28 : 0.18) + Math.sin(state.animationTick * 4) * 0.04;
+        context.fillStyle = phase === "livelihood-counter" ? "#2c7a66" : phase === "power-shadow" ? "#9a241c" : "#c49245";
         context.beginPath();
         context.arc(width * 0.74, height * 0.22, Math.min(width, height) * 0.18, 0, Math.PI * 2);
         context.fill();
+        context.restore();
+
+        context.save();
+        context.globalAlpha = phase === "power-shadow" ? 0.3 : 0.2;
+        context.strokeStyle = phase === "livelihood-counter" ? "#8ee0a8" : "#f3c46d";
+        context.lineWidth = phase === "fiscal-pressure" ? 2 : 1;
+        for (let i = 0; i < 9; i += 1) {
+          const offset = (state.animationTick * 120 + i * 66) % (width + 160) - 80;
+          const y = height * (0.18 + (i % 5) * 0.12);
+          context.beginPath();
+          context.moveTo(offset - 100, y + Math.sin(state.animationTick * 6 + i) * 22);
+          context.lineTo(width * 0.52, height * 0.46);
+          context.stroke();
+        }
         context.restore();
 
         requestAnimationFrame(draw);
