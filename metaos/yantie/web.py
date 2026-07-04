@@ -90,7 +90,7 @@ YANTIE_HTML = """<!doctype html>
     .stage {
       position: relative;
       min-height: 100vh;
-      overflow: hidden;
+      overflow-x: hidden;
       isolation: isolate;
       background:
         linear-gradient(180deg, rgba(9, 13, 19, 0.24), rgba(9, 13, 19, 0.92)),
@@ -199,8 +199,11 @@ YANTIE_HTML = """<!doctype html>
     }
 
     .story-panel {
+      grid-column: 1;
+      grid-row: 1;
       max-width: 760px;
       min-width: 0;
+      align-self: center;
     }
 
     .chapter-kicker {
@@ -258,6 +261,8 @@ YANTIE_HTML = """<!doctype html>
     }
 
     .scene-world {
+      grid-column: 2;
+      grid-row: 1 / span 2;
       position: relative;
       min-height: 640px;
       border: 1px solid rgba(255,236,188,0.24);
@@ -269,25 +274,24 @@ YANTIE_HTML = """<!doctype html>
 
     .debate-hud {
       position: absolute;
-      left: 18px;
-      right: 18px;
-      top: 18px;
+      left: 16px;
+      right: 16px;
+      bottom: 16px;
       z-index: 8;
       display: grid;
-      gap: 12px;
       pointer-events: none;
     }
 
-    .debate-card {
+    .scene-caption {
       display: grid;
-      gap: 10px;
-      max-width: 620px;
-      padding: 14px 16px;
+      gap: 6px;
+      max-width: min(520px, 72%);
+      padding: 10px 12px;
       border: 1px solid rgba(255,236,188,0.28);
       border-radius: 8px;
-      background: linear-gradient(135deg, rgba(9,13,19,0.84), rgba(9,13,19,0.52));
-      box-shadow: 0 18px 52px rgba(0,0,0,0.28);
-      backdrop-filter: blur(10px);
+      background: linear-gradient(135deg, rgba(9,13,19,0.58), rgba(9,13,19,0.24));
+      box-shadow: 0 12px 36px rgba(0,0,0,0.22);
+      backdrop-filter: blur(5px);
     }
 
     .debate-meta {
@@ -302,7 +306,7 @@ YANTIE_HTML = """<!doctype html>
 
     .debate-speaker {
       color: #fff4d6;
-      font-size: 18px;
+      font-size: 15px;
     }
 
     .stance-chip {
@@ -315,8 +319,27 @@ YANTIE_HTML = """<!doctype html>
     .debate-line {
       margin: 0;
       color: #ffe7b0;
-      font-size: clamp(17px, 2vw, 22px);
-      line-height: 1.65;
+      font-size: clamp(15px, 1.5vw, 18px);
+      line-height: 1.55;
+    }
+
+    .decision-dock {
+      grid-column: 1;
+      grid-row: 2;
+      align-self: start;
+      display: grid;
+      gap: 12px;
+      max-width: 700px;
+      padding: 14px 16px;
+      border: 1px solid rgba(255,236,188,0.22);
+      border-radius: 8px;
+      background: rgba(9,13,19,0.42);
+      box-shadow: 0 14px 42px rgba(0,0,0,0.22);
+      backdrop-filter: blur(8px);
+    }
+
+    .decision-dock.is-empty {
+      display: none;
     }
 
     .conflict-question {
@@ -490,27 +513,86 @@ YANTIE_HTML = """<!doctype html>
       display: block;
     }
 
-    .evidence-ribbon {
-      position: absolute;
-      left: 18px;
-      right: 18px;
-      bottom: 18px;
-      display: grid;
-      gap: 8px;
-      max-height: 38%;
-      overflow: auto;
-      padding: 12px;
-      border: 1px solid rgba(255,236,188,0.26);
-      border-radius: 8px;
-      background: rgba(9,13,19,0.74);
-      backdrop-filter: blur(10px);
-      transform: translateY(calc(100% + 24px));
-      transition: transform 360ms ease;
+    .evidence-scrim {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background: rgba(3, 6, 10, 0.44);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 260ms ease;
+    }
+
+    .evidence-scrim.is-open {
+      opacity: 1;
       pointer-events: auto;
     }
 
+    .evidence-ribbon {
+      position: fixed;
+      top: 84px;
+      right: clamp(16px, 4vw, 48px);
+      bottom: 72px;
+      z-index: 60;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      gap: 12px;
+      width: min(520px, calc(100vw - 32px));
+      overflow: hidden;
+      padding: 14px;
+      border: 1px solid rgba(255,236,188,0.28);
+      border-radius: 8px;
+      background: rgba(9,13,19,0.9);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.48);
+      backdrop-filter: blur(14px);
+      opacity: 0;
+      transform: translateX(calc(100% + 64px));
+      transition: opacity 260ms ease, transform 360ms ease;
+      pointer-events: none;
+    }
+
     .evidence-ribbon.is-open {
-      transform: translateY(0);
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: auto;
+    }
+
+    .evidence-panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255,236,188,0.16);
+    }
+
+    .evidence-panel-title {
+      margin: 0;
+      color: #fff4d6;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .evidence-close {
+      width: 34px;
+      height: 34px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 8px;
+      border: 1px solid rgba(255,236,188,0.28);
+      background: rgba(255,244,214,0.08);
+      color: #fff4d6;
+      cursor: pointer;
+    }
+
+    .evidence-list {
+      display: grid;
+      align-content: start;
+      gap: 12px;
+      min-height: 0;
+      overflow: auto;
+      padding-right: 4px;
     }
 
     .evidence-item {
@@ -626,6 +708,25 @@ YANTIE_HTML = """<!doctype html>
         padding-top: 92px;
       }
 
+      .story-panel,
+      .scene-world,
+      .decision-dock {
+        grid-column: auto;
+        grid-row: auto;
+      }
+
+      .story-panel {
+        order: 1;
+      }
+
+      .scene-world {
+        order: 2;
+      }
+
+      .decision-dock {
+        order: 3;
+      }
+
       .scene-world {
         min-height: 520px;
       }
@@ -673,11 +774,34 @@ YANTIE_HTML = """<!doctype html>
       .debate-hud {
         left: 10px;
         right: 10px;
-        top: 10px;
+        bottom: 10px;
       }
 
-      .debate-card {
+      .scene-caption {
+        max-width: 100%;
         padding: 11px;
+      }
+
+      .scene-caption .debate-meta {
+        font-size: 11px;
+      }
+
+      .scene-caption .debate-line {
+        font-size: 14px;
+        line-height: 1.45;
+      }
+
+      .evidence-ribbon {
+        top: 72px;
+        right: 10px;
+        bottom: 20px;
+        left: 10px;
+        width: auto;
+        transform: translateY(calc(100% + 48px));
+      }
+
+      .evidence-ribbon.is-open {
+        transform: translateY(0);
       }
 
       .voice-pair {
@@ -751,10 +875,12 @@ YANTIE_HTML = """<!doctype html>
             <div id="judgmentOutput" class="judgment-output">你的退朝案牍不会写入历史证据包。</div>
           </form>
         </div>
-        <aside id="evidenceRibbon" class="evidence-ribbon" aria-label="关键证据"></aside>
       </section>
+      <aside id="decisionDock" class="decision-dock is-empty" aria-label="思想判断区"></aside>
     </section>
 
+    <div id="evidenceScrim" class="evidence-scrim" aria-hidden="true"></div>
+    <aside id="evidenceRibbon" class="evidence-ribbon" aria-label="关键证据"></aside>
     <div class="timeline-rail" id="timelineRail" aria-hidden="true"></div>
     <p class="scene-footnote" id="historyBoundary">历史事实来自精选 evidence_pack.json；声音与动画只负责临场感，不生成史实。</p>
   </main>
@@ -1326,7 +1452,33 @@ YANTIE_HTML = """<!doctype html>
       renderJudgmentBackdrop(scene);
     }
 
-    function renderDebateHud(scene) {
+    function sceneEvidenceButtons(scene) {
+      const rawButtons = [
+        ...(scene.historicalEvidence || []).map((id, index) => ({ id, label: `史证 ${index + 1}` })),
+        ...(scene.philosophyLens || []).map((id, index) => ({ id, label: `透镜 ${index + 1}` }))
+      ];
+      const seen = new Set();
+      return rawButtons.filter(item => {
+        if (seen.has(item.id)) return false;
+        seen.add(item.id);
+        return true;
+      });
+    }
+
+    function renderSceneCaption(scene) {
+      document.getElementById("debateHud").innerHTML = `
+        <div class="scene-caption" data-visual-mode="${escapeHtml(scene.visualMode)}">
+          <div class="debate-meta">
+            <span class="debate-speaker">${escapeHtml(scene.speaker)}</span>
+            <span class="stance-chip">${escapeHtml(scene.stance)}</span>
+            <span>${escapeHtml(scene.kicker)}</span>
+          </div>
+          <p class="debate-line">${escapeHtml(scene.line)}</p>
+        </div>
+      `;
+    }
+
+    function renderDecisionDock(scene) {
       const axes = [
         ["fiscal", "财政国家"],
         ["virtue", "儒家德治"],
@@ -1340,18 +1492,10 @@ YANTIE_HTML = """<!doctype html>
       const tensionBefore = scene.tensionBefore || scene.tension || {};
       const tensionAfter = scene.tensionAfter || scene.tension || {};
       const voices = scene.opposingVoices || [];
-      const evidenceButtons = [
-        ...(scene.historicalEvidence || []).map((id, index) => ({ id, label: `史证 ${index + 1}` })),
-        ...(scene.philosophyLens || []).map((id, index) => ({ id, label: `透镜 ${index + 1}` }))
-      ];
-      document.getElementById("debateHud").innerHTML = `
-        <div class="debate-card" data-visual-mode="${escapeHtml(scene.visualMode)}">
-          <div class="debate-meta">
-            <span class="debate-speaker">${escapeHtml(scene.speaker)}</span>
-            <span class="stance-chip">${escapeHtml(scene.stance)}</span>
-            <span>${escapeHtml(scene.kicker)}</span>
-          </div>
-          <p class="debate-line">${escapeHtml(scene.line)}</p>
+      const evidenceButtons = sceneEvidenceButtons(scene);
+      const dock = document.getElementById("decisionDock");
+      dock.classList.toggle("is-empty", false);
+      dock.innerHTML = `
           <p class="conflict-question">${escapeHtml(scene.revealedConflict || "")}</p>
           ${voices.length ? `
             <div class="voice-pair" aria-label="本幕两股声音">
@@ -1394,7 +1538,6 @@ YANTIE_HTML = """<!doctype html>
               <button class="evidence-seal" type="button" data-evidence-id="${escapeHtml(item.id)}">${escapeHtml(item.label)}</button>
             `).join("")}
           </div>
-        </div>
       `;
     }
 
@@ -1551,7 +1694,8 @@ YANTIE_HTML = """<!doctype html>
     async function renderScene() {
       const scene = scenes[state.sceneIndex];
       renderRoundVisual(scene);
-      renderDebateHud(scene);
+      renderSceneCaption(scene);
+      renderDecisionDock(scene);
       document.getElementById("chapterKicker").textContent = scene.kicker;
       document.getElementById("sceneTitle").textContent = scene.title;
       document.getElementById("sceneCopy").textContent = scene.copy;
@@ -1561,7 +1705,7 @@ YANTIE_HTML = """<!doctype html>
       document.querySelectorAll("[data-scene-layer]").forEach(layer => layer.classList.remove("is-active"));
       const layerId = scene.key === "map" ? "mapScene" : scene.key === "court" ? "courtScene" : scene.key === "network" ? "networkScene" : "judgmentScene";
       document.getElementById(layerId).classList.add("is-active");
-      document.getElementById("evidenceRibbon").classList.remove("is-open");
+      closeEvidence();
       updateRail();
       await preloadSceneEvidence(scene);
       pulseSound(scene.visualMode || scene.key);
@@ -1576,15 +1720,29 @@ YANTIE_HTML = """<!doctype html>
       const evidenceIds = focusEvidenceId ? [focusEvidenceId] : scene.evidence;
       const evidenceItems = await Promise.all(evidenceIds.map(getEvidence));
       const ribbon = document.getElementById("evidenceRibbon");
-      ribbon.innerHTML = evidenceItems.map(evidence => `
-        <div class="evidence-item">
-          <strong>${escapeHtml(evidence.excerpt_original || evidence.paraphrase_zh)}</strong>
-          <span>${escapeHtml(evidence.paraphrase_zh)}</span>
-          <span>${escapeHtml(evidence.source_id)} · ${escapeHtml(evidence.canonical_location)}</span>
+      ribbon.innerHTML = `
+        <div class="evidence-panel-head">
+          <p class="evidence-panel-title">史料浮现</p>
+          <button class="evidence-close" type="button" data-close-evidence aria-label="关闭证据" title="关闭证据">×</button>
         </div>
-      `).join("");
-      ribbon.classList.toggle("is-open");
+        <div class="evidence-list">
+          ${evidenceItems.map(evidence => `
+            <div class="evidence-item">
+              <strong>${escapeHtml(evidence.excerpt_original || evidence.paraphrase_zh)}</strong>
+              <span>${escapeHtml(evidence.paraphrase_zh)}</span>
+              <span>${escapeHtml(evidence.source_id)} · ${escapeHtml(evidence.canonical_location)}</span>
+            </div>
+          `).join("")}
+        </div>
+      `;
+      ribbon.classList.add("is-open");
+      document.getElementById("evidenceScrim").classList.add("is-open");
       pulseSound("evidence");
+    }
+
+    function closeEvidence() {
+      document.getElementById("evidenceRibbon").classList.remove("is-open");
+      document.getElementById("evidenceScrim").classList.remove("is-open");
     }
 
     document.getElementById("advanceScene").addEventListener("click", async () => {
@@ -1603,13 +1761,24 @@ YANTIE_HTML = """<!doctype html>
 
     document.getElementById("revealEvidence").addEventListener("click", () => openEvidence());
 
-    document.getElementById("debateHud").addEventListener("click", event => {
+    document.getElementById("decisionDock").addEventListener("click", event => {
       const target = event.target.closest("[data-evidence-id]");
       if (!target) return;
       openEvidence(target.dataset.evidenceId);
     });
 
-    document.getElementById("debateHud").addEventListener("input", event => {
+    document.getElementById("evidenceScrim").addEventListener("click", closeEvidence);
+
+    document.getElementById("evidenceRibbon").addEventListener("click", event => {
+      if (!event.target.closest("[data-close-evidence]")) return;
+      closeEvidence();
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") closeEvidence();
+    });
+
+    document.getElementById("decisionDock").addEventListener("input", event => {
       const target = event.target.closest("[data-act-key]");
       if (!target) return;
       state.userChoices[target.dataset.actKey] = Number(target.value);
