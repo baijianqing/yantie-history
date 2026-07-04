@@ -91,6 +91,36 @@ class YantieEvidencePackDataTests(unittest.TestCase):
             for feature in layer.features:
                 self.assertTrue(feature.evidence_ids, feature.feature_id)
 
+    def test_philosophy_lens_evidence_is_distinct_from_meeting_fact_evidence(self) -> None:
+        pack = load_pack()
+        sources_by_id = {source.source_id: source for source in pack.sources}
+        evidence_by_id = {evidence.evidence_id: evidence for evidence in pack.evidence_units}
+
+        lens_evidence = [
+            evidence for evidence in pack.evidence_units if "philosophy_lens" in evidence.value_tags
+        ]
+        self.assertGreaterEqual(len(lens_evidence), 6)
+
+        for evidence in lens_evidence:
+            source = sources_by_id[evidence.source_id]
+            self.assertEqual(evidence.review_status, ReviewStatus.verified)
+            self.assertNotEqual(source.source_type, SourceType.external_echo)
+            self.assertTrue(evidence.excerpt_original)
+            self.assertTrue(evidence.paraphrase_zh)
+            self.assertIn("lens", evidence.copyright_note.lower())
+            self.assertTrue(evidence.adjacent_context_note)
+
+        original_fact_claims = [
+            claim for claim in pack.claims if claim.claim_type == ClaimType.original_fact
+        ]
+        self.assertTrue(original_fact_claims)
+        for claim in original_fact_claims:
+            claim_evidence = [evidence_by_id[evidence_id] for evidence_id in claim.evidence_ids]
+            self.assertTrue(
+                any("philosophy_lens" not in evidence.value_tags for evidence in claim_evidence),
+                claim.claim_id,
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

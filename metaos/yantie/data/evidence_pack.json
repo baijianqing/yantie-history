@@ -56,6 +56,60 @@
       "excerpt_count": 1,
       "human_verified": true,
       "note": "Later commentary used only for reception and textual framing."
+    },
+    {
+      "source_id": "src_lunyu_liren",
+      "title": "论语/里仁第四",
+      "license_status": "public_domain_text",
+      "delivery_policy": "excerpt_allowed",
+      "excerpt_count": 1,
+      "human_verified": true,
+      "note": "Philosophy-lens source used to frame the Yantie debate; not treated as meeting fact evidence."
+    },
+    {
+      "source_id": "src_mengzi_lianghuiwang",
+      "title": "孟子/梁惠王上",
+      "license_status": "public_domain_text",
+      "delivery_policy": "excerpt_allowed",
+      "excerpt_count": 1,
+      "human_verified": true,
+      "note": "Philosophy-lens source used to frame the Yantie debate; not treated as meeting fact evidence."
+    },
+    {
+      "source_id": "src_xunzi_fuguo",
+      "title": "荀子/富国篇",
+      "license_status": "public_domain_text",
+      "delivery_policy": "excerpt_allowed",
+      "excerpt_count": 1,
+      "human_verified": true,
+      "note": "Philosophy-lens source used to frame the Yantie debate; not treated as meeting fact evidence."
+    },
+    {
+      "source_id": "src_guanzi_mumin",
+      "title": "管子/牧民",
+      "license_status": "public_domain_text",
+      "delivery_policy": "excerpt_allowed",
+      "excerpt_count": 1,
+      "human_verified": true,
+      "note": "Philosophy-lens source used to frame the Yantie debate; not treated as meeting fact evidence."
+    },
+    {
+      "source_id": "src_hanfeizi_wudu",
+      "title": "韩非子/五蠹",
+      "license_status": "public_domain_text",
+      "delivery_policy": "excerpt_allowed",
+      "excerpt_count": 1,
+      "human_verified": true,
+      "note": "Philosophy-lens source used to frame the Yantie debate; not treated as meeting fact evidence."
+    },
+    {
+      "source_id": "src_shangjunshu_nongzhan",
+      "title": "商君书/农战",
+      "license_status": "public_domain_text",
+      "delivery_policy": "excerpt_allowed",
+      "excerpt_count": 1,
+      "human_verified": true,
+      "note": "Philosophy-lens source used to frame the Yantie debate; not treated as meeting fact evidence."
     }
   ],
   "theme_spec": {
@@ -70,7 +124,10 @@
         "requirement_type": "primary_fact",
         "description": "会议时间、召集方式、参与者和议题必须有原文证据。",
         "minimum_count": 4,
-        "required_source_types": ["primary_text", "chronicle"],
+        "required_source_types": [
+          "primary_text",
+          "chronicle"
+        ],
         "counterevidence_required": false
       },
       {
@@ -78,7 +135,9 @@
         "requirement_type": "institutional_context",
         "description": "盐铁、均输、平准和边费背景必须来自食货类或政书类材料。",
         "minimum_count": 4,
-        "required_source_types": ["institutional_history"],
+        "required_source_types": [
+          "institutional_history"
+        ],
         "counterevidence_required": true
       },
       {
@@ -86,7 +145,10 @@
         "requirement_type": "power_context",
         "description": "霍光、桑弘羊、上官桀、燕王旦等关系必须标注证据强度。",
         "minimum_count": 3,
-        "required_source_types": ["biography", "chronicle"],
+        "required_source_types": [
+          "biography",
+          "chronicle"
+        ],
         "counterevidence_required": false
       }
     ],
@@ -97,7 +159,13 @@
       "court_power_vs_policy_merit"
     ],
     "output_contract": {
-      "sections": ["original_facts", "curatorial_inferences", "contested_views", "personal_reflection", "disposition"],
+      "sections": [
+        "original_facts",
+        "curatorial_inferences",
+        "contested_views",
+        "personal_reflection",
+        "disposition"
+      ],
       "history_boundary": "External echoes and personal reflections must not become historical evidence."
     }
   },
@@ -167,6 +235,72 @@
       "citation_style": "《四库全书总目·盐铁论提要》",
       "delivery_policy": "excerpt_allowed",
       "human_verified": true
+    },
+    {
+      "source_id": "src_lunyu_liren",
+      "title": "论语/里仁第四",
+      "source_type": "primary_text",
+      "authority_level": "comparison",
+      "license_status": "public_domain_text",
+      "canonical_url": "https://zh.wikisource.org/wiki/%E8%AB%96%E8%AA%9E/%E9%87%8C%E4%BB%81%E7%AC%AC%E5%9B%9B",
+      "citation_style": "《论语·里仁》",
+      "delivery_policy": "excerpt_allowed",
+      "human_verified": true
+    },
+    {
+      "source_id": "src_mengzi_lianghuiwang",
+      "title": "孟子/梁惠王上",
+      "source_type": "primary_text",
+      "authority_level": "comparison",
+      "license_status": "public_domain_text",
+      "canonical_url": "https://zh.wikisource.org/wiki/%E5%AD%9F%E5%AD%90/%E6%A2%81%E6%83%A0%E7%8E%8B%E4%B8%8A",
+      "citation_style": "《孟子·梁惠王上》",
+      "delivery_policy": "excerpt_allowed",
+      "human_verified": true
+    },
+    {
+      "source_id": "src_xunzi_fuguo",
+      "title": "荀子/富国篇",
+      "source_type": "primary_text",
+      "authority_level": "comparison",
+      "license_status": "public_domain_text",
+      "canonical_url": "https://zh.wikisource.org/wiki/%E8%8D%80%E5%AD%90/%E5%AF%8C%E5%9C%8B%E7%AF%87",
+      "citation_style": "《荀子·富国》",
+      "delivery_policy": "excerpt_allowed",
+      "human_verified": true
+    },
+    {
+      "source_id": "src_guanzi_mumin",
+      "title": "管子/牧民",
+      "source_type": "primary_text",
+      "authority_level": "comparison",
+      "license_status": "public_domain_text",
+      "canonical_url": "https://zh.wikisource.org/wiki/%E7%AE%A1%E5%AD%90/%E7%AC%AC01%E7%AF%87%E7%89%A7%E6%B0%91",
+      "citation_style": "《管子·牧民》",
+      "delivery_policy": "excerpt_allowed",
+      "human_verified": true
+    },
+    {
+      "source_id": "src_hanfeizi_wudu",
+      "title": "韩非子/五蠹",
+      "source_type": "primary_text",
+      "authority_level": "comparison",
+      "license_status": "public_domain_text",
+      "canonical_url": "https://zh.wikisource.org/wiki/%E9%9F%93%E9%9D%9E%E5%AD%90/%E4%BA%94%E8%A0%B9",
+      "citation_style": "《韩非子·五蠹》",
+      "delivery_policy": "excerpt_allowed",
+      "human_verified": true
+    },
+    {
+      "source_id": "src_shangjunshu_nongzhan",
+      "title": "商君书/农战",
+      "source_type": "primary_text",
+      "authority_level": "comparison",
+      "license_status": "public_domain_text",
+      "canonical_url": "https://zh.wikisource.org/wiki/%E5%95%86%E5%90%9B%E6%9B%B8/%E8%BE%B2%E6%88%B0",
+      "citation_style": "《商君书·农战》",
+      "delivery_policy": "excerpt_allowed",
+      "human_verified": true
     }
   ],
   "actors": [
@@ -176,8 +310,16 @@
       "role_title": "御史大夫、财政政策辩护者",
       "meeting_position": "state_policy_defender",
       "stance_summary": "以边费、府库、均输平准和国家能力为盐铁政策辩护。",
-      "interest_constraints": ["frontier_finance", "state_capacity", "policy_credit"],
-      "evidence_ids": ["ev:src_yantielun:juan01_benyi:border_finance:1a2b3c4d", "ev:src_shiji_pingzhun:juan030:sang_equal_transport:5e6f7081", "ev:src_hanshu_huoguang:juan068:sang_resentment:778899aa"]
+      "interest_constraints": [
+        "frontier_finance",
+        "state_capacity",
+        "policy_credit"
+      ],
+      "evidence_ids": [
+        "ev:src_yantielun:juan01_benyi:border_finance:1a2b3c4d",
+        "ev:src_shiji_pingzhun:juan030:sang_equal_transport:5e6f7081",
+        "ev:src_hanshu_huoguang:juan068:sang_resentment:778899aa"
+      ]
     },
     {
       "actor_id": "actor_literati",
@@ -185,8 +327,15 @@
       "role_title": "郡国所举贤良、文学之士",
       "meeting_position": "literati_opposition",
       "stance_summary": "以德治、务本、轻利和民间疾苦反对盐铁酒榷均输。",
-      "interest_constraints": ["confucian_morality", "agricultural_base", "people_livelihood"],
-      "evidence_ids": ["ev:src_yantielun:juan01_benyi:literati_abolish:0a1b2c3d", "ev:src_yantielun:juan01_benyi:virtue_vs_profit:44556677"]
+      "interest_constraints": [
+        "confucian_morality",
+        "agricultural_base",
+        "people_livelihood"
+      ],
+      "evidence_ids": [
+        "ev:src_yantielun:juan01_benyi:literati_abolish:0a1b2c3d",
+        "ev:src_yantielun:juan01_benyi:virtue_vs_profit:44556677"
+      ]
     },
     {
       "actor_id": "actor_huo_guang",
@@ -194,8 +343,15 @@
       "role_title": "大司马大将军、辅政核心",
       "meeting_position": "regent_power",
       "stance_summary": "会议发生在霍光秉政和与上官桀、桑弘羊等权力张力并存的朝局中。",
-      "interest_constraints": ["regency_legitimacy", "court_control", "policy_stability"],
-      "evidence_ids": ["ev:src_hanshu_huoguang:juan068:regency_decided_by_huo:11223344", "ev:src_hanshu_zhaodi:juan007:huo_in_power:33445566"]
+      "interest_constraints": [
+        "regency_legitimacy",
+        "court_control",
+        "policy_stability"
+      ],
+      "evidence_ids": [
+        "ev:src_hanshu_huoguang:juan068:regency_decided_by_huo:11223344",
+        "ev:src_hanshu_zhaodi:juan007:huo_in_power:33445566"
+      ]
     },
     {
       "actor_id": "actor_zhao_di",
@@ -203,8 +359,15 @@
       "role_title": "皇帝、会议名义上的最高权威",
       "meeting_position": "imperial_center",
       "stance_summary": "幼年即位，政事初由霍光主导，始元六年由有司问贤良文学民所疾苦。",
-      "interest_constraints": ["imperial_legitimacy", "rest_after_wudi", "public_order"],
-      "evidence_ids": ["ev:src_hanshu_zhaodi:juan007:zhaodi_young_huo_regency:22334455", "ev:src_hanshu_zhaodi:juan007:meeting_edict:ccddeeff"]
+      "interest_constraints": [
+        "imperial_legitimacy",
+        "rest_after_wudi",
+        "public_order"
+      ],
+      "evidence_ids": [
+        "ev:src_hanshu_zhaodi:juan007:zhaodi_young_huo_regency:22334455",
+        "ev:src_hanshu_zhaodi:juan007:meeting_edict:ccddeeff"
+      ]
     },
     {
       "actor_id": "actor_shangguan_jie",
@@ -212,8 +375,15 @@
       "role_title": "左将军、霍光政敌",
       "meeting_position": "background_actor",
       "stance_summary": "与霍光争权，并在元凤元年与燕王旦、桑弘羊等通谋。",
-      "interest_constraints": ["court_faction", "kinship_power", "anti_huo_interest"],
-      "evidence_ids": ["ev:src_hanshu_huoguang:juan068:shangguan_power_struggle:99aabbcc", "ev:src_hanshu_zhaodi:juan007:rebellion_record:ddee0011"]
+      "interest_constraints": [
+        "court_faction",
+        "kinship_power",
+        "anti_huo_interest"
+      ],
+      "evidence_ids": [
+        "ev:src_hanshu_huoguang:juan068:shangguan_power_struggle:99aabbcc",
+        "ev:src_hanshu_zhaodi:juan007:rebellion_record:ddee0011"
+      ]
     },
     {
       "actor_id": "actor_che_qianqiu",
@@ -221,8 +391,14 @@
       "role_title": "丞相、会议制度席位",
       "meeting_position": "mediator",
       "stance_summary": "《盐铁论》称丞相、御史与贤良文学对话，车千秋是理解会议制度位置的重要背景。",
-      "interest_constraints": ["formal_deliberation", "bureaucratic_mediation"],
-      "evidence_ids": ["ev:src_yantielun:juan01_benyi:meeting_opening:a1b2c3d4", "ev:src_yantielun_siku:preface:che_qianqiu_critique:abcdef12"]
+      "interest_constraints": [
+        "formal_deliberation",
+        "bureaucratic_mediation"
+      ],
+      "evidence_ids": [
+        "ev:src_yantielun:juan01_benyi:meeting_opening:a1b2c3d4",
+        "ev:src_yantielun_siku:preface:che_qianqiu_critique:abcdef12"
+      ]
     },
     {
       "actor_id": "actor_yan_wang_dan",
@@ -230,8 +406,14 @@
       "role_title": "昭帝兄、元凤元年政变参与者",
       "meeting_position": "background_actor",
       "stance_summary": "会后一年与上官桀、桑弘羊等形成反霍光政治联盟。",
-      "interest_constraints": ["imperial_succession_grievance", "anti_huo_alliance"],
-      "evidence_ids": ["ev:src_hanshu_zhaodi:juan007:rebellion_record:ddee0011", "ev:src_hanshu_huoguang:juan068:sang_resentment:778899aa"]
+      "interest_constraints": [
+        "imperial_succession_grievance",
+        "anti_huo_alliance"
+      ],
+      "evidence_ids": [
+        "ev:src_hanshu_zhaodi:juan007:rebellion_record:ddee0011",
+        "ev:src_hanshu_huoguang:juan068:sang_resentment:778899aa"
+      ]
     }
   ],
   "events": [
@@ -242,9 +424,17 @@
       "event_type": "policy_background",
       "summary": "战争、赏赐和转输支出使财政压力上升，盐铁政策成为国家筹资机制的一部分。",
       "location_id": "han_empire",
-      "actor_ids": ["actor_sang_hongyang"],
-      "topic_ids": ["topic_frontier_finance", "topic_state_monopoly"],
-      "evidence_ids": ["ev:src_shiji_pingzhun:juan030:war_cost_shortage:2233aabb", "ev:src_hanshu_shihuo:juan024:war_cost_shortage:8899aabb"]
+      "actor_ids": [
+        "actor_sang_hongyang"
+      ],
+      "topic_ids": [
+        "topic_frontier_finance",
+        "topic_state_monopoly"
+      ],
+      "evidence_ids": [
+        "ev:src_shiji_pingzhun:juan030:war_cost_shortage:2233aabb",
+        "ev:src_hanshu_shihuo:juan024:war_cost_shortage:8899aabb"
+      ]
     },
     {
       "event_id": "event_salt_iron_established",
@@ -253,9 +443,16 @@
       "event_type": "policy_background",
       "summary": "孔仅、东郭咸阳领盐铁事，官府介入山海之利，桑弘羊也进入财政体系。",
       "location_id": "resource_regions",
-      "actor_ids": ["actor_sang_hongyang"],
-      "topic_ids": ["topic_state_monopoly"],
-      "evidence_ids": ["ev:src_shiji_pingzhun:juan030:salt_iron_offices:3344bbcc", "ev:src_hanshu_shihuo:juan024:salt_iron_offices:99aabbcc"]
+      "actor_ids": [
+        "actor_sang_hongyang"
+      ],
+      "topic_ids": [
+        "topic_state_monopoly"
+      ],
+      "evidence_ids": [
+        "ev:src_shiji_pingzhun:juan030:salt_iron_offices:3344bbcc",
+        "ev:src_hanshu_shihuo:juan024:salt_iron_offices:99aabbcc"
+      ]
     },
     {
       "event_id": "event_equal_transport_price_leveling",
@@ -264,9 +461,17 @@
       "event_type": "policy_background",
       "summary": "桑弘羊推动均输盐铁官和平准体系，以调货物流通、抑制商贾大利、供给国家支出。",
       "location_id": "capital_and_commandery",
-      "actor_ids": ["actor_sang_hongyang"],
-      "topic_ids": ["topic_equal_transport", "topic_price_leveling"],
-      "evidence_ids": ["ev:src_shiji_pingzhun:juan030:sang_equal_transport:5e6f7081", "ev:src_yantielun:juan01_benyi:great_officer_equal_transport:77889900"]
+      "actor_ids": [
+        "actor_sang_hongyang"
+      ],
+      "topic_ids": [
+        "topic_equal_transport",
+        "topic_price_leveling"
+      ],
+      "evidence_ids": [
+        "ev:src_shiji_pingzhun:juan030:sang_equal_transport:5e6f7081",
+        "ev:src_yantielun:juan01_benyi:great_officer_equal_transport:77889900"
+      ]
     },
     {
       "event_id": "event_zhaodi_huo_regency",
@@ -275,9 +480,17 @@
       "event_type": "political_context",
       "summary": "昭帝八岁即位，大将军霍光受遗诏辅政，政事一决于光。",
       "location_id": "chang_an",
-      "actor_ids": ["actor_zhao_di", "actor_huo_guang"],
-      "topic_ids": ["topic_power_network"],
-      "evidence_ids": ["ev:src_hanshu_zhaodi:juan007:zhaodi_young_huo_regency:22334455", "ev:src_hanshu_huoguang:juan068:regency_decided_by_huo:11223344"]
+      "actor_ids": [
+        "actor_zhao_di",
+        "actor_huo_guang"
+      ],
+      "topic_ids": [
+        "topic_power_network"
+      ],
+      "evidence_ids": [
+        "ev:src_hanshu_zhaodi:juan007:zhaodi_young_huo_regency:22334455",
+        "ev:src_hanshu_huoguang:juan068:regency_decided_by_huo:11223344"
+      ]
     },
     {
       "event_id": "event_recommend_worthy_literati",
@@ -286,9 +499,17 @@
       "event_type": "political_context",
       "summary": "昭帝朝先后遣使行郡国、举贤良文学，为始元六年的盐铁讨论提供制度入口。",
       "location_id": "commandery_states",
-      "actor_ids": ["actor_zhao_di", "actor_literati"],
-      "topic_ids": ["topic_meeting_process"],
-      "evidence_ids": ["ev:src_hanshu_zhaodi:juan007:recommend_worthy:f00d1234", "ev:src_hanshu_zhaodi:juan007:call_literati:aa11bb22"]
+      "actor_ids": [
+        "actor_zhao_di",
+        "actor_literati"
+      ],
+      "topic_ids": [
+        "topic_meeting_process"
+      ],
+      "evidence_ids": [
+        "ev:src_hanshu_zhaodi:juan007:recommend_worthy:f00d1234",
+        "ev:src_hanshu_zhaodi:juan007:call_literati:aa11bb22"
+      ]
     },
     {
       "event_id": "event_yantie_meeting",
@@ -297,9 +518,23 @@
       "event_type": "meeting_session",
       "summary": "有司问郡国贤良文学民所疾苦，围绕盐铁、榷酤、均输等政策展开争论。",
       "location_id": "chang_an",
-      "actor_ids": ["actor_zhao_di", "actor_huo_guang", "actor_sang_hongyang", "actor_literati", "actor_che_qianqiu"],
-      "topic_ids": ["topic_meeting_process", "topic_state_monopoly", "topic_liquor_monopoly", "topic_equal_transport"],
-      "evidence_ids": ["ev:src_yantielun:juan01_benyi:meeting_opening:a1b2c3d4", "ev:src_hanshu_zhaodi:juan007:meeting_edict:ccddeeff"]
+      "actor_ids": [
+        "actor_zhao_di",
+        "actor_huo_guang",
+        "actor_sang_hongyang",
+        "actor_literati",
+        "actor_che_qianqiu"
+      ],
+      "topic_ids": [
+        "topic_meeting_process",
+        "topic_state_monopoly",
+        "topic_liquor_monopoly",
+        "topic_equal_transport"
+      ],
+      "evidence_ids": [
+        "ev:src_yantielun:juan01_benyi:meeting_opening:a1b2c3d4",
+        "ev:src_hanshu_zhaodi:juan007:meeting_edict:ccddeeff"
+      ]
     },
     {
       "event_id": "event_partial_result",
@@ -308,9 +543,18 @@
       "event_type": "policy_result",
       "summary": "昭帝纪记载罢榷酤官，但盐铁官营并未全部罢去。",
       "location_id": "han_empire",
-      "actor_ids": ["actor_zhao_di", "actor_literati"],
-      "topic_ids": ["topic_liquor_monopoly", "topic_meeting_result"],
-      "evidence_ids": ["ev:src_hanshu_zhaodi:juan007:abolish_liquor_office:ddccbbaa", "ev:src_yantielun_siku:preface:partial_result:1234abcd"]
+      "actor_ids": [
+        "actor_zhao_di",
+        "actor_literati"
+      ],
+      "topic_ids": [
+        "topic_liquor_monopoly",
+        "topic_meeting_result"
+      ],
+      "evidence_ids": [
+        "ev:src_hanshu_zhaodi:juan007:abolish_liquor_office:ddccbbaa",
+        "ev:src_yantielun_siku:preface:partial_result:1234abcd"
+      ]
     },
     {
       "event_id": "event_yuanfeng_rebellion",
@@ -319,9 +563,19 @@
       "event_type": "political_context",
       "summary": "会后一年，桑弘羊与上官桀、燕王旦等被记载为反霍光政治联盟成员。",
       "location_id": "chang_an",
-      "actor_ids": ["actor_sang_hongyang", "actor_huo_guang", "actor_shangguan_jie", "actor_yan_wang_dan"],
-      "topic_ids": ["topic_power_network"],
-      "evidence_ids": ["ev:src_hanshu_huoguang:juan068:sang_resentment:778899aa", "ev:src_hanshu_zhaodi:juan007:rebellion_record:ddee0011"]
+      "actor_ids": [
+        "actor_sang_hongyang",
+        "actor_huo_guang",
+        "actor_shangguan_jie",
+        "actor_yan_wang_dan"
+      ],
+      "topic_ids": [
+        "topic_power_network"
+      ],
+      "evidence_ids": [
+        "ev:src_hanshu_huoguang:juan068:sang_resentment:778899aa",
+        "ev:src_hanshu_zhaodi:juan007:rebellion_record:ddee0011"
+      ]
     }
   ],
   "topics": [
@@ -329,64 +583,118 @@
       "topic_id": "topic_meeting_process",
       "title": "会议如何发生",
       "summary": "会议的制度入口、时间、参与方与问题设置。",
-      "value_axes": ["court_power_vs_policy_merit"],
-      "evidence_ids": ["ev:src_yantielun:juan01_benyi:meeting_opening:a1b2c3d4", "ev:src_hanshu_zhaodi:juan007:meeting_edict:ccddeeff"]
+      "value_axes": [
+        "court_power_vs_policy_merit"
+      ],
+      "evidence_ids": [
+        "ev:src_yantielun:juan01_benyi:meeting_opening:a1b2c3d4",
+        "ev:src_hanshu_zhaodi:juan007:meeting_edict:ccddeeff"
+      ]
     },
     {
       "topic_id": "topic_state_monopoly",
       "title": "盐铁官营是否应罢",
       "summary": "桑弘羊一方强调边费和国家财政，贤良文学一方强调与民争利和务本。",
-      "value_axes": ["fiscal_capacity_vs_livelihood", "legalist_order_vs_confucian_morality"],
-      "evidence_ids": ["ev:src_yantielun:juan01_benyi:literati_abolish:0a1b2c3d", "ev:src_yantielun:juan01_benyi:border_finance:1a2b3c4d"]
+      "value_axes": [
+        "fiscal_capacity_vs_livelihood",
+        "legalist_order_vs_confucian_morality"
+      ],
+      "evidence_ids": [
+        "ev:src_yantielun:juan01_benyi:literati_abolish:0a1b2c3d",
+        "ev:src_yantielun:juan01_benyi:border_finance:1a2b3c4d",
+        "ev:src_xunzi_fuguo:fuguo:jieyong_yumin:aa110003",
+        "ev:src_hanfeizi_wudu:wudu:adapt_law_to_age:aa110005"
+      ]
     },
     {
       "topic_id": "topic_equal_transport",
       "title": "均输",
       "summary": "均输被解释为调运贡输和财政物资的制度，也被批评为变相经商扰民。",
-      "value_axes": ["fiscal_capacity_vs_livelihood"],
-      "evidence_ids": ["ev:src_yantielun:juan01_benyi:great_officer_equal_transport:77889900", "ev:src_yantielun:juan01_benyi:literati_equal_transport_abuse:abcd5678"]
+      "value_axes": [
+        "fiscal_capacity_vs_livelihood"
+      ],
+      "evidence_ids": [
+        "ev:src_yantielun:juan01_benyi:great_officer_equal_transport:77889900",
+        "ev:src_yantielun:juan01_benyi:literati_equal_transport_abuse:abcd5678"
+      ]
     },
     {
       "topic_id": "topic_price_leveling",
       "title": "平准",
       "summary": "平准意在平抑物价和抑制商贾大利，但也打开国家直接参与市场的争议。",
-      "value_axes": ["fiscal_capacity_vs_livelihood"],
-      "evidence_ids": ["ev:src_shiji_pingzhun:juan030:sang_equal_transport:5e6f7081"]
+      "value_axes": [
+        "fiscal_capacity_vs_livelihood"
+      ],
+      "evidence_ids": [
+        "ev:src_shiji_pingzhun:juan030:sang_equal_transport:5e6f7081",
+        "ev:src_guanzi_mumin:mumin01:canglin_lijie:aa110004"
+      ]
     },
     {
       "topic_id": "topic_liquor_monopoly",
       "title": "酒榷",
       "summary": "酒榷在会议后成为有限让步对象，罢榷酤官标志部分议题被采纳。",
-      "value_axes": ["court_power_vs_policy_merit"],
-      "evidence_ids": ["ev:src_hanshu_zhaodi:juan007:abolish_liquor_office:ddccbbaa"]
+      "value_axes": [
+        "court_power_vs_policy_merit"
+      ],
+      "evidence_ids": [
+        "ev:src_hanshu_zhaodi:juan007:abolish_liquor_office:ddccbbaa"
+      ]
     },
     {
       "topic_id": "topic_frontier_finance",
       "title": "边防财政",
       "summary": "匈奴和边塞支出是桑弘羊一方最关键的财政理由。",
-      "value_axes": ["frontier_security_vs_domestic_rest"],
-      "evidence_ids": ["ev:src_yantielun:juan01_benyi:border_finance:1a2b3c4d", "ev:src_shiji_pingzhun:juan030:frontier_supply:66778899"]
+      "value_axes": [
+        "frontier_security_vs_domestic_rest"
+      ],
+      "evidence_ids": [
+        "ev:src_yantielun:juan01_benyi:border_finance:1a2b3c4d",
+        "ev:src_shiji_pingzhun:juan030:frontier_supply:66778899",
+        "ev:src_shangjunshu_nongzhan:nongzhan:state_agriculture_war:aa110006"
+      ]
     },
     {
       "topic_id": "topic_confucian_legalist_values",
       "title": "儒法价值冲突",
       "summary": "辩论反复围绕德义、务本、商工、利官和国家强制展开。",
-      "value_axes": ["legalist_order_vs_confucian_morality"],
-      "evidence_ids": ["ev:src_yantielun:juan01_benyi:virtue_vs_profit:44556677", "ev:src_yantielun:juan01_jingeng:state_control_prevents_cliques:1122aabb"]
+      "value_axes": [
+        "legalist_order_vs_confucian_morality"
+      ],
+      "evidence_ids": [
+        "ev:src_yantielun:juan01_benyi:virtue_vs_profit:44556677",
+        "ev:src_yantielun:juan01_jingeng:state_control_prevents_cliques:1122aabb",
+        "ev:src_lunyu_liren:liren04:yi_li_lens:aa110001",
+        "ev:src_mengzi_lianghuiwang:liang01:renyi_over_profit:aa110002",
+        "ev:src_xunzi_fuguo:fuguo:jieyong_yumin:aa110003",
+        "ev:src_guanzi_mumin:mumin01:canglin_lijie:aa110004",
+        "ev:src_hanfeizi_wudu:wudu:adapt_law_to_age:aa110005",
+        "ev:src_shangjunshu_nongzhan:nongzhan:state_agriculture_war:aa110006"
+      ]
     },
     {
       "topic_id": "topic_power_network",
       "title": "霍光格局下的权力关系",
       "summary": "政策争论背后存在霍光辅政、上官桀争权和桑弘羊怨恨等政治关系。",
-      "value_axes": ["court_power_vs_policy_merit"],
-      "evidence_ids": ["ev:src_hanshu_huoguang:juan068:shangguan_power_struggle:99aabbcc", "ev:src_hanshu_huoguang:juan068:sang_resentment:778899aa"]
+      "value_axes": [
+        "court_power_vs_policy_merit"
+      ],
+      "evidence_ids": [
+        "ev:src_hanshu_huoguang:juan068:shangguan_power_struggle:99aabbcc",
+        "ev:src_hanshu_huoguang:juan068:sang_resentment:778899aa"
+      ]
     },
     {
       "topic_id": "topic_meeting_result",
       "title": "会议结果与后世评价",
       "summary": "后罢榷酤而盐铁如旧，四库提要把这一点解释为书名与著书意旨的重要线索。",
-      "value_axes": ["court_power_vs_policy_merit"],
-      "evidence_ids": ["ev:src_hanshu_zhaodi:juan007:abolish_liquor_office:ddccbbaa", "ev:src_yantielun_siku:preface:partial_result:1234abcd"]
+      "value_axes": [
+        "court_power_vs_policy_merit"
+      ],
+      "evidence_ids": [
+        "ev:src_hanshu_zhaodi:juan007:abolish_liquor_office:ddccbbaa",
+        "ev:src_yantielun_siku:preface:partial_result:1234abcd"
+      ]
     }
   ],
   "evidence_units": [
@@ -398,8 +706,12 @@
       "paraphrase_zh": "《盐铁论》把会议设定为始元六年诏令下，丞相、御史与贤良文学讨论民间疾苦。",
       "evidence_kind": "event_record",
       "speaker_actor_id": null,
-      "topic_ids": ["topic_meeting_process"],
-      "value_tags": ["formal_deliberation"],
+      "topic_ids": [
+        "topic_meeting_process"
+      ],
+      "value_tags": [
+        "formal_deliberation"
+      ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
       "review_status": "verified"
@@ -412,8 +724,14 @@
       "paraphrase_zh": "贤良文学认为盐铁、酒榷、均输是国家与民争利，会诱导民众趋末弃本。",
       "evidence_kind": "speech_argument",
       "speaker_actor_id": "actor_literati",
-      "topic_ids": ["topic_state_monopoly", "topic_confucian_legalist_values"],
-      "value_tags": ["anti_profit_governance", "agricultural_base"],
+      "topic_ids": [
+        "topic_state_monopoly",
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "anti_profit_governance",
+        "agricultural_base"
+      ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
       "review_status": "verified"
@@ -426,8 +744,14 @@
       "paraphrase_zh": "大夫一方把盐铁、酒榷、均输解释为补足边防费用的财政措施。",
       "evidence_kind": "speech_argument",
       "speaker_actor_id": "actor_sang_hongyang",
-      "topic_ids": ["topic_state_monopoly", "topic_frontier_finance"],
-      "value_tags": ["frontier_security", "state_capacity"],
+      "topic_ids": [
+        "topic_state_monopoly",
+        "topic_frontier_finance"
+      ],
+      "value_tags": [
+        "frontier_security",
+        "state_capacity"
+      ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
       "review_status": "verified"
@@ -440,8 +764,13 @@
       "paraphrase_zh": "贤良文学把政治语言建立在仁义和德行上，反对官员以利害得失为中心。",
       "evidence_kind": "speech_argument",
       "speaker_actor_id": "actor_literati",
-      "topic_ids": ["topic_confucian_legalist_values"],
-      "value_tags": ["virtue_governance", "anti_utility_language"],
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "virtue_governance",
+        "anti_utility_language"
+      ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
       "review_status": "verified"
@@ -454,8 +783,13 @@
       "paraphrase_zh": "大夫一方认为废止盐铁均输会削弱边防和国家军事准备。",
       "evidence_kind": "speech_argument",
       "speaker_actor_id": "actor_sang_hongyang",
-      "topic_ids": ["topic_frontier_finance", "topic_state_monopoly"],
-      "value_tags": ["military_readiness"],
+      "topic_ids": [
+        "topic_frontier_finance",
+        "topic_state_monopoly"
+      ],
+      "value_tags": [
+        "military_readiness"
+      ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
       "review_status": "verified"
@@ -468,8 +802,13 @@
       "paraphrase_zh": "大夫一方并不把商工视为纯粹末业，而强调商工对农用和财货流通的功能。",
       "evidence_kind": "speech_argument",
       "speaker_actor_id": "actor_sang_hongyang",
-      "topic_ids": ["topic_equal_transport", "topic_confucian_legalist_values"],
-      "value_tags": ["commerce_utility"],
+      "topic_ids": [
+        "topic_equal_transport",
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "commerce_utility"
+      ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
       "review_status": "verified"
@@ -482,8 +821,14 @@
       "paraphrase_zh": "大夫一方把平准和均输解释为平抑物价、便利百姓与贡输的制度。",
       "evidence_kind": "speech_argument",
       "speaker_actor_id": "actor_sang_hongyang",
-      "topic_ids": ["topic_equal_transport", "topic_price_leveling"],
-      "value_tags": ["price_leveling", "state_coordination"],
+      "topic_ids": [
+        "topic_equal_transport",
+        "topic_price_leveling"
+      ],
+      "value_tags": [
+        "price_leveling",
+        "state_coordination"
+      ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
       "review_status": "verified"
@@ -496,8 +841,14 @@
       "paraphrase_zh": "贤良文学反驳说，均输实践可能迫使百姓低价售物，官吏与市场交易带来新的盘剥。",
       "evidence_kind": "speech_argument",
       "speaker_actor_id": "actor_literati",
-      "topic_ids": ["topic_equal_transport", "topic_state_monopoly"],
-      "value_tags": ["bureaucratic_abuse", "people_livelihood"],
+      "topic_ids": [
+        "topic_equal_transport",
+        "topic_state_monopoly"
+      ],
+      "value_tags": [
+        "bureaucratic_abuse",
+        "people_livelihood"
+      ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
       "review_status": "verified"
@@ -510,8 +861,13 @@
       "paraphrase_zh": "贤良文学把衣食和农桑视为民生与国家稳定的根本。",
       "evidence_kind": "speech_argument",
       "speaker_actor_id": "actor_literati",
-      "topic_ids": ["topic_confucian_legalist_values", "topic_state_monopoly"],
-      "value_tags": ["agricultural_base"],
+      "topic_ids": [
+        "topic_confucian_legalist_values",
+        "topic_state_monopoly"
+      ],
+      "value_tags": [
+        "agricultural_base"
+      ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
       "review_status": "verified"
@@ -524,8 +880,13 @@
       "paraphrase_zh": "大夫一方把均输积蓄解释为赈济困乏、应对水旱的储备机制。",
       "evidence_kind": "speech_argument",
       "speaker_actor_id": "actor_sang_hongyang",
-      "topic_ids": ["topic_equal_transport", "topic_frontier_finance"],
-      "value_tags": ["relief_reserve"],
+      "topic_ids": [
+        "topic_equal_transport",
+        "topic_frontier_finance"
+      ],
+      "value_tags": [
+        "relief_reserve"
+      ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
       "review_status": "verified"
@@ -538,8 +899,13 @@
       "paraphrase_zh": "贤良文学批评珍怪远物和奢侈消费，主张节用以安民。",
       "evidence_kind": "speech_argument",
       "speaker_actor_id": "actor_literati",
-      "topic_ids": ["topic_confucian_legalist_values"],
-      "value_tags": ["frugality", "anti_luxury"],
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "frugality",
+        "anti_luxury"
+      ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
       "review_status": "verified"
@@ -552,8 +918,13 @@
       "paraphrase_zh": "大夫一方用交通和商业都市说明财富流动与市场位置的重要性。",
       "evidence_kind": "speech_argument",
       "speaker_actor_id": "actor_sang_hongyang",
-      "topic_ids": ["topic_equal_transport", "topic_price_leveling"],
-      "value_tags": ["market_connectivity"],
+      "topic_ids": [
+        "topic_equal_transport",
+        "topic_price_leveling"
+      ],
+      "value_tags": [
+        "market_connectivity"
+      ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
       "review_status": "verified"
@@ -566,8 +937,14 @@
       "paraphrase_zh": "大夫一方认为放开盐铁可能资助豪强、形成私门党羽和兼并风险。",
       "evidence_kind": "speech_argument",
       "speaker_actor_id": "actor_sang_hongyang",
-      "topic_ids": ["topic_state_monopoly", "topic_power_network"],
-      "value_tags": ["anti_elite_capture", "state_control"],
+      "topic_ids": [
+        "topic_state_monopoly",
+        "topic_power_network"
+      ],
+      "value_tags": [
+        "anti_elite_capture",
+        "state_control"
+      ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
       "review_status": "verified"
@@ -580,8 +957,14 @@
       "paraphrase_zh": "贤良文学反驳说，真正深重的权利并不只在盐铁资源，而在朝廷权力结构本身。",
       "evidence_kind": "speech_argument",
       "speaker_actor_id": "actor_literati",
-      "topic_ids": ["topic_power_network", "topic_confucian_legalist_values"],
-      "value_tags": ["court_power", "anti_state_profit"],
+      "topic_ids": [
+        "topic_power_network",
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "court_power",
+        "anti_state_profit"
+      ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
       "review_status": "verified"
@@ -594,8 +977,12 @@
       "paraphrase_zh": "昭帝幼年即位，霍光受遗诏辅政，是会议政治背景的核心。",
       "evidence_kind": "biographical_context",
       "speaker_actor_id": null,
-      "topic_ids": ["topic_power_network"],
-      "value_tags": ["regency"],
+      "topic_ids": [
+        "topic_power_network"
+      ],
+      "value_tags": [
+        "regency"
+      ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
       "review_status": "verified"
@@ -608,8 +995,12 @@
       "paraphrase_zh": "《昭帝纪》明示霍光秉政、领尚书事，说明会议不是普通公共辩论，而在辅政格局中发生。",
       "evidence_kind": "biographical_context",
       "speaker_actor_id": null,
-      "topic_ids": ["topic_power_network"],
-      "value_tags": ["regency_power"],
+      "topic_ids": [
+        "topic_power_network"
+      ],
+      "value_tags": [
+        "regency_power"
+      ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
       "review_status": "verified"
@@ -622,8 +1013,12 @@
       "paraphrase_zh": "昭帝朝早期已经通过举贤良、问民疾苦建立问题征询机制。",
       "evidence_kind": "event_record",
       "speaker_actor_id": null,
-      "topic_ids": ["topic_meeting_process"],
-      "value_tags": ["public_grievance_inquiry"],
+      "topic_ids": [
+        "topic_meeting_process"
+      ],
+      "value_tags": [
+        "public_grievance_inquiry"
+      ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
       "review_status": "verified"
@@ -636,8 +1031,12 @@
       "paraphrase_zh": "始元五年诏令郡国举文学高第者，为次年会议的参与者来源提供制度背景。",
       "evidence_kind": "event_record",
       "speaker_actor_id": null,
-      "topic_ids": ["topic_meeting_process"],
-      "value_tags": ["literati_selection"],
+      "topic_ids": [
+        "topic_meeting_process"
+      ],
+      "value_tags": [
+        "literati_selection"
+      ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
       "review_status": "verified"
@@ -650,8 +1049,14 @@
       "paraphrase_zh": "《昭帝纪》直接记载始元六年二月询问贤良文学民间疾苦，并讨论罢盐铁榷酤。",
       "evidence_kind": "event_record",
       "speaker_actor_id": null,
-      "topic_ids": ["topic_meeting_process", "topic_state_monopoly", "topic_liquor_monopoly"],
-      "value_tags": ["meeting_event"],
+      "topic_ids": [
+        "topic_meeting_process",
+        "topic_state_monopoly",
+        "topic_liquor_monopoly"
+      ],
+      "value_tags": [
+        "meeting_event"
+      ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
       "review_status": "verified"
@@ -664,8 +1069,13 @@
       "paraphrase_zh": "会议后的明确政策结果是罢榷酤官，并非全面废止盐铁。",
       "evidence_kind": "policy_record",
       "speaker_actor_id": null,
-      "topic_ids": ["topic_liquor_monopoly", "topic_meeting_result"],
-      "value_tags": ["partial_result"],
+      "topic_ids": [
+        "topic_liquor_monopoly",
+        "topic_meeting_result"
+      ],
+      "value_tags": [
+        "partial_result"
+      ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
       "review_status": "verified"
@@ -678,8 +1088,12 @@
       "paraphrase_zh": "元凤元年，上官桀、上官安、桑弘羊等被记载为谋反伏诛，说明会议后的朝局仍高度紧张。",
       "evidence_kind": "event_record",
       "speaker_actor_id": null,
-      "topic_ids": ["topic_power_network"],
-      "value_tags": ["post_meeting_power_crisis"],
+      "topic_ids": [
+        "topic_power_network"
+      ],
+      "value_tags": [
+        "post_meeting_power_crisis"
+      ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
       "review_status": "verified"
@@ -692,8 +1106,12 @@
       "paraphrase_zh": "《食货志》说明盐铁官营设官府，并吸纳原盐铁富家进入吏治体系。",
       "evidence_kind": "policy_record",
       "speaker_actor_id": null,
-      "topic_ids": ["topic_state_monopoly"],
-      "value_tags": ["institutionalization"],
+      "topic_ids": [
+        "topic_state_monopoly"
+      ],
+      "value_tags": [
+        "institutionalization"
+      ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
       "review_status": "verified"
@@ -706,8 +1124,13 @@
       "paraphrase_zh": "《食货志》把桑弘羊描述为洛阳商贾之子，以计算、理财能力进入中央财政体系。",
       "evidence_kind": "biographical_context",
       "speaker_actor_id": null,
-      "topic_ids": ["topic_power_network", "topic_state_monopoly"],
-      "value_tags": ["fiscal_technocrat"],
+      "topic_ids": [
+        "topic_power_network",
+        "topic_state_monopoly"
+      ],
+      "value_tags": [
+        "fiscal_technocrat"
+      ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
       "review_status": "verified"
@@ -720,8 +1143,12 @@
       "paraphrase_zh": "武帝军事行动后，财政短缺到士卒俸给受影响，是国家兴利政策的重要背景。",
       "evidence_kind": "policy_record",
       "speaker_actor_id": null,
-      "topic_ids": ["topic_frontier_finance"],
-      "value_tags": ["fiscal_shortage"],
+      "topic_ids": [
+        "topic_frontier_finance"
+      ],
+      "value_tags": [
+        "fiscal_shortage"
+      ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
       "review_status": "verified"
@@ -734,8 +1161,12 @@
       "paraphrase_zh": "《平准书》以战争赏赐和马匹损耗说明财政压力。",
       "evidence_kind": "policy_record",
       "speaker_actor_id": null,
-      "topic_ids": ["topic_frontier_finance"],
-      "value_tags": ["war_cost"],
+      "topic_ids": [
+        "topic_frontier_finance"
+      ],
+      "value_tags": [
+        "war_cost"
+      ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
       "review_status": "verified"
@@ -748,8 +1179,12 @@
       "paraphrase_zh": "《平准书》记载孔仅、东郭咸阳奉命推行天下盐铁官营。",
       "evidence_kind": "policy_record",
       "speaker_actor_id": null,
-      "topic_ids": ["topic_state_monopoly"],
-      "value_tags": ["state_monopoly_implementation"],
+      "topic_ids": [
+        "topic_state_monopoly"
+      ],
+      "value_tags": [
+        "state_monopoly_implementation"
+      ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
       "review_status": "verified"
@@ -762,8 +1197,13 @@
       "paraphrase_zh": "边郡与南方战事需要远距离道路和粮食供给，构成国家财政和转运压力。",
       "evidence_kind": "policy_record",
       "speaker_actor_id": null,
-      "topic_ids": ["topic_frontier_finance", "topic_equal_transport"],
-      "value_tags": ["logistics_cost"],
+      "topic_ids": [
+        "topic_frontier_finance",
+        "topic_equal_transport"
+      ],
+      "value_tags": [
+        "logistics_cost"
+      ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
       "review_status": "verified"
@@ -776,8 +1216,14 @@
       "paraphrase_zh": "桑弘羊请求设置大农部丞、均输盐铁官和平准体系，以汇聚与调节天下物资。",
       "evidence_kind": "policy_record",
       "speaker_actor_id": null,
-      "topic_ids": ["topic_equal_transport", "topic_price_leveling"],
-      "value_tags": ["equal_transport", "price_leveling"],
+      "topic_ids": [
+        "topic_equal_transport",
+        "topic_price_leveling"
+      ],
+      "value_tags": [
+        "equal_transport",
+        "price_leveling"
+      ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
       "review_status": "verified"
@@ -790,8 +1236,13 @@
       "paraphrase_zh": "《平准书》呈现桑弘羊制度的正面财政效果：不增赋而国家用度充足。",
       "evidence_kind": "policy_record",
       "speaker_actor_id": null,
-      "topic_ids": ["topic_equal_transport", "topic_price_leveling"],
-      "value_tags": ["fiscal_effectiveness"],
+      "topic_ids": [
+        "topic_equal_transport",
+        "topic_price_leveling"
+      ],
+      "value_tags": [
+        "fiscal_effectiveness"
+      ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
       "review_status": "verified"
@@ -804,8 +1255,12 @@
       "paraphrase_zh": "霍光传明确昭帝初年政事由霍光决断，会议不能脱离辅政权力结构理解。",
       "evidence_kind": "biographical_context",
       "speaker_actor_id": null,
-      "topic_ids": ["topic_power_network"],
-      "value_tags": ["regency_power"],
+      "topic_ids": [
+        "topic_power_network"
+      ],
+      "value_tags": [
+        "regency_power"
+      ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
       "review_status": "verified"
@@ -818,8 +1273,12 @@
       "paraphrase_zh": "上官桀父子与霍光之间的争权，是会议后一系列政治事件的背景。",
       "evidence_kind": "biographical_context",
       "speaker_actor_id": null,
-      "topic_ids": ["topic_power_network"],
-      "value_tags": ["court_faction"],
+      "topic_ids": [
+        "topic_power_network"
+      ],
+      "value_tags": [
+        "court_faction"
+      ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
       "review_status": "verified"
@@ -832,8 +1291,14 @@
       "paraphrase_zh": "霍光传把桑弘羊兴利、求子弟得官和怨恨霍光联系起来，提示政策功劳与权力分配的张力。",
       "evidence_kind": "biographical_context",
       "speaker_actor_id": null,
-      "topic_ids": ["topic_power_network", "topic_state_monopoly"],
-      "value_tags": ["policy_credit", "anti_huo_alliance"],
+      "topic_ids": [
+        "topic_power_network",
+        "topic_state_monopoly"
+      ],
+      "value_tags": [
+        "policy_credit",
+        "anti_huo_alliance"
+      ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
       "review_status": "verified"
@@ -846,8 +1311,12 @@
       "paraphrase_zh": "四库提要将会议结果概括为罢酒榷而盐铁如旧，并解释《盐铁论》书名与未尽行之议有关。",
       "evidence_kind": "later_evaluation",
       "speaker_actor_id": null,
-      "topic_ids": ["topic_meeting_result"],
-      "value_tags": ["later_reception"],
+      "topic_ids": [
+        "topic_meeting_result"
+      ],
+      "value_tags": [
+        "later_reception"
+      ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain later commentary, short excerpt.",
       "review_status": "verified"
@@ -860,11 +1329,152 @@
       "paraphrase_zh": "四库提要指出《盐铁论》对桑弘羊、车千秋有微词，提示文本本身有立场和著述意旨。",
       "evidence_kind": "later_evaluation",
       "speaker_actor_id": null,
-      "topic_ids": ["topic_meeting_result", "topic_power_network"],
-      "value_tags": ["textual_bias", "later_reception"],
+      "topic_ids": [
+        "topic_meeting_result",
+        "topic_power_network"
+      ],
+      "value_tags": [
+        "textual_bias",
+        "later_reception"
+      ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain later commentary, short excerpt.",
       "review_status": "verified"
+    },
+    {
+      "evidence_id": "ev:src_lunyu_liren:liren04:yi_li_lens:aa110001",
+      "source_id": "src_lunyu_liren",
+      "canonical_location": "里仁第四",
+      "excerpt_original": "君子喻于义，小人喻于利",
+      "paraphrase_zh": "《论语》把义与利区分为不同的价值取向，可作为理解盐铁争论中义利张力的思想透镜。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "yi_li",
+        "rule_by_virtue"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, short excerpt used as philosophy lens.",
+      "review_status": "verified",
+      "adjacent_context_note": "This is not evidence that Confucius discussed the Yantie meeting; it frames the yi-li tension exposed by the debate."
+    },
+    {
+      "evidence_id": "ev:src_mengzi_lianghuiwang:liang01:renyi_over_profit:aa110002",
+      "source_id": "src_mengzi_lianghuiwang",
+      "canonical_location": "梁惠王上",
+      "excerpt_original": "王何必曰利？亦有仁义而已矣",
+      "paraphrase_zh": "《孟子》警惕君臣上下皆以利相争，可帮助解释贤良文学为何把官营逐利视为治理正当性问题。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "yi_li",
+        "people_livelihood",
+        "rule_by_virtue"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, short excerpt used as philosophy lens.",
+      "review_status": "verified",
+      "adjacent_context_note": "This quote is used as a conceptual lens for profit-governance, not as meeting testimony."
+    },
+    {
+      "evidence_id": "ev:src_xunzi_fuguo:fuguo:jieyong_yumin:aa110003",
+      "source_id": "src_xunzi_fuguo",
+      "canonical_location": "富国篇",
+      "excerpt_original": "足国之道，节用裕民",
+      "paraphrase_zh": "《荀子》把富国与裕民、节用连在一起，提示儒家并非不要制度能力，而是要求制度受民生与礼义约束。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values",
+        "topic_state_monopoly"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "institutional_order",
+        "people_livelihood",
+        "rule_by_virtue"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, short excerpt used as philosophy lens.",
+      "review_status": "verified",
+      "adjacent_context_note": "This lens complicates a simple morality-versus-institution split in the Yantie experience."
+    },
+    {
+      "evidence_id": "ev:src_guanzi_mumin:mumin01:canglin_lijie:aa110004",
+      "source_id": "src_guanzi_mumin",
+      "canonical_location": "牧民第一",
+      "excerpt_original": "仓廪实则知礼节，衣食足则知荣辱",
+      "paraphrase_zh": "《管子》把物质供给与礼义秩序相连，可作为理解财政、民生和教化互相牵动的中间视角。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values",
+        "topic_price_leveling"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "statecraft",
+        "institutional_order",
+        "people_livelihood"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, short excerpt used as philosophy lens.",
+      "review_status": "verified",
+      "adjacent_context_note": "This lens prevents the product from treating material provision and moral order as unrelated worlds."
+    },
+    {
+      "evidence_id": "ev:src_hanfeizi_wudu:wudu:adapt_law_to_age:aa110005",
+      "source_id": "src_hanfeizi_wudu",
+      "canonical_location": "五蠹",
+      "excerpt_original": "不期修古，不法常可，论世之事，因为之备",
+      "paraphrase_zh": "《韩非子》强调因时制宜和制度应对，可作为桑弘羊式国家能力与制度治理理由的思想透镜。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values",
+        "topic_state_monopoly"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "statecraft",
+        "institutional_order",
+        "legalist_order"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, short excerpt used as philosophy lens.",
+      "review_status": "verified",
+      "adjacent_context_note": "This quote frames institutional adaptation; it is not a direct source for Han fiscal policy."
+    },
+    {
+      "evidence_id": "ev:src_shangjunshu_nongzhan:nongzhan:state_agriculture_war:aa110006",
+      "source_id": "src_shangjunshu_nongzhan",
+      "canonical_location": "农战",
+      "excerpt_original": "国之所以兴者，农战也",
+      "paraphrase_zh": "《商君书》把国家兴盛归于农战，帮助用户理解富国强兵逻辑如何把民生、生产与军事绑在一起。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values",
+        "topic_frontier_finance"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "statecraft",
+        "frontier_security",
+        "legalist_order"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, short excerpt used as philosophy lens.",
+      "review_status": "verified",
+      "adjacent_context_note": "This lens helps explain state-capacity reasoning without claiming the meeting directly cited Shang Yang."
     }
   ],
   "claims": [
@@ -873,7 +1483,10 @@
       "claim_type": "original_fact",
       "statement": "盐铁会议发生在昭帝始元六年，围绕贤良文学所陈民间疾苦展开。",
       "stance": "explains_context",
-      "evidence_ids": ["ev:src_yantielun:juan01_benyi:meeting_opening:a1b2c3d4", "ev:src_hanshu_zhaodi:juan007:meeting_edict:ccddeeff"],
+      "evidence_ids": [
+        "ev:src_yantielun:juan01_benyi:meeting_opening:a1b2c3d4",
+        "ev:src_hanshu_zhaodi:juan007:meeting_edict:ccddeeff"
+      ],
       "counterevidence_ids": [],
       "external_reference_ids": [],
       "reasoning_note": null,
@@ -884,8 +1497,12 @@
       "claim_type": "original_fact",
       "statement": "贤良文学明确请求罢盐铁、酒榷、均输，理由是国家与民争利、伤害务本之风。",
       "stance": "opposes_state_monopoly",
-      "evidence_ids": ["ev:src_yantielun:juan01_benyi:literati_abolish:0a1b2c3d"],
-      "counterevidence_ids": ["ev:src_yantielun:juan01_benyi:border_finance:1a2b3c4d"],
+      "evidence_ids": [
+        "ev:src_yantielun:juan01_benyi:literati_abolish:0a1b2c3d"
+      ],
+      "counterevidence_ids": [
+        "ev:src_yantielun:juan01_benyi:border_finance:1a2b3c4d"
+      ],
       "external_reference_ids": [],
       "reasoning_note": null,
       "display_zone": "meeting"
@@ -895,8 +1512,13 @@
       "claim_type": "original_fact",
       "statement": "桑弘羊一方把盐铁、酒榷、均输解释为支撑边防财政的必要手段。",
       "stance": "supports_state_monopoly",
-      "evidence_ids": ["ev:src_yantielun:juan01_benyi:border_finance:1a2b3c4d", "ev:src_yantielun:juan01_benyi:military_strategy_reply:55667788"],
-      "counterevidence_ids": ["ev:src_yantielun:juan01_jingeng:agriculture_base:88990011"],
+      "evidence_ids": [
+        "ev:src_yantielun:juan01_benyi:border_finance:1a2b3c4d",
+        "ev:src_yantielun:juan01_benyi:military_strategy_reply:55667788"
+      ],
+      "counterevidence_ids": [
+        "ev:src_yantielun:juan01_jingeng:agriculture_base:88990011"
+      ],
       "external_reference_ids": [],
       "reasoning_note": null,
       "display_zone": "meeting"
@@ -906,7 +1528,10 @@
       "claim_type": "curatorial_inference",
       "statement": "盐铁之议不是单纯技术性财政争论，而是财政能力与德义教化之间的冲突。",
       "stance": "explains_context",
-      "evidence_ids": ["ev:src_yantielun:juan01_benyi:virtue_vs_profit:44556677", "ev:src_yantielun:juan01_benyi:border_finance:1a2b3c4d"],
+      "evidence_ids": [
+        "ev:src_yantielun:juan01_benyi:virtue_vs_profit:44556677",
+        "ev:src_yantielun:juan01_benyi:border_finance:1a2b3c4d"
+      ],
       "counterevidence_ids": [],
       "external_reference_ids": [],
       "reasoning_note": "一方以边费和府库为论点，另一方以仁义、务本和反利为论点，构成价值轴而非单一财政技术争论。",
@@ -917,7 +1542,10 @@
       "claim_type": "contested_view",
       "statement": "均输和平准可被理解为物资调节机制，也可被批评为官府入市扰民。",
       "stance": "neutral",
-      "evidence_ids": ["ev:src_yantielun:juan01_benyi:great_officer_equal_transport:77889900", "ev:src_yantielun:juan01_benyi:literati_equal_transport_abuse:abcd5678"],
+      "evidence_ids": [
+        "ev:src_yantielun:juan01_benyi:great_officer_equal_transport:77889900",
+        "ev:src_yantielun:juan01_benyi:literati_equal_transport_abuse:abcd5678"
+      ],
       "counterevidence_ids": [],
       "external_reference_ids": [],
       "reasoning_note": "同一制度在双方话语中分别呈现为便民和平物价，或官吏与民间交易造成盘剥。",
@@ -928,7 +1556,10 @@
       "claim_type": "original_fact",
       "statement": "会议后的明确结果是罢榷酤官；盐铁并未在会议后全部废止。",
       "stance": "explains_context",
-      "evidence_ids": ["ev:src_hanshu_zhaodi:juan007:abolish_liquor_office:ddccbbaa", "ev:src_yantielun_siku:preface:partial_result:1234abcd"],
+      "evidence_ids": [
+        "ev:src_hanshu_zhaodi:juan007:abolish_liquor_office:ddccbbaa",
+        "ev:src_yantielun_siku:preface:partial_result:1234abcd"
+      ],
       "counterevidence_ids": [],
       "external_reference_ids": [],
       "reasoning_note": null,
@@ -939,7 +1570,10 @@
       "claim_type": "original_fact",
       "statement": "盐铁会议发生在昭帝幼年、霍光秉政的辅政格局下。",
       "stance": "explains_context",
-      "evidence_ids": ["ev:src_hanshu_zhaodi:juan007:zhaodi_young_huo_regency:22334455", "ev:src_hanshu_zhaodi:juan007:huo_in_power:33445566"],
+      "evidence_ids": [
+        "ev:src_hanshu_zhaodi:juan007:zhaodi_young_huo_regency:22334455",
+        "ev:src_hanshu_zhaodi:juan007:huo_in_power:33445566"
+      ],
       "counterevidence_ids": [],
       "external_reference_ids": [],
       "reasoning_note": null,
@@ -950,7 +1584,11 @@
       "claim_type": "curatorial_inference",
       "statement": "理解盐铁会议需要同时看政策功劳、霍光辅政和会后政变关系。",
       "stance": "explains_context",
-      "evidence_ids": ["ev:src_hanshu_huoguang:juan068:sang_resentment:778899aa", "ev:src_hanshu_zhaodi:juan007:rebellion_record:ddee0011", "ev:src_hanshu_huoguang:juan068:regency_decided_by_huo:11223344"],
+      "evidence_ids": [
+        "ev:src_hanshu_huoguang:juan068:sang_resentment:778899aa",
+        "ev:src_hanshu_zhaodi:juan007:rebellion_record:ddee0011",
+        "ev:src_hanshu_huoguang:juan068:regency_decided_by_huo:11223344"
+      ],
       "counterevidence_ids": [],
       "external_reference_ids": [],
       "reasoning_note": "桑弘羊的财政政策功劳、霍光的辅政权力和元凤元年政治联盟在史料中相邻出现，说明政策辩论与权力关系相互嵌套。",
@@ -961,8 +1599,13 @@
       "claim_type": "original_fact",
       "statement": "《平准书》提供了桑弘羊政策有效性的正面财政叙述。",
       "stance": "supports_state_monopoly",
-      "evidence_ids": ["ev:src_shiji_pingzhun:juan030:people_tax_no_increase:4455ccdd", "ev:src_shiji_pingzhun:juan030:sang_equal_transport:5e6f7081"],
-      "counterevidence_ids": ["ev:src_yantielun:juan01_benyi:literati_equal_transport_abuse:abcd5678"],
+      "evidence_ids": [
+        "ev:src_shiji_pingzhun:juan030:people_tax_no_increase:4455ccdd",
+        "ev:src_shiji_pingzhun:juan030:sang_equal_transport:5e6f7081"
+      ],
+      "counterevidence_ids": [
+        "ev:src_yantielun:juan01_benyi:literati_equal_transport_abuse:abcd5678"
+      ],
       "external_reference_ids": [],
       "reasoning_note": null,
       "display_zone": "evidence_room"
@@ -972,8 +1615,14 @@
       "claim_type": "curatorial_inference",
       "statement": "贤良文学并非只反对某项税制，而是反对朝廷主动以利导民的治理逻辑。",
       "stance": "opposes_state_monopoly",
-      "evidence_ids": ["ev:src_yantielun:juan01_benyi:virtue_vs_profit:44556677", "ev:src_yantielun:juan01_jingeng:power_inside_court:2233bbcc", "ev:src_yantielun:juan01_jingeng:agriculture_base:88990011"],
-      "counterevidence_ids": ["ev:src_yantielun:juan01_benyi:commerce_utility:66778899"],
+      "evidence_ids": [
+        "ev:src_yantielun:juan01_benyi:virtue_vs_profit:44556677",
+        "ev:src_yantielun:juan01_jingeng:power_inside_court:2233bbcc",
+        "ev:src_yantielun:juan01_jingeng:agriculture_base:88990011"
+      ],
+      "counterevidence_ids": [
+        "ev:src_yantielun:juan01_benyi:commerce_utility:66778899"
+      ],
       "external_reference_ids": [],
       "reasoning_note": "其论证从罢盐铁扩展到德义、务本、朝廷权利和民俗导向，范围超出单项政策。",
       "display_zone": "judgment_card"
@@ -983,8 +1632,12 @@
       "claim_type": "original_fact",
       "statement": "大夫一方担心放开盐铁会使豪强私门坐大。",
       "stance": "supports_state_monopoly",
-      "evidence_ids": ["ev:src_yantielun:juan01_jingeng:state_control_prevents_cliques:1122aabb"],
-      "counterevidence_ids": ["ev:src_yantielun:juan01_jingeng:power_inside_court:2233bbcc"],
+      "evidence_ids": [
+        "ev:src_yantielun:juan01_jingeng:state_control_prevents_cliques:1122aabb"
+      ],
+      "counterevidence_ids": [
+        "ev:src_yantielun:juan01_jingeng:power_inside_court:2233bbcc"
+      ],
       "external_reference_ids": [],
       "reasoning_note": null,
       "display_zone": "power_network"
@@ -994,8 +1647,13 @@
       "claim_type": "contested_view",
       "statement": "《盐铁论》虽保存会议辩难形态，但后世提要提醒它带有著述立场和微词。",
       "stance": "evaluates_afterlife",
-      "evidence_ids": ["ev:src_yantielun_siku:preface:che_qianqiu_critique:abcdef12", "ev:src_yantielun_siku:preface:partial_result:1234abcd"],
-      "counterevidence_ids": ["ev:src_yantielun:juan01_benyi:meeting_opening:a1b2c3d4"],
+      "evidence_ids": [
+        "ev:src_yantielun_siku:preface:che_qianqiu_critique:abcdef12",
+        "ev:src_yantielun_siku:preface:partial_result:1234abcd"
+      ],
+      "counterevidence_ids": [
+        "ev:src_yantielun:juan01_benyi:meeting_opening:a1b2c3d4"
+      ],
       "external_reference_ids": [],
       "reasoning_note": "后世评价将文本视为保存辩论又带著书意旨的材料，因此作品中需区分会议事实和文本立场。",
       "display_zone": "later_echo"
@@ -1013,28 +1671,250 @@
     }
   ],
   "relations": [
-    {"relation_id": "rel_claim_meeting_yantie", "from_id": "claim_meeting_in_shiyuan_six", "to_id": "event_yantie_meeting", "relation_type": "contextualizes", "evidence_ids": ["ev:src_yantielun:juan01_benyi:meeting_opening:a1b2c3d4"], "strength": "explicit_source", "note": null},
-    {"relation_id": "rel_literati_opposes_monopoly", "from_id": "actor_literati", "to_id": "topic_state_monopoly", "relation_type": "opposes", "evidence_ids": ["ev:src_yantielun:juan01_benyi:literati_abolish:0a1b2c3d"], "strength": "explicit_source", "note": null},
-    {"relation_id": "rel_sang_supports_monopoly", "from_id": "actor_sang_hongyang", "to_id": "topic_state_monopoly", "relation_type": "supports", "evidence_ids": ["ev:src_yantielun:juan01_benyi:border_finance:1a2b3c4d"], "strength": "explicit_source", "note": null},
-    {"relation_id": "rel_border_causes_state_policy", "from_id": "topic_frontier_finance", "to_id": "topic_state_monopoly", "relation_type": "caused_by", "evidence_ids": ["ev:src_yantielun:juan01_benyi:border_finance:1a2b3c4d"], "strength": "explicit_source", "note": null},
-    {"relation_id": "rel_equal_transport_supports_fiscal", "from_id": "topic_equal_transport", "to_id": "topic_frontier_finance", "relation_type": "supports", "evidence_ids": ["ev:src_shiji_pingzhun:juan030:sang_equal_transport:5e6f7081"], "strength": "explicit_source", "note": null},
-    {"relation_id": "rel_literati_value_conflict", "from_id": "claim_literati_target_state_profit", "to_id": "claim_sang_defends_frontier_finance", "relation_type": "value_conflict", "evidence_ids": ["ev:src_yantielun:juan01_benyi:virtue_vs_profit:44556677", "ev:src_yantielun:juan01_benyi:border_finance:1a2b3c4d"], "strength": "contextual_inference", "note": "Two direct arguments use incompatible normative centers: virtue and agriculture versus frontier finance."},
-    {"relation_id": "rel_huo_contextualizes_meeting", "from_id": "actor_huo_guang", "to_id": "event_yantie_meeting", "relation_type": "contextualizes", "evidence_ids": ["ev:src_hanshu_zhaodi:juan007:huo_in_power:33445566"], "strength": "contextual_inference", "note": "The meeting occurs under the same regency structure recorded in the reign annals."},
-    {"relation_id": "rel_sang_power_constraint_huo", "from_id": "actor_sang_hongyang", "to_id": "actor_huo_guang", "relation_type": "power_constraint", "evidence_ids": ["ev:src_hanshu_huoguang:juan068:sang_resentment:778899aa"], "strength": "explicit_source", "note": null},
-    {"relation_id": "rel_shangguan_anti_huo", "from_id": "actor_shangguan_jie", "to_id": "actor_huo_guang", "relation_type": "power_constraint", "evidence_ids": ["ev:src_hanshu_huoguang:juan068:shangguan_power_struggle:99aabbcc"], "strength": "explicit_source", "note": null},
-    {"relation_id": "rel_yan_alliance", "from_id": "actor_yan_wang_dan", "to_id": "actor_shangguan_jie", "relation_type": "contextualizes", "evidence_ids": ["ev:src_hanshu_zhaodi:juan007:rebellion_record:ddee0011"], "strength": "explicit_source", "note": null},
-    {"relation_id": "rel_sang_yan_alliance", "from_id": "actor_sang_hongyang", "to_id": "actor_yan_wang_dan", "relation_type": "contextualizes", "evidence_ids": ["ev:src_hanshu_huoguang:juan068:sang_resentment:778899aa"], "strength": "explicit_source", "note": null},
-    {"relation_id": "rel_policy_result_later_eval", "from_id": "claim_policy_result_partial", "to_id": "topic_meeting_result", "relation_type": "supports", "evidence_ids": ["ev:src_hanshu_zhaodi:juan007:abolish_liquor_office:ddccbbaa", "ev:src_yantielun_siku:preface:partial_result:1234abcd"], "strength": "explicit_source", "note": null},
-    {"relation_id": "rel_shiji_background_supports_sang", "from_id": "src_shiji_pingzhun", "to_id": "claim_shiji_supports_policy_effectiveness", "relation_type": "supports", "evidence_ids": ["ev:src_shiji_pingzhun:juan030:people_tax_no_increase:4455ccdd"], "strength": "explicit_source", "note": null},
-    {"relation_id": "rel_hanshu_background_sang", "from_id": "src_hanshu_shihuo", "to_id": "actor_sang_hongyang", "relation_type": "contextualizes", "evidence_ids": ["ev:src_hanshu_shihuo:juan024:sang_background:99887766"], "strength": "explicit_source", "note": null},
-    {"relation_id": "rel_private_power_argument", "from_id": "claim_state_side_fears_private_power", "to_id": "topic_power_network", "relation_type": "actor_interest", "evidence_ids": ["ev:src_yantielun:juan01_jingeng:state_control_prevents_cliques:1122aabb"], "strength": "contextual_inference", "note": "The argument against private salt and iron power maps onto the wider power-network view."},
-    {"relation_id": "rel_court_power_counterargument", "from_id": "ev:src_yantielun:juan01_jingeng:power_inside_court:2233bbcc", "to_id": "claim_state_side_fears_private_power", "relation_type": "opposes", "evidence_ids": ["ev:src_yantielun:juan01_jingeng:power_inside_court:2233bbcc"], "strength": "explicit_source", "note": null},
-    {"relation_id": "rel_agriculture_base_opposes_market", "from_id": "ev:src_yantielun:juan01_jingeng:agriculture_base:88990011", "to_id": "topic_state_monopoly", "relation_type": "opposes", "evidence_ids": ["ev:src_yantielun:juan01_jingeng:agriculture_base:88990011"], "strength": "explicit_source", "note": null},
-    {"relation_id": "rel_market_connectivity_supports_transport", "from_id": "ev:src_yantielun:juan01_jingeng:market_cities:bb11cc22", "to_id": "topic_equal_transport", "relation_type": "supports", "evidence_ids": ["ev:src_yantielun:juan01_jingeng:market_cities:bb11cc22"], "strength": "explicit_source", "note": null},
-    {"relation_id": "rel_luxury_critique_value", "from_id": "ev:src_yantielun:juan01_jingeng:luxury_critique:aa00bb11", "to_id": "topic_confucian_legalist_values", "relation_type": "supports", "evidence_ids": ["ev:src_yantielun:juan01_jingeng:luxury_critique:aa00bb11"], "strength": "explicit_source", "note": null},
-    {"relation_id": "rel_textual_bias_warning", "from_id": "claim_text_has_later_framing", "to_id": "src_yantielun", "relation_type": "contextualizes", "evidence_ids": ["ev:src_yantielun_siku:preface:che_qianqiu_critique:abcdef12"], "strength": "contextual_inference", "note": "Later commentary warns that the text's framing is not neutral stenography."},
-    {"relation_id": "rel_liquor_result_meeting", "from_id": "topic_liquor_monopoly", "to_id": "topic_meeting_result", "relation_type": "supports", "evidence_ids": ["ev:src_hanshu_zhaodi:juan007:abolish_liquor_office:ddccbbaa"], "strength": "explicit_source", "note": null},
-    {"relation_id": "rel_reflection_depends_on_conflict", "from_id": "claim_reflection_prompt", "to_id": "claim_conflict_is_moral_and_fiscal", "relation_type": "contextualizes", "evidence_ids": ["ev:src_yantielun:juan01_benyi:virtue_vs_profit:44556677"], "strength": "interpretive_hypothesis", "note": "The reflection prompt is derived from the value conflict exposed in the verified claims."}
+    {
+      "relation_id": "rel_claim_meeting_yantie",
+      "from_id": "claim_meeting_in_shiyuan_six",
+      "to_id": "event_yantie_meeting",
+      "relation_type": "contextualizes",
+      "evidence_ids": [
+        "ev:src_yantielun:juan01_benyi:meeting_opening:a1b2c3d4"
+      ],
+      "strength": "explicit_source",
+      "note": null
+    },
+    {
+      "relation_id": "rel_literati_opposes_monopoly",
+      "from_id": "actor_literati",
+      "to_id": "topic_state_monopoly",
+      "relation_type": "opposes",
+      "evidence_ids": [
+        "ev:src_yantielun:juan01_benyi:literati_abolish:0a1b2c3d"
+      ],
+      "strength": "explicit_source",
+      "note": null
+    },
+    {
+      "relation_id": "rel_sang_supports_monopoly",
+      "from_id": "actor_sang_hongyang",
+      "to_id": "topic_state_monopoly",
+      "relation_type": "supports",
+      "evidence_ids": [
+        "ev:src_yantielun:juan01_benyi:border_finance:1a2b3c4d"
+      ],
+      "strength": "explicit_source",
+      "note": null
+    },
+    {
+      "relation_id": "rel_border_causes_state_policy",
+      "from_id": "topic_frontier_finance",
+      "to_id": "topic_state_monopoly",
+      "relation_type": "caused_by",
+      "evidence_ids": [
+        "ev:src_yantielun:juan01_benyi:border_finance:1a2b3c4d"
+      ],
+      "strength": "explicit_source",
+      "note": null
+    },
+    {
+      "relation_id": "rel_equal_transport_supports_fiscal",
+      "from_id": "topic_equal_transport",
+      "to_id": "topic_frontier_finance",
+      "relation_type": "supports",
+      "evidence_ids": [
+        "ev:src_shiji_pingzhun:juan030:sang_equal_transport:5e6f7081"
+      ],
+      "strength": "explicit_source",
+      "note": null
+    },
+    {
+      "relation_id": "rel_literati_value_conflict",
+      "from_id": "claim_literati_target_state_profit",
+      "to_id": "claim_sang_defends_frontier_finance",
+      "relation_type": "value_conflict",
+      "evidence_ids": [
+        "ev:src_yantielun:juan01_benyi:virtue_vs_profit:44556677",
+        "ev:src_yantielun:juan01_benyi:border_finance:1a2b3c4d"
+      ],
+      "strength": "contextual_inference",
+      "note": "Two direct arguments use incompatible normative centers: virtue and agriculture versus frontier finance."
+    },
+    {
+      "relation_id": "rel_huo_contextualizes_meeting",
+      "from_id": "actor_huo_guang",
+      "to_id": "event_yantie_meeting",
+      "relation_type": "contextualizes",
+      "evidence_ids": [
+        "ev:src_hanshu_zhaodi:juan007:huo_in_power:33445566"
+      ],
+      "strength": "contextual_inference",
+      "note": "The meeting occurs under the same regency structure recorded in the reign annals."
+    },
+    {
+      "relation_id": "rel_sang_power_constraint_huo",
+      "from_id": "actor_sang_hongyang",
+      "to_id": "actor_huo_guang",
+      "relation_type": "power_constraint",
+      "evidence_ids": [
+        "ev:src_hanshu_huoguang:juan068:sang_resentment:778899aa"
+      ],
+      "strength": "explicit_source",
+      "note": null
+    },
+    {
+      "relation_id": "rel_shangguan_anti_huo",
+      "from_id": "actor_shangguan_jie",
+      "to_id": "actor_huo_guang",
+      "relation_type": "power_constraint",
+      "evidence_ids": [
+        "ev:src_hanshu_huoguang:juan068:shangguan_power_struggle:99aabbcc"
+      ],
+      "strength": "explicit_source",
+      "note": null
+    },
+    {
+      "relation_id": "rel_yan_alliance",
+      "from_id": "actor_yan_wang_dan",
+      "to_id": "actor_shangguan_jie",
+      "relation_type": "contextualizes",
+      "evidence_ids": [
+        "ev:src_hanshu_zhaodi:juan007:rebellion_record:ddee0011"
+      ],
+      "strength": "explicit_source",
+      "note": null
+    },
+    {
+      "relation_id": "rel_sang_yan_alliance",
+      "from_id": "actor_sang_hongyang",
+      "to_id": "actor_yan_wang_dan",
+      "relation_type": "contextualizes",
+      "evidence_ids": [
+        "ev:src_hanshu_huoguang:juan068:sang_resentment:778899aa"
+      ],
+      "strength": "explicit_source",
+      "note": null
+    },
+    {
+      "relation_id": "rel_policy_result_later_eval",
+      "from_id": "claim_policy_result_partial",
+      "to_id": "topic_meeting_result",
+      "relation_type": "supports",
+      "evidence_ids": [
+        "ev:src_hanshu_zhaodi:juan007:abolish_liquor_office:ddccbbaa",
+        "ev:src_yantielun_siku:preface:partial_result:1234abcd"
+      ],
+      "strength": "explicit_source",
+      "note": null
+    },
+    {
+      "relation_id": "rel_shiji_background_supports_sang",
+      "from_id": "src_shiji_pingzhun",
+      "to_id": "claim_shiji_supports_policy_effectiveness",
+      "relation_type": "supports",
+      "evidence_ids": [
+        "ev:src_shiji_pingzhun:juan030:people_tax_no_increase:4455ccdd"
+      ],
+      "strength": "explicit_source",
+      "note": null
+    },
+    {
+      "relation_id": "rel_hanshu_background_sang",
+      "from_id": "src_hanshu_shihuo",
+      "to_id": "actor_sang_hongyang",
+      "relation_type": "contextualizes",
+      "evidence_ids": [
+        "ev:src_hanshu_shihuo:juan024:sang_background:99887766"
+      ],
+      "strength": "explicit_source",
+      "note": null
+    },
+    {
+      "relation_id": "rel_private_power_argument",
+      "from_id": "claim_state_side_fears_private_power",
+      "to_id": "topic_power_network",
+      "relation_type": "actor_interest",
+      "evidence_ids": [
+        "ev:src_yantielun:juan01_jingeng:state_control_prevents_cliques:1122aabb"
+      ],
+      "strength": "contextual_inference",
+      "note": "The argument against private salt and iron power maps onto the wider power-network view."
+    },
+    {
+      "relation_id": "rel_court_power_counterargument",
+      "from_id": "ev:src_yantielun:juan01_jingeng:power_inside_court:2233bbcc",
+      "to_id": "claim_state_side_fears_private_power",
+      "relation_type": "opposes",
+      "evidence_ids": [
+        "ev:src_yantielun:juan01_jingeng:power_inside_court:2233bbcc"
+      ],
+      "strength": "explicit_source",
+      "note": null
+    },
+    {
+      "relation_id": "rel_agriculture_base_opposes_market",
+      "from_id": "ev:src_yantielun:juan01_jingeng:agriculture_base:88990011",
+      "to_id": "topic_state_monopoly",
+      "relation_type": "opposes",
+      "evidence_ids": [
+        "ev:src_yantielun:juan01_jingeng:agriculture_base:88990011"
+      ],
+      "strength": "explicit_source",
+      "note": null
+    },
+    {
+      "relation_id": "rel_market_connectivity_supports_transport",
+      "from_id": "ev:src_yantielun:juan01_jingeng:market_cities:bb11cc22",
+      "to_id": "topic_equal_transport",
+      "relation_type": "supports",
+      "evidence_ids": [
+        "ev:src_yantielun:juan01_jingeng:market_cities:bb11cc22"
+      ],
+      "strength": "explicit_source",
+      "note": null
+    },
+    {
+      "relation_id": "rel_luxury_critique_value",
+      "from_id": "ev:src_yantielun:juan01_jingeng:luxury_critique:aa00bb11",
+      "to_id": "topic_confucian_legalist_values",
+      "relation_type": "supports",
+      "evidence_ids": [
+        "ev:src_yantielun:juan01_jingeng:luxury_critique:aa00bb11"
+      ],
+      "strength": "explicit_source",
+      "note": null
+    },
+    {
+      "relation_id": "rel_textual_bias_warning",
+      "from_id": "claim_text_has_later_framing",
+      "to_id": "src_yantielun",
+      "relation_type": "contextualizes",
+      "evidence_ids": [
+        "ev:src_yantielun_siku:preface:che_qianqiu_critique:abcdef12"
+      ],
+      "strength": "contextual_inference",
+      "note": "Later commentary warns that the text's framing is not neutral stenography."
+    },
+    {
+      "relation_id": "rel_liquor_result_meeting",
+      "from_id": "topic_liquor_monopoly",
+      "to_id": "topic_meeting_result",
+      "relation_type": "supports",
+      "evidence_ids": [
+        "ev:src_hanshu_zhaodi:juan007:abolish_liquor_office:ddccbbaa"
+      ],
+      "strength": "explicit_source",
+      "note": null
+    },
+    {
+      "relation_id": "rel_reflection_depends_on_conflict",
+      "from_id": "claim_reflection_prompt",
+      "to_id": "claim_conflict_is_moral_and_fiscal",
+      "relation_type": "contextualizes",
+      "evidence_ids": [
+        "ev:src_yantielun:juan01_benyi:virtue_vs_profit:44556677"
+      ],
+      "strength": "interpretive_hypothesis",
+      "note": "The reflection prompt is derived from the value conflict exposed in the verified claims."
+    }
   ],
   "map_layers": [
     {
@@ -1047,12 +1927,23 @@
           "feature_id": "feature_changan",
           "title": "长安",
           "summary": "会议的朝廷空间，霍光辅政、丞相御史与贤良文学在此发生制度性对话。",
-          "coordinates": [50.0, 50.0],
-          "evidence_ids": ["ev:src_yantielun:juan01_benyi:meeting_opening:a1b2c3d4", "ev:src_hanshu_zhaodi:juan007:meeting_edict:ccddeeff"]
+          "coordinates": [
+            50.0,
+            50.0
+          ],
+          "evidence_ids": [
+            "ev:src_yantielun:juan01_benyi:meeting_opening:a1b2c3d4",
+            "ev:src_hanshu_zhaodi:juan007:meeting_edict:ccddeeff"
+          ]
         }
       ],
-      "evidence_ids": ["ev:src_yantielun:juan01_benyi:meeting_opening:a1b2c3d4"],
-      "display_style": {"color": "#8c1d18", "icon": "landmark"}
+      "evidence_ids": [
+        "ev:src_yantielun:juan01_benyi:meeting_opening:a1b2c3d4"
+      ],
+      "display_style": {
+        "color": "#8c1d18",
+        "icon": "landmark"
+      }
     },
     {
       "layer_id": "layer_frontier_pressure",
@@ -1064,19 +1955,36 @@
           "feature_id": "feature_northern_frontier",
           "title": "北边与朔方方向",
           "summary": "大夫一方以匈奴、边塞、屯戍和军费解释盐铁政策。",
-          "coordinates": [55.0, 20.0],
-          "evidence_ids": ["ev:src_yantielun:juan01_benyi:border_finance:1a2b3c4d", "ev:src_shiji_pingzhun:juan030:frontier_supply:66778899"]
+          "coordinates": [
+            55.0,
+            20.0
+          ],
+          "evidence_ids": [
+            "ev:src_yantielun:juan01_benyi:border_finance:1a2b3c4d",
+            "ev:src_shiji_pingzhun:juan030:frontier_supply:66778899"
+          ]
         },
         {
           "feature_id": "feature_jincheng",
           "title": "金城郡设置背景",
           "summary": "始元六年罢榷酤同年，边塞阔远成为设置金城郡的理由之一。",
-          "coordinates": [35.0, 30.0],
-          "evidence_ids": ["ev:src_hanshu_zhaodi:juan007:abolish_liquor_office:ddccbbaa"]
+          "coordinates": [
+            35.0,
+            30.0
+          ],
+          "evidence_ids": [
+            "ev:src_hanshu_zhaodi:juan007:abolish_liquor_office:ddccbbaa"
+          ]
         }
       ],
-      "evidence_ids": ["ev:src_yantielun:juan01_benyi:border_finance:1a2b3c4d", "ev:src_shiji_pingzhun:juan030:frontier_supply:66778899"],
-      "display_style": {"color": "#475569", "icon": "shield"}
+      "evidence_ids": [
+        "ev:src_yantielun:juan01_benyi:border_finance:1a2b3c4d",
+        "ev:src_shiji_pingzhun:juan030:frontier_supply:66778899"
+      ],
+      "display_style": {
+        "color": "#475569",
+        "icon": "shield"
+      }
     },
     {
       "layer_id": "layer_resource_market",
@@ -1088,19 +1996,37 @@
           "feature_id": "feature_salt_iron_resources",
           "title": "盐铁山海之利",
           "summary": "盐铁官营把山海资源纳入国家财政和市场调节。",
-          "coordinates": [72.0, 58.0],
-          "evidence_ids": ["ev:src_shiji_pingzhun:juan030:salt_iron_offices:3344bbcc", "ev:src_hanshu_shihuo:juan024:salt_iron_offices:99aabbcc"]
+          "coordinates": [
+            72.0,
+            58.0
+          ],
+          "evidence_ids": [
+            "ev:src_shiji_pingzhun:juan030:salt_iron_offices:3344bbcc",
+            "ev:src_hanshu_shihuo:juan024:salt_iron_offices:99aabbcc"
+          ]
         },
         {
           "feature_id": "feature_equal_transport_routes",
           "title": "均输转运网络",
           "summary": "远方贡输与物价调节构成均输和平准制度的空间逻辑。",
-          "coordinates": [60.0, 65.0],
-          "evidence_ids": ["ev:src_shiji_pingzhun:juan030:sang_equal_transport:5e6f7081", "ev:src_yantielun:juan01_benyi:great_officer_equal_transport:77889900"]
+          "coordinates": [
+            60.0,
+            65.0
+          ],
+          "evidence_ids": [
+            "ev:src_shiji_pingzhun:juan030:sang_equal_transport:5e6f7081",
+            "ev:src_yantielun:juan01_benyi:great_officer_equal_transport:77889900"
+          ]
         }
       ],
-      "evidence_ids": ["ev:src_shiji_pingzhun:juan030:salt_iron_offices:3344bbcc", "ev:src_shiji_pingzhun:juan030:sang_equal_transport:5e6f7081"],
-      "display_style": {"color": "#166534", "icon": "route"}
+      "evidence_ids": [
+        "ev:src_shiji_pingzhun:juan030:salt_iron_offices:3344bbcc",
+        "ev:src_shiji_pingzhun:juan030:sang_equal_transport:5e6f7081"
+      ],
+      "display_style": {
+        "color": "#166534",
+        "icon": "route"
+      }
     }
   ],
   "curated_paths": [
@@ -1109,8 +2035,26 @@
       "title": "进入始元六年",
       "summary": "从昭帝、霍光辅政和举贤良文学进入会议现场。",
       "steps": [
-        {"order": 1, "title": "昭帝幼年与霍光辅政", "claim_ids": ["claim_huo_regency_context"], "evidence_ids": ["ev:src_hanshu_zhaodi:juan007:zhaodi_young_huo_regency:22334455"]},
-        {"order": 2, "title": "会议开启", "claim_ids": ["claim_meeting_in_shiyuan_six"], "evidence_ids": ["ev:src_yantielun:juan01_benyi:meeting_opening:a1b2c3d4"]}
+        {
+          "order": 1,
+          "title": "昭帝幼年与霍光辅政",
+          "claim_ids": [
+            "claim_huo_regency_context"
+          ],
+          "evidence_ids": [
+            "ev:src_hanshu_zhaodi:juan007:zhaodi_young_huo_regency:22334455"
+          ]
+        },
+        {
+          "order": 2,
+          "title": "会议开启",
+          "claim_ids": [
+            "claim_meeting_in_shiyuan_six"
+          ],
+          "evidence_ids": [
+            "ev:src_yantielun:juan01_benyi:meeting_opening:a1b2c3d4"
+          ]
+        }
       ]
     },
     {
@@ -1118,9 +2062,36 @@
       "title": "盐铁官营之辩",
       "summary": "比较贤良文学与桑弘羊一方的核心论证。",
       "steps": [
-        {"order": 1, "title": "贤良文学反对", "claim_ids": ["claim_literati_oppose_monopoly"], "evidence_ids": ["ev:src_yantielun:juan01_benyi:literati_abolish:0a1b2c3d"]},
-        {"order": 2, "title": "桑弘羊财政理由", "claim_ids": ["claim_sang_defends_frontier_finance"], "evidence_ids": ["ev:src_yantielun:juan01_benyi:border_finance:1a2b3c4d"]},
-        {"order": 3, "title": "形成价值冲突判断", "claim_ids": ["claim_conflict_is_moral_and_fiscal"], "evidence_ids": ["ev:src_yantielun:juan01_benyi:virtue_vs_profit:44556677"]}
+        {
+          "order": 1,
+          "title": "贤良文学反对",
+          "claim_ids": [
+            "claim_literati_oppose_monopoly"
+          ],
+          "evidence_ids": [
+            "ev:src_yantielun:juan01_benyi:literati_abolish:0a1b2c3d"
+          ]
+        },
+        {
+          "order": 2,
+          "title": "桑弘羊财政理由",
+          "claim_ids": [
+            "claim_sang_defends_frontier_finance"
+          ],
+          "evidence_ids": [
+            "ev:src_yantielun:juan01_benyi:border_finance:1a2b3c4d"
+          ]
+        },
+        {
+          "order": 3,
+          "title": "形成价值冲突判断",
+          "claim_ids": [
+            "claim_conflict_is_moral_and_fiscal"
+          ],
+          "evidence_ids": [
+            "ev:src_yantielun:juan01_benyi:virtue_vs_profit:44556677"
+          ]
+        }
       ]
     },
     {
@@ -1128,9 +2099,36 @@
       "title": "权力关系网",
       "summary": "把会议放回霍光辅政、桑弘羊政策功劳和元凤元年政变背景。",
       "steps": [
-        {"order": 1, "title": "霍光掌权", "claim_ids": ["claim_huo_regency_context"], "evidence_ids": ["ev:src_hanshu_huoguang:juan068:regency_decided_by_huo:11223344"]},
-        {"order": 2, "title": "桑弘羊怨恨霍光", "claim_ids": ["claim_power_network_not_optional"], "evidence_ids": ["ev:src_hanshu_huoguang:juan068:sang_resentment:778899aa"]},
-        {"order": 3, "title": "会后政治危机", "claim_ids": ["claim_power_network_not_optional"], "evidence_ids": ["ev:src_hanshu_zhaodi:juan007:rebellion_record:ddee0011"]}
+        {
+          "order": 1,
+          "title": "霍光掌权",
+          "claim_ids": [
+            "claim_huo_regency_context"
+          ],
+          "evidence_ids": [
+            "ev:src_hanshu_huoguang:juan068:regency_decided_by_huo:11223344"
+          ]
+        },
+        {
+          "order": 2,
+          "title": "桑弘羊怨恨霍光",
+          "claim_ids": [
+            "claim_power_network_not_optional"
+          ],
+          "evidence_ids": [
+            "ev:src_hanshu_huoguang:juan068:sang_resentment:778899aa"
+          ]
+        },
+        {
+          "order": 3,
+          "title": "会后政治危机",
+          "claim_ids": [
+            "claim_power_network_not_optional"
+          ],
+          "evidence_ids": [
+            "ev:src_hanshu_zhaodi:juan007:rebellion_record:ddee0011"
+          ]
+        }
       ]
     }
   ],
@@ -1138,15 +2136,72 @@
   "lexical_index": {
     "tokenization": "char_bigram_zh_v1",
     "entries": {
-      "盐铁": ["ev:src_yantielun:juan01_benyi:literati_abolish:0a1b2c3d", "ev:src_yantielun:juan01_benyi:border_finance:1a2b3c4d", "ev:src_shiji_pingzhun:juan030:salt_iron_offices:3344bbcc"],
-      "桑弘羊": ["ev:src_hanshu_shihuo:juan024:sang_background:99887766", "ev:src_hanshu_huoguang:juan068:sang_resentment:778899aa", "ev:src_shiji_pingzhun:juan030:sang_equal_transport:5e6f7081"],
-      "贤良文学": ["ev:src_yantielun:juan01_benyi:meeting_opening:a1b2c3d4", "ev:src_hanshu_zhaodi:juan007:meeting_edict:ccddeeff"],
-      "霍光": ["ev:src_hanshu_zhaodi:juan007:huo_in_power:33445566", "ev:src_hanshu_huoguang:juan068:regency_decided_by_huo:11223344"],
-      "均输": ["ev:src_yantielun:juan01_benyi:great_officer_equal_transport:77889900", "ev:src_yantielun:juan01_benyi:literati_equal_transport_abuse:abcd5678", "ev:src_shiji_pingzhun:juan030:sang_equal_transport:5e6f7081"],
-      "平准": ["ev:src_shiji_pingzhun:juan030:sang_equal_transport:5e6f7081", "ev:src_yantielun:juan01_benyi:great_officer_equal_transport:77889900"],
-      "榷酤": ["ev:src_hanshu_zhaodi:juan007:meeting_edict:ccddeeff", "ev:src_hanshu_zhaodi:juan007:abolish_liquor_office:ddccbbaa", "ev:src_yantielun_siku:preface:partial_result:1234abcd"],
-      "边费": ["ev:src_yantielun:juan01_benyi:border_finance:1a2b3c4d", "ev:src_shiji_pingzhun:juan030:frontier_supply:66778899", "ev:src_hanshu_shihuo:juan024:war_cost_shortage:8899aabb"],
-      "权力": ["ev:src_yantielun:juan01_jingeng:power_inside_court:2233bbcc", "ev:src_hanshu_huoguang:juan068:sang_resentment:778899aa", "ev:src_hanshu_zhaodi:juan007:rebellion_record:ddee0011"]
+      "盐铁": [
+        "ev:src_yantielun:juan01_benyi:literati_abolish:0a1b2c3d",
+        "ev:src_yantielun:juan01_benyi:border_finance:1a2b3c4d",
+        "ev:src_shiji_pingzhun:juan030:salt_iron_offices:3344bbcc"
+      ],
+      "桑弘羊": [
+        "ev:src_hanshu_shihuo:juan024:sang_background:99887766",
+        "ev:src_hanshu_huoguang:juan068:sang_resentment:778899aa",
+        "ev:src_shiji_pingzhun:juan030:sang_equal_transport:5e6f7081"
+      ],
+      "贤良文学": [
+        "ev:src_yantielun:juan01_benyi:meeting_opening:a1b2c3d4",
+        "ev:src_hanshu_zhaodi:juan007:meeting_edict:ccddeeff"
+      ],
+      "霍光": [
+        "ev:src_hanshu_zhaodi:juan007:huo_in_power:33445566",
+        "ev:src_hanshu_huoguang:juan068:regency_decided_by_huo:11223344"
+      ],
+      "均输": [
+        "ev:src_yantielun:juan01_benyi:great_officer_equal_transport:77889900",
+        "ev:src_yantielun:juan01_benyi:literati_equal_transport_abuse:abcd5678",
+        "ev:src_shiji_pingzhun:juan030:sang_equal_transport:5e6f7081"
+      ],
+      "平准": [
+        "ev:src_shiji_pingzhun:juan030:sang_equal_transport:5e6f7081",
+        "ev:src_yantielun:juan01_benyi:great_officer_equal_transport:77889900"
+      ],
+      "榷酤": [
+        "ev:src_hanshu_zhaodi:juan007:meeting_edict:ccddeeff",
+        "ev:src_hanshu_zhaodi:juan007:abolish_liquor_office:ddccbbaa",
+        "ev:src_yantielun_siku:preface:partial_result:1234abcd"
+      ],
+      "边费": [
+        "ev:src_yantielun:juan01_benyi:border_finance:1a2b3c4d",
+        "ev:src_shiji_pingzhun:juan030:frontier_supply:66778899",
+        "ev:src_hanshu_shihuo:juan024:war_cost_shortage:8899aabb"
+      ],
+      "权力": [
+        "ev:src_yantielun:juan01_jingeng:power_inside_court:2233bbcc",
+        "ev:src_hanshu_huoguang:juan068:sang_resentment:778899aa",
+        "ev:src_hanshu_zhaodi:juan007:rebellion_record:ddee0011"
+      ],
+      "义利": [
+        "ev:src_lunyu_liren:liren04:yi_li_lens:aa110001",
+        "ev:src_mengzi_lianghuiwang:liang01:renyi_over_profit:aa110002"
+      ],
+      "哲学透镜": [
+        "ev:src_lunyu_liren:liren04:yi_li_lens:aa110001",
+        "ev:src_mengzi_lianghuiwang:liang01:renyi_over_profit:aa110002",
+        "ev:src_xunzi_fuguo:fuguo:jieyong_yumin:aa110003",
+        "ev:src_guanzi_mumin:mumin01:canglin_lijie:aa110004",
+        "ev:src_hanfeizi_wudu:wudu:adapt_law_to_age:aa110005",
+        "ev:src_shangjunshu_nongzhan:nongzhan:state_agriculture_war:aa110006"
+      ],
+      "荀子": [
+        "ev:src_xunzi_fuguo:fuguo:jieyong_yumin:aa110003"
+      ],
+      "管子": [
+        "ev:src_guanzi_mumin:mumin01:canglin_lijie:aa110004"
+      ],
+      "韩非子": [
+        "ev:src_hanfeizi_wudu:wudu:adapt_law_to_age:aa110005"
+      ],
+      "商君书": [
+        "ev:src_shangjunshu_nongzhan:nongzhan:state_agriculture_war:aa110006"
+      ]
     }
   }
 }
