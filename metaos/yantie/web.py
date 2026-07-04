@@ -484,6 +484,49 @@ YANTIE_HTML = """<!doctype html>
       font-weight: 700;
     }
 
+    .lens-section {
+      display: grid;
+      gap: 8px;
+      padding: 10px;
+      border: 1px solid rgba(255,236,188,0.16);
+      border-radius: 8px;
+      background: rgba(255,244,214,0.055);
+    }
+
+    .lens-section-title {
+      margin: 0;
+      color: rgba(255,244,214,0.74);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .lens-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .lens-seal {
+      display: grid;
+      gap: 3px;
+      min-height: 58px;
+      text-align: left;
+      border-color: rgba(243,196,109,0.34);
+      background: rgba(31,79,82,0.36);
+    }
+
+    .lens-seal strong {
+      color: #fff4d6;
+      font-size: 13px;
+      line-height: 1.25;
+    }
+
+    .lens-seal span {
+      color: rgba(255,244,214,0.68);
+      font-size: 11px;
+      line-height: 1.35;
+    }
+
     .map-layer,
     .court-layer,
     .network-layer,
@@ -511,6 +554,152 @@ YANTIE_HTML = """<!doctype html>
       width: 100%;
       height: 100%;
       display: block;
+    }
+
+
+    .chapter-map-scrim {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      background: rgba(3, 6, 10, 0.5);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 260ms ease;
+    }
+
+    .chapter-map-scrim.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .chapter-map-panel {
+      position: fixed;
+      inset: 72px clamp(16px, 4vw, 48px) 58px clamp(16px, 4vw, 48px);
+      z-index: 45;
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr);
+      gap: 16px;
+      padding: 16px;
+      border: 1px solid rgba(255,236,188,0.28);
+      border-radius: 8px;
+      background: rgba(9,13,19,0.9);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.48);
+      backdrop-filter: blur(14px);
+      opacity: 0;
+      transform: translateY(22px);
+      pointer-events: none;
+      transition: opacity 260ms ease, transform 320ms ease;
+    }
+
+    .chapter-map-panel.is-open {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .chapter-map-head {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid rgba(255,236,188,0.16);
+      padding-bottom: 10px;
+    }
+
+    .chapter-map-title {
+      margin: 0;
+      color: #fff4d6;
+      font-size: 18px;
+    }
+
+    .chapter-grid {
+      min-height: 0;
+      overflow: auto;
+      display: grid;
+      gap: 12px;
+      padding-right: 4px;
+    }
+
+    .juan-band {
+      display: grid;
+      gap: 8px;
+    }
+
+    .juan-title {
+      color: rgba(255,244,214,0.72);
+      font-size: 12px;
+    }
+
+    .chapter-node-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(142px, 1fr));
+      gap: 8px;
+    }
+
+    .chapter-node {
+      min-height: 94px;
+      text-align: left;
+      display: grid;
+      align-content: start;
+      gap: 5px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,236,188,0.18);
+      background: rgba(255,244,214,0.06);
+      color: #fff4d6;
+      cursor: pointer;
+    }
+
+    .chapter-node.is-active {
+      border-color: rgba(243,196,109,0.82);
+      background: rgba(243,196,109,0.14);
+    }
+
+    .chapter-node strong {
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .chapter-node span {
+      color: rgba(255,244,214,0.68);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .chapter-detail {
+      min-height: 0;
+      overflow: auto;
+      display: grid;
+      align-content: start;
+      gap: 12px;
+      padding: 12px;
+      border-left: 1px solid rgba(255,236,188,0.16);
+    }
+
+    .chapter-detail h3 {
+      margin: 0;
+      color: #fff4d6;
+      font-size: 22px;
+    }
+
+    .chapter-conflict {
+      margin: 0;
+      color: #f3c46d;
+      line-height: 1.6;
+      font-size: 16px;
+    }
+
+    .chapter-map-close {
+      width: 34px;
+      height: 34px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 8px;
+      border: 1px solid rgba(255,236,188,0.28);
+      background: rgba(255,244,214,0.08);
+      color: #fff4d6;
+      cursor: pointer;
     }
 
     .evidence-scrim {
@@ -602,6 +791,24 @@ YANTIE_HTML = """<!doctype html>
       padding-left: 10px;
     }
 
+    .evidence-item.is-lens {
+      border-left-color: rgba(100,196,187,0.9);
+      background: rgba(100,196,187,0.06);
+      padding: 10px 10px 10px 12px;
+      border-radius: 8px;
+    }
+
+    .evidence-boundary {
+      display: inline-flex;
+      width: fit-content;
+      border: 1px solid rgba(100,196,187,0.34);
+      border-radius: 999px;
+      padding: 2px 7px;
+      color: #b7fff4;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
     .evidence-item strong {
       color: #fff4d6;
       line-height: 1.5;
@@ -691,6 +898,36 @@ YANTIE_HTML = """<!doctype html>
       line-height: 1.55;
       text-align: right;
       pointer-events: none;
+    }
+
+
+    @media (max-width: 780px) {
+      .chapter-map-panel {
+        inset: 68px 10px 18px 10px;
+        grid-template-columns: 1fr;
+        overflow: auto;
+      }
+
+      .chapter-map-head {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        background: rgba(9,13,19,0.94);
+      }
+
+      .chapter-detail {
+        border-left: 0;
+        border-top: 1px solid rgba(255,236,188,0.16);
+        padding: 12px 0 0;
+      }
+
+      .chapter-node-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .lens-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -852,6 +1089,7 @@ YANTIE_HTML = """<!doctype html>
         <div class="scene-actions">
           <button id="advanceScene" class="primary" type="button">继续进入</button>
           <button id="revealEvidence" class="ghost" type="button">史料浮现</button>
+          <button id="chapterMapToggle" class="ghost" type="button">诸篇争锋</button>
           <button id="rewindScene" class="ghost" type="button">回看</button>
         </div>
       </article>
@@ -879,6 +1117,8 @@ YANTIE_HTML = """<!doctype html>
       <aside id="decisionDock" class="decision-dock is-empty" aria-label="思想判断区"></aside>
     </section>
 
+    <div id="chapterMapScrim" class="chapter-map-scrim" aria-hidden="true"></div>
+    <aside id="chapterMapPanel" class="chapter-map-panel" aria-label="诸篇争锋"></aside>
     <div id="evidenceScrim" class="evidence-scrim" aria-hidden="true"></div>
     <aside id="evidenceRibbon" class="evidence-ribbon" aria-label="关键证据"></aside>
     <div class="timeline-rail" id="timelineRail" aria-hidden="true"></div>
@@ -897,6 +1137,10 @@ YANTIE_HTML = """<!doctype html>
       evidenceById: new Map(),
       sceneIndex: 0,
       userChoices: {},
+      visitedChapters: new Set(),
+      visitedLensIds: new Set(),
+      activeChapterIndex: 0,
+      chapterMapOpen: false,
       audio: null,
       soundEnabled: false,
       animationTick: 0
@@ -1223,6 +1467,1775 @@ YANTIE_HTML = """<!doctype html>
       }
 ];
 
+    const chapterConflictMap = [
+      {
+            "chapterNumber": 1,
+            "juan": "卷一",
+            "title": "本议第一",
+            "slug": "benyi",
+            "actKey": "act-livelihood",
+            "issue": "monopoly",
+            "conflict": "盐铁酒榷均输是救边费，还是与民争利？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "制度必须供给边防与府库。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "治道应先抑末利、开仁义。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan01_benyi:meeting_opening:a1b2c3d4"
+            ],
+            "philosophyLens": [
+                  "ev:src_lunyu_liren:liren04:yi_li_lens:aa110001",
+                  "ev:src_guanzi_mumin:mumin01:follow_people_heart:aa220011"
+            ],
+            "visualCue": "monopoly"
+      },
+      {
+            "chapterNumber": 2,
+            "juan": "卷一",
+            "title": "力耕第二",
+            "slug": "ligeng",
+            "actKey": "act-livelihood",
+            "issue": "agriculture",
+            "conflict": "农桑为本与国家调剂如何共存？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "储积调剂可以救乏绝。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "务本力耕才是民生根基。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan01_jingeng:agriculture_base:88990011"
+            ],
+            "philosophyLens": [
+                  "ev:src_mengzi_tengwen:tengwen01:constant_livelihood:aa110009",
+                  "ev:src_shangjunshu_nongzhan:nongzhan:state_agriculture_war:aa110006"
+            ],
+            "visualCue": "agriculture"
+      },
+      {
+            "chapterNumber": 3,
+            "juan": "卷一",
+            "title": "通有第三",
+            "slug": "tongyou",
+            "actKey": "act-statecraft",
+            "issue": "market",
+            "conflict": "城市商路是流通之利，还是逐末之源？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "通有无可使货物流转。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "商工过盛会夺农桑之本。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan01_jingeng:market_cities:bb11cc22"
+            ],
+            "philosophyLens": [
+                  "ev:src_guanzi_mumin:mumin01:canglin_lijie:aa110004",
+                  "ev:src_xunzi_wangzhi:wangzhi:market_tax_light:aa220008"
+            ],
+            "visualCue": "market"
+      },
+      {
+            "chapterNumber": 4,
+            "juan": "卷一",
+            "title": "错币第四",
+            "slug": "cuobi",
+            "actKey": "act-statecraft",
+            "issue": "currency",
+            "conflict": "货币与物价应由国家调节，还是顺民间自通？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "轻重调剂可以平缓急。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "错币扰民会放大贫富不均。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan01_cuobi:chapter_conflict:71e30b87"
+            ],
+            "philosophyLens": [
+                  "ev:src_guanzi_mumin:mumin01:follow_people_heart:aa220011",
+                  "ev:src_huainanzi_zhushu:zhushu:law_as_measure:aa220017"
+            ],
+            "visualCue": "currency"
+      },
+      {
+            "chapterNumber": 5,
+            "juan": "卷一",
+            "title": "禁耕第五",
+            "slug": "jingeng",
+            "actKey": "act-power",
+            "issue": "power",
+            "conflict": "国家垄断能防豪强，还是制造更大的官府强权？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "山海之利若归豪民，会成私强。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "权利深处未必在山海，也可能在朝廷。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan01_jingeng:state_control_prevents_cliques:1122aabb"
+            ],
+            "philosophyLens": [
+                  "ev:src_huainanzi_zhushu:zhushu:law_as_measure:aa220017",
+                  "ev:src_lunyu_yanyuan:yanyuan12:governance_rectification:aa220002"
+            ],
+            "visualCue": "power"
+      },
+      {
+            "chapterNumber": 6,
+            "juan": "卷一",
+            "title": "复古第六",
+            "slug": "fugu",
+            "actKey": "act-statecraft",
+            "issue": "reform",
+            "conflict": "制度弊病应修令，还是回到古法？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "盐铁令意在总一资源。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "古法之本在薄利安民。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan01_fugu:chapter_conflict:edd2cc73"
+            ],
+            "philosophyLens": [
+                  "ev:src_hanfeizi_wudu:wudu:adapt_law_to_age:aa110005",
+                  "ev:src_liji_wangzhi:wangzhi:nine_year_storage:aa220016"
+            ],
+            "visualCue": "reform"
+      },
+      {
+            "chapterNumber": 7,
+            "juan": "卷二",
+            "title": "非鞅第七",
+            "slug": "feiyang",
+            "actKey": "act-yili",
+            "issue": "legalism",
+            "conflict": "商鞅式富强能否成为汉政范式？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "法度严明可富国强兵。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "以刑利成强，未必合乎王道。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan02_feiyang:chapter_conflict:4702f508"
+            ],
+            "philosophyLens": [
+                  "ev:src_hanfeizi_xianxue:xianxue:scholars_disorder_law:aa220013",
+                  "ev:src_hanfeizi_wudu:wudu:adapt_law_to_age:aa110005"
+            ],
+            "visualCue": "legalism"
+      },
+      {
+            "chapterNumber": 8,
+            "juan": "卷二",
+            "title": "晁错第八",
+            "slug": "chaocuo",
+            "actKey": "act-power",
+            "issue": "faction",
+            "conflict": "削藩与忠谋为何会走向政治牺牲？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "为国深谋可制诸侯。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "权力局中，忠谋也可能成祸端。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan02_chaocuo:chapter_conflict:154f63e3"
+            ],
+            "philosophyLens": [
+                  "ev:src_lunyu_yanyuan:yanyuan12:governance_rectification:aa220002",
+                  "ev:src_xunzi_wangzhi:wangzhi:boat_water:aa220007"
+            ],
+            "visualCue": "faction"
+      },
+      {
+            "chapterNumber": 9,
+            "juan": "卷二",
+            "title": "刺权第九",
+            "slug": "ciquan",
+            "actKey": "act-power",
+            "issue": "power",
+            "conflict": "权利归上能强国，还是使朝廷失衡？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "统山海则国家不为豪强所分。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "权太集中会反噬公议。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan02_ciquan:chapter_conflict:d6d59555"
+            ],
+            "philosophyLens": [
+                  "ev:src_huainanzi_zhushu:zhushu:law_as_measure:aa220017",
+                  "ev:src_lunyu_yanyuan:yanyuan12:governance_rectification:aa220002"
+            ],
+            "visualCue": "power"
+      },
+      {
+            "chapterNumber": 10,
+            "juan": "卷二",
+            "title": "刺复第十",
+            "slug": "cifu",
+            "actKey": "act-power",
+            "issue": "burden",
+            "conflict": "在局者的财政忧惧能否压过旁观者的德义批评？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "当局者知负载之劳。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "忧国不能取消民间痛感。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan02_cifu:chapter_conflict:db419abd"
+            ],
+            "philosophyLens": [
+                  "ev:src_lunyu_yanyuan:yanyuan07:food_army_trust:aa220001",
+                  "ev:src_xunzi_fuguo:fuguo:jieyong_yumin:aa110003"
+            ],
+            "visualCue": "burden"
+      },
+      {
+            "chapterNumber": 11,
+            "juan": "卷二",
+            "title": "论儒第十一",
+            "slug": "lunru",
+            "actKey": "act-yili",
+            "issue": "values",
+            "conflict": "儒者能治世，还是只会称古？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "空言德义未必能救政务。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "德义教化正是治世根本。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan02_lunru:chapter_conflict:d3a320b3"
+            ],
+            "philosophyLens": [
+                  "ev:src_lunyu_liren:liren04:yi_li_lens:aa110001",
+                  "ev:src_mengzi_gaozishang:gaozi10:choose_righteousness:aa220005",
+                  "ev:src_hanfeizi_xianxue:xianxue:scholars_disorder_law:aa220013"
+            ],
+            "visualCue": "values"
+      },
+      {
+            "chapterNumber": 12,
+            "juan": "卷二",
+            "title": "忧边第十二",
+            "slug": "youbian",
+            "actKey": "act-fiscal",
+            "issue": "frontier",
+            "conflict": "忧边应先筹兵食，还是先息民力？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "边患不除，国家不安。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "长久军费会困穷百姓。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan02_youbian:chapter_conflict:62cc2317"
+            ],
+            "philosophyLens": [
+                  "ev:src_lunyu_yanyuan:yanyuan07:food_army_trust:aa220001",
+                  "ev:src_shangjunshu_nongzhan:nongzhan:state_agriculture_war:aa110006"
+            ],
+            "visualCue": "frontier"
+      },
+      {
+            "chapterNumber": 13,
+            "juan": "卷三",
+            "title": "园池第十三",
+            "slug": "yuanchi",
+            "actKey": "act-fiscal",
+            "issue": "resource",
+            "conflict": "园池山海是公共财政，还是奢侈占夺？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "总山海可助贡赋。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "苑囿奢用会离民生越来越远。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan03_yuanchi:chapter_conflict:b271ef45"
+            ],
+            "philosophyLens": [
+                  "ev:src_liji_wangzhi:wangzhi:labor_limit:aa220015",
+                  "ev:src_xunzi_fuguo:fuguo:jieyong_yumin:aa110003"
+            ],
+            "visualCue": "resource"
+      },
+      {
+            "chapterNumber": 14,
+            "juan": "卷三",
+            "title": "轻重第十四",
+            "slug": "qingzhong",
+            "actKey": "act-statecraft",
+            "issue": "price",
+            "conflict": "轻重之术能平物价，还是让官府入市逐利？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "轻重调节可通财货。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "官府逐利会改变政德。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan03_qingzhong:chapter_conflict:fa483d8c"
+            ],
+            "philosophyLens": [
+                  "ev:src_guanzi_mumin:mumin01:canglin_lijie:aa110004",
+                  "ev:src_xunzi_wangzhi:wangzhi:market_tax_light:aa220008"
+            ],
+            "visualCue": "price"
+      },
+      {
+            "chapterNumber": 15,
+            "juan": "卷三",
+            "title": "未通第十五",
+            "slug": "weitong",
+            "actKey": "act-livelihood",
+            "issue": "transport",
+            "conflict": "交通未通造成贫苦，国家转运是否必要？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "转运能济区域不足。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "民间劳苦不应只被当成物流问题。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan03_weitong:chapter_conflict:0608353b"
+            ],
+            "philosophyLens": [
+                  "ev:src_guanzi_mumin:mumin01:canglin_lijie:aa110004",
+                  "ev:src_liji_wangzhi:wangzhi:labor_limit:aa220015"
+            ],
+            "visualCue": "transport"
+      },
+      {
+            "chapterNumber": 16,
+            "juan": "卷四",
+            "title": "地广第十六",
+            "slug": "diguang",
+            "actKey": "act-fiscal",
+            "issue": "frontier",
+            "conflict": "天下地广，应调远近，还是减边地扰动？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "边地同为臣民，国家应调剂。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "远方寒苦不能被财政一笔抹平。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan04_diguang:chapter_conflict:88cc9d6d"
+            ],
+            "philosophyLens": [
+                  "ev:src_lunyu_yanyuan:yanyuan07:food_army_trust:aa220001",
+                  "ev:src_shangjunshu_nongzhan:nongzhan:state_agriculture_war:aa110006"
+            ],
+            "visualCue": "frontier"
+      },
+      {
+            "chapterNumber": 17,
+            "juan": "卷四",
+            "title": "贫富第十七",
+            "slug": "pinfu",
+            "actKey": "act-livelihood",
+            "issue": "wealth",
+            "conflict": "贫富来自勤俭，还是来自制度位置？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "俭节量入可保家。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "贫富差距不能只归因个人。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan04_pinfu:chapter_conflict:ace6a215"
+            ],
+            "philosophyLens": [
+                  "ev:src_xunzi_fuguo:fuguo:jieyong_yumin:aa110003",
+                  "ev:src_mengzi_tengwen:tengwen01:constant_livelihood:aa110009"
+            ],
+            "visualCue": "wealth"
+      },
+      {
+            "chapterNumber": 18,
+            "juan": "卷四",
+            "title": "毁学第十八",
+            "slug": "huixue",
+            "actKey": "act-yili",
+            "issue": "learning",
+            "conflict": "学术批评是空谈，还是纠偏权力的必要声音？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "怀枉言正是士风之弊。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "无学术批评，权力更难自省。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan04_huixue:chapter_conflict:1e1fb1a6"
+            ],
+            "philosophyLens": [
+                  "ev:src_guanzi_quanxiu:quanxiu:long_term_teaching:aa220010",
+                  "ev:src_hanfeizi_xianxue:xianxue:scholars_disorder_law:aa220013"
+            ],
+            "visualCue": "learning"
+      },
+      {
+            "chapterNumber": 19,
+            "juan": "卷四",
+            "title": "褒贤第十九",
+            "slug": "baoxian",
+            "actKey": "act-yili",
+            "issue": "merit",
+            "conflict": "贤者应以功名衡量，还是以德义自守？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "纵横强国亦可建功。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "功名不能替代德义标准。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan04_baoxian:chapter_conflict:0d83a973"
+            ],
+            "philosophyLens": [
+                  "ev:src_liji_liyun:liyun:public_order:aa110010",
+                  "ev:src_hanfeizi_wudu:wudu:adapt_law_to_age:aa110005"
+            ],
+            "visualCue": "merit"
+      },
+      {
+            "chapterNumber": 20,
+            "juan": "卷五",
+            "title": "相刺第二十",
+            "slug": "xiangci",
+            "actKey": "act-yili",
+            "issue": "critique",
+            "conflict": "儒生批政是离本，还是公共议论的开始？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "弃耕谈学未必有实功。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "议政本身也是士人的责任。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan05_xiangci:chapter_conflict:be9c4edf"
+            ],
+            "philosophyLens": [
+                  "ev:src_lunyu_yanyuan:yanyuan13:no_litigation:aa220003",
+                  "ev:src_hanfeizi_youdu:youdu:law_no_noble:aa220012"
+            ],
+            "visualCue": "critique"
+      },
+      {
+            "chapterNumber": 21,
+            "juan": "卷五",
+            "title": "殊路第二十一",
+            "slug": "shulu",
+            "actKey": "act-yili",
+            "issue": "paths",
+            "conflict": "同出儒门为何走向不同政治道路？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "才具应落实在政事。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "道路不同不等于价值无用。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan05_shulu:chapter_conflict:fa045567"
+            ],
+            "philosophyLens": [
+                  "ev:src_liji_liyun:liyun:public_order:aa110010",
+                  "ev:src_lunyu_liren:liren04:yi_li_lens:aa110001"
+            ],
+            "visualCue": "paths"
+      },
+      {
+            "chapterNumber": 22,
+            "juan": "卷五",
+            "title": "讼贤第二十二",
+            "slug": "songxian",
+            "actKey": "act-yili",
+            "issue": "virtue",
+            "conflict": "贤能应刚强有为，还是守正不阿？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "矜己伐能会害事。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "折柔之间仍要守义。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan05_songxian:chapter_conflict:287558dd"
+            ],
+            "philosophyLens": [
+                  "ev:src_mengzi_gaozishang:gaozi10:choose_righteousness:aa220005",
+                  "ev:src_lunyu_yanyuan:yanyuan12:governance_rectification:aa220002"
+            ],
+            "visualCue": "virtue"
+      },
+      {
+            "chapterNumber": 23,
+            "juan": "卷五",
+            "title": "遵道第二十三",
+            "slug": "zundao",
+            "actKey": "act-statecraft",
+            "issue": "dao",
+            "conflict": "遵道是守古言，还是把道落到当世？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "政务不能止于高言。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "无道则现实只剩权术。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan05_zundao:chapter_conflict:317552c8"
+            ],
+            "philosophyLens": [
+                  "ev:src_hanfeizi_wudu:wudu:adapt_law_to_age:aa110005",
+                  "ev:src_xunzi_tianlun:tianlun:nature_constant:aa110008"
+            ],
+            "visualCue": "dao"
+      },
+      {
+            "chapterNumber": 24,
+            "juan": "卷五",
+            "title": "论诽第二十四",
+            "slug": "lunfei",
+            "actKey": "act-power",
+            "issue": "speech",
+            "conflict": "批评当政是诽谤，还是议政权利？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "称古訾今会扰乱政令。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "不许论诽，朝廷更难听见疾苦。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan05_lunfei:chapter_conflict:38a9a473"
+            ],
+            "philosophyLens": [
+                  "ev:src_lunyu_yanyuan:yanyuan13:no_litigation:aa220003",
+                  "ev:src_hanfeizi_xianxue:xianxue:scholars_disorder_law:aa220013"
+            ],
+            "visualCue": "speech"
+      },
+      {
+            "chapterNumber": 25,
+            "juan": "卷五",
+            "title": "孝养第二十五",
+            "slug": "xiaoyang",
+            "actKey": "act-livelihood",
+            "issue": "family",
+            "conflict": "孝养重在物质供养，还是敬与礼？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "衣食供养不可缺。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "孝不止是资源问题。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan05_xiaoyang:chapter_conflict:cf8d3a59"
+            ],
+            "philosophyLens": [
+                  "ev:src_liji_liyun:liyun:public_order:aa110010",
+                  "ev:src_lunyu_xueer:xueer01:govern_with_time:aa110007"
+            ],
+            "visualCue": "family"
+      },
+      {
+            "chapterNumber": 26,
+            "juan": "卷五",
+            "title": "刺议第二十六",
+            "slug": "ciyi",
+            "actKey": "act-power",
+            "issue": "deliberation",
+            "conflict": "朝廷应纳众议，还是防止空言误政？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "多闻多见可广策。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "议论若不负责任也会误国。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan05_ciyi:chapter_conflict:d01622d1"
+            ],
+            "philosophyLens": [
+                  "ev:src_lunyu_yanyuan:yanyuan13:no_litigation:aa220003",
+                  "ev:src_huainanzi_zhushu:zhushu:law_as_measure:aa220017"
+            ],
+            "visualCue": "deliberation"
+      },
+      {
+            "chapterNumber": 27,
+            "juan": "卷五",
+            "title": "利议第二十七",
+            "slug": "liyi",
+            "actKey": "act-power",
+            "issue": "strategy",
+            "conflict": "求奇计安边，是否会把议论拉回功利？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "边境未安，必须求可行策。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "只问利策会压扁德义问题。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan05_liyi:chapter_conflict:61fc0944"
+            ],
+            "philosophyLens": [
+                  "ev:src_hanfeizi_wudu:wudu:adapt_law_to_age:aa110005",
+                  "ev:src_shangjunshu_nongzhan:nongzhan:state_agriculture_war:aa110006"
+            ],
+            "visualCue": "strategy"
+      },
+      {
+            "chapterNumber": 28,
+            "juan": "卷五",
+            "title": "国疾第二十八",
+            "slug": "guoji",
+            "actKey": "act-yili",
+            "issue": "illness",
+            "conflict": "国家之疾在无贤，还是在制度不听贤？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "贤士不用是国家羞耻。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "贤言若不能落地也难救病。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan05_guoji:chapter_conflict:e989c27c"
+            ],
+            "philosophyLens": [
+                  "ev:src_xunzi_wangzhi:wangzhi:boat_water:aa220007",
+                  "ev:src_guanzi_mumin:mumin01:follow_people_heart:aa220011"
+            ],
+            "visualCue": "illness"
+      },
+      {
+            "chapterNumber": 29,
+            "juan": "卷六",
+            "title": "散不足第二十九",
+            "slug": "sanbuzu",
+            "actKey": "act-livelihood",
+            "issue": "frugality",
+            "conflict": "奢费不足应开财源，还是节上以足下？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "财用不足须筹措。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "上层奢费才是民困之源。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan06_sanbuzu:chapter_conflict:bfec3e04"
+            ],
+            "philosophyLens": [
+                  "ev:src_mozi_feile:feile01:three_harms:aa220014",
+                  "ev:src_liji_wangzhi:wangzhi:nine_year_storage:aa220016"
+            ],
+            "visualCue": "frugality"
+      },
+      {
+            "chapterNumber": 30,
+            "juan": "卷六",
+            "title": "救匮第三十",
+            "slug": "jiukui",
+            "actKey": "act-livelihood",
+            "issue": "relief",
+            "conflict": "救匮应靠国家财力，还是公卿节俭示范？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "财政可以救困乏。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "节俭率下才能止匮。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan06_jiukui:chapter_conflict:be30f275"
+            ],
+            "philosophyLens": [
+                  "ev:src_liji_wangzhi:wangzhi:nine_year_storage:aa220016",
+                  "ev:src_lunyu_yanyuan:yanyuan07:food_army_trust:aa220001"
+            ],
+            "visualCue": "relief"
+      },
+      {
+            "chapterNumber": 31,
+            "juan": "卷六",
+            "title": "箴石第三十一",
+            "slug": "zhenshi",
+            "actKey": "act-power",
+            "issue": "admonition",
+            "conflict": "激烈批评是药石，还是伤害朝堂秩序？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "言行可则才能治政。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "刺痛权力的言论也可能是箴石。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan06_zhenshi:chapter_conflict:c5cdbdf6"
+            ],
+            "philosophyLens": [
+                  "ev:src_lunyu_yanyuan:yanyuan13:no_litigation:aa220003",
+                  "ev:src_huainanzi_zhushu:zhushu:law_as_measure:aa220017"
+            ],
+            "visualCue": "admonition"
+      },
+      {
+            "chapterNumber": 32,
+            "juan": "卷六",
+            "title": "除狭第三十二",
+            "slug": "chuxia",
+            "actKey": "act-power",
+            "issue": "local",
+            "conflict": "地方治理靠长吏专制，还是制度监督？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "郡守握权才能处置千里。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "权专而无监督会狭隘侵民。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan06_chuxia:chapter_conflict:17fcc6d6"
+            ],
+            "philosophyLens": [
+                  "ev:src_hanfeizi_youdu:youdu:law_no_noble:aa220012",
+                  "ev:src_lunyu_yanyuan:yanyuan12:governance_rectification:aa220002"
+            ],
+            "visualCue": "local"
+      },
+      {
+            "chapterNumber": 33,
+            "juan": "卷六",
+            "title": "疾贪第三十三",
+            "slug": "jitan",
+            "actKey": "act-power",
+            "issue": "corruption",
+            "conflict": "吏治之病在贪，还是在求取机制？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "贪吏侵渔百姓应严治。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "只责小吏不能遮蔽制度诱因。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan06_jitan:chapter_conflict:30f9be49"
+            ],
+            "philosophyLens": [
+                  "ev:src_hanfeizi_youdu:youdu:law_no_noble:aa220012",
+                  "ev:src_guanzi_mumin:mumin01:follow_people_heart:aa220011"
+            ],
+            "visualCue": "corruption"
+      },
+      {
+            "chapterNumber": 34,
+            "juan": "卷六",
+            "title": "后刑第三十四",
+            "slug": "houxing",
+            "actKey": "act-power",
+            "issue": "punishment",
+            "conflict": "刑罚是治恶必要，还是德治失败的补丁？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "刑一恶可悦万民。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "依赖刑罚会削弱教化。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan06_houxing:chapter_conflict:2620c13c"
+            ],
+            "philosophyLens": [
+                  "ev:src_hanfeizi_youdu:youdu:law_no_noble:aa220012",
+                  "ev:src_liji_liyun:liyun:public_order:aa110010"
+            ],
+            "visualCue": "punishment"
+      },
+      {
+            "chapterNumber": 35,
+            "juan": "卷六",
+            "title": "授时第三十五",
+            "slug": "shoushi",
+            "actKey": "act-statecraft",
+            "issue": "time",
+            "conflict": "贫困应归咎惰奢，还是看时令与机会？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "勤俭守时可免贫。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "治理要给民以合时之生路。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan06_shoushi:chapter_conflict:9a50b48c"
+            ],
+            "philosophyLens": [
+                  "ev:src_lunyu_xueer:xueer01:govern_with_time:aa110007",
+                  "ev:src_xunzi_tianlun:tianlun:nature_constant:aa110008"
+            ],
+            "visualCue": "time"
+      },
+      {
+            "chapterNumber": 36,
+            "juan": "卷六",
+            "title": "水旱第三十六",
+            "slug": "shuihan",
+            "actKey": "act-statecraft",
+            "issue": "disaster",
+            "conflict": "水旱灾异是天道，还是政治责任？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "灾荒有自然之数。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "政治仍要承担备荒救民。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan06_shuihan:chapter_conflict:d03b9a50"
+            ],
+            "philosophyLens": [
+                  "ev:src_xunzi_tianlun:tianlun:nature_constant:aa110008",
+                  "ev:src_lunyu_yanyuan:yanyuan12:governance_rectification:aa220002"
+            ],
+            "visualCue": "disaster"
+      },
+      {
+            "chapterNumber": 37,
+            "juan": "卷七",
+            "title": "崇礼第三十七",
+            "slug": "chongli",
+            "actKey": "act-yili",
+            "issue": "ritual",
+            "conflict": "礼乐仪物是秩序象征，还是奢侈负担？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "礼仪可示威德与秩序。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "崇礼若成炫耀，会离民甚远。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan07_chongli:chapter_conflict:e7b8e2ac"
+            ],
+            "philosophyLens": [
+                  "ev:src_liji_liyun:liyun:public_order:aa110010",
+                  "ev:src_xunzi_xiushen:xiushen:ritual_corrects_body:aa220009"
+            ],
+            "visualCue": "ritual"
+      },
+      {
+            "chapterNumber": 38,
+            "juan": "卷七",
+            "title": "备胡第三十八",
+            "slug": "beihu",
+            "actKey": "act-fiscal",
+            "issue": "frontier",
+            "conflict": "面对匈奴，备战是否压倒仁义怀远？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "不备则边境受害。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "备胡不能无限征敛。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan07_beihu:chapter_conflict:4c55b53d"
+            ],
+            "philosophyLens": [
+                  "ev:src_lunyu_yanyuan:yanyuan07:food_army_trust:aa220001",
+                  "ev:src_shangjunshu_nongzhan:nongzhan:state_agriculture_war:aa110006"
+            ],
+            "visualCue": "frontier"
+      },
+      {
+            "chapterNumber": 39,
+            "juan": "卷七",
+            "title": "执务第三十九",
+            "slug": "zhiwu",
+            "actKey": "act-statecraft",
+            "issue": "practice",
+            "conflict": "当世急务能否取代上古理想？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "政务必须可执行。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "急务不应抹掉道义方向。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan07_zhiwu:chapter_conflict:f9bc9127"
+            ],
+            "philosophyLens": [
+                  "ev:src_hanfeizi_wudu:wudu:adapt_law_to_age:aa110005",
+                  "ev:src_guanzi_mumin:mumin01:canglin_lijie:aa110004"
+            ],
+            "visualCue": "practice"
+      },
+      {
+            "chapterNumber": 40,
+            "juan": "卷七",
+            "title": "能言第四十",
+            "slug": "nengyan",
+            "actKey": "act-statecraft",
+            "issue": "speech",
+            "conflict": "能言治乱者，是否必须能亲自行之？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "坐言不行不足治国。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "言说也能揭示政治盲点。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan07_nengyan:chapter_conflict:3bd58d49"
+            ],
+            "philosophyLens": [
+                  "ev:src_lunyu_yanyuan:yanyuan13:no_litigation:aa220003",
+                  "ev:src_hanfeizi_xianxue:xianxue:scholars_disorder_law:aa220013"
+            ],
+            "visualCue": "speech"
+      },
+      {
+            "chapterNumber": 41,
+            "juan": "卷七",
+            "title": "取下第四十一",
+            "slug": "quxia",
+            "actKey": "act-power",
+            "issue": "people",
+            "conflict": "取利于下是亏主，还是还利于民？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "利归下则县官无可为。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "取下太重则民无可生。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan07_quxia:chapter_conflict:b3f59835"
+            ],
+            "philosophyLens": [
+                  "ev:src_mengzi_jinxinxia:jinxin14:people_first:aa220004",
+                  "ev:src_guanzi_mumin:mumin01:follow_people_heart:aa220011"
+            ],
+            "visualCue": "people"
+      },
+      {
+            "chapterNumber": 42,
+            "juan": "卷七",
+            "title": "击之第四十二",
+            "slug": "jizhi",
+            "actKey": "act-fiscal",
+            "issue": "war",
+            "conflict": "击匈奴是主动安边，还是把财政推向战争？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "击之可困敌安边。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "用兵会继续加重民力。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan07_jizhi:chapter_conflict:859e3660"
+            ],
+            "philosophyLens": [
+                  "ev:src_shangjunshu_nongzhan:nongzhan:state_agriculture_war:aa110006",
+                  "ev:src_mozi_feile:feile01:three_harms:aa220014"
+            ],
+            "visualCue": "war"
+      },
+      {
+            "chapterNumber": 43,
+            "juan": "卷八",
+            "title": "结和第四十三",
+            "slug": "jiehe",
+            "actKey": "act-fiscal",
+            "issue": "diplomacy",
+            "conflict": "和亲厚赂为何未能换来稳定？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "厚赂不一定改敌节。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "武折之外仍要考量德怀。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan08_jiehe:chapter_conflict:f24f1d0f"
+            ],
+            "philosophyLens": [
+                  "ev:src_mengzi_jinxinxia:jinxin14:people_first:aa220004",
+                  "ev:src_liji_liyun:liyun:public_order:aa110010"
+            ],
+            "visualCue": "diplomacy"
+      },
+      {
+            "chapterNumber": 44,
+            "juan": "卷八",
+            "title": "诛秦第四十四",
+            "slug": "zhuqin",
+            "actKey": "act-yili",
+            "issue": "qin",
+            "conflict": "秦制之强可取，还是其亡足戒？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "强国之术能扩地立威。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "秦亡说明强制有极限。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan08_zhuqin:chapter_conflict:b8a1140b"
+            ],
+            "philosophyLens": [
+                  "ev:src_hanfeizi_wudu:wudu:adapt_law_to_age:aa110005",
+                  "ev:src_xunzi_wangzhi:wangzhi:boat_water:aa220007"
+            ],
+            "visualCue": "qin"
+      },
+      {
+            "chapterNumber": 45,
+            "juan": "卷八",
+            "title": "伐功第四十五",
+            "slug": "fagong",
+            "actKey": "act-fiscal",
+            "issue": "merit",
+            "conflict": "武功开边是功业，还是成本被遮蔽？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "伐功可显国家威力。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "功业背后有民力代价。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan08_fagong:chapter_conflict:e293d79c"
+            ],
+            "philosophyLens": [
+                  "ev:src_liji_liyun:liyun:public_order:aa110010",
+                  "ev:src_hanfeizi_wudu:wudu:adapt_law_to_age:aa110005"
+            ],
+            "visualCue": "merit"
+      },
+      {
+            "chapterNumber": 46,
+            "juan": "卷八",
+            "title": "西域第四十六",
+            "slug": "xiyu",
+            "actKey": "act-fiscal",
+            "issue": "xiyu",
+            "conflict": "经营西域是战略纵深，还是远方财政负担？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "通西域可制匈奴。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "远略会拉长供给与役使。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan08_xiyu:chapter_conflict:1a2e4eba"
+            ],
+            "philosophyLens": [
+                  "ev:src_shangjunshu_nongzhan:nongzhan:state_agriculture_war:aa110006",
+                  "ev:src_liji_wangzhi:wangzhi:labor_limit:aa220015"
+            ],
+            "visualCue": "xiyu"
+      },
+      {
+            "chapterNumber": 47,
+            "juan": "卷八",
+            "title": "世务第四十七",
+            "slug": "shiwu",
+            "actKey": "act-statecraft",
+            "issue": "now",
+            "conflict": "世务之急能否压倒椎车古语？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "当世病痛必须当世治理。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "急务若只重权利会失道。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan08_shiwu:chapter_conflict:b932a66f"
+            ],
+            "philosophyLens": [
+                  "ev:src_hanfeizi_wudu:wudu:adapt_law_to_age:aa110005",
+                  "ev:src_guanzi_mumin:mumin01:canglin_lijie:aa110004"
+            ],
+            "visualCue": "now"
+      },
+      {
+            "chapterNumber": 48,
+            "juan": "卷八",
+            "title": "和亲第四十八",
+            "slug": "heqin",
+            "actKey": "act-fiscal",
+            "issue": "peace",
+            "conflict": "和亲与备战，哪一种更接近仁政？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "仁义也要城守器备。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "备战不应吞没怀远之道。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan08_heqin:chapter_conflict:660b7116"
+            ],
+            "philosophyLens": [
+                  "ev:src_mengzi_jinxinxia:jinxin14:people_first:aa220004",
+                  "ev:src_liji_liyun:liyun:public_order:aa110010"
+            ],
+            "visualCue": "peace"
+      },
+      {
+            "chapterNumber": 49,
+            "juan": "卷九",
+            "title": "繇役第四十九",
+            "slug": "yaoyi",
+            "actKey": "act-livelihood",
+            "issue": "labor",
+            "conflict": "征伐与徭役是否必然相连？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "征不从者需举兵。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "徭役过重会伤民本。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan09_yaoyi:chapter_conflict:9caab5c5"
+            ],
+            "philosophyLens": [
+                  "ev:src_liji_wangzhi:wangzhi:labor_limit:aa220015",
+                  "ev:src_mozi_feile:feile01:three_harms:aa220014"
+            ],
+            "visualCue": "labor"
+      },
+      {
+            "chapterNumber": 50,
+            "juan": "卷九",
+            "title": "险固第五十",
+            "slug": "xiangu",
+            "actKey": "act-fiscal",
+            "issue": "defense",
+            "conflict": "险固器备是安全根本，还是财政吞口？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "有备则能制敌。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "险固之费仍出自百姓。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan09_xiangu:chapter_conflict:68de2221"
+            ],
+            "philosophyLens": [
+                  "ev:src_lunyu_yanyuan:yanyuan07:food_army_trust:aa220001",
+                  "ev:src_shangjunshu_nongzhan:nongzhan:state_agriculture_war:aa110006"
+            ],
+            "visualCue": "defense"
+      },
+      {
+            "chapterNumber": 51,
+            "juan": "卷九",
+            "title": "论勇第五十一",
+            "slug": "lunyong",
+            "actKey": "act-fiscal",
+            "issue": "courage",
+            "conflict": "勇力靠个人胆气，还是靠器械制度？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "武备器械成就勇功。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "勇功叙事会遮蔽民生。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan09_lunyong:chapter_conflict:5b45eb09"
+            ],
+            "philosophyLens": [
+                  "ev:src_shangjunshu_nongzhan:nongzhan:state_agriculture_war:aa110006",
+                  "ev:src_hanfeizi_wudu:wudu:adapt_law_to_age:aa110005"
+            ],
+            "visualCue": "courage"
+      },
+      {
+            "chapterNumber": 52,
+            "juan": "卷九",
+            "title": "论功第五十二",
+            "slug": "lungong",
+            "actKey": "act-fiscal",
+            "issue": "achievement",
+            "conflict": "功业衡量应看战果，还是看礼义秩序？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "匈奴无礼法，故不足畏。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "以功论政可能轻忽德义。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan09_lungong:chapter_conflict:cfb1a7de"
+            ],
+            "philosophyLens": [
+                  "ev:src_liji_liyun:liyun:public_order:aa110010",
+                  "ev:src_mengzi_gaozishang:gaozi10:choose_righteousness:aa220005"
+            ],
+            "visualCue": "achievement"
+      },
+      {
+            "chapterNumber": 53,
+            "juan": "卷九",
+            "title": "论邹第五十三",
+            "slug": "lunzou",
+            "actKey": "act-yili",
+            "issue": "cosmos",
+            "conflict": "阴阳大论能解释政治，还是远离现实？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "宏阔理论可喻王公。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "远言若不合近事便成空论。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan09_lunzou:chapter_conflict:c3d2b4c3"
+            ],
+            "philosophyLens": [
+                  "ev:src_xunzi_tianlun:tianlun:nature_constant:aa110008",
+                  "ev:src_liji_wangzhi:wangzhi:nine_year_storage:aa220016"
+            ],
+            "visualCue": "cosmos"
+      },
+      {
+            "chapterNumber": 54,
+            "juan": "卷九",
+            "title": "论菑第五十四",
+            "slug": "lunzai",
+            "actKey": "act-statecraft",
+            "issue": "disaster",
+            "conflict": "灾异应作政治警讯，还是不可逐语迷信？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "灾异可以提醒政失。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "信灾异不能替代近事治理。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan09_lunzai:chapter_conflict:6a3e947b"
+            ],
+            "philosophyLens": [
+                  "ev:src_xunzi_tianlun:tianlun:nature_constant:aa110008",
+                  "ev:src_lunyu_yanyuan:yanyuan12:governance_rectification:aa220002"
+            ],
+            "visualCue": "disaster"
+      },
+      {
+            "chapterNumber": 55,
+            "juan": "卷十",
+            "title": "刑德第五十五",
+            "slug": "xingde",
+            "actKey": "act-yili",
+            "issue": "law",
+            "conflict": "刑与德谁是治民根本？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "法令督奸，刑罚禁恶。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "刑不能替代德教。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan10_xingde:chapter_conflict:c177a5c9"
+            ],
+            "philosophyLens": [
+                  "ev:src_hanfeizi_youdu:youdu:law_no_noble:aa220012",
+                  "ev:src_liji_liyun:liyun:public_order:aa110010"
+            ],
+            "visualCue": "law"
+      },
+      {
+            "chapterNumber": 56,
+            "juan": "卷十",
+            "title": "申韩第五十六",
+            "slug": "shenhan",
+            "actKey": "act-yili",
+            "issue": "legalism",
+            "conflict": "申韩法术是补政缺，还是伤王道？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "小缺可用法令防。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "法术过盛会压低礼义。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan10_shenhan:chapter_conflict:851016ec"
+            ],
+            "philosophyLens": [
+                  "ev:src_hanfeizi_xianxue:xianxue:scholars_disorder_law:aa220013",
+                  "ev:src_hanfeizi_wudu:wudu:adapt_law_to_age:aa110005"
+            ],
+            "visualCue": "legalism"
+      },
+      {
+            "chapterNumber": 57,
+            "juan": "卷十",
+            "title": "周秦第五十七",
+            "slug": "zhouqin",
+            "actKey": "act-yili",
+            "issue": "history",
+            "conflict": "周礼与秦法，何者能解释汉代困境？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "秦法强制有现实效力。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "周礼提供秩序理想。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan10_zhouqin:chapter_conflict:f2a74bce"
+            ],
+            "philosophyLens": [
+                  "ev:src_hanfeizi_wudu:wudu:adapt_law_to_age:aa110005",
+                  "ev:src_liji_liyun:liyun:public_order:aa110010"
+            ],
+            "visualCue": "history"
+      },
+      {
+            "chapterNumber": 58,
+            "juan": "卷十",
+            "title": "诏圣第五十八",
+            "slug": "zhaosheng",
+            "actKey": "act-statecraft",
+            "issue": "reform",
+            "conflict": "圣王之法应守成，还是随世更制？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "法弊则更制。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "更制不能背离德信。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan10_zhaosheng:chapter_conflict:2f682d00"
+            ],
+            "philosophyLens": [
+                  "ev:src_hanfeizi_wudu:wudu:adapt_law_to_age:aa110005",
+                  "ev:src_liji_wangzhi:wangzhi:nine_year_storage:aa220016"
+            ],
+            "visualCue": "reform"
+      },
+      {
+            "chapterNumber": 59,
+            "juan": "卷十",
+            "title": "大论第五十九",
+            "slug": "dalun",
+            "actKey": "act-statecraft",
+            "issue": "summary",
+            "conflict": "大论应归于务实，还是保留价值审判？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "治民如匠，需有法度工具。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "工具理性仍须接受价值审判。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan10_dalun:chapter_conflict:638ed1b2"
+            ],
+            "philosophyLens": [
+                  "ev:src_lunyu_liren:liren04:yi_li_lens:aa110001",
+                  "ev:src_hanfeizi_wudu:wudu:adapt_law_to_age:aa110005",
+                  "ev:src_guanzi_mumin:mumin01:follow_people_heart:aa220011"
+            ],
+            "visualCue": "summary"
+      },
+      {
+            "chapterNumber": 60,
+            "juan": "卷十",
+            "title": "杂论第六十",
+            "slug": "zalun",
+            "actKey": "act-yili",
+            "issue": "closure",
+            "conflict": "全书终局是各有所出，还是仍可判其义利？",
+            "voices": [
+                  {
+                        "side": "大夫一方",
+                        "text": "诸论各有所出，权利有其理由。"
+                  },
+                  {
+                        "side": "贤良文学",
+                        "text": "上仁义与务权利仍需辨别。"
+                  }
+            ],
+            "historicalEvidence": [
+                  "ev:src_yantielun:juan10_zalun:chapter_conflict:6f36a7cb"
+            ],
+            "philosophyLens": [
+                  "ev:src_lunyu_liren:liren04:yi_li_lens:aa110001",
+                  "ev:src_mengzi_jinxinxia:jinxin14:people_first:aa220004",
+                  "ev:src_hanfeizi_youdu:youdu:law_no_noble:aa220012"
+            ],
+            "visualCue": "closure"
+      }
+];
+
+    const philosophyLensMeta = {
+      "ev:src_lunyu_liren:liren04:yi_li_lens:aa110001": {
+            "label": "义利之辨",
+            "family": "义利",
+            "note": "用义与利的价值排序观看争论。"
+      },
+      "ev:src_lunyu_liren:liren04:profit_breeds_resentment:aa220000": {
+            "label": "逐利生怨",
+            "family": "义利",
+            "note": "观察官府逐利如何累积民怨。"
+      },
+      "ev:src_mengzi_lianghuiwang:liang01:renyi_over_profit:aa110002": {
+            "label": "仁义高于利",
+            "family": "义利",
+            "note": "把国家目标从收益转回仁义。"
+      },
+      "ev:src_mengzi_lianghuiwang:liang01:profit_endangers_state:aa220006": {
+            "label": "交征利危",
+            "family": "义利",
+            "note": "追问上下逐利如何危及国家。"
+      },
+      "ev:src_xunzi_fuguo:fuguo:jieyong_yumin:aa110003": {
+            "label": "节用裕民",
+            "family": "富国",
+            "note": "承认制度治理，同时要求富国不伤民。"
+      },
+      "ev:src_guanzi_mumin:mumin01:canglin_lijie:aa110004": {
+            "label": "仓廪礼节",
+            "family": "富国",
+            "note": "从物质基础理解秩序何以可能。"
+      },
+      "ev:src_hanfeizi_wudu:wudu:adapt_law_to_age:aa110005": {
+            "label": "因世变法",
+            "family": "法术",
+            "note": "把制度有效性放进时代变化中检验。"
+      },
+      "ev:src_shangjunshu_nongzhan:nongzhan:state_agriculture_war:aa110006": {
+            "label": "农战国家",
+            "family": "农战",
+            "note": "用耕战动员观看边防财政。"
+      },
+      "ev:src_lunyu_xueer:xueer01:govern_with_time:aa110007": {
+            "label": "使民以时",
+            "family": "民生",
+            "note": "用不误农时衡量动员边界。"
+      },
+      "ev:src_xunzi_tianlun:tianlun:nature_constant:aa110008": {
+            "label": "天行有常",
+            "family": "灾异",
+            "note": "区分自然灾害与政治责任。"
+      },
+      "ev:src_mengzi_tengwen:tengwen01:constant_livelihood:aa110009": {
+            "label": "恒产民生",
+            "family": "民生",
+            "note": "先看百姓是否有稳定生计。"
+      },
+      "ev:src_liji_liyun:liyun:public_order:aa110010": {
+            "label": "礼运公序",
+            "family": "礼法",
+            "note": "用公共秩序理解礼与制度。"
+      },
+      "ev:src_lunyu_yanyuan:yanyuan07:food_army_trust:aa220001": {
+            "label": "食兵民信",
+            "family": "国家能力",
+            "note": "同时衡量粮食、军备与民信。"
+      },
+      "ev:src_lunyu_yanyuan:yanyuan12:governance_rectification:aa220002": {
+            "label": "政者正也",
+            "family": "德治",
+            "note": "追问权力自身是否正当。"
+      },
+      "ev:src_lunyu_yanyuan:yanyuan13:no_litigation:aa220003": {
+            "label": "无讼追问",
+            "family": "议政",
+            "note": "从争论回看制度病根。"
+      },
+      "ev:src_mengzi_jinxinxia:jinxin14:people_first:aa220004": {
+            "label": "民贵君轻",
+            "family": "民本",
+            "note": "把民生置于国家目标之前检验。"
+      },
+      "ev:src_mengzi_gaozishang:gaozi10:choose_righteousness:aa220005": {
+            "label": "取义之择",
+            "family": "义利",
+            "note": "看哪些选择不能只按利益计算。"
+      },
+      "ev:src_xunzi_wangzhi:wangzhi:boat_water:aa220007": {
+            "label": "舟水之喻",
+            "family": "民本",
+            "note": "观察国家权力对民众承载的依赖。"
+      },
+      "ev:src_xunzi_wangzhi:wangzhi:market_tax_light:aa220008": {
+            "label": "关市轻征",
+            "family": "市场",
+            "note": "承认市场治理，但警惕官府重取。"
+      },
+      "ev:src_xunzi_xiushen:xiushen:ritual_corrects_body:aa220009": {
+            "label": "礼以正身",
+            "family": "礼法",
+            "note": "把礼看成秩序技术而非装饰。"
+      },
+      "ev:src_guanzi_quanxiu:quanxiu:long_term_teaching:aa220010": {
+            "label": "树人之计",
+            "family": "教化",
+            "note": "用长期教化衡量政治能力。"
+      },
+      "ev:src_guanzi_mumin:mumin01:follow_people_heart:aa220011": {
+            "label": "顺民心",
+            "family": "民本",
+            "note": "富国术也要接受民心检验。"
+      },
+      "ev:src_hanfeizi_youdu:youdu:law_no_noble:aa220012": {
+            "label": "法不阿贵",
+            "family": "法术",
+            "note": "用同一尺度约束贵势与私门。"
+      },
+      "ev:src_hanfeizi_xianxue:xianxue:scholars_disorder_law:aa220013": {
+            "label": "文乱法",
+            "family": "法术",
+            "note": "理解法家对空言议政的警惕。"
+      },
+      "ev:src_mozi_feile:feile01:three_harms:aa220014": {
+            "label": "饥寒劳苦",
+            "family": "民生",
+            "note": "把制度成本落实到百姓身体感受。"
+      },
+      "ev:src_liji_wangzhi:wangzhi:labor_limit:aa220015": {
+            "label": "用民有限",
+            "family": "徭役",
+            "note": "国家动员必须有边界。"
+      },
+      "ev:src_liji_wangzhi:wangzhi:nine_year_storage:aa220016": {
+            "label": "九年之蓄",
+            "family": "财政",
+            "note": "承认储备是国家安定的一部分。"
+      },
+      "ev:src_huainanzi_zhushu:zhushu:law_as_measure:aa220017": {
+            "label": "法为准绳",
+            "family": "权力边界",
+            "note": "制度也应约束权力本身。"
+      }
+};
+
     const issueMatrix = [
       {
             "issue": "盐铁",
@@ -1409,6 +3422,7 @@ YANTIE_HTML = """<!doctype html>
       document.getElementById("packStatus").textContent = `${manifest.evidence_count} 条证据 · 无运行时模型`;
       renderRail();
       renderStaticScenes();
+      renderChapterMap();
       await renderScene();
       startCanvas();
     }
@@ -1452,10 +3466,22 @@ YANTIE_HTML = """<!doctype html>
       renderJudgmentBackdrop(scene);
     }
 
+    function lensMetaFor(evidenceId) {
+      return philosophyLensMeta[evidenceId] || {
+        label: "思想透镜",
+        family: "解释",
+        note: "这是一种解释角度，不作为会议事实。"
+      };
+    }
+
+    function isPhilosophyLensEvidence(evidence) {
+      return Array.isArray(evidence.value_tags) && evidence.value_tags.includes("philosophy_lens");
+    }
+
     function sceneEvidenceButtons(scene) {
       const rawButtons = [
         ...(scene.historicalEvidence || []).map((id, index) => ({ id, label: `史证 ${index + 1}` })),
-        ...(scene.philosophyLens || []).map((id, index) => ({ id, label: `透镜 ${index + 1}` }))
+        ...(scene.philosophyLens || []).map(id => ({ id, label: lensMetaFor(id).label }))
       ];
       const seen = new Set();
       return rawButtons.filter(item => {
@@ -1691,6 +3717,92 @@ YANTIE_HTML = """<!doctype html>
       `;
     }
 
+
+    function renderChapterMap() {
+      const groups = chapterConflictMap.reduce((acc, chapter) => {
+        if (!acc[chapter.juan]) acc[chapter.juan] = [];
+        acc[chapter.juan].push(chapter);
+        return acc;
+      }, {});
+      const active = chapterConflictMap[state.activeChapterIndex] || chapterConflictMap[0];
+      document.getElementById("chapterMapPanel").innerHTML = `
+        <div class="chapter-map-head">
+          <h2 class="chapter-map-title">诸篇争锋 · ${chapterConflictMap.length} 篇</h2>
+          <button class="chapter-map-close" type="button" data-close-chapter-map aria-label="关闭章节图谱" title="关闭章节图谱">×</button>
+        </div>
+        <div class="chapter-grid" aria-label="盐铁论六十篇章节冲突图谱">
+          ${Object.entries(groups).map(([juan, chapters]) => `
+            <section class="juan-band">
+              <div class="juan-title">${escapeHtml(juan)}</div>
+              <div class="chapter-node-grid">
+                ${chapters.map(chapter => `
+                  <button class="chapter-node ${chapter.chapterNumber === active.chapterNumber ? "is-active" : ""}" type="button" data-chapter-number="${chapter.chapterNumber}">
+                    <strong>${chapter.chapterNumber}. ${escapeHtml(chapter.title)}</strong>
+                    <span>${escapeHtml(chapter.conflict)}</span>
+                  </button>
+                `).join("")}
+              </div>
+            </section>
+          `).join("")}
+        </div>
+        <aside class="chapter-detail" id="chapterDetail"></aside>
+      `;
+      renderChapterDetail(active);
+    }
+
+    function renderChapterDetail(chapter) {
+      state.activeChapterIndex = chapter.chapterNumber - 1;
+      state.visitedChapters.add(chapter.chapterNumber);
+      const detail = document.getElementById("chapterDetail");
+      if (!detail) return;
+      const lensButtons = chapter.philosophyLens.map(id => {
+        const meta = lensMetaFor(id);
+        return `
+          <button class="evidence-seal lens-seal" type="button" data-evidence-id="${escapeHtml(id)}">
+            <strong>${escapeHtml(meta.label)}</strong>
+            <span>${escapeHtml(meta.note)}</span>
+          </button>
+        `;
+      }).join("");
+      detail.innerHTML = `
+        <p class="chapter-kicker">${escapeHtml(chapter.juan)} · 第 ${chapter.chapterNumber} 篇 · ${escapeHtml(chapter.actKey)}</p>
+        <h3>${escapeHtml(chapter.title)}</h3>
+        <p class="chapter-conflict">${escapeHtml(chapter.conflict)}</p>
+        <div class="voice-pair" aria-label="本篇两股声音">
+          ${chapter.voices.map(voice => `
+            <div class="voice-chip">
+              <strong>${escapeHtml(voice.side)}</strong>
+              <span>${escapeHtml(voice.text)}</span>
+            </div>
+          `).join("")}
+        </div>
+        <div class="evidence-seals" aria-label="本篇史证">
+          ${chapter.historicalEvidence.map((id, index) => `<button class="evidence-seal" type="button" data-evidence-id="${escapeHtml(id)}">史证 ${index + 1}</button>`).join("")}
+        </div>
+        <div class="lens-section" aria-label="本篇思想透镜">
+          <p class="lens-section-title">用什么眼光看这场争论</p>
+          <div class="lens-grid">${lensButtons}</div>
+        </div>
+      `;
+      document.querySelectorAll(".chapter-node").forEach(node => {
+        node.classList.toggle("is-active", Number(node.dataset.chapterNumber) === chapter.chapterNumber);
+      });
+    }
+
+    function openChapterMap() {
+      state.chapterMapOpen = true;
+      renderChapterMap();
+      document.getElementById("chapterMapPanel").classList.add("is-open");
+      document.getElementById("chapterMapScrim").classList.add("is-open");
+      pulseSound("evidence");
+    }
+
+    function closeChapterMap() {
+      state.chapterMapOpen = false;
+      document.getElementById("chapterMapPanel").classList.remove("is-open");
+      document.getElementById("chapterMapScrim").classList.remove("is-open");
+    }
+
     async function renderScene() {
       const scene = scenes[state.sceneIndex];
       renderRoundVisual(scene);
@@ -1719,20 +3831,29 @@ YANTIE_HTML = """<!doctype html>
       const scene = scenes[state.sceneIndex];
       const evidenceIds = focusEvidenceId ? [focusEvidenceId] : scene.evidence;
       const evidenceItems = await Promise.all(evidenceIds.map(getEvidence));
+      evidenceItems.forEach(evidence => {
+        if (isPhilosophyLensEvidence(evidence)) state.visitedLensIds.add(evidence.evidence_id);
+      });
+      const allLens = evidenceItems.length > 0 && evidenceItems.every(isPhilosophyLensEvidence);
       const ribbon = document.getElementById("evidenceRibbon");
       ribbon.innerHTML = `
         <div class="evidence-panel-head">
-          <p class="evidence-panel-title">史料浮现</p>
+          <p class="evidence-panel-title">${allLens ? "思想透镜" : "史料浮现"}</p>
           <button class="evidence-close" type="button" data-close-evidence aria-label="关闭证据" title="关闭证据">×</button>
         </div>
         <div class="evidence-list">
-          ${evidenceItems.map(evidence => `
-            <div class="evidence-item">
+          ${evidenceItems.map(evidence => {
+            const isLens = isPhilosophyLensEvidence(evidence);
+            const meta = isLens ? lensMetaFor(evidence.evidence_id) : null;
+            return `
+            <div class="evidence-item${isLens ? " is-lens" : ""}">
+              ${isLens ? `<span class="evidence-boundary">${escapeHtml(meta.label)} · 思想透镜，不是会议事实</span>` : ""}
               <strong>${escapeHtml(evidence.excerpt_original || evidence.paraphrase_zh)}</strong>
               <span>${escapeHtml(evidence.paraphrase_zh)}</span>
+              ${isLens ? `<span>${escapeHtml(meta.note)}</span>` : ""}
               <span>${escapeHtml(evidence.source_id)} · ${escapeHtml(evidence.canonical_location)}</span>
             </div>
-          `).join("")}
+          `}).join("")}
         </div>
       `;
       ribbon.classList.add("is-open");
@@ -1761,6 +3882,25 @@ YANTIE_HTML = """<!doctype html>
 
     document.getElementById("revealEvidence").addEventListener("click", () => openEvidence());
 
+    document.getElementById("chapterMapToggle").addEventListener("click", openChapterMap);
+
+    document.getElementById("chapterMapScrim").addEventListener("click", closeChapterMap);
+
+    document.getElementById("chapterMapPanel").addEventListener("click", event => {
+      const chapterNode = event.target.closest("[data-chapter-number]");
+      if (chapterNode) {
+        const chapter = chapterConflictMap.find(item => item.chapterNumber === Number(chapterNode.dataset.chapterNumber));
+        if (chapter) renderChapterDetail(chapter);
+        return;
+      }
+      const evidenceTarget = event.target.closest("[data-evidence-id]");
+      if (evidenceTarget) {
+        openEvidence(evidenceTarget.dataset.evidenceId);
+        return;
+      }
+      if (event.target.closest("[data-close-chapter-map]")) closeChapterMap();
+    });
+
     document.getElementById("decisionDock").addEventListener("click", event => {
       const target = event.target.closest("[data-evidence-id]");
       if (!target) return;
@@ -1775,7 +3915,10 @@ YANTIE_HTML = """<!doctype html>
     });
 
     document.addEventListener("keydown", event => {
-      if (event.key === "Escape") closeEvidence();
+      if (event.key === "Escape") {
+        closeEvidence();
+        closeChapterMap();
+      }
     });
 
     document.getElementById("decisionDock").addEventListener("input", event => {
@@ -1791,6 +3934,27 @@ YANTIE_HTML = """<!doctype html>
       if (state.soundEnabled) pulseSound("open");
     });
 
+    function buildChapterVisitSummary() {
+      const visited = Array.from(state.visitedChapters).sort((a, b) => a - b);
+      if (!visited.length) return "诸篇争锋：尚未打开具体章节。";
+      return `诸篇争锋访问：${visited.map(number => chapterConflictMap[number - 1]?.title || `第${number}篇`).join("、")}`;
+    }
+
+    function buildLensVisitSummary() {
+      const chapterLensIds = Array.from(state.visitedChapters).flatMap(number => {
+        const chapter = chapterConflictMap[number - 1];
+        return chapter ? chapter.philosophyLens : [];
+      });
+      const lensIds = [...Array.from(state.visitedLensIds), ...chapterLensIds]
+        .filter((id, index, ids) => ids.indexOf(id) === index);
+      if (!lensIds.length) return "思想透镜：尚未借用具体透镜。";
+      const families = lensIds.map(id => lensMetaFor(id).family)
+        .filter((family, index, values) => values.indexOf(family) === index);
+      const labels = lensIds.map(id => lensMetaFor(id).label)
+        .filter((label, index, values) => values.indexOf(label) === index);
+      return `思想透镜：${families.join("、")}。具体视角：${labels.join("、")}`;
+    }
+
     function buildChoiceSummary() {
       return conflictActs.map(act => {
         const value = Number(state.userChoices[act.key] ?? 50);
@@ -1802,15 +3966,22 @@ YANTIE_HTML = """<!doctype html>
     document.getElementById("judgmentForm").addEventListener("submit", async event => {
       event.preventDefault();
       const sceneEvidence = scenes.flatMap(scene => scene.evidence).filter((id, index, ids) => ids.indexOf(id) === index);
+      const chapterEvidence = Array.from(state.visitedChapters).flatMap(number => {
+        const chapter = chapterConflictMap[number - 1];
+        return chapter ? [...chapter.historicalEvidence, ...chapter.philosophyLens] : [];
+      });
+      const selectedEvidence = [...sceneEvidence, ...chapterEvidence].filter((id, index, ids) => ids.indexOf(id) === index);
       const reflectionText = document.getElementById("reflectionInput").value || "";
       const choiceSummary = `五幕显影选择：\\n${buildChoiceSummary()}`;
+      const chapterSummary = buildChapterVisitSummary();
+      const lensSummary = buildLensVisitSummary();
       const response = await fetch(apiBase + "/judgment-cards", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           selected_claim_ids: ["claim_conflict_is_moral_and_fiscal", "claim_power_network_not_optional"],
-          selected_evidence_ids: sceneEvidence,
-          personal_reflection: [choiceSummary, reflectionText].filter(Boolean).join("\\n\\n") || null,
+          selected_evidence_ids: selectedEvidence,
+          personal_reflection: [choiceSummary, chapterSummary, lensSummary, reflectionText].filter(Boolean).join("\\n\\n") || null,
           disposition: "modern_analogy_with_caution"
         })
       });

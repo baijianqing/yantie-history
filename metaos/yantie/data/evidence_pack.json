@@ -8,18 +8,18 @@
       "title": "盐铁论",
       "license_status": "public_domain_text",
       "delivery_policy": "excerpt_allowed",
-      "excerpt_count": 9,
+      "excerpt_count": 70,
       "human_verified": true,
-      "note": "Wikisource public-domain classical text; excerpts are short and tied to chapter locations."
+      "note": "Public-domain classical text; selected short excerpts used only as historical evidence or philosophy lenses."
     },
     {
       "source_id": "src_hanshu_zhaodi",
       "title": "汉书/卷007 昭帝纪",
       "license_status": "public_domain_text",
       "delivery_policy": "excerpt_allowed",
-      "excerpt_count": 3,
+      "excerpt_count": 7,
       "human_verified": true,
-      "note": "Chronicle evidence for edicts, the meeting, partial result, and later appraisal."
+      "note": "Public-domain classical text; selected short excerpts used only as historical evidence or philosophy lenses."
     },
     {
       "source_id": "src_hanshu_shihuo",
@@ -28,52 +28,52 @@
       "delivery_policy": "excerpt_allowed",
       "excerpt_count": 3,
       "human_verified": true,
-      "note": "Institutional background for salt, iron, equal transport, fiscal pressure, and Sang Hongyang."
+      "note": "Public-domain classical text; selected short excerpts used only as historical evidence or philosophy lenses."
     },
     {
       "source_id": "src_shiji_pingzhun",
       "title": "史记/卷030 平准书",
       "license_status": "public_domain_text",
       "delivery_policy": "excerpt_allowed",
-      "excerpt_count": 4,
+      "excerpt_count": 5,
       "human_verified": true,
-      "note": "Institutional and policy background for state salt, iron, equal transport, and price leveling."
+      "note": "Public-domain classical text; selected short excerpts used only as historical evidence or philosophy lenses."
     },
     {
       "source_id": "src_hanshu_huoguang",
       "title": "汉书/卷068 霍光金日磾传",
       "license_status": "public_domain_text",
       "delivery_policy": "excerpt_allowed",
-      "excerpt_count": 2,
+      "excerpt_count": 3,
       "human_verified": true,
-      "note": "Biographical and power-network evidence for Huo Guang, Shangguan Jie, Sang Hongyang, and Yan Wang Dan."
+      "note": "Public-domain classical text; selected short excerpts used only as historical evidence or philosophy lenses."
     },
     {
       "source_id": "src_yantielun_siku",
       "title": "盐铁论四库提要",
       "license_status": "public_domain_text",
       "delivery_policy": "excerpt_allowed",
-      "excerpt_count": 1,
+      "excerpt_count": 2,
       "human_verified": true,
-      "note": "Later commentary used only for reception and textual framing."
+      "note": "Public-domain classical text; selected short excerpts used only as historical evidence or philosophy lenses."
     },
     {
       "source_id": "src_lunyu_liren",
       "title": "论语/里仁第四",
       "license_status": "public_domain_text",
       "delivery_policy": "excerpt_allowed",
-      "excerpt_count": 1,
+      "excerpt_count": 2,
       "human_verified": true,
-      "note": "Philosophy-lens source used to frame the Yantie debate; not treated as meeting fact evidence."
+      "note": "Public-domain classical text; selected short excerpts used only as historical evidence or philosophy lenses."
     },
     {
       "source_id": "src_mengzi_lianghuiwang",
       "title": "孟子/梁惠王上",
       "license_status": "public_domain_text",
       "delivery_policy": "excerpt_allowed",
-      "excerpt_count": 1,
+      "excerpt_count": 2,
       "human_verified": true,
-      "note": "Philosophy-lens source used to frame the Yantie debate; not treated as meeting fact evidence."
+      "note": "Public-domain classical text; selected short excerpts used only as historical evidence or philosophy lenses."
     },
     {
       "source_id": "src_xunzi_fuguo",
@@ -82,16 +82,16 @@
       "delivery_policy": "excerpt_allowed",
       "excerpt_count": 1,
       "human_verified": true,
-      "note": "Philosophy-lens source used to frame the Yantie debate; not treated as meeting fact evidence."
+      "note": "Public-domain classical text; selected short excerpts used only as historical evidence or philosophy lenses."
     },
     {
       "source_id": "src_guanzi_mumin",
       "title": "管子/牧民",
       "license_status": "public_domain_text",
       "delivery_policy": "excerpt_allowed",
-      "excerpt_count": 1,
+      "excerpt_count": 2,
       "human_verified": true,
-      "note": "Philosophy-lens source used to frame the Yantie debate; not treated as meeting fact evidence."
+      "note": "Public-domain classical text; selected short excerpts used only as historical evidence or philosophy lenses."
     },
     {
       "source_id": "src_hanfeizi_wudu",
@@ -100,7 +100,7 @@
       "delivery_policy": "excerpt_allowed",
       "excerpt_count": 1,
       "human_verified": true,
-      "note": "Philosophy-lens source used to frame the Yantie debate; not treated as meeting fact evidence."
+      "note": "Public-domain classical text; selected short excerpts used only as historical evidence or philosophy lenses."
     },
     {
       "source_id": "src_shangjunshu_nongzhan",
@@ -109,7 +109,142 @@
       "delivery_policy": "excerpt_allowed",
       "excerpt_count": 1,
       "human_verified": true,
-      "note": "Philosophy-lens source used to frame the Yantie debate; not treated as meeting fact evidence."
+      "note": "Public-domain classical text; selected short excerpts used only as historical evidence or philosophy lenses."
+    },
+    {
+      "source_id": "src_lunyu_xueer",
+      "title": "论语/学而第一",
+      "license_status": "public_domain_text",
+      "delivery_policy": "excerpt_allowed",
+      "excerpt_count": 1,
+      "human_verified": true,
+      "note": "Public-domain classical text; selected short excerpts used only as historical evidence or philosophy lenses."
+    },
+    {
+      "source_id": "src_xunzi_tianlun",
+      "title": "荀子/天论篇",
+      "license_status": "public_domain_text",
+      "delivery_policy": "excerpt_allowed",
+      "excerpt_count": 1,
+      "human_verified": true,
+      "note": "Public-domain classical text; selected short excerpts used only as historical evidence or philosophy lenses."
+    },
+    {
+      "source_id": "src_mengzi_tengwen",
+      "title": "孟子/滕文公上",
+      "license_status": "public_domain_text",
+      "delivery_policy": "excerpt_allowed",
+      "excerpt_count": 1,
+      "human_verified": true,
+      "note": "Public-domain classical text; selected short excerpts used only as historical evidence or philosophy lenses."
+    },
+    {
+      "source_id": "src_liji_liyun",
+      "title": "礼记/礼运",
+      "license_status": "public_domain_text",
+      "delivery_policy": "excerpt_allowed",
+      "excerpt_count": 1,
+      "human_verified": true,
+      "note": "Public-domain classical text; selected short excerpts used only as historical evidence or philosophy lenses."
+    },
+    {
+      "source_id": "src_lunyu_yanyuan",
+      "title": "论语/颜渊第十二",
+      "license_status": "public_domain_text",
+      "delivery_policy": "excerpt_allowed",
+      "excerpt_count": 3,
+      "human_verified": true,
+      "note": "Public-domain classical text; selected short excerpts used only as historical evidence or philosophy lenses."
+    },
+    {
+      "source_id": "src_mengzi_jinxinxia",
+      "title": "孟子/尽心下",
+      "license_status": "public_domain_text",
+      "delivery_policy": "excerpt_allowed",
+      "excerpt_count": 1,
+      "human_verified": true,
+      "note": "Public-domain classical text; selected short excerpts used only as historical evidence or philosophy lenses."
+    },
+    {
+      "source_id": "src_mengzi_gaozishang",
+      "title": "孟子/告子上",
+      "license_status": "public_domain_text",
+      "delivery_policy": "excerpt_allowed",
+      "excerpt_count": 1,
+      "human_verified": true,
+      "note": "Public-domain classical text; selected short excerpts used only as historical evidence or philosophy lenses."
+    },
+    {
+      "source_id": "src_xunzi_wangzhi",
+      "title": "荀子/王制篇",
+      "license_status": "public_domain_text",
+      "delivery_policy": "excerpt_allowed",
+      "excerpt_count": 2,
+      "human_verified": true,
+      "note": "Public-domain classical text; selected short excerpts used only as historical evidence or philosophy lenses."
+    },
+    {
+      "source_id": "src_xunzi_xiushen",
+      "title": "荀子/修身篇",
+      "license_status": "public_domain_text",
+      "delivery_policy": "excerpt_allowed",
+      "excerpt_count": 1,
+      "human_verified": true,
+      "note": "Public-domain classical text; selected short excerpts used only as historical evidence or philosophy lenses."
+    },
+    {
+      "source_id": "src_guanzi_quanxiu",
+      "title": "管子/权修",
+      "license_status": "public_domain_text",
+      "delivery_policy": "excerpt_allowed",
+      "excerpt_count": 1,
+      "human_verified": true,
+      "note": "Public-domain classical text; selected short excerpts used only as historical evidence or philosophy lenses."
+    },
+    {
+      "source_id": "src_hanfeizi_youdu",
+      "title": "韩非子/有度",
+      "license_status": "public_domain_text",
+      "delivery_policy": "excerpt_allowed",
+      "excerpt_count": 1,
+      "human_verified": true,
+      "note": "Public-domain classical text; selected short excerpts used only as historical evidence or philosophy lenses."
+    },
+    {
+      "source_id": "src_hanfeizi_xianxue",
+      "title": "韩非子/显学",
+      "license_status": "public_domain_text",
+      "delivery_policy": "excerpt_allowed",
+      "excerpt_count": 1,
+      "human_verified": true,
+      "note": "Public-domain classical text; selected short excerpts used only as historical evidence or philosophy lenses."
+    },
+    {
+      "source_id": "src_mozi_feile",
+      "title": "墨子/非乐上",
+      "license_status": "public_domain_text",
+      "delivery_policy": "excerpt_allowed",
+      "excerpt_count": 1,
+      "human_verified": true,
+      "note": "Public-domain classical text; selected short excerpts used only as historical evidence or philosophy lenses."
+    },
+    {
+      "source_id": "src_liji_wangzhi",
+      "title": "礼记/王制",
+      "license_status": "public_domain_text",
+      "delivery_policy": "excerpt_allowed",
+      "excerpt_count": 2,
+      "human_verified": true,
+      "note": "Public-domain classical text; selected short excerpts used only as historical evidence or philosophy lenses."
+    },
+    {
+      "source_id": "src_huainanzi_zhushu",
+      "title": "淮南子/主术训",
+      "license_status": "public_domain_text",
+      "delivery_policy": "excerpt_allowed",
+      "excerpt_count": 1,
+      "human_verified": true,
+      "note": "Public-domain classical text; selected short excerpts used only as historical evidence or philosophy lenses."
     }
   ],
   "theme_spec": {
@@ -299,6 +434,171 @@
       "license_status": "public_domain_text",
       "canonical_url": "https://zh.wikisource.org/wiki/%E5%95%86%E5%90%9B%E6%9B%B8/%E8%BE%B2%E6%88%B0",
       "citation_style": "《商君书·农战》",
+      "delivery_policy": "excerpt_allowed",
+      "human_verified": true
+    },
+    {
+      "source_id": "src_lunyu_xueer",
+      "title": "论语/学而第一",
+      "source_type": "primary_text",
+      "authority_level": "comparison",
+      "license_status": "public_domain_text",
+      "canonical_url": "https://zh.wikisource.org/wiki/%E8%AB%96%E8%AA%9E/%E5%AD%B8%E8%80%8C%E7%AC%AC%E4%B8%80",
+      "citation_style": "《论语·学而》",
+      "delivery_policy": "excerpt_allowed",
+      "human_verified": true
+    },
+    {
+      "source_id": "src_xunzi_tianlun",
+      "title": "荀子/天论篇",
+      "source_type": "primary_text",
+      "authority_level": "comparison",
+      "license_status": "public_domain_text",
+      "canonical_url": "https://zh.wikisource.org/wiki/%E8%8D%80%E5%AD%90/%E5%A4%A9%E8%AB%96%E7%AF%87",
+      "citation_style": "《荀子·天论》",
+      "delivery_policy": "excerpt_allowed",
+      "human_verified": true
+    },
+    {
+      "source_id": "src_mengzi_tengwen",
+      "title": "孟子/滕文公上",
+      "source_type": "primary_text",
+      "authority_level": "comparison",
+      "license_status": "public_domain_text",
+      "canonical_url": "https://zh.wikisource.org/wiki/%E5%AD%9F%E5%AD%90/%E6%BB%95%E6%96%87%E5%85%AC%E4%B8%8A",
+      "citation_style": "《孟子·滕文公上》",
+      "delivery_policy": "excerpt_allowed",
+      "human_verified": true
+    },
+    {
+      "source_id": "src_liji_liyun",
+      "title": "礼记/礼运",
+      "source_type": "primary_text",
+      "authority_level": "comparison",
+      "license_status": "public_domain_text",
+      "canonical_url": "https://zh.wikisource.org/wiki/%E7%A6%AE%E8%A8%98/%E7%A6%AE%E9%81%8B",
+      "citation_style": "《礼记·礼运》",
+      "delivery_policy": "excerpt_allowed",
+      "human_verified": true
+    },
+    {
+      "source_id": "src_lunyu_yanyuan",
+      "title": "论语/颜渊第十二",
+      "source_type": "primary_text",
+      "authority_level": "comparison",
+      "license_status": "public_domain_text",
+      "canonical_url": "https://zh.wikisource.org/wiki/%E8%AB%96%E8%AA%9E/%E9%A1%8F%E6%B7%B5%E7%AC%AC%E5%8D%81%E4%BA%8C",
+      "citation_style": "《论语·颜渊》",
+      "delivery_policy": "excerpt_allowed",
+      "human_verified": true
+    },
+    {
+      "source_id": "src_mengzi_jinxinxia",
+      "title": "孟子/尽心下",
+      "source_type": "primary_text",
+      "authority_level": "comparison",
+      "license_status": "public_domain_text",
+      "canonical_url": "https://zh.wikisource.org/wiki/%E5%AD%9F%E5%AD%90/%E7%9B%A1%E5%BF%83%E4%B8%8B",
+      "citation_style": "《孟子·尽心下》",
+      "delivery_policy": "excerpt_allowed",
+      "human_verified": true
+    },
+    {
+      "source_id": "src_mengzi_gaozishang",
+      "title": "孟子/告子上",
+      "source_type": "primary_text",
+      "authority_level": "comparison",
+      "license_status": "public_domain_text",
+      "canonical_url": "https://zh.wikisource.org/wiki/%E5%AD%9F%E5%AD%90/%E5%91%8A%E5%AD%90%E4%B8%8A",
+      "citation_style": "《孟子·告子上》",
+      "delivery_policy": "excerpt_allowed",
+      "human_verified": true
+    },
+    {
+      "source_id": "src_xunzi_wangzhi",
+      "title": "荀子/王制篇",
+      "source_type": "primary_text",
+      "authority_level": "comparison",
+      "license_status": "public_domain_text",
+      "canonical_url": "https://zh.wikisource.org/wiki/%E8%8D%80%E5%AD%90/%E7%8E%8B%E5%88%B6%E7%AF%87",
+      "citation_style": "《荀子·王制》",
+      "delivery_policy": "excerpt_allowed",
+      "human_verified": true
+    },
+    {
+      "source_id": "src_xunzi_xiushen",
+      "title": "荀子/修身篇",
+      "source_type": "primary_text",
+      "authority_level": "comparison",
+      "license_status": "public_domain_text",
+      "canonical_url": "https://zh.wikisource.org/wiki/%E8%8D%80%E5%AD%90/%E4%BF%AE%E8%BA%AB%E7%AF%87",
+      "citation_style": "《荀子·修身》",
+      "delivery_policy": "excerpt_allowed",
+      "human_verified": true
+    },
+    {
+      "source_id": "src_guanzi_quanxiu",
+      "title": "管子/权修",
+      "source_type": "primary_text",
+      "authority_level": "comparison",
+      "license_status": "public_domain_text",
+      "canonical_url": "https://zh.wikisource.org/wiki/%E7%AE%A1%E5%AD%90/%E7%AC%AC03%E7%AF%87%E6%AC%8A%E4%BF%AE",
+      "citation_style": "《管子·权修》",
+      "delivery_policy": "excerpt_allowed",
+      "human_verified": true
+    },
+    {
+      "source_id": "src_hanfeizi_youdu",
+      "title": "韩非子/有度",
+      "source_type": "primary_text",
+      "authority_level": "comparison",
+      "license_status": "public_domain_text",
+      "canonical_url": "https://zh.wikisource.org/wiki/%E9%9F%93%E9%9D%9E%E5%AD%90/%E6%9C%89%E5%BA%A6",
+      "citation_style": "《韩非子·有度》",
+      "delivery_policy": "excerpt_allowed",
+      "human_verified": true
+    },
+    {
+      "source_id": "src_hanfeizi_xianxue",
+      "title": "韩非子/显学",
+      "source_type": "primary_text",
+      "authority_level": "comparison",
+      "license_status": "public_domain_text",
+      "canonical_url": "https://zh.wikisource.org/wiki/%E9%9F%93%E9%9D%9E%E5%AD%90/%E9%A1%AF%E5%AD%B8",
+      "citation_style": "《韩非子·显学》",
+      "delivery_policy": "excerpt_allowed",
+      "human_verified": true
+    },
+    {
+      "source_id": "src_mozi_feile",
+      "title": "墨子/非乐上",
+      "source_type": "primary_text",
+      "authority_level": "comparison",
+      "license_status": "public_domain_text",
+      "canonical_url": "https://zh.wikisource.org/wiki/%E5%A2%A8%E5%AD%90/%E9%9D%9E%E6%A8%82%E4%B8%8A",
+      "citation_style": "《墨子·非乐上》",
+      "delivery_policy": "excerpt_allowed",
+      "human_verified": true
+    },
+    {
+      "source_id": "src_liji_wangzhi",
+      "title": "礼记/王制",
+      "source_type": "primary_text",
+      "authority_level": "comparison",
+      "license_status": "public_domain_text",
+      "canonical_url": "https://zh.wikisource.org/wiki/%E7%A6%AE%E8%A8%98/%E7%8E%8B%E5%88%B6",
+      "citation_style": "《礼记·王制》",
+      "delivery_policy": "excerpt_allowed",
+      "human_verified": true
+    },
+    {
+      "source_id": "src_huainanzi_zhushu",
+      "title": "淮南子/主术训",
+      "source_type": "primary_text",
+      "authority_level": "comparison",
+      "license_status": "public_domain_text",
+      "canonical_url": "https://zh.wikisource.org/wiki/%E6%B7%AE%E5%8D%97%E5%AD%90/%E4%B8%BB%E8%A1%93%E8%A8%93",
+      "citation_style": "《淮南子·主术训》",
       "delivery_policy": "excerpt_allowed",
       "human_verified": true
     }
@@ -710,7 +1010,11 @@
         "topic_meeting_process"
       ],
       "value_tags": [
-        "formal_deliberation"
+        "formal_deliberation",
+        "yantie_chapter_01",
+        "chapter_conflict",
+        "act-livelihood",
+        "monopoly"
       ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
@@ -866,7 +1170,11 @@
         "topic_state_monopoly"
       ],
       "value_tags": [
-        "agricultural_base"
+        "agricultural_base",
+        "yantie_chapter_02",
+        "chapter_conflict",
+        "act-livelihood",
+        "agriculture"
       ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
@@ -923,7 +1231,11 @@
         "topic_price_leveling"
       ],
       "value_tags": [
-        "market_connectivity"
+        "market_connectivity",
+        "yantie_chapter_03",
+        "chapter_conflict",
+        "act-statecraft",
+        "market"
       ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
@@ -943,7 +1255,11 @@
       ],
       "value_tags": [
         "anti_elite_capture",
-        "state_control"
+        "state_control",
+        "yantie_chapter_05",
+        "chapter_conflict",
+        "act-power",
+        "power"
       ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
@@ -1475,6 +1791,1722 @@
       "copyright_note": "Public-domain classical text, short excerpt used as philosophy lens.",
       "review_status": "verified",
       "adjacent_context_note": "This lens helps explain state-capacity reasoning without claiming the meeting directly cited Shang Yang."
+    },
+    {
+      "evidence_id": "ev:src_lunyu_xueer:xueer01:govern_with_time:aa110007",
+      "source_id": "src_lunyu_xueer",
+      "canonical_location": "学而第一",
+      "excerpt_original": "节用而爱人，使民以时",
+      "paraphrase_zh": "治理国家要节制用度、爱护百姓，并按时令役使民力。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "timely_labor",
+        "frugality",
+        "people_livelihood"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain philosophy lens excerpt; used as interpretive lens only.",
+      "review_status": "verified",
+      "adjacent_context_note": "作为劳役、节用与民生节奏的思想透镜，不作为盐铁会议事实。"
+    },
+    {
+      "evidence_id": "ev:src_xunzi_tianlun:tianlun:nature_constant:aa110008",
+      "source_id": "src_xunzi_tianlun",
+      "canonical_location": "天论篇",
+      "excerpt_original": "天行有常，不为尧存，不为桀亡",
+      "paraphrase_zh": "自然灾变有其常道，政治判断不能简单把水旱归咎为德性报应。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "disaster_governance",
+        "tianlun",
+        "statecraft"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain philosophy lens excerpt; used as interpretive lens only.",
+      "review_status": "verified",
+      "adjacent_context_note": "作为水旱、灾异与治理责任的思想透镜，不作为盐铁会议事实。"
+    },
+    {
+      "evidence_id": "ev:src_mengzi_tengwen:tengwen01:constant_livelihood:aa110009",
+      "source_id": "src_mengzi_tengwen",
+      "canonical_location": "滕文公上",
+      "excerpt_original": "民之为道也，有恒产者有恒心",
+      "paraphrase_zh": "民生资产与道德稳定相关，贫富争论不能只看个人德性。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "constant_livelihood",
+        "people_livelihood",
+        "virtue"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain philosophy lens excerpt; used as interpretive lens only.",
+      "review_status": "verified",
+      "adjacent_context_note": "作为贫富、民生与道德稳定关系的思想透镜，不作为盐铁会议事实。"
+    },
+    {
+      "evidence_id": "ev:src_liji_liyun:liyun:public_order:aa110010",
+      "source_id": "src_liji_liyun",
+      "canonical_location": "礼运",
+      "excerpt_original": "大道之行也，天下为公",
+      "paraphrase_zh": "礼制理想把公共秩序置于私利之上，可作为公私权力边界的透镜。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "ritual_order",
+        "public_order",
+        "virtue"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain philosophy lens excerpt; used as interpretive lens only.",
+      "review_status": "verified",
+      "adjacent_context_note": "作为礼治、公私边界与公共秩序的思想透镜，不作为盐铁会议事实。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan01_cuobi:chapter_conflict:71e30b87",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷一·错币第四",
+      "excerpt_original": "大夫曰：「交幣通施，民事不及，物有所幷也。",
+      "paraphrase_zh": "《错币第四》围绕“货币与物价应由国家调节，还是顺民间自通？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_price_leveling"
+      ],
+      "value_tags": [
+        "yantie_chapter_04",
+        "chapter_conflict",
+        "act-statecraft",
+        "currency"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan01_fugu:chapter_conflict:edd2cc73",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷一·复古第六",
+      "excerpt_original": "大夫曰：「故扇水都尉彭祖寧歸，言：『鹽、鐵令品，令品甚明。",
+      "paraphrase_zh": "《复古第六》围绕“制度弊病应修令，还是回到古法？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_state_monopoly"
+      ],
+      "value_tags": [
+        "yantie_chapter_06",
+        "chapter_conflict",
+        "act-statecraft",
+        "reform"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan02_feiyang:chapter_conflict:4702f508",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷二·非鞅第七",
+      "excerpt_original": "大夫曰：「昔商君相秦也，內立法度，嚴刑罰，飭政教，奸偽無所容。",
+      "paraphrase_zh": "《非鞅第七》围绕“商鞅式富强能否成为汉政范式？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "yantie_chapter_07",
+        "chapter_conflict",
+        "act-yili",
+        "legalism"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan02_chaocuo:chapter_conflict:154f63e3",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷二·晁错第八",
+      "excerpt_original": "大夫曰：「春秋之法，君親無將，將而必誅。",
+      "paraphrase_zh": "《晁错第八》围绕“削藩与忠谋为何会走向政治牺牲？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_power_network"
+      ],
+      "value_tags": [
+        "yantie_chapter_08",
+        "chapter_conflict",
+        "act-power",
+        "faction"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan02_ciquan:chapter_conflict:d6d59555",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷二·刺权第九",
+      "excerpt_original": "大夫曰：「今夫越之具區，楚之雲夢，宋之鉅野，齊之孟諸，有國之富而霸王之資也。",
+      "paraphrase_zh": "《刺权第九》围绕“权利归上能强国，还是使朝廷失衡？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_power_network"
+      ],
+      "value_tags": [
+        "yantie_chapter_09",
+        "chapter_conflict",
+        "act-power",
+        "power"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan02_cifu:chapter_conflict:db419abd",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷二·刺复第十",
+      "excerpt_original": "大夫曰為色矜而心不懌，曰：「但居者不知負載之勞，從旁議者與當局者異憂。",
+      "paraphrase_zh": "《刺复第十》围绕“在局者的财政忧惧能否压过旁观者的德义批评？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_power_network"
+      ],
+      "value_tags": [
+        "yantie_chapter_10",
+        "chapter_conflict",
+        "act-power",
+        "burden"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan02_lunru:chapter_conflict:d3a320b3",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷二·论儒第十一",
+      "excerpt_original": "御史曰：「文學祖述仲尼，稱誦其德，以為自古及今，未之有也。",
+      "paraphrase_zh": "《论儒第十一》围绕“儒者能治世，还是只会称古？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "yantie_chapter_11",
+        "chapter_conflict",
+        "act-yili",
+        "values"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan02_youbian:chapter_conflict:62cc2317",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷二·忧边第十二",
+      "excerpt_original": "大夫曰：「文學言：『天下不平，庶國不寧，明王之憂也。",
+      "paraphrase_zh": "《忧边第十二》围绕“忧边应先筹兵食，还是先息民力？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_frontier_finance"
+      ],
+      "value_tags": [
+        "yantie_chapter_12",
+        "chapter_conflict",
+        "act-fiscal",
+        "frontier"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan03_yuanchi:chapter_conflict:b271ef45",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷三·园池第十三",
+      "excerpt_original": "大夫曰：「諸侯以國為家，其憂在內。",
+      "paraphrase_zh": "《园池第十三》围绕“园池山海是公共财政，还是奢侈占夺？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_state_monopoly"
+      ],
+      "value_tags": [
+        "yantie_chapter_13",
+        "chapter_conflict",
+        "act-fiscal",
+        "resource"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan03_qingzhong:chapter_conflict:fa483d8c",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷三·轻重第十四",
+      "excerpt_original": "御史進曰：「昔太公封於營丘，辟草萊而居焉。",
+      "paraphrase_zh": "《轻重第十四》围绕“轻重之术能平物价，还是让官府入市逐利？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_price_leveling"
+      ],
+      "value_tags": [
+        "yantie_chapter_14",
+        "chapter_conflict",
+        "act-statecraft",
+        "price"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan03_weitong:chapter_conflict:0608353b",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷三·未通第十五",
+      "excerpt_original": "御史曰：「內郡人眾，水泉薦草，不能相贍，地勢溫濕，不宜牛馬；",
+      "paraphrase_zh": "《未通第十五》围绕“交通未通造成贫苦，国家转运是否必要？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_equal_transport"
+      ],
+      "value_tags": [
+        "yantie_chapter_15",
+        "chapter_conflict",
+        "act-livelihood",
+        "transport"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan04_diguang:chapter_conflict:88cc9d6d",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷四·地广第十六",
+      "excerpt_original": "大夫曰：「王者包含幷覆，普愛無私，不為近重施，不為遠遺恩。",
+      "paraphrase_zh": "《地广第十六》围绕“天下地广，应调远近，还是减边地扰动？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_frontier_finance"
+      ],
+      "value_tags": [
+        "yantie_chapter_16",
+        "chapter_conflict",
+        "act-fiscal",
+        "frontier"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan04_pinfu:chapter_conflict:ace6a215",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷四·贫富第十七",
+      "excerpt_original": "大夫曰：「余結髮束修年十三，幸得宿衛，給事輦轂之下，以至卿大夫之位，獲祿受賜，六十有餘年矣。",
+      "paraphrase_zh": "《贫富第十七》围绕“贫富来自勤俭，还是来自制度位置？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "yantie_chapter_17",
+        "chapter_conflict",
+        "act-livelihood",
+        "wealth"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan04_huixue:chapter_conflict:1e1fb1a6",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷四·毁学第十八",
+      "excerpt_original": "大夫曰：「夫懷枉而言正，自托於無欲而實不從，此非士之情也？昔李斯與包丘子俱事荀卿，既而李斯入秦，遂取三公，據萬乘",
+      "paraphrase_zh": "《毁学第十八》围绕“学术批评是空谈，还是纠偏权力的必要声音？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "yantie_chapter_18",
+        "chapter_conflict",
+        "act-yili",
+        "learning"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan04_baoxian:chapter_conflict:0d83a973",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷四·褒贤第十九",
+      "excerpt_original": "大夫曰：「伯夷以廉饑，尾生以信死。",
+      "paraphrase_zh": "《褒贤第十九》围绕“贤者应以功名衡量，还是以德义自守？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "yantie_chapter_19",
+        "chapter_conflict",
+        "act-yili",
+        "merit"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan05_xiangci:chapter_conflict:be9c4edf",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷五·相刺第二十",
+      "excerpt_original": "大夫曰：「古者，經井田，制廛里，丈夫治其田疇，女子治其麻枲，無曠地，無遊人。",
+      "paraphrase_zh": "《相刺第二十》围绕“儒生批政是离本，还是公共议论的开始？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "yantie_chapter_20",
+        "chapter_conflict",
+        "act-yili",
+        "critique"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan05_shulu:chapter_conflict:fa045567",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷五·殊路第二十一",
+      "excerpt_original": "大夫曰：「七十子躬受聖人之術，有名列於孔子之門，皆諸侯卿相之才，可南面者數人云。",
+      "paraphrase_zh": "《殊路第二十一》围绕“同出儒门为何走向不同政治道路？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "yantie_chapter_21",
+        "chapter_conflict",
+        "act-yili",
+        "paths"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan05_songxian:chapter_conflict:287558dd",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷五·讼贤第二十二",
+      "excerpt_original": "大夫曰：「剛者折，柔者卷。故季由以強梁死，宰我以柔弱殺。使二子不學，未必不得其死。何者？矜己而伐能，小知而巨牧，",
+      "paraphrase_zh": "《讼贤第二十二》围绕“贤能应刚强有为，还是守正不阿？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "yantie_chapter_22",
+        "chapter_conflict",
+        "act-yili",
+        "virtue"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan05_zundao:chapter_conflict:317552c8",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷五·遵道第二十三",
+      "excerpt_original": "大夫曰：「御史！」御史未應。謂丞相史曰：「文學結髮學語，服膺不舍，辭若循環，轉若陶鈞。文繁如春華，無效如抱風。飾",
+      "paraphrase_zh": "《遵道第二十三》围绕“遵道是守古言，还是把道落到当世？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "yantie_chapter_23",
+        "chapter_conflict",
+        "act-statecraft",
+        "dao"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan05_lunfei:chapter_conflict:38a9a473",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷五·论诽第二十四",
+      "excerpt_original": "丞相史曰：「晏子有言：『儒者華於言而寡於實，繁於樂而舒於民，久喪以害生，厚葬以傷業，禮煩而難行，道迂而難遵，稱往古而訾當世，賤所見而貴所聞。",
+      "paraphrase_zh": "《论诽第二十四》围绕“批评当政是诽谤，还是议政权利？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_power_network"
+      ],
+      "value_tags": [
+        "yantie_chapter_24",
+        "chapter_conflict",
+        "act-power",
+        "speech"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan05_xiaoyang:chapter_conflict:cf8d3a59",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷五·孝养第二十五",
+      "excerpt_original": "文學曰：「善養者不必芻豢也，善供服者不必錦繡也。",
+      "paraphrase_zh": "《孝养第二十五》围绕“孝养重在物质供养，还是敬与礼？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "yantie_chapter_25",
+        "chapter_conflict",
+        "act-livelihood",
+        "family"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan05_ciyi:chapter_conflict:d01622d1",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷五·刺议第二十六",
+      "excerpt_original": "丞相史曰：「山陵不讓椒跬，以成其崇；",
+      "paraphrase_zh": "《刺议第二十六》围绕“朝廷应纳众议，还是防止空言误政？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_power_network"
+      ],
+      "value_tags": [
+        "yantie_chapter_26",
+        "chapter_conflict",
+        "act-power",
+        "deliberation"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan05_liyi:chapter_conflict:61fc0944",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷五·利议第二十七",
+      "excerpt_original": "大夫曰：「作世明主，憂勞萬民，思念北邊之未安，故使使者舉賢良、文學高第，詳延有道之士，將欲觀殊議異策，虛心傾耳以聽，庶幾云得。",
+      "paraphrase_zh": "《利议第二十七》围绕“求奇计安边，是否会把议论拉回功利？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_frontier_finance"
+      ],
+      "value_tags": [
+        "yantie_chapter_27",
+        "chapter_conflict",
+        "act-power",
+        "strategy"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan05_guoji:chapter_conflict:e989c27c",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷五·国疾第二十八",
+      "excerpt_original": "文學曰：「國有賢士而不用，非士之過，有國者之恥。",
+      "paraphrase_zh": "《国疾第二十八》围绕“国家之疾在无贤，还是在制度不听贤？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "yantie_chapter_28",
+        "chapter_conflict",
+        "act-yili",
+        "illness"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan06_sanbuzu:chapter_conflict:bfec3e04",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷六·散不足第二十九",
+      "excerpt_original": "大夫曰：「吾以賢良為少愈，乃反其幽明，若胡車相隨而鳴。",
+      "paraphrase_zh": "《散不足第二十九》围绕“奢费不足应开财源，还是节上以足下？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_liquor_monopoly"
+      ],
+      "value_tags": [
+        "yantie_chapter_29",
+        "chapter_conflict",
+        "act-livelihood",
+        "frugality"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan06_jiukui:chapter_conflict:be30f275",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷六·救匮第三十",
+      "excerpt_original": "賢良曰：「蓋橈枉者以直，救文者以質。",
+      "paraphrase_zh": "《救匮第三十》围绕“救匮应靠国家财力，还是公卿节俭示范？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "yantie_chapter_30",
+        "chapter_conflict",
+        "act-livelihood",
+        "relief"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan06_zhenshi:chapter_conflict:c5cdbdf6",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷六·箴石第三十一",
+      "excerpt_original": "丞相曰：「吾聞諸鄭長者曰：『君子正顏色，則遠暴嫚；",
+      "paraphrase_zh": "《箴石第三十一》围绕“激烈批评是药石，还是伤害朝堂秩序？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_power_network"
+      ],
+      "value_tags": [
+        "yantie_chapter_31",
+        "chapter_conflict",
+        "act-power",
+        "admonition"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan06_chuxia:chapter_conflict:17fcc6d6",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷六·除狭第三十二",
+      "excerpt_original": "大夫曰：「賢者處大林，遭風雷而不迷。",
+      "paraphrase_zh": "《除狭第三十二》围绕“地方治理靠长吏专制，还是制度监督？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_power_network"
+      ],
+      "value_tags": [
+        "yantie_chapter_32",
+        "chapter_conflict",
+        "act-power",
+        "local"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan06_jitan:chapter_conflict:30f9be49",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷六·疾贪第三十三",
+      "excerpt_original": "大夫曰：「然。為醫以拙矣，又多求謝。為吏既多不良矣，又侵漁百姓。長吏厲諸小吏，小吏厲諸百姓。故不患擇之不熟，而患",
+      "paraphrase_zh": "《疾贪第三十三》围绕“吏治之病在贪，还是在求取机制？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_power_network"
+      ],
+      "value_tags": [
+        "yantie_chapter_33",
+        "chapter_conflict",
+        "act-power",
+        "corruption"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan06_houxing:chapter_conflict:2620c13c",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷六·后刑第三十四",
+      "excerpt_original": "大夫曰：「古之君子，善善而惡惡。",
+      "paraphrase_zh": "《后刑第三十四》围绕“刑罚是治恶必要，还是德治失败的补丁？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "yantie_chapter_34",
+        "chapter_conflict",
+        "act-power",
+        "punishment"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan06_shoushi:chapter_conflict:9a50b48c",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷六·授时第三十五",
+      "excerpt_original": "大夫曰：「共其地，居是世也，非有災害疾疫，獨以貧窮，非惰則奢也；",
+      "paraphrase_zh": "《授时第三十五》围绕“贫困应归咎惰奢，还是看时令与机会？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "yantie_chapter_35",
+        "chapter_conflict",
+        "act-statecraft",
+        "time"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan06_shuihan:chapter_conflict:d03b9a50",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷六·水旱第三十六",
+      "excerpt_original": "大夫曰：「禹、湯聖主，后稷、伊尹賢相也，而有水旱之災。",
+      "paraphrase_zh": "《水旱第三十六》围绕“水旱灾异是天道，还是政治责任？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "yantie_chapter_36",
+        "chapter_conflict",
+        "act-statecraft",
+        "disaster"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan07_chongli:chapter_conflict:e7b8e2ac",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷七·崇礼第三十七",
+      "excerpt_original": "大夫曰：「飾几杖，修樽俎，為賓，非為主也。",
+      "paraphrase_zh": "《崇礼第三十七》围绕“礼乐仪物是秩序象征，还是奢侈负担？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "yantie_chapter_37",
+        "chapter_conflict",
+        "act-yili",
+        "ritual"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan07_beihu:chapter_conflict:4c55b53d",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷七·备胡第三十八",
+      "excerpt_original": "大夫曰：「鄙語曰：『賢者容不辱。",
+      "paraphrase_zh": "《备胡第三十八》围绕“面对匈奴，备战是否压倒仁义怀远？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_frontier_finance"
+      ],
+      "value_tags": [
+        "yantie_chapter_38",
+        "chapter_conflict",
+        "act-fiscal",
+        "frontier"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan07_zhiwu:chapter_conflict:f9bc9127",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷七·执务第三十九",
+      "excerpt_original": "丞相曰：「先王之道，軼久而難復，賢良、文學之言，深遠而難行。",
+      "paraphrase_zh": "《执务第三十九》围绕“当世急务能否取代上古理想？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "yantie_chapter_39",
+        "chapter_conflict",
+        "act-statecraft",
+        "practice"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan07_nengyan:chapter_conflict:3bd58d49",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷七·能言第四十",
+      "excerpt_original": "大夫曰：「盲者口能言白黑，而無目以別之。",
+      "paraphrase_zh": "《能言第四十》围绕“能言治乱者，是否必须能亲自行之？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "yantie_chapter_40",
+        "chapter_conflict",
+        "act-statecraft",
+        "speech"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan07_quxia:chapter_conflict:b3f59835",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷七·取下第四十一",
+      "excerpt_original": "大夫曰：「不軌之民，困橈公利，而欲擅山澤。",
+      "paraphrase_zh": "《取下第四十一》围绕“取利于下是亏主，还是还利于民？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_power_network"
+      ],
+      "value_tags": [
+        "yantie_chapter_41",
+        "chapter_conflict",
+        "act-power",
+        "people"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan07_jizhi:chapter_conflict:859e3660",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷七·击之第四十二",
+      "excerpt_original": "賢良、文學既拜，咸取列大夫，辭丞相、御史。",
+      "paraphrase_zh": "《击之第四十二》围绕“击匈奴是主动安边，还是把财政推向战争？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_frontier_finance"
+      ],
+      "value_tags": [
+        "yantie_chapter_42",
+        "chapter_conflict",
+        "act-fiscal",
+        "war"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan08_jiehe:chapter_conflict:f24f1d0f",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷八·结和第四十三",
+      "excerpt_original": "大夫曰：「漢興以來，修好結和親，所聘遺單于者甚厚；",
+      "paraphrase_zh": "《结和第四十三》围绕“和亲厚赂为何未能换来稳定？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_frontier_finance"
+      ],
+      "value_tags": [
+        "yantie_chapter_43",
+        "chapter_conflict",
+        "act-fiscal",
+        "diplomacy"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan08_zhuqin:chapter_conflict:b8a1140b",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷八·诛秦第四十四",
+      "excerpt_original": "大夫曰：「秦、楚、燕、齊、周之封國也；",
+      "paraphrase_zh": "《诛秦第四十四》围绕“秦制之强可取，还是其亡足戒？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "yantie_chapter_44",
+        "chapter_conflict",
+        "act-yili",
+        "qin"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan08_fagong:chapter_conflict:e293d79c",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷八·伐功第四十五",
+      "excerpt_original": "大夫曰：「齊桓公越燕伐山戎，破孤竹，殘令支。",
+      "paraphrase_zh": "《伐功第四十五》围绕“武功开边是功业，还是成本被遮蔽？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_frontier_finance"
+      ],
+      "value_tags": [
+        "yantie_chapter_45",
+        "chapter_conflict",
+        "act-fiscal",
+        "merit"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan08_xiyu:chapter_conflict:1a2e4eba",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷八·西域第四十六",
+      "excerpt_original": "大夫曰：「往者，匈奴據河、山之險，擅田牧之利，民富兵強，行入為寇，則句註之內驚動，而上郡以南咸城。",
+      "paraphrase_zh": "《西域第四十六》围绕“经营西域是战略纵深，还是远方财政负担？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_frontier_finance"
+      ],
+      "value_tags": [
+        "yantie_chapter_46",
+        "chapter_conflict",
+        "act-fiscal",
+        "xiyu"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan08_shiwu:chapter_conflict:b932a66f",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷八·世务第四十七",
+      "excerpt_original": "大夫曰：「諸生妄言！議者令可詳用，無徒守椎車之語，滑稽而不可循。",
+      "paraphrase_zh": "《世务第四十七》围绕“世务之急能否压倒椎车古语？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "yantie_chapter_47",
+        "chapter_conflict",
+        "act-statecraft",
+        "now"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan08_heqin:chapter_conflict:660b7116",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷八·和亲第四十八",
+      "excerpt_original": "大夫曰：「昔徐偃王行義而滅，魯哀公好儒而削。",
+      "paraphrase_zh": "《和亲第四十八》围绕“和亲与备战，哪一种更接近仁政？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_frontier_finance"
+      ],
+      "value_tags": [
+        "yantie_chapter_48",
+        "chapter_conflict",
+        "act-fiscal",
+        "peace"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan09_yaoyi:chapter_conflict:9caab5c5",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷九·繇役第四十九",
+      "excerpt_original": "大夫曰：「屠者解分中理，可橫以手而離也；",
+      "paraphrase_zh": "《繇役第四十九》围绕“征伐与徭役是否必然相连？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_frontier_finance"
+      ],
+      "value_tags": [
+        "yantie_chapter_49",
+        "chapter_conflict",
+        "act-livelihood",
+        "labor"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan09_xiangu:chapter_conflict:68de2221",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷九·险固第五十",
+      "excerpt_original": "大夫曰：「虎兕所以能執熊羆、服群獸者，爪牙利而攫便也。",
+      "paraphrase_zh": "《险固第五十》围绕“险固器备是安全根本，还是财政吞口？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_frontier_finance"
+      ],
+      "value_tags": [
+        "yantie_chapter_50",
+        "chapter_conflict",
+        "act-fiscal",
+        "defense"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan09_lunyong:chapter_conflict:5b45eb09",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷九·论勇第五十一",
+      "excerpt_original": "大夫曰：「荊軻懷數年之謀而事不就者，尺八匕首不足恃也。",
+      "paraphrase_zh": "《论勇第五十一》围绕“勇力靠个人胆气，还是靠器械制度？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_frontier_finance"
+      ],
+      "value_tags": [
+        "yantie_chapter_51",
+        "chapter_conflict",
+        "act-fiscal",
+        "courage"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan09_lungong:chapter_conflict:cfb1a7de",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷九·论功第五十二",
+      "excerpt_original": "大夫曰：「匈奴無城廓之守，溝池之固，修戟強弩之用，倉廩府庫之積，上無義法，下無文理，君臣嫚易，上下無禮，織柳為室，旃廗為蓋。",
+      "paraphrase_zh": "《论功第五十二》围绕“功业衡量应看战果，还是看礼义秩序？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_frontier_finance"
+      ],
+      "value_tags": [
+        "yantie_chapter_52",
+        "chapter_conflict",
+        "act-fiscal",
+        "achievement"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan09_lunzou:chapter_conflict:c3d2b4c3",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷九·论邹第五十三",
+      "excerpt_original": "大夫曰：「鄒子疾晚世之儒墨，不知天地之弘，昭曠之道，將一曲而欲道九折，守一隅而欲知萬方，猶無準平而欲知高下，無規矩而欲知方圓也。",
+      "paraphrase_zh": "《论邹第五十三》围绕“阴阳大论能解释政治，还是远离现实？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "yantie_chapter_53",
+        "chapter_conflict",
+        "act-yili",
+        "cosmos"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan09_lunzai:chapter_conflict:6a3e947b",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷九·论菑第五十四",
+      "excerpt_original": "大夫曰：「巫祝不可與並祀，諸生不可與逐語，信往疑今，非人自是。",
+      "paraphrase_zh": "《论菑第五十四》围绕“灾异应作政治警讯，还是不可逐语迷信？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "yantie_chapter_54",
+        "chapter_conflict",
+        "act-statecraft",
+        "disaster"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan10_xingde:chapter_conflict:c177a5c9",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷十·刑德第五十五",
+      "excerpt_original": "大夫曰：「令者所以教民也，法者所以督奸也。",
+      "paraphrase_zh": "《刑德第五十五》围绕“刑与德谁是治民根本？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "yantie_chapter_55",
+        "chapter_conflict",
+        "act-yili",
+        "law"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan10_shenhan:chapter_conflict:851016ec",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷十·申韩第五十六",
+      "excerpt_original": "御史曰：「待周公而為相，則世無列國。",
+      "paraphrase_zh": "《申韩第五十六》围绕“申韩法术是补政缺，还是伤王道？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "yantie_chapter_56",
+        "chapter_conflict",
+        "act-yili",
+        "legalism"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan10_zhouqin:chapter_conflict:f2a74bce",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷十·周秦第五十七",
+      "excerpt_original": "御史曰：「春秋無名號，謂之雲盜，所以賤刑人而絕之人倫也。",
+      "paraphrase_zh": "《周秦第五十七》围绕“周礼与秦法，何者能解释汉代困境？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "yantie_chapter_57",
+        "chapter_conflict",
+        "act-yili",
+        "history"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan10_zhaosheng:chapter_conflict:2f682d00",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷十·诏圣第五十八",
+      "excerpt_original": "御史曰：「夏後氏不倍言，殷誓，周盟，德信彌衰。",
+      "paraphrase_zh": "《诏圣第五十八》围绕“圣王之法应守成，还是随世更制？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "yantie_chapter_58",
+        "chapter_conflict",
+        "act-statecraft",
+        "reform"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan10_dalun:chapter_conflict:638ed1b2",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷十·大论第五十九",
+      "excerpt_original": "大夫曰：「呻吟槁簡，誦死人之語，則有司不以文學。",
+      "paraphrase_zh": "《大论第五十九》围绕“大论应归于务实，还是保留价值审判？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "yantie_chapter_59",
+        "chapter_conflict",
+        "act-statecraft",
+        "summary"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_yantielun:juan10_zalun:chapter_conflict:6f36a7cb",
+      "source_id": "src_yantielun",
+      "canonical_location": "卷十·杂论第六十",
+      "excerpt_original": "客曰：「余睹鹽、鐵之義，觀乎公卿、文學、賢良之論，意指殊路，各有所出，或上仁義，或務權利。",
+      "paraphrase_zh": "《杂论第六十》围绕“全书终局是各有所出，还是仍可判其义利？”展开问答，是全书冲突结构中的一个节点。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "yantie_chapter_60",
+        "chapter_conflict",
+        "act-yili",
+        "closure"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Wikisource public-domain Yantie excerpt; short chapter conflict evidence.",
+      "review_status": "verified",
+      "adjacent_context_note": "短摘只定位本篇冲突入口，不替代《盐铁论》全文阅读。"
+    },
+    {
+      "evidence_id": "ev:src_lunyu_liren:liren04:profit_breeds_resentment:aa220000",
+      "source_id": "src_lunyu_liren",
+      "canonical_location": "里仁第四",
+      "excerpt_original": "放于利而行，多怨",
+      "paraphrase_zh": "《论语》提醒以利为行动中心会激起怨怼，可解释盐铁争论中“官府逐利”引发的正当性危机。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "yi_li",
+        "resentment",
+        "profit_governance"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, short excerpt used as philosophy lens.",
+      "review_status": "verified",
+      "adjacent_context_note": "This is a philosophy lens (义利警戒), not evidence that the source discussed the Yantie meeting. 以利为政会积累怨怼。"
+    },
+    {
+      "evidence_id": "ev:src_lunyu_yanyuan:yanyuan07:food_army_trust:aa220001",
+      "source_id": "src_lunyu_yanyuan",
+      "canonical_location": "颜渊第十二",
+      "excerpt_original": "足食，足兵，民信之矣",
+      "paraphrase_zh": "《论语》把食、兵、信并列为治理根基，可让用户看到财政、军备和民信并非单一排序。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "state_capacity",
+        "public_trust",
+        "frontier_security"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, short excerpt used as philosophy lens.",
+      "review_status": "verified",
+      "adjacent_context_note": "This is a philosophy lens (食兵民信), not evidence that the source discussed the Yantie meeting. 财政、军备与民信必须同时被衡量。"
+    },
+    {
+      "evidence_id": "ev:src_lunyu_yanyuan:yanyuan12:governance_rectification:aa220002",
+      "source_id": "src_lunyu_yanyuan",
+      "canonical_location": "颜渊第十二",
+      "excerpt_original": "政者，正也",
+      "paraphrase_zh": "《论语》将政治理解为正己正人，适合解释儒家为何把盐铁问题看成治道正当性问题。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "rule_by_virtue",
+        "political_rectitude",
+        "public_order"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, short excerpt used as philosophy lens.",
+      "review_status": "verified",
+      "adjacent_context_note": "This is a philosophy lens (政者正也), not evidence that the source discussed the Yantie meeting. 治理首先要求权力自身可被正当化。"
+    },
+    {
+      "evidence_id": "ev:src_lunyu_yanyuan:yanyuan13:no_litigation:aa220003",
+      "source_id": "src_lunyu_yanyuan",
+      "canonical_location": "颜渊第十二",
+      "excerpt_original": "听讼，吾犹人也，必也使无讼乎",
+      "paraphrase_zh": "孔子并不以善断争讼为终点，而追问如何减少争讼，可作为理解公共议论和制度病根的透镜。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "deliberation",
+        "public_speech",
+        "rule_by_virtue"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, short excerpt used as philosophy lens.",
+      "review_status": "verified",
+      "adjacent_context_note": "This is a philosophy lens (无讼追问), not evidence that the source discussed the Yantie meeting. 争论本身暴露的是制度深处的病根。"
+    },
+    {
+      "evidence_id": "ev:src_mengzi_jinxinxia:jinxin14:people_first:aa220004",
+      "source_id": "src_mengzi_jinxinxia",
+      "canonical_location": "尽心下",
+      "excerpt_original": "民为贵，社稷次之，君为轻",
+      "paraphrase_zh": "《孟子》的民本排序让盐铁争论中的财政收益必须接受民生优先性的检验。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "people_first",
+        "people_livelihood",
+        "rule_by_virtue"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, short excerpt used as philosophy lens.",
+      "review_status": "verified",
+      "adjacent_context_note": "This is a philosophy lens (民贵君轻), not evidence that the source discussed the Yantie meeting. 民生不是财政目标之后的附属项。"
+    },
+    {
+      "evidence_id": "ev:src_mengzi_gaozishang:gaozi10:choose_righteousness:aa220005",
+      "source_id": "src_mengzi_gaozishang",
+      "canonical_location": "告子上",
+      "excerpt_original": "舍生而取义者也",
+      "paraphrase_zh": "《孟子》将义置于生利之上，可解释贤良文学为何把政策争论推高为价值选择。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "yi_li",
+        "moral_choice",
+        "rule_by_virtue"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, short excerpt used as philosophy lens.",
+      "review_status": "verified",
+      "adjacent_context_note": "This is a philosophy lens (取义之择), not evidence that the source discussed the Yantie meeting. 有些政治选择不能只按收益计算。"
+    },
+    {
+      "evidence_id": "ev:src_mengzi_lianghuiwang:liang01:profit_endangers_state:aa220006",
+      "source_id": "src_mengzi_lianghuiwang",
+      "canonical_location": "梁惠王上",
+      "excerpt_original": "上下交征利而国危矣",
+      "paraphrase_zh": "《孟子》批评上下逐利会危及国家，可直接照亮盐铁会议中“国家以利入市”的道德风险。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "yi_li",
+        "profit_governance",
+        "state_risk"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, short excerpt used as philosophy lens.",
+      "review_status": "verified",
+      "adjacent_context_note": "This is a philosophy lens (交征利危), not evidence that the source discussed the Yantie meeting. 当上下都以利相竞，国家自身也会被利吞没。"
+    },
+    {
+      "evidence_id": "ev:src_xunzi_wangzhi:wangzhi:boat_water:aa220007",
+      "source_id": "src_xunzi_wangzhi",
+      "canonical_location": "王制篇",
+      "excerpt_original": "君者，舟也；庶人者，水也",
+      "paraphrase_zh": "《荀子》以舟水关系说明国家权力依赖民众承载，可平衡财政国家与民生承受力。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "people_livelihood",
+        "state_capacity",
+        "political_legitimacy"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, short excerpt used as philosophy lens.",
+      "review_status": "verified",
+      "adjacent_context_note": "This is a philosophy lens (舟水之喻), not evidence that the source discussed the Yantie meeting. 权力能否漂浮，取决于民众能否承载。"
+    },
+    {
+      "evidence_id": "ev:src_xunzi_wangzhi:wangzhi:market_tax_light:aa220008",
+      "source_id": "src_xunzi_wangzhi",
+      "canonical_location": "王制篇",
+      "excerpt_original": "关市讥而不征",
+      "paraphrase_zh": "《荀子》承认市场与关市治理，但强调轻取不扰，可作为理解国家介入市场边界的透镜。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "market_order",
+        "institutional_order",
+        "light_taxation"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, short excerpt used as philosophy lens.",
+      "review_status": "verified",
+      "adjacent_context_note": "This is a philosophy lens (关市轻征), not evidence that the source discussed the Yantie meeting. 国家可以治理市场，但不能把市场完全变成取利之所。"
+    },
+    {
+      "evidence_id": "ev:src_xunzi_xiushen:xiushen:ritual_corrects_body:aa220009",
+      "source_id": "src_xunzi_xiushen",
+      "canonical_location": "修身篇",
+      "excerpt_original": "礼者，所以正身也",
+      "paraphrase_zh": "《荀子》把礼理解为规范身心与秩序的制度，可用于解释礼法并非空洞装饰。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "ritual_order",
+        "institutional_order",
+        "education"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, short excerpt used as philosophy lens.",
+      "review_status": "verified",
+      "adjacent_context_note": "This is a philosophy lens (礼以正身), not evidence that the source discussed the Yantie meeting. 礼是塑造秩序的技术，不只是仪式外观。"
+    },
+    {
+      "evidence_id": "ev:src_guanzi_quanxiu:quanxiu:long_term_teaching:aa220010",
+      "source_id": "src_guanzi_quanxiu",
+      "canonical_location": "权修",
+      "excerpt_original": "终身之计，莫如树人",
+      "paraphrase_zh": "《管子》把育人视为长久之计，可帮助理解教化、学术与政治能力之间的关系。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "education",
+        "statecraft",
+        "long_term_governance"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, short excerpt used as philosophy lens.",
+      "review_status": "verified",
+      "adjacent_context_note": "This is a philosophy lens (树人之计), not evidence that the source discussed the Yantie meeting. 治理不能只看当下收益，也要塑造长期的人。"
+    },
+    {
+      "evidence_id": "ev:src_guanzi_mumin:mumin01:follow_people_heart:aa220011",
+      "source_id": "src_guanzi_mumin",
+      "canonical_location": "牧民第一",
+      "excerpt_original": "政之所兴，在顺民心；政之所废，在逆民心",
+      "paraphrase_zh": "《管子》虽重富国术，却同样要求顺民心，可避免把国家能力简单理解为强制。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "people_first",
+        "statecraft",
+        "public_trust"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, short excerpt used as philosophy lens.",
+      "review_status": "verified",
+      "adjacent_context_note": "This is a philosophy lens (顺民心), not evidence that the source discussed the Yantie meeting. 富国术如果逆民心，也会失去政治根基。"
+    },
+    {
+      "evidence_id": "ev:src_hanfeizi_youdu:youdu:law_no_noble:aa220012",
+      "source_id": "src_hanfeizi_youdu",
+      "canonical_location": "有度",
+      "excerpt_original": "法不阿贵，绳不挠曲",
+      "paraphrase_zh": "《韩非子》强调法不偏贵，可作为理解法家秩序诉求的透镜，而不只把法家看成苛刻。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "legalist_order",
+        "institutional_order",
+        "anti_privilege"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, short excerpt used as philosophy lens.",
+      "review_status": "verified",
+      "adjacent_context_note": "This is a philosophy lens (法不阿贵), not evidence that the source discussed the Yantie meeting. 法家关心的是权力与私门能否被同一尺度约束。"
+    },
+    {
+      "evidence_id": "ev:src_hanfeizi_xianxue:xianxue:scholars_disorder_law:aa220013",
+      "source_id": "src_hanfeizi_xianxue",
+      "canonical_location": "显学",
+      "excerpt_original": "儒以文乱法，侠以武犯禁",
+      "paraphrase_zh": "《韩非子》从法家角度怀疑儒者以古文扰乱法令，可解释大夫一方为何警惕空言议政。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "legalist_order",
+        "public_speech",
+        "anti_scholar"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, short excerpt used as philosophy lens.",
+      "review_status": "verified",
+      "adjacent_context_note": "This is a philosophy lens (文乱法), not evidence that the source discussed the Yantie meeting. 法家会把某些议论看成对制度执行的干扰。"
+    },
+    {
+      "evidence_id": "ev:src_mozi_feile:feile01:three_harms:aa220014",
+      "source_id": "src_mozi_feile",
+      "canonical_location": "非乐上",
+      "excerpt_original": "饥者不得食，寒者不得衣，劳者不得息",
+      "paraphrase_zh": "《墨子》以饥寒劳苦衡量政治费用，可为盐铁争论中的民生痛感提供功利而非纯儒家的透镜。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "people_livelihood",
+        "frugality",
+        "labor_burden"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, short excerpt used as philosophy lens.",
+      "review_status": "verified",
+      "adjacent_context_note": "This is a philosophy lens (饥寒劳苦), not evidence that the source discussed the Yantie meeting. 一项制度的成本要落到饥寒劳苦的人身上衡量。"
+    },
+    {
+      "evidence_id": "ev:src_liji_wangzhi:wangzhi:labor_limit:aa220015",
+      "source_id": "src_liji_wangzhi",
+      "canonical_location": "王制",
+      "excerpt_original": "用民之力，岁不过三日",
+      "paraphrase_zh": "《礼记·王制》为役使民力设限，可用于理解徭役、边防与国家动员的边界。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "labor_burden",
+        "ritual_order",
+        "people_livelihood"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, short excerpt used as philosophy lens.",
+      "review_status": "verified",
+      "adjacent_context_note": "This is a philosophy lens (用民有限), not evidence that the source discussed the Yantie meeting. 国家动员必须有制度边界。"
+    },
+    {
+      "evidence_id": "ev:src_liji_wangzhi:wangzhi:nine_year_storage:aa220016",
+      "source_id": "src_liji_wangzhi",
+      "canonical_location": "王制",
+      "excerpt_original": "国无九年之蓄，曰不足",
+      "paraphrase_zh": "《礼记·王制》强调国家储备，可让用户看到儒家传统内部也承认财政储备的重要性。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "state_capacity",
+        "fiscal_reserve",
+        "ritual_order"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, short excerpt used as philosophy lens.",
+      "review_status": "verified",
+      "adjacent_context_note": "This is a philosophy lens (九年之蓄), not evidence that the source discussed the Yantie meeting. 民生伦理并不等于否定国家储备。"
+    },
+    {
+      "evidence_id": "ev:src_huainanzi_zhushu:zhushu:law_as_measure:aa220017",
+      "source_id": "src_huainanzi_zhushu",
+      "canonical_location": "主术训",
+      "excerpt_original": "法者，天下之度量，而人主之准绳也",
+      "paraphrase_zh": "《淮南子》把法理解为天下与君主共同的准绳，可作为权力边界与制度约束的透镜。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "law_constraint",
+        "power_boundary",
+        "institutional_order"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, short excerpt used as philosophy lens.",
+      "review_status": "verified",
+      "adjacent_context_note": "This is a philosophy lens (法为准绳), not evidence that the source discussed the Yantie meeting. 制度不只是约束百姓，也应约束权力本身。"
     }
   ],
   "claims": [
@@ -2180,15 +4212,22 @@
       ],
       "义利": [
         "ev:src_lunyu_liren:liren04:yi_li_lens:aa110001",
-        "ev:src_mengzi_lianghuiwang:liang01:renyi_over_profit:aa110002"
+        "ev:src_mengzi_lianghuiwang:liang01:renyi_over_profit:aa110002",
+        "ev:src_lunyu_liren:liren04:profit_breeds_resentment:aa220000",
+        "ev:src_mengzi_gaozishang:gaozi10:choose_righteousness:aa220005",
+        "ev:src_mengzi_lianghuiwang:liang01:profit_endangers_state:aa220006"
       ],
       "哲学透镜": [
-        "ev:src_lunyu_liren:liren04:yi_li_lens:aa110001",
-        "ev:src_mengzi_lianghuiwang:liang01:renyi_over_profit:aa110002",
-        "ev:src_xunzi_fuguo:fuguo:jieyong_yumin:aa110003",
         "ev:src_guanzi_mumin:mumin01:canglin_lijie:aa110004",
         "ev:src_hanfeizi_wudu:wudu:adapt_law_to_age:aa110005",
-        "ev:src_shangjunshu_nongzhan:nongzhan:state_agriculture_war:aa110006"
+        "ev:src_liji_liyun:liyun:public_order:aa110010",
+        "ev:src_lunyu_liren:liren04:yi_li_lens:aa110001",
+        "ev:src_lunyu_xueer:xueer01:govern_with_time:aa110007",
+        "ev:src_mengzi_lianghuiwang:liang01:renyi_over_profit:aa110002",
+        "ev:src_mengzi_tengwen:tengwen01:constant_livelihood:aa110009",
+        "ev:src_shangjunshu_nongzhan:nongzhan:state_agriculture_war:aa110006",
+        "ev:src_xunzi_fuguo:fuguo:jieyong_yumin:aa110003",
+        "ev:src_xunzi_tianlun:tianlun:nature_constant:aa110008"
       ],
       "荀子": [
         "ev:src_xunzi_fuguo:fuguo:jieyong_yumin:aa110003"
@@ -2201,6 +4240,437 @@
       ],
       "商君书": [
         "ev:src_shangjunshu_nongzhan:nongzhan:state_agriculture_war:aa110006"
+      ],
+      "本议": [
+        "ev:src_yantielun:juan01_benyi:meeting_opening:a1b2c3d4"
+      ],
+      "第1篇": [
+        "ev:src_yantielun:juan01_benyi:meeting_opening:a1b2c3d4"
+      ],
+      "力耕": [
+        "ev:src_yantielun:juan01_jingeng:agriculture_base:88990011"
+      ],
+      "第2篇": [
+        "ev:src_yantielun:juan01_jingeng:agriculture_base:88990011"
+      ],
+      "通有": [
+        "ev:src_yantielun:juan01_jingeng:market_cities:bb11cc22"
+      ],
+      "第3篇": [
+        "ev:src_yantielun:juan01_jingeng:market_cities:bb11cc22"
+      ],
+      "错币": [
+        "ev:src_yantielun:juan01_cuobi:chapter_conflict:71e30b87"
+      ],
+      "第4篇": [
+        "ev:src_yantielun:juan01_cuobi:chapter_conflict:71e30b87"
+      ],
+      "禁耕": [
+        "ev:src_yantielun:juan01_jingeng:state_control_prevents_cliques:1122aabb"
+      ],
+      "第5篇": [
+        "ev:src_yantielun:juan01_jingeng:state_control_prevents_cliques:1122aabb"
+      ],
+      "复古": [
+        "ev:src_yantielun:juan01_fugu:chapter_conflict:edd2cc73"
+      ],
+      "第6篇": [
+        "ev:src_yantielun:juan01_fugu:chapter_conflict:edd2cc73"
+      ],
+      "非鞅": [
+        "ev:src_yantielun:juan02_feiyang:chapter_conflict:4702f508"
+      ],
+      "第7篇": [
+        "ev:src_yantielun:juan02_feiyang:chapter_conflict:4702f508"
+      ],
+      "晁错": [
+        "ev:src_yantielun:juan02_chaocuo:chapter_conflict:154f63e3"
+      ],
+      "第8篇": [
+        "ev:src_yantielun:juan02_chaocuo:chapter_conflict:154f63e3"
+      ],
+      "刺权": [
+        "ev:src_yantielun:juan02_ciquan:chapter_conflict:d6d59555"
+      ],
+      "第9篇": [
+        "ev:src_yantielun:juan02_ciquan:chapter_conflict:d6d59555"
+      ],
+      "刺复": [
+        "ev:src_yantielun:juan02_cifu:chapter_conflict:db419abd"
+      ],
+      "第10篇": [
+        "ev:src_yantielun:juan02_cifu:chapter_conflict:db419abd"
+      ],
+      "论儒": [
+        "ev:src_yantielun:juan02_lunru:chapter_conflict:d3a320b3"
+      ],
+      "第11篇": [
+        "ev:src_yantielun:juan02_lunru:chapter_conflict:d3a320b3"
+      ],
+      "忧边": [
+        "ev:src_yantielun:juan02_youbian:chapter_conflict:62cc2317"
+      ],
+      "第12篇": [
+        "ev:src_yantielun:juan02_youbian:chapter_conflict:62cc2317"
+      ],
+      "园池": [
+        "ev:src_yantielun:juan03_yuanchi:chapter_conflict:b271ef45"
+      ],
+      "第13篇": [
+        "ev:src_yantielun:juan03_yuanchi:chapter_conflict:b271ef45"
+      ],
+      "轻重": [
+        "ev:src_yantielun:juan03_qingzhong:chapter_conflict:fa483d8c"
+      ],
+      "第14篇": [
+        "ev:src_yantielun:juan03_qingzhong:chapter_conflict:fa483d8c"
+      ],
+      "未通": [
+        "ev:src_yantielun:juan03_weitong:chapter_conflict:0608353b"
+      ],
+      "第15篇": [
+        "ev:src_yantielun:juan03_weitong:chapter_conflict:0608353b"
+      ],
+      "地广": [
+        "ev:src_yantielun:juan04_diguang:chapter_conflict:88cc9d6d"
+      ],
+      "第16篇": [
+        "ev:src_yantielun:juan04_diguang:chapter_conflict:88cc9d6d"
+      ],
+      "贫富": [
+        "ev:src_yantielun:juan04_pinfu:chapter_conflict:ace6a215"
+      ],
+      "第17篇": [
+        "ev:src_yantielun:juan04_pinfu:chapter_conflict:ace6a215"
+      ],
+      "毁学": [
+        "ev:src_yantielun:juan04_huixue:chapter_conflict:1e1fb1a6"
+      ],
+      "第18篇": [
+        "ev:src_yantielun:juan04_huixue:chapter_conflict:1e1fb1a6"
+      ],
+      "褒贤": [
+        "ev:src_yantielun:juan04_baoxian:chapter_conflict:0d83a973"
+      ],
+      "第19篇": [
+        "ev:src_yantielun:juan04_baoxian:chapter_conflict:0d83a973"
+      ],
+      "相刺": [
+        "ev:src_yantielun:juan05_xiangci:chapter_conflict:be9c4edf"
+      ],
+      "第20篇": [
+        "ev:src_yantielun:juan05_xiangci:chapter_conflict:be9c4edf"
+      ],
+      "殊路": [
+        "ev:src_yantielun:juan05_shulu:chapter_conflict:fa045567"
+      ],
+      "第21篇": [
+        "ev:src_yantielun:juan05_shulu:chapter_conflict:fa045567"
+      ],
+      "讼贤": [
+        "ev:src_yantielun:juan05_songxian:chapter_conflict:287558dd"
+      ],
+      "第22篇": [
+        "ev:src_yantielun:juan05_songxian:chapter_conflict:287558dd"
+      ],
+      "遵道": [
+        "ev:src_yantielun:juan05_zundao:chapter_conflict:317552c8"
+      ],
+      "第23篇": [
+        "ev:src_yantielun:juan05_zundao:chapter_conflict:317552c8"
+      ],
+      "论诽": [
+        "ev:src_yantielun:juan05_lunfei:chapter_conflict:38a9a473"
+      ],
+      "第24篇": [
+        "ev:src_yantielun:juan05_lunfei:chapter_conflict:38a9a473"
+      ],
+      "孝养": [
+        "ev:src_yantielun:juan05_xiaoyang:chapter_conflict:cf8d3a59"
+      ],
+      "第25篇": [
+        "ev:src_yantielun:juan05_xiaoyang:chapter_conflict:cf8d3a59"
+      ],
+      "刺议": [
+        "ev:src_yantielun:juan05_ciyi:chapter_conflict:d01622d1"
+      ],
+      "第26篇": [
+        "ev:src_yantielun:juan05_ciyi:chapter_conflict:d01622d1"
+      ],
+      "利议": [
+        "ev:src_yantielun:juan05_liyi:chapter_conflict:61fc0944"
+      ],
+      "第27篇": [
+        "ev:src_yantielun:juan05_liyi:chapter_conflict:61fc0944"
+      ],
+      "国疾": [
+        "ev:src_yantielun:juan05_guoji:chapter_conflict:e989c27c"
+      ],
+      "第28篇": [
+        "ev:src_yantielun:juan05_guoji:chapter_conflict:e989c27c"
+      ],
+      "散不足": [
+        "ev:src_yantielun:juan06_sanbuzu:chapter_conflict:bfec3e04"
+      ],
+      "第29篇": [
+        "ev:src_yantielun:juan06_sanbuzu:chapter_conflict:bfec3e04"
+      ],
+      "救匮": [
+        "ev:src_yantielun:juan06_jiukui:chapter_conflict:be30f275"
+      ],
+      "第30篇": [
+        "ev:src_yantielun:juan06_jiukui:chapter_conflict:be30f275"
+      ],
+      "箴石": [
+        "ev:src_yantielun:juan06_zhenshi:chapter_conflict:c5cdbdf6"
+      ],
+      "第31篇": [
+        "ev:src_yantielun:juan06_zhenshi:chapter_conflict:c5cdbdf6"
+      ],
+      "除狭": [
+        "ev:src_yantielun:juan06_chuxia:chapter_conflict:17fcc6d6"
+      ],
+      "第32篇": [
+        "ev:src_yantielun:juan06_chuxia:chapter_conflict:17fcc6d6"
+      ],
+      "疾贪": [
+        "ev:src_yantielun:juan06_jitan:chapter_conflict:30f9be49"
+      ],
+      "第33篇": [
+        "ev:src_yantielun:juan06_jitan:chapter_conflict:30f9be49"
+      ],
+      "后刑": [
+        "ev:src_yantielun:juan06_houxing:chapter_conflict:2620c13c"
+      ],
+      "第34篇": [
+        "ev:src_yantielun:juan06_houxing:chapter_conflict:2620c13c"
+      ],
+      "授时": [
+        "ev:src_yantielun:juan06_shoushi:chapter_conflict:9a50b48c"
+      ],
+      "第35篇": [
+        "ev:src_yantielun:juan06_shoushi:chapter_conflict:9a50b48c"
+      ],
+      "水旱": [
+        "ev:src_yantielun:juan06_shuihan:chapter_conflict:d03b9a50"
+      ],
+      "第36篇": [
+        "ev:src_yantielun:juan06_shuihan:chapter_conflict:d03b9a50"
+      ],
+      "崇礼": [
+        "ev:src_yantielun:juan07_chongli:chapter_conflict:e7b8e2ac"
+      ],
+      "第37篇": [
+        "ev:src_yantielun:juan07_chongli:chapter_conflict:e7b8e2ac"
+      ],
+      "备胡": [
+        "ev:src_yantielun:juan07_beihu:chapter_conflict:4c55b53d"
+      ],
+      "第38篇": [
+        "ev:src_yantielun:juan07_beihu:chapter_conflict:4c55b53d"
+      ],
+      "执务": [
+        "ev:src_yantielun:juan07_zhiwu:chapter_conflict:f9bc9127"
+      ],
+      "第39篇": [
+        "ev:src_yantielun:juan07_zhiwu:chapter_conflict:f9bc9127"
+      ],
+      "能言": [
+        "ev:src_yantielun:juan07_nengyan:chapter_conflict:3bd58d49"
+      ],
+      "第40篇": [
+        "ev:src_yantielun:juan07_nengyan:chapter_conflict:3bd58d49"
+      ],
+      "取下": [
+        "ev:src_yantielun:juan07_quxia:chapter_conflict:b3f59835"
+      ],
+      "第41篇": [
+        "ev:src_yantielun:juan07_quxia:chapter_conflict:b3f59835"
+      ],
+      "击之": [
+        "ev:src_yantielun:juan07_jizhi:chapter_conflict:859e3660"
+      ],
+      "第42篇": [
+        "ev:src_yantielun:juan07_jizhi:chapter_conflict:859e3660"
+      ],
+      "结和": [
+        "ev:src_yantielun:juan08_jiehe:chapter_conflict:f24f1d0f"
+      ],
+      "第43篇": [
+        "ev:src_yantielun:juan08_jiehe:chapter_conflict:f24f1d0f"
+      ],
+      "诛秦": [
+        "ev:src_yantielun:juan08_zhuqin:chapter_conflict:b8a1140b"
+      ],
+      "第44篇": [
+        "ev:src_yantielun:juan08_zhuqin:chapter_conflict:b8a1140b"
+      ],
+      "伐功": [
+        "ev:src_yantielun:juan08_fagong:chapter_conflict:e293d79c"
+      ],
+      "第45篇": [
+        "ev:src_yantielun:juan08_fagong:chapter_conflict:e293d79c"
+      ],
+      "西域": [
+        "ev:src_yantielun:juan08_xiyu:chapter_conflict:1a2e4eba"
+      ],
+      "第46篇": [
+        "ev:src_yantielun:juan08_xiyu:chapter_conflict:1a2e4eba"
+      ],
+      "世务": [
+        "ev:src_yantielun:juan08_shiwu:chapter_conflict:b932a66f"
+      ],
+      "第47篇": [
+        "ev:src_yantielun:juan08_shiwu:chapter_conflict:b932a66f"
+      ],
+      "和亲": [
+        "ev:src_yantielun:juan08_heqin:chapter_conflict:660b7116"
+      ],
+      "第48篇": [
+        "ev:src_yantielun:juan08_heqin:chapter_conflict:660b7116"
+      ],
+      "繇役": [
+        "ev:src_yantielun:juan09_yaoyi:chapter_conflict:9caab5c5"
+      ],
+      "第49篇": [
+        "ev:src_yantielun:juan09_yaoyi:chapter_conflict:9caab5c5"
+      ],
+      "险固": [
+        "ev:src_yantielun:juan09_xiangu:chapter_conflict:68de2221"
+      ],
+      "第50篇": [
+        "ev:src_yantielun:juan09_xiangu:chapter_conflict:68de2221"
+      ],
+      "论勇": [
+        "ev:src_yantielun:juan09_lunyong:chapter_conflict:5b45eb09"
+      ],
+      "第51篇": [
+        "ev:src_yantielun:juan09_lunyong:chapter_conflict:5b45eb09"
+      ],
+      "论功": [
+        "ev:src_yantielun:juan09_lungong:chapter_conflict:cfb1a7de"
+      ],
+      "第52篇": [
+        "ev:src_yantielun:juan09_lungong:chapter_conflict:cfb1a7de"
+      ],
+      "论邹": [
+        "ev:src_yantielun:juan09_lunzou:chapter_conflict:c3d2b4c3"
+      ],
+      "第53篇": [
+        "ev:src_yantielun:juan09_lunzou:chapter_conflict:c3d2b4c3"
+      ],
+      "论菑": [
+        "ev:src_yantielun:juan09_lunzai:chapter_conflict:6a3e947b"
+      ],
+      "第54篇": [
+        "ev:src_yantielun:juan09_lunzai:chapter_conflict:6a3e947b"
+      ],
+      "刑德": [
+        "ev:src_yantielun:juan10_xingde:chapter_conflict:c177a5c9",
+        "ev:src_hanfeizi_youdu:youdu:law_no_noble:aa220012",
+        "ev:src_liji_liyun:liyun:public_order:aa110010"
+      ],
+      "第55篇": [
+        "ev:src_yantielun:juan10_xingde:chapter_conflict:c177a5c9"
+      ],
+      "申韩": [
+        "ev:src_yantielun:juan10_shenhan:chapter_conflict:851016ec"
+      ],
+      "第56篇": [
+        "ev:src_yantielun:juan10_shenhan:chapter_conflict:851016ec"
+      ],
+      "周秦": [
+        "ev:src_yantielun:juan10_zhouqin:chapter_conflict:f2a74bce"
+      ],
+      "第57篇": [
+        "ev:src_yantielun:juan10_zhouqin:chapter_conflict:f2a74bce"
+      ],
+      "诏圣": [
+        "ev:src_yantielun:juan10_zhaosheng:chapter_conflict:2f682d00"
+      ],
+      "第58篇": [
+        "ev:src_yantielun:juan10_zhaosheng:chapter_conflict:2f682d00"
+      ],
+      "大论": [
+        "ev:src_yantielun:juan10_dalun:chapter_conflict:638ed1b2"
+      ],
+      "第59篇": [
+        "ev:src_yantielun:juan10_dalun:chapter_conflict:638ed1b2"
+      ],
+      "杂论": [
+        "ev:src_yantielun:juan10_zalun:chapter_conflict:6f36a7cb"
+      ],
+      "第60篇": [
+        "ev:src_yantielun:juan10_zalun:chapter_conflict:6f36a7cb"
+      ],
+      "全文争点": [
+        "ev:src_yantielun:juan01_benyi:meeting_opening:a1b2c3d4",
+        "ev:src_yantielun:juan01_jingeng:agriculture_base:88990011",
+        "ev:src_yantielun:juan01_jingeng:market_cities:bb11cc22",
+        "ev:src_yantielun:juan01_cuobi:chapter_conflict:71e30b87",
+        "ev:src_yantielun:juan01_jingeng:state_control_prevents_cliques:1122aabb",
+        "ev:src_yantielun:juan01_fugu:chapter_conflict:edd2cc73",
+        "ev:src_yantielun:juan02_feiyang:chapter_conflict:4702f508",
+        "ev:src_yantielun:juan02_chaocuo:chapter_conflict:154f63e3",
+        "ev:src_yantielun:juan02_ciquan:chapter_conflict:d6d59555",
+        "ev:src_yantielun:juan02_cifu:chapter_conflict:db419abd",
+        "ev:src_yantielun:juan02_lunru:chapter_conflict:d3a320b3",
+        "ev:src_yantielun:juan02_youbian:chapter_conflict:62cc2317"
+      ],
+      "??": [
+        "ev:src_lunyu_liren:liren04:yi_li_lens:aa110001",
+        "ev:src_lunyu_liren:liren04:profit_breeds_resentment:aa220000",
+        "ev:src_mengzi_gaozishang:gaozi10:choose_righteousness:aa220005",
+        "ev:src_mengzi_lianghuiwang:liang01:profit_endangers_state:aa220006",
+        "ev:src_xunzi_xiushen:xiushen:ritual_corrects_body:aa220009",
+        "ev:src_hanfeizi_youdu:youdu:law_no_noble:aa220012",
+        "ev:src_huainanzi_zhushu:zhushu:law_as_measure:aa220017",
+        "ev:src_liji_liyun:liyun:public_order:aa110010",
+        "ev:src_shangjunshu_nongzhan:nongzhan:state_agriculture_war:aa110006",
+        "ev:src_liji_wangzhi:wangzhi:labor_limit:aa220015",
+        "ev:src_mengzi_jinxinxia:jinxin14:people_first:aa220004",
+        "ev:src_mozi_feile:feile01:three_harms:aa220014",
+        "ev:src_guanzi_mumin:mumin01:follow_people_heart:aa220011",
+        "ev:src_guanzi_quanxiu:quanxiu:long_term_teaching:aa220010",
+        "ev:src_lunyu_yanyuan:yanyuan07:food_army_trust:aa220001",
+        "ev:src_xunzi_tianlun:tianlun:nature_constant:aa110008"
+      ],
+      "????": [
+        "ev:src_huainanzi_zhushu:zhushu:law_as_measure:aa220017",
+        "ev:src_hanfeizi_youdu:youdu:law_no_noble:aa220012"
+      ],
+      "礼法": [
+        "ev:src_xunzi_xiushen:xiushen:ritual_corrects_body:aa220009",
+        "ev:src_hanfeizi_youdu:youdu:law_no_noble:aa220012",
+        "ev:src_huainanzi_zhushu:zhushu:law_as_measure:aa220017"
+      ],
+      "农战": [
+        "ev:src_shangjunshu_nongzhan:nongzhan:state_agriculture_war:aa110006",
+        "ev:src_liji_wangzhi:wangzhi:labor_limit:aa220015"
+      ],
+      "民生": [
+        "ev:src_mengzi_jinxinxia:jinxin14:people_first:aa220004",
+        "ev:src_mozi_feile:feile01:three_harms:aa220014",
+        "ev:src_guanzi_mumin:mumin01:follow_people_heart:aa220011"
+      ],
+      "教化": [
+        "ev:src_guanzi_quanxiu:quanxiu:long_term_teaching:aa220010",
+        "ev:src_xunzi_xiushen:xiushen:ritual_corrects_body:aa220009"
+      ],
+      "边防": [
+        "ev:src_lunyu_yanyuan:yanyuan07:food_army_trust:aa220001",
+        "ev:src_shangjunshu_nongzhan:nongzhan:state_agriculture_war:aa110006"
+      ],
+      "权力边界": [
+        "ev:src_huainanzi_zhushu:zhushu:law_as_measure:aa220017",
+        "ev:src_hanfeizi_youdu:youdu:law_no_noble:aa220012"
+      ],
+      "徭役": [
+        "ev:src_liji_wangzhi:wangzhi:labor_limit:aa220015",
+        "ev:src_mozi_feile:feile01:three_harms:aa220014"
+      ],
+      "灾异": [
+        "ev:src_xunzi_tianlun:tianlun:nature_constant:aa110008"
       ]
     }
   }

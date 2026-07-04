@@ -1,10 +1,16 @@
 from __future__ import annotations
 
+import json
+import re
 import unittest
+from pathlib import Path
 
 from fastapi.testclient import TestClient
 
 from metaos.yantie import create_yantie_web_app
+
+
+PACK_PATH = Path(__file__).resolve().parents[1] / "metaos" / "yantie" / "data" / "evidence_pack.json"
 
 
 class YantieWebUiTests(unittest.TestCase):
@@ -94,6 +100,69 @@ class YantieWebUiTests(unittest.TestCase):
         self.assertIn("五幕显影选择", html)
         self.assertNotIn("第60回合", html)
         self.assertNotIn("yantielunChapters", html)
+
+    def test_yantie_page_exposes_sixty_chapter_conflict_map(self) -> None:
+        html = self.client.get("/yantie").text
+
+        match = re.search(r"const chapterConflictMap = (\[.*?\]);\n\n    const philosophyLensMeta =", html, re.S)
+        self.assertIsNotNone(match)
+        chapter_map = json.loads(match.group(1))
+
+        self.assertEqual(len(chapter_map), 60)
+        self.assertEqual(chapter_map[0]["title"], "本议第一")
+        self.assertEqual(chapter_map[1]["title"], "力耕第二")
+        self.assertEqual(chapter_map[28]["title"], "散不足第二十九")
+        self.assertEqual(chapter_map[35]["title"], "水旱第三十六")
+        self.assertEqual(chapter_map[55]["title"], "申韩第五十六")
+        self.assertEqual(chapter_map[-1]["title"], "杂论第六十")
+        self.assertEqual([item["chapterNumber"] for item in chapter_map], list(range(1, 61)))
+        for item in chapter_map:
+            self.assertTrue(item["historicalEvidence"], item["title"])
+            self.assertTrue(item["philosophyLens"], item["title"])
+            self.assertTrue(item["conflict"], item["title"])
+        self.assertIn('id="chapterMapToggle"', html)
+        self.assertIn('id="chapterMapPanel"', html)
+        self.assertIn("buildChapterVisitSummary", html)
+
+    def test_yantie_chapter_lenses_are_named_and_valid(self) -> None:
+        html = self.client.get("/yantie").text
+        chapter_match = re.search(
+            r"const chapterConflictMap = (\[.*?\]);\n\n    const philosophyLensMeta =",
+            html,
+            re.S,
+        )
+        meta_match = re.search(
+            r"const philosophyLensMeta = (\{.*?\});\n\n    const issueMatrix =",
+            html,
+            re.S,
+        )
+        self.assertIsNotNone(chapter_match)
+        self.assertIsNotNone(meta_match)
+        chapter_map = json.loads(chapter_match.group(1))
+        lens_meta = json.loads(meta_match.group(1))
+        pack_payload = json.loads(PACK_PATH.read_text(encoding="utf-8"))
+        valid_lens_ids = {
+            evidence["evidence_id"]
+            for evidence in pack_payload["evidence_units"]
+            if "philosophy_lens" in evidence["value_tags"]
+        }
+
+        self.assertGreaterEqual(len(lens_meta), 24)
+        for chapter in chapter_map:
+            self.assertTrue(chapter["philosophyLens"], chapter["title"])
+            for evidence_id in chapter["philosophyLens"]:
+                self.assertIn(evidence_id, valid_lens_ids, chapter["title"])
+                self.assertIn(evidence_id, lens_meta, chapter["title"])
+                self.assertTrue(lens_meta[evidence_id]["label"], evidence_id)
+                self.assertTrue(lens_meta[evidence_id]["note"], evidence_id)
+
+        self.assertIn("lens-section-title", html)
+        self.assertIn("lensMetaFor", html)
+        self.assertIn("\\u4e49\\u5229\\u4e4b\\u8fa8", json.dumps(lens_meta, ensure_ascii=True))
+        self.assertIn("\\u601d\\u60f3\\u900f\\u955c\\uff0c\\u4e0d\\u662f\\u4f1a\\u8bae\\u4e8b\\u5b9e", json.dumps(html, ensure_ascii=True))
+        self.assertNotIn("ev:src_hanshu_zhaodi:juan007:abolish_liquor_office:ddccbbaa", {
+            evidence_id for chapter in chapter_map for evidence_id in chapter["philosophyLens"]
+        })
 
     def test_yantie_page_uses_only_yantie_api_surface_and_local_audio(self) -> None:
         html = self.client.get("/yantie").text
