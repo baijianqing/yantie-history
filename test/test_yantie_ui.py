@@ -311,6 +311,11 @@ class YantieWebUiTests(unittest.TestCase):
         self.assertIn('const apiBase = "/api/yantie";', html)
         self.assertIn('const yantieRuntimeMode = document.documentElement.dataset.yantieRuntime || "api";', html)
         self.assertIn('const staticPackUrl = "data/evidence_pack.json";', html)
+        self.assertIn('narrative: { src: "assets/audio/narrative.mp3"', html)
+        self.assertIn('debate: { src: "assets/audio/debate.mp3"', html)
+        self.assertIn('reflection: { src: "assets/audio/reflection.mp3"', html)
+        self.assertIn("syncMusicToExperience", html)
+        self.assertIn("activateMusicTrack", html)
         self.assertIn("getStaticData", html)
         self.assertIn("createStaticJudgmentCard", html)
         self.assertIn('getData("/manifest")', html)
@@ -321,6 +326,7 @@ class YantieWebUiTests(unittest.TestCase):
         self.assertNotIn("zhihu", html.lower())
         self.assertNotIn("elevenlabs", html.lower())
         self.assertNotIn("suno", html.lower())
+        self.assertNotIn("runway", html.lower())
 
     def test_yantie_static_html_uses_github_pages_data_adapter(self) -> None:
         html = render_yantie_static_html()
@@ -342,6 +348,9 @@ class YantieWebUiTests(unittest.TestCase):
             self.assertTrue(index_path.exists())
             self.assertTrue(pack_path.exists())
             self.assertTrue((target / ".nojekyll").exists())
+            self.assertTrue((target / "assets" / "audio" / "narrative.mp3").exists())
+            self.assertTrue((target / "assets" / "audio" / "debate.mp3").exists())
+            self.assertTrue((target / "assets" / "audio" / "reflection.mp3").exists())
             self.assertIn('data-yantie-runtime="static"', index_path.read_text(encoding="utf-8"))
             self.assertEqual(json.loads(pack_path.read_text(encoding="utf-8"))["pack_id"], "yantie_meeting_v1")
 

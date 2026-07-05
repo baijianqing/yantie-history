@@ -1760,7 +1760,7 @@
       </div>
       <div class="top-actions">
         <span class="scene-meter" id="packStatus">读取史料中</span>
-        <button id="soundToggle" class="sound-toggle" type="button" aria-pressed="false">声场</button>
+        <button id="soundToggle" class="sound-toggle" type="button" aria-pressed="false">带声进入</button>
       </div>
     </header>
 
@@ -1837,6 +1837,11 @@
     const isStaticRuntime = yantieRuntimeMode === "static";
     const staticPackUrl = "data/evidence_pack.json";
     let staticPackPromise = null;
+    const musicTracks = {
+      narrative: { src: "assets/audio/narrative.mp3", label: "叙事过场", volume: 0.32 },
+      debate: { src: "assets/audio/debate.mp3", label: "高潮辩论", volume: 0.36 },
+      reflection: { src: "assets/audio/reflection.mp3", label: "冷静哲思", volume: 0.3 }
+    };
     const state = {
       manifest: null,
       actors: [],
@@ -1852,6 +1857,8 @@
       activeChapterIndex: 0,
       chapterMapOpen: false,
       audio: null,
+      music: null,
+      activeMusicTrack: null,
       soundEnabled: false,
       dramaPhase: "map-pressure",
       sceneProgress: 0,
@@ -4316,6 +4323,7 @@
       renderChapterMap();
       await renderExperience();
       startCanvas();
+      updateSoundButton();
     }
 
     async function getData(path, options = {}) {
@@ -4850,6 +4858,7 @@
       document.getElementById("decisionDock").classList.add("is-empty");
       closeEvidence();
       pulseSound("map-pressure");
+      await syncMusicToExperience();
     }
 
     async function renderStandpointChoice() {
@@ -4870,6 +4879,7 @@
       document.querySelectorAll("[data-scene-layer]").forEach(layer => layer.classList.remove("is-active"));
       document.getElementById("mapScene").classList.add("is-active");
       closeEvidence();
+      await syncMusicToExperience();
     }
 
     async function renderExperience() {
@@ -5332,6 +5342,7 @@
       updateRail();
       await preloadSceneEvidence(scene);
       pulseSound(scene.visualMode || scene.key);
+      await syncMusicToExperience();
     }
 
     async function preloadSceneEvidence(scene) {
@@ -5532,8 +5543,13 @@
     document.getElementById("soundToggle").addEventListener("click", async () => {
       await ensureAudio();
       state.soundEnabled = !state.soundEnabled;
-      document.getElementById("soundToggle").setAttribute("aria-pressed", String(state.soundEnabled));
-      if (state.soundEnabled) pulseSound("open");
+      updateSoundButton();
+      if (state.soundEnabled) {
+        await syncMusicToExperience({ immediate: true });
+        pulseSound("open");
+      } else {
+        stopMusic();
+      }
     });
 
     function buildChapterVisitSummary() {
@@ -5636,8 +5652,116 @@
       pulseSound("judgment");
     });
 
+    function ensureMusicDeck() {
+      if (state.music) return state.music;
+      const tracks = {};
+      Object.entries(musicTracks).forEach(([key, config]) => {
+        const audio = new Audio(config.src);
+        audio.loop = true;
+        audio.preload = "auto";
+        audio.volume = 0;
+        audio.dataset.musicTrack = key;
+        tracks[key] = audio;
+      });
+      state.music = { tracks };
+      return state.music;
+    }
+
+    function musicTrackForCurrentScene() {
+      if (state.experiencePhase === "pressure_entry" || state.experiencePhase === "standpoint_choice") {
+        return "narrative";
+      }
+      const scene = scenes[state.sceneIndex];
+      if (!scene || scene.key === "judgment" || state.experiencePhase === "judgment" || state.experiencePhase === "after_echo") {
+        return "reflection";
+      }
+      if (scene.visualMode === "archive-closure" || scene.visualMode === "statecraft-complexity") {
+        return "reflection";
+      }
+      return "debate";
+    }
+
+    async function syncMusicToExperience(options = {}) {
+      updateSoundButton();
+      if (!state.soundEnabled) return;
+      try {
+        await activateMusicTrack(musicTrackForCurrentScene(), options);
+      } catch (error) {
+        state.soundEnabled = false;
+        stopMusic();
+        updateSoundButton("带声进入");
+      }
+    }
+
+    async function activateMusicTrack(trackKey, options = {}) {
+      const deck = ensureMusicDeck();
+      const next = deck.tracks[trackKey];
+      if (!next) return;
+      const targetVolume = musicTracks[trackKey].volume;
+      if (state.activeMusicTrack === trackKey) {
+        if (next.paused) await next.play();
+        fadeAudio(next, targetVolume, options.immediate ? 180 : 900);
+        updateSoundButton();
+        return;
+      }
+
+      const previous = state.activeMusicTrack ? deck.tracks[state.activeMusicTrack] : null;
+      state.activeMusicTrack = trackKey;
+      next.volume = options.immediate ? targetVolume : 0;
+      if (next.paused) await next.play();
+      if (!options.immediate) fadeAudio(next, targetVolume, 1800);
+      if (previous && previous !== next) {
+        fadeAudio(previous, 0, 1600, () => {
+          previous.pause();
+          previous.currentTime = 0;
+        });
+      }
+      updateSoundButton();
+    }
+
+    function fadeAudio(audio, targetVolume, durationMs, done = null) {
+      if (audio._fadeTimer) window.clearInterval(audio._fadeTimer);
+      const startVolume = Number(audio.volume || 0);
+      const startedAt = Date.now();
+      audio._fadeTimer = window.setInterval(() => {
+        const progress = Math.min(1, (Date.now() - startedAt) / durationMs);
+        audio.volume = startVolume + ((targetVolume - startVolume) * progress);
+        if (progress >= 1) {
+          window.clearInterval(audio._fadeTimer);
+          audio._fadeTimer = null;
+          if (done) done();
+        }
+      }, 80);
+    }
+
+    function stopMusic() {
+      if (!state.music) {
+        updateSoundButton();
+        return;
+      }
+      Object.values(state.music.tracks).forEach(audio => {
+        fadeAudio(audio, 0, 600, () => {
+          audio.pause();
+          audio.currentTime = 0;
+        });
+      });
+      state.activeMusicTrack = null;
+      updateSoundButton();
+    }
+
+    function updateSoundButton(fallbackLabel = null) {
+      const button = document.getElementById("soundToggle");
+      if (!button) return;
+      button.setAttribute("aria-pressed", String(state.soundEnabled));
+      const trackKey = state.activeMusicTrack || musicTrackForCurrentScene();
+      const label = musicTracks[trackKey] ? musicTracks[trackKey].label : "声场";
+      button.textContent = state.soundEnabled ? label : fallbackLabel || "带声进入";
+      button.title = state.soundEnabled ? `正在播放：${label}` : "点击后开启叙事音乐；浏览器需要一次用户操作才允许播放声音";
+    }
+
     async function ensureAudio() {
       if (state.audio) return;
+      ensureMusicDeck();
       const AudioContext = window.AudioContext || window.webkitAudioContext;
       if (!AudioContext) return;
       const context = new AudioContext();
@@ -5645,6 +5769,7 @@
       master.gain.value = 0.045;
       master.connect(context.destination);
       state.audio = { context, master };
+      if (context.state === "suspended") await context.resume();
     }
 
     function pulseSound(kind) {
