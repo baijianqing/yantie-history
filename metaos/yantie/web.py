@@ -403,6 +403,10 @@ YANTIE_HTML = """<!doctype html>
       display: none;
     }
 
+    .stage:not(.is-prologue-active) #revealEvidence {
+      display: none;
+    }
+
     .stage[data-experience-phase="pressure_entry"] .pressure-director-panel {
       pointer-events: none;
     }
@@ -1893,11 +1897,11 @@ YANTIE_HTML = """<!doctype html>
     };
 
     const restorationSequence = [
-      { key: "era", label: "正在复原：汉昭帝始元六年" },
-      { key: "texts", label: "正在校勘：《盐铁论》《汉书》《史记》" },
-      { key: "map", label: "正在显影：长安、北边、山海盐铁" },
-      { key: "routes", label: "正在恢复：均输路线与府库压力" },
-      { key: "court", label: "正在接近：未央宫朝堂" }
+      { key: "era", label: "定位：汉昭帝始元六年" },
+      { key: "texts", label: "校勘：《盐铁论》《汉书》《史记》" },
+      { key: "map", label: "显影：长安、北边、山海盐铁" },
+      { key: "routes", label: "恢复：均输路线与府库压力" },
+      { key: "court", label: "接近：未央宫朝堂" }
     ];
 
     const restorationHotspots = {
@@ -4438,11 +4442,11 @@ YANTIE_HTML = """<!doctype html>
     function supportMarkup(meta) {
       return `
         <div class="support-strength" title="证据支持强度，不是绝对真相概率">
-          <span>证据支持强度</span>
+          <span>证据支持</span>
           <div class="support-track"><i style="width: ${Number(meta.value)}%"></i></div>
           <em>${Number(meta.value)}</em>
         </div>
-        <p class="support-note">${escapeHtml(meta.label)}。这是证据支持强度，不是绝对真相概率。</p>
+        <p class="support-note">${escapeHtml(meta.label)}，不是绝对真相概率。</p>
       `;
     }
 
@@ -4474,8 +4478,7 @@ YANTIE_HTML = """<!doctype html>
       const support = supportMeta(item.support);
       document.getElementById("pressureDirectorPanel").innerHTML = `
         <span class="pressure-time">${escapeHtml(item.time)}</span>
-        <h2>${escapeHtml(item.title)}</h2>
-        <p>${escapeHtml(item.narration)}</p>
+        <h2>压力分布</h2>
         <div class="pressure-grid" aria-label="历史压力变化">
           ${pressureRowsMarkup(item.pressure)}
         </div>
@@ -4524,7 +4527,6 @@ YANTIE_HTML = """<!doctype html>
       document.getElementById("pressureDirectorPanel").innerHTML = `
         <span class="pressure-time">入朝之前</span>
         <h2>你先站在哪里？</h2>
-        <p>不要先选择正确答案。先选择你愿意承受哪一种压力，再进入盐铁会议。</p>
         <div class="standpoint-grid" aria-label="初始身份选择">
           ${standpointRoles.map(role => `
             <button class="standpoint-card${state.userStandpoint === role.id ? " is-selected" : ""}" type="button" data-standpoint-id="${escapeHtml(role.id)}">
@@ -4568,9 +4570,9 @@ YANTIE_HTML = """<!doctype html>
       renderStandpointPanel();
       renderRestorationStatus(item);
       document.getElementById("chapterKicker").textContent = "入朝之前 · 初始站队";
-      document.getElementById("sceneTitle").textContent = "选择你带入朝堂的压力";
-      document.getElementById("sceneCopy").textContent = "国家财政官、边疆将军、地方百姓、盐铁商人都没有说完整的谎；他们只是承担不同压力。";
-      document.getElementById("sceneQuote").textContent = state.userStandpoint ? standpointRoles.find(role => role.id === state.userStandpoint).innerVoice : "先站队，再进入会议；之后你可以被证据改变。";
+      document.getElementById("sceneTitle").textContent = "带着立场入朝";
+      document.getElementById("sceneCopy").textContent = "先选择一种压力。它不是答案，只是你进入会议时最先相信的理由。";
+      document.getElementById("sceneQuote").textContent = state.userStandpoint ? standpointRoles.find(role => role.id === state.userStandpoint).innerVoice : "之后，证据可以改变你。";
       const advance = document.getElementById("advanceScene");
       advance.disabled = !state.userStandpoint;
       advance.textContent = state.userStandpoint ? "带着立场入朝" : "先选择身份";
@@ -4624,7 +4626,6 @@ YANTIE_HTML = """<!doctype html>
           <div class="debate-meta">
             <span class="debate-speaker">${escapeHtml(scene.speaker)}</span>
             <span class="stance-chip">${escapeHtml(scene.stance)}</span>
-            <span>${escapeHtml(scene.kicker)}</span>
           </div>
           <p class="debate-line">${escapeHtml(scene.line)}</p>
           ${supportMarkup(support)}
@@ -4691,7 +4692,6 @@ YANTIE_HTML = """<!doctype html>
             ${evidenceButtons.map(item => `
               <button class="evidence-seal" type="button" data-evidence-id="${escapeHtml(item.id)}">
                 ${escapeHtml(item.label)}
-                <em>证据支持强度 ${Number(item.support.value)}</em>
               </button>
             `).join("")}
           </div>

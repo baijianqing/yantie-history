@@ -151,6 +151,16 @@ class YantieWebUiTests(unittest.TestCase):
         self.assertIn("发现案卷", html)
         self.assertIn("发现一份竹简", html)
 
+    def test_yantie_page_reduces_duplicate_visible_copy(self) -> None:
+        html = self.client.get("/yantie").text
+
+        self.assertIn("<h2>压力分布</h2>", html)
+        self.assertIn("<span>证据支持</span>", html)
+        self.assertIn("不是绝对真相概率", html)
+        self.assertIn("带着立场入朝", html)
+        self.assertNotIn("证据支持强度 ${Number(item.support.value)}", html)
+        self.assertNotIn("<span>${escapeHtml(scene.kicker)}</span>", html)
+
     def test_yantie_page_has_overlap_resistant_layout_rules(self) -> None:
         html = self.client.get("/yantie").text
 
