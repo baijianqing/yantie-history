@@ -387,6 +387,14 @@ YANTIE_HTML = """<!doctype html>
       display: none;
     }
 
+    .stage[data-experience-phase="pressure_entry"] .pressure-director-panel {
+      pointer-events: none;
+    }
+
+    .stage[data-experience-phase="standpoint_choice"] .pressure-director-panel {
+      pointer-events: auto;
+    }
+
     .pressure-director-panel h2 {
       margin: 0 0 8px;
       font-size: 20px;
@@ -397,6 +405,114 @@ YANTIE_HTML = """<!doctype html>
       margin: 0;
       color: rgba(255,244,214,0.78);
       line-height: 1.62;
+    }
+
+    .restoration-status-panel {
+      position: absolute;
+      top: clamp(78px, 10vh, 118px);
+      left: clamp(16px, 4vw, 42px);
+      z-index: 7;
+      display: grid;
+      gap: 9px;
+      width: min(340px, calc(100vw - 32px));
+      padding: 14px;
+      border: 1px solid rgba(255,236,188,0.2);
+      border-radius: 8px;
+      background: rgba(9,13,19,0.34);
+      box-shadow: 0 18px 48px rgba(0,0,0,0.22);
+      color: #fff4d6;
+      pointer-events: none;
+      backdrop-filter: blur(10px);
+    }
+
+    .stage:not(.is-prologue-active) .restoration-status-panel,
+    .stage:not(.is-prologue-active) .restoration-discovery-panel {
+      display: none;
+    }
+
+    .restoration-status-title {
+      margin: 0;
+      color: #f3c46d;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    .restoration-step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: rgba(255,244,214,0.62);
+      font-size: 12px;
+      line-height: 1.4;
+      transition: color 180ms ease, transform 180ms ease;
+    }
+
+    .restoration-step::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      flex: 0 0 auto;
+      border-radius: 999px;
+      background: rgba(255,244,214,0.24);
+      box-shadow: 0 0 0 rgba(243,196,109,0);
+      transition: background 180ms ease, box-shadow 180ms ease;
+    }
+
+    .restoration-step.is-active {
+      color: #fff4d6;
+      transform: translateX(2px);
+    }
+
+    .restoration-step.is-active::before {
+      background: #f3c46d;
+      box-shadow: 0 0 18px rgba(243,196,109,0.62);
+    }
+
+    .restoration-discovery-panel {
+      position: absolute;
+      left: clamp(16px, 5vw, 78px);
+      bottom: clamp(96px, 13vh, 132px);
+      z-index: 9;
+      width: min(340px, calc(100vw - 32px));
+      padding: 13px 14px;
+      border: 1px solid rgba(243,196,109,0.34);
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(61,32,22,0.78), rgba(9,13,19,0.48));
+      box-shadow: 0 20px 54px rgba(0,0,0,0.28);
+      color: #fff4d6;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 180ms ease, transform 220ms ease;
+      pointer-events: none;
+      backdrop-filter: blur(10px);
+    }
+
+    .restoration-discovery-panel.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .restoration-discovery-panel strong {
+      display: block;
+      margin-bottom: 5px;
+      color: #ffe7b0;
+      font-size: 15px;
+    }
+
+    .restoration-discovery-panel span {
+      display: block;
+      color: rgba(255,244,214,0.66);
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .restoration-discovery-panel p {
+      margin: 0;
+      color: rgba(255,244,214,0.8);
+      font-size: 13px;
+      line-height: 1.55;
     }
 
     .pressure-time {
@@ -858,9 +974,10 @@ YANTIE_HTML = """<!doctype html>
     .judgment-layer {
       position: absolute;
       inset: 0;
+      visibility: hidden;
       opacity: 0;
       transform: scale(1.03);
-      transition: opacity 680ms ease, transform 900ms ease;
+      transition: opacity 680ms ease, transform 900ms ease, visibility 0s linear 680ms;
       pointer-events: none;
     }
 
@@ -869,7 +986,13 @@ YANTIE_HTML = """<!doctype html>
     .network-layer.is-active,
     .judgment-layer.is-active {
       opacity: 1;
+      visibility: visible;
       transform: scale(1);
+      transition-delay: 0s;
+    }
+
+    .map-layer.is-active {
+      pointer-events: auto;
     }
 
     .map-layer svg,
@@ -926,6 +1049,29 @@ YANTIE_HTML = """<!doctype html>
       stroke-linejoin: round;
     }
 
+    .map-feature-marker {
+      cursor: pointer;
+      pointer-events: all;
+    }
+
+    .map-feature-marker circle {
+      transition: r 180ms ease, stroke-width 180ms ease, filter 180ms ease;
+    }
+
+    .map-feature-marker:hover circle,
+    .map-feature-marker:focus-visible circle,
+    .map-feature-marker.is-restoration-focus circle {
+      r: 25px;
+      stroke-width: 7px;
+      filter: drop-shadow(0 0 18px rgba(243,196,109,0.72));
+    }
+
+    .map-feature-marker:hover text,
+    .map-feature-marker:focus-visible text,
+    .map-feature-marker.is-restoration-focus text {
+      fill: #ffe7b0;
+    }
+
     .stage.is-prologue-active .map-feature-marker text {
       font-size: 18px;
       opacity: 0.82;
@@ -934,6 +1080,12 @@ YANTIE_HTML = """<!doctype html>
     .pressure-route {
       stroke-dasharray: 18 18;
       animation: routeMarch 3.8s linear infinite;
+    }
+
+    .map-live-flow {
+      fill: #fff4d6;
+      opacity: 0.86;
+      filter: drop-shadow(0 0 8px rgba(243,196,109,0.72));
     }
 
     .capital-pulse,
@@ -947,6 +1099,7 @@ YANTIE_HTML = """<!doctype html>
 
     .court-threshold-wash {
       opacity: 0;
+      pointer-events: none;
       transition: opacity 560ms ease;
     }
 
@@ -1442,13 +1595,35 @@ YANTIE_HTML = """<!doctype html>
       }
 
       .pressure-director-panel {
+        top: 236px;
+        left: 12px;
+        right: 12px;
+        width: auto;
+        max-height: 30vh;
+        overflow: auto;
+        padding: 12px;
+      }
+
+      .restoration-status-panel {
         top: 104px;
         left: 12px;
         right: 12px;
         width: auto;
-        max-height: 42vh;
-        overflow: auto;
-        padding: 12px;
+        max-height: 118px;
+        overflow: hidden;
+        padding: 11px;
+      }
+
+      .restoration-step {
+        font-size: 11px;
+        line-height: 1.3;
+      }
+
+      .restoration-discovery-panel {
+        left: 12px;
+        right: 12px;
+        bottom: 106px;
+        width: auto;
       }
 
       .standpoint-grid {
@@ -1567,7 +1742,7 @@ YANTIE_HTML = """<!doctype html>
         <blockquote class="quote-line" id="sceneQuote">边塞军费、山海盐铁、转运网络，都在向长安汇聚。</blockquote>
         <div class="scene-actions">
           <button id="advanceScene" class="primary" type="button">继续进入</button>
-          <button id="revealEvidence" class="ghost" type="button">史料浮现</button>
+          <button id="revealEvidence" class="ghost" type="button">发现竹简</button>
           <button id="chapterMapToggle" class="ghost" type="button">诸篇争锋</button>
           <button id="rewindScene" class="ghost" type="button">回看</button>
         </div>
@@ -1586,6 +1761,8 @@ YANTIE_HTML = """<!doctype html>
             <span>长安</span>
           </div>
           <p class="prologue-map-note">开源 GIS 方案兼容的汉昭帝时期复原叙事地图；本地矢量层绘制，不伪装成精确测绘边界。</p>
+          <div id="restorationStatusPanel" class="restoration-status-panel" aria-live="polite"></div>
+          <div id="restorationDiscoveryPanel" class="restoration-discovery-panel" aria-live="polite"></div>
           <div id="pressureDirectorPanel" class="pressure-director-panel" aria-live="polite"></div>
           <div class="drama-progress" aria-hidden="true">
             <div class="drama-step"><span></span></div>
@@ -1648,7 +1825,55 @@ YANTIE_HTML = """<!doctype html>
       experiencePhase: "pressure_entry",
       pressureIndex: 0,
       userStandpoint: null,
-      stanceTrajectory: []
+      stanceTrajectory: [],
+      restorationFocus: null,
+      restorationDiscoveries: new Set()
+    };
+
+    const restorationSequence = [
+      { key: "era", label: "正在复原：汉昭帝始元六年" },
+      { key: "texts", label: "正在校勘：《盐铁论》《汉书》《史记》" },
+      { key: "map", label: "正在显影：长安、北边、山海盐铁" },
+      { key: "routes", label: "正在恢复：均输路线与府库压力" },
+      { key: "court", label: "正在接近：未央宫朝堂" }
+    ];
+
+    const restorationHotspots = {
+      feature_changan: {
+        label: "长安",
+        signal: "朝廷正在召议",
+        question: "为什么压力最后汇入长安？",
+        answer: "因为盐铁、均输、边费和诏令都要在这里被转化成国家决策。",
+        sound: "court"
+      },
+      feature_northern_frontier: {
+        label: "北边与朔方",
+        signal: "边军告急",
+        question: "为什么财政争论会先从边防开始？",
+        answer: "边费是盐铁官营最强的现实理由：没有持续供给，边塞秩序就会先松动。",
+        sound: "frontier"
+      },
+      feature_jincheng: {
+        label: "金城郡",
+        signal: "河西压力",
+        question: "为什么郡县设置也会成为财政问题？",
+        answer: "新设边郡意味着驻防、转运和行政成本，国家能力必须被持续供养。",
+        sound: "frontier"
+      },
+      feature_salt_iron_resources: {
+        label: "盐铁山海之利",
+        signal: "金铁有声",
+        question: "为什么盐铁不是普通物产？",
+        answer: "它连接日用、军备和财政，一旦入官，就把市场问题变成治理问题。",
+        sound: "metal"
+      },
+      feature_equal_transport_routes: {
+        label: "均输转运网络",
+        signal: "车船正在转运",
+        question: "为什么均输会引发争论？",
+        answer: "它能调剂物资，也会让官府更深地进入买卖与价格。",
+        sound: "bamboo"
+      }
     };
 
     const pressureTimeline = [
@@ -4035,6 +4260,8 @@ YANTIE_HTML = """<!doctype html>
     }));
 
     async function boot() {
+      document.getElementById("packStatus").textContent = "历史正在复原";
+      renderRestorationStatus(pressureTimeline[0]);
       const [manifest, actors, events, claims, relations, mapLayers] = await Promise.all([
         getData("/manifest"),
         getData("/actors?include=evidence_summary"),
@@ -4194,6 +4421,43 @@ YANTIE_HTML = """<!doctype html>
       `;
     }
 
+    function renderRestorationStatus(item) {
+      const activeIndex = Math.min(restorationSequence.length - 1, state.pressureIndex);
+      document.getElementById("restorationStatusPanel").innerHTML = `
+        <p class="restoration-status-title" data-testid="history-restoration-runtime">历史正在复原</p>
+        ${restorationSequence.map((step, index) => `
+          <div class="restoration-step${index <= activeIndex ? " is-active" : ""}" data-restoration-step="${escapeHtml(step.key)}">
+            ${escapeHtml(step.label)}
+          </div>
+        `).join("")}
+      `;
+      if (item && state.restorationDiscoveries.size === 0) {
+        showRestorationHotspot(item.mapFocus, { quiet: true });
+      }
+    }
+
+    function showRestorationHotspot(featureId, options = {}) {
+      const hotspot = restorationHotspotFor(featureId);
+      const panel = document.getElementById("restorationDiscoveryPanel");
+      state.restorationFocus = featureId;
+      if (!options.quiet) state.restorationDiscoveries.add(featureId);
+      document.querySelectorAll("[data-restoration-hotspot]").forEach(node => {
+        node.classList.toggle("is-restoration-focus", node.dataset.restorationHotspot === featureId);
+      });
+      panel.innerHTML = `
+        <span>${escapeHtml(hotspot.signal)}</span>
+        <strong>${escapeHtml(hotspot.question)}</strong>
+        <p>${escapeHtml(hotspot.answer)}</p>
+      `;
+      panel.classList.add("is-visible");
+      if (!options.quiet) pulseSound(hotspot.sound || "bamboo");
+    }
+
+    function hideRestorationHotspot() {
+      if (state.restorationDiscoveries.size > 0) return;
+      document.getElementById("restorationDiscoveryPanel").classList.remove("is-visible");
+    }
+
     function renderStandpointPanel() {
       document.getElementById("pressureDirectorPanel").innerHTML = `
         <span class="pressure-time">入朝之前</span>
@@ -4218,6 +4482,7 @@ YANTIE_HTML = """<!doctype html>
       renderRoundVisual(scene);
       renderDramaOverlay(scene);
       renderPressurePanel(item);
+      renderRestorationStatus(item);
       document.getElementById("chapterKicker").textContent = "历史压力入场";
       document.getElementById("sceneTitle").textContent = item.title;
       document.getElementById("sceneCopy").textContent = item.narration;
@@ -4239,6 +4504,7 @@ YANTIE_HTML = """<!doctype html>
       renderRoundVisual(scene);
       renderDramaOverlay(scene);
       renderStandpointPanel();
+      renderRestorationStatus(item);
       document.getElementById("chapterKicker").textContent = "入朝之前 · 初始站队";
       document.getElementById("sceneTitle").textContent = "选择你带入朝堂的压力";
       document.getElementById("sceneCopy").textContent = "国家财政官、边疆将军、地方百姓、盐铁商人都没有说完整的谎；他们只是承担不同压力。";
@@ -4278,7 +4544,7 @@ YANTIE_HTML = """<!doctype html>
 
     function sceneEvidenceButtons(scene) {
       const rawButtons = [
-        ...(scene.historicalEvidence || []).map((id, index) => ({ id, label: `史证 ${index + 1}`, support: evidenceSupportFor(id) })),
+        ...(scene.historicalEvidence || []).map((id, index) => ({ id, label: `发现竹简 ${index + 1}`, support: evidenceSupportFor(id) })),
         ...(scene.philosophyLens || []).map(id => ({ id, label: lensMetaFor(id).label, support: evidenceSupportFor(id) }))
       ];
       const seen = new Set();
@@ -4383,6 +4649,16 @@ YANTIE_HTML = """<!doctype html>
       return [Math.max(120, Math.min(850, x * 8.6)), Math.max(112, Math.min(560, y * 7.2))];
     }
 
+    function restorationHotspotFor(featureId) {
+      return restorationHotspots[featureId] || {
+        label: "历史地点",
+        signal: "等待复原",
+        question: "为什么这里重要？",
+        answer: "这个地点正在参与盐铁会议的压力网络。",
+        sound: "bamboo"
+      };
+    }
+
     function renderHanRestoredBasemap() {
       return `
         <g class="han-restored-basemap" data-testid="han-restored-basemap" data-gis-mode="open-source-compatible" aria-label="开源 GIS 兼容的汉昭帝时期复原叙事地图">
@@ -4425,7 +4701,14 @@ YANTIE_HTML = """<!doctype html>
         const labelX = feature.feature_id === "feature_changan" ? px + 24 : Math.min(px + 22, 840);
         const labelY = feature.feature_id === "feature_northern_frontier" ? py - 22 : py - 14;
         const markerSize = layer.layer_type === "capital" ? 20 : 14;
-        return `<g class="map-feature-marker" filter="url(#softGlow)" data-feature="${escapeHtml(feature.feature_id)}">
+        const hotspot = restorationHotspotFor(feature.feature_id);
+        const focusClass = state.restorationFocus === feature.feature_id ? " is-restoration-focus" : "";
+        return `<g class="map-feature-marker restoration-hotspot${focusClass}" filter="url(#softGlow)" role="button" tabindex="0"
+          data-feature="${escapeHtml(feature.feature_id)}"
+          data-restoration-hotspot="${escapeHtml(feature.feature_id)}"
+          data-question="${escapeHtml(hotspot.question)}"
+          aria-label="${escapeHtml(hotspot.label)}：${escapeHtml(hotspot.signal)}">
+          <title>${escapeHtml(hotspot.question)} ${escapeHtml(hotspot.answer)}</title>
           <circle cx="${px}" cy="${py}" r="${markerSize}" fill="${color}" stroke="#fff4d6" stroke-width="5"/>
           <text x="${labelX}" y="${labelY}" fill="#fff4d6" font-size="24">${escapeHtml(feature.title)}</text>
         </g>`;
@@ -4453,6 +4736,9 @@ YANTIE_HTML = """<!doctype html>
           <path class="pressure-route" d="M506 132 C474 190 440 244 408 314" fill="none" stroke="#9a241c" stroke-width="8" stroke-linecap="round"/>
           <path class="pressure-route" d="M716 424 C642 392 546 350 408 314" fill="none" stroke="#2c7a66" stroke-width="7" stroke-linecap="round" opacity="0.74"/>
           <path class="pressure-route" d="M574 356 C518 336 462 326 408 314" fill="none" stroke="#f3c46d" stroke-width="6" stroke-linecap="round" opacity="0.78"/>
+          <circle class="map-live-flow" r="6"><animateMotion dur="6.2s" repeatCount="indefinite" path="M506 132 C474 190 440 244 408 314"/></circle>
+          <circle class="map-live-flow" r="5" opacity="0.72"><animateMotion dur="7.6s" repeatCount="indefinite" begin="-2.1s" path="M716 424 C642 392 546 350 408 314"/></circle>
+          <circle class="map-live-flow" r="4" opacity="0.66"><animateMotion dur="5.8s" repeatCount="indefinite" begin="-1.2s" path="M574 356 C518 336 462 326 408 314"/></circle>
           <circle class="resource-pulse is-frontier" cx="506" cy="132" r="38" fill="rgba(154,36,28,0.2)" stroke="rgba(154,36,28,0.68)" stroke-width="3"/>
           <circle class="resource-pulse" cx="716" cy="424" r="36" fill="rgba(44,122,102,0.2)" stroke="rgba(44,122,102,0.68)" stroke-width="3"/>
           <circle class="resource-pulse is-transport" cx="574" cy="356" r="34" fill="rgba(243,196,109,0.16)" stroke="rgba(243,196,109,0.62)" stroke-width="3"/>
@@ -4647,7 +4933,7 @@ YANTIE_HTML = """<!doctype html>
           `).join("")}
         </div>
         <div class="evidence-seals" aria-label="本篇史证">
-          ${chapter.historicalEvidence.map((id, index) => `<button class="evidence-seal" type="button" data-evidence-id="${escapeHtml(id)}">史证 ${index + 1}</button>`).join("")}
+          ${chapter.historicalEvidence.map((id, index) => `<button class="evidence-seal" type="button" data-evidence-id="${escapeHtml(id)}">发现案卷 ${index + 1}</button>`).join("")}
         </div>
         <div class="lens-section" aria-label="本篇思想透镜">
           <p class="lens-section-title">用什么眼光看这场争论</p>
@@ -4711,7 +4997,7 @@ YANTIE_HTML = """<!doctype html>
       const ribbon = document.getElementById("evidenceRibbon");
       ribbon.innerHTML = `
         <div class="evidence-panel-head">
-          <p class="evidence-panel-title">${allLens ? "思想透镜" : "史料浮现"}</p>
+          <p class="evidence-panel-title">${allLens ? "思想透镜" : "发现一份竹简"}</p>
           <button class="evidence-close" type="button" data-close-evidence aria-label="关闭证据" title="关闭证据">×</button>
         </div>
         <div class="evidence-list">
@@ -4803,6 +5089,36 @@ YANTIE_HTML = """<!doctype html>
         note: role.innerVoice
       });
       await renderStandpointChoice();
+    });
+
+    document.getElementById("hanMapScene").addEventListener("pointerover", event => {
+      const hotspotNode = event.target.closest("[data-restoration-hotspot]");
+      if (!hotspotNode) return;
+      showRestorationHotspot(hotspotNode.dataset.restorationHotspot, { quiet: true });
+    });
+
+    document.getElementById("hanMapScene").addEventListener("pointerout", event => {
+      if (event.relatedTarget && event.relatedTarget.closest && event.relatedTarget.closest("[data-restoration-hotspot]")) return;
+      hideRestorationHotspot();
+    });
+
+    document.getElementById("hanMapScene").addEventListener("focusin", event => {
+      const hotspotNode = event.target.closest("[data-restoration-hotspot]");
+      if (!hotspotNode) return;
+      showRestorationHotspot(hotspotNode.dataset.restorationHotspot, { quiet: true });
+    });
+
+    document.getElementById("hanMapScene").addEventListener("keydown", event => {
+      const hotspotNode = event.target.closest("[data-restoration-hotspot]");
+      if (!hotspotNode || !["Enter", " "].includes(event.key)) return;
+      event.preventDefault();
+      showRestorationHotspot(hotspotNode.dataset.restorationHotspot);
+    });
+
+    document.getElementById("hanMapScene").addEventListener("click", event => {
+      const hotspotNode = event.target.closest("[data-restoration-hotspot]");
+      if (!hotspotNode) return;
+      showRestorationHotspot(hotspotNode.dataset.restorationHotspot);
     });
 
     document.getElementById("chapterMapToggle").addEventListener("click", openChapterMap);
@@ -5009,7 +5325,10 @@ YANTIE_HTML = """<!doctype html>
         network: 72,
         judgment: 180,
         evidence: 232,
-        open: 156
+        open: 156,
+        frontier: 74,
+        metal: 258,
+        bamboo: 210
       };
       osc.frequency.value = freqs[kind] || 110;
       osc.type = kind === "power-shadow" || kind === "network" || kind === "fiscal-pressure" ? "sawtooth" : "sine";

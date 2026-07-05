@@ -125,6 +125,32 @@ class YantieWebUiTests(unittest.TestCase):
         self.assertIn(".stage.is-prologue-active .evidence-seals", html)
         self.assertIn('id="pressureDirectorPanel"', html)
 
+    def test_yantie_page_exposes_v33_restoration_feedback_runtime(self) -> None:
+        html = self.client.get("/yantie").text
+
+        self.assertIn("const restorationSequence = [", html)
+        self.assertIn("const restorationHotspots = {", html)
+        self.assertIn('id="restorationStatusPanel"', html)
+        self.assertIn('id="restorationDiscoveryPanel"', html)
+        self.assertIn('data-testid="history-restoration-runtime"', html)
+        self.assertIn("renderRestorationStatus", html)
+        self.assertIn("showRestorationHotspot", html)
+        self.assertIn("data-restoration-hotspot", html)
+        self.assertIn("restoration-hotspot", html)
+        self.assertIn("map-live-flow", html)
+        self.assertIn("animateMotion", html)
+        for feature_id in [
+            "feature_changan",
+            "feature_northern_frontier",
+            "feature_jincheng",
+            "feature_salt_iron_resources",
+            "feature_equal_transport_routes",
+        ]:
+            self.assertIn(feature_id, html)
+        self.assertIn("发现竹简", html)
+        self.assertIn("发现案卷", html)
+        self.assertIn("发现一份竹简", html)
+
     def test_yantie_page_is_guided_not_tab_driven(self) -> None:
         html = self.client.get("/yantie").text
 
