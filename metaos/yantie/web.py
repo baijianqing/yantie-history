@@ -310,6 +310,9 @@ YANTIE_HTML = """<!doctype html>
 
     .stage.is-prologue-active .quote-line,
     .stage.is-prologue-active #revealEvidence,
+    .stage.is-prologue-active #evidenceScrim,
+    .stage.is-prologue-active #evidenceRibbon,
+    .stage.is-prologue-active .evidence-seals,
     .stage.is-prologue-active #chapterMapToggle,
     .stage.is-prologue-active #rewindScene,
     .stage.is-prologue-active #decisionDock,
@@ -321,6 +324,11 @@ YANTIE_HTML = """<!doctype html>
 
     .stage.is-prologue-active .scene-actions {
       margin-top: 18px;
+    }
+
+    .stage.is-prologue-active #advanceScene:disabled {
+      cursor: not-allowed;
+      opacity: 0.48;
     }
 
     .stage.is-prologue-active .scene-world {
@@ -357,6 +365,140 @@ YANTIE_HTML = """<!doctype html>
 
     .stage.is-prologue-active .prologue-map-note {
       opacity: 1;
+    }
+
+    .pressure-director-panel {
+      position: absolute;
+      top: clamp(78px, 10vh, 118px);
+      right: clamp(16px, 4vw, 42px);
+      z-index: 7;
+      width: min(430px, calc(100vw - 32px));
+      padding: 16px;
+      border: 1px solid rgba(255,236,188,0.24);
+      border-radius: 8px;
+      background: rgba(9,13,19,0.48);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+      color: #fff4d6;
+      pointer-events: auto;
+    }
+
+    .stage:not(.is-prologue-active) .pressure-director-panel {
+      display: none;
+    }
+
+    .pressure-director-panel h2 {
+      margin: 0 0 8px;
+      font-size: 20px;
+      line-height: 1.35;
+    }
+
+    .pressure-director-panel p {
+      margin: 0;
+      color: rgba(255,244,214,0.78);
+      line-height: 1.62;
+    }
+
+    .pressure-time {
+      display: inline-flex;
+      margin-bottom: 10px;
+      padding: 3px 8px;
+      border: 1px solid rgba(243,196,109,0.36);
+      border-radius: 999px;
+      color: #f3c46d;
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(154,36,28,0.14);
+    }
+
+    .pressure-grid {
+      display: grid;
+      gap: 9px;
+      margin: 14px 0;
+    }
+
+    .pressure-row {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr) 34px;
+      align-items: center;
+      gap: 8px;
+      color: rgba(255,244,214,0.78);
+      font-size: 12px;
+    }
+
+    .pressure-bar,
+    .support-track {
+      height: 7px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(255,244,214,0.13);
+    }
+
+    .pressure-bar i,
+    .support-track i {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #36516c, #f3c46d, #9a241c);
+    }
+
+    .support-strength {
+      display: grid;
+      grid-template-columns: 116px minmax(0, 1fr) 30px;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+      color: rgba(255,244,214,0.66);
+      font-size: 12px;
+    }
+
+    .support-note {
+      margin-top: 8px;
+      color: rgba(255,244,214,0.56);
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .standpoint-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .standpoint-card {
+      min-height: 132px;
+      padding: 12px;
+      border: 1px solid rgba(255,236,188,0.2);
+      border-radius: 6px;
+      color: #fff4d6;
+      text-align: left;
+      cursor: pointer;
+      background: rgba(255,244,214,0.08);
+      transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+    }
+
+    .standpoint-card.is-selected {
+      border-color: rgba(243,196,109,0.82);
+      background: rgba(154,36,28,0.2);
+      transform: translateY(-2px);
+    }
+
+    .standpoint-card strong,
+    .standpoint-card span {
+      display: block;
+    }
+
+    .standpoint-card strong {
+      margin-bottom: 7px;
+      color: #ffe7b0;
+      font-size: 14px;
+    }
+
+    .standpoint-card span {
+      color: rgba(255,244,214,0.72);
+      font-size: 12px;
+      line-height: 1.5;
     }
 
     .drama-thread {
@@ -656,6 +798,15 @@ YANTIE_HTML = """<!doctype html>
       color: #fff4d6;
       font-size: 12px;
       font-weight: 700;
+    }
+
+    .evidence-seal em {
+      display: block;
+      margin-top: 3px;
+      color: rgba(255,244,214,0.56);
+      font-size: 10px;
+      font-style: normal;
+      line-height: 1.2;
     }
 
     .lens-section {
@@ -1146,6 +1297,33 @@ YANTIE_HTML = """<!doctype html>
       white-space: pre-wrap;
     }
 
+    .stance-trajectory-panel {
+      max-height: 174px;
+      margin-bottom: 10px;
+      padding: 12px;
+      overflow: auto;
+      border: 1px solid rgba(255,236,188,0.18);
+      border-radius: 6px;
+      color: rgba(255,244,214,0.72);
+      background: rgba(9,13,19,0.36);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .stance-trajectory-panel strong {
+      display: block;
+      margin-bottom: 6px;
+      color: #ffe7b0;
+      font-size: 13px;
+    }
+
+    .stance-trajectory-panel ol {
+      display: grid;
+      gap: 5px;
+      margin: 0;
+      padding-left: 18px;
+    }
+
     .scene-footnote {
       position: fixed;
       right: clamp(16px, 4vw, 48px);
@@ -1261,6 +1439,24 @@ YANTIE_HTML = """<!doctype html>
 
       .stage.is-prologue-active .scene-world {
         min-height: calc(100vh - 94px);
+      }
+
+      .pressure-director-panel {
+        top: 104px;
+        left: 12px;
+        right: 12px;
+        width: auto;
+        max-height: 42vh;
+        overflow: auto;
+        padding: 12px;
+      }
+
+      .standpoint-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .standpoint-card {
+        min-height: 92px;
       }
 
       .stage.is-prologue-active .scene-title {
@@ -1390,6 +1586,7 @@ YANTIE_HTML = """<!doctype html>
             <span>长安</span>
           </div>
           <p class="prologue-map-note">开源 GIS 方案兼容的汉昭帝时期复原叙事地图；本地矢量层绘制，不伪装成精确测绘边界。</p>
+          <div id="pressureDirectorPanel" class="pressure-director-panel" aria-live="polite"></div>
           <div class="drama-progress" aria-hidden="true">
             <div class="drama-step"><span></span></div>
             <div class="drama-step"><span></span></div>
@@ -1409,6 +1606,7 @@ YANTIE_HTML = """<!doctype html>
         <div id="judgmentScene" class="judgment-layer" data-scene-layer="judgment">
           <svg id="judgmentSvg" viewBox="0 0 1000 680" role="img" aria-label="退朝案牍收束场景"></svg>
           <form class="judgment-form" id="judgmentForm">
+            <div id="stanceTrajectoryPanel" class="stance-trajectory-panel" aria-label="观点变化图"></div>
             <textarea id="reflectionInput" placeholder="写下你的退朝案牍：当边费、与民争利和权力阴影同时成立时，制度应废止、修正，还是保留并审计？"></textarea>
             <button class="primary" type="submit">钤下案牍</button>
             <div id="judgmentOutput" class="judgment-output">你的退朝案牍不会写入历史证据包。</div>
@@ -1446,7 +1644,136 @@ YANTIE_HTML = """<!doctype html>
       soundEnabled: false,
       dramaPhase: "map-pressure",
       sceneProgress: 0,
-      animationTick: 0
+      animationTick: 0,
+      experiencePhase: "pressure_entry",
+      pressureIndex: 0,
+      userStandpoint: null,
+      stanceTrajectory: []
+    };
+
+    const pressureTimeline = [
+      {
+        key: "wudi-afterglow",
+        time: "公元前 87 年后",
+        title: "武帝余响还在运转",
+        narration: "战争、转运、盐铁和平准没有随武帝去世而停止。财政机器继续转动，会议尚未开始，压力已经存在。",
+        mapFocus: "feature_changan",
+        pressure: { frontier: 58, treasury: 72, livelihood: 38, merchants: 48, power: 44 },
+        evidence: ["ev:src_shiji_pingzhun:juan030:salt_iron_offices:3344bbcc"],
+        support: 95
+      },
+      {
+        key: "frontier-report",
+        time: "北边急报",
+        title: "边防压力向长安逼近",
+        narration: "北边军费与粮草不是抽象数字。边塞每一次吃紧，都会把府库、运输和征敛一起推向朝堂。",
+        mapFocus: "feature_northern_frontier",
+        pressure: { frontier: 92, treasury: 80, livelihood: 42, merchants: 46, power: 58 },
+        evidence: ["ev:src_shiji_pingzhun:juan030:frontier_supply:66778899"],
+        support: 95
+      },
+      {
+        key: "treasury-tight",
+        time: "府库吃紧",
+        title: "国家先感到缺钱",
+        narration: "财政官看到的是府库、边费和制度调度。若国家先失去筹措能力，道德理想也会失去执行边界。",
+        mapFocus: "feature_equal_transport_routes",
+        pressure: { frontier: 86, treasury: 94, livelihood: 48, merchants: 54, power: 64 },
+        evidence: ["ev:src_shiji_pingzhun:juan030:sang_equal_transport:5e6f7081"],
+        support: 95
+      },
+      {
+        key: "salt-iron-office",
+        time: "盐铁入官",
+        title: "山海之利被纳入制度",
+        narration: "盐铁资源从地方、商贾和山海之间被拉入国家网络。它可能抑制豪强，也可能让官府更深地进入民生日用。",
+        mapFocus: "feature_salt_iron_resources",
+        pressure: { frontier: 74, treasury: 88, livelihood: 66, merchants: 82, power: 70 },
+        evidence: ["ev:src_yantielun:juan01_benyi:border_finance:1a2b3c4d"],
+        support: 80
+      },
+      {
+        key: "livelihood-burden",
+        time: "民户承压",
+        title: "百姓开始感到制度的重量",
+        narration: "当政策落到盐价、铁器、徭役和农桑上，财政技术就变成了生活经验。民间痛感开始反问国家能力的边界。",
+        mapFocus: "feature_jincheng",
+        pressure: { frontier: 66, treasury: 76, livelihood: 92, merchants: 72, power: 68 },
+        evidence: ["ev:src_yantielun:juan01_benyi:literati_abolish:0a1b2c3d"],
+        support: 80
+      },
+      {
+        key: "summon-court",
+        time: "始元六年",
+        title: "未央宫召议",
+        narration: "朝廷问民所疾苦。会议即将开始，但每个人带进朝堂的不是观点本身，而是自己承受的压力。",
+        mapFocus: "feature_changan",
+        pressure: { frontier: 78, treasury: 82, livelihood: 86, merchants: 68, power: 88 },
+        evidence: ["ev:src_hanshu_zhaodi:juan007:meeting_edict:ccddeeff"],
+        support: 95
+      }
+    ];
+
+    const standpointRoles = [
+      {
+        id: "fiscal-official",
+        label: "国家财政官",
+        pressureFocus: "府库",
+        initialLeaning: 28,
+        innerVoice: "若府库空虚，边防与赈济都只是愿望。"
+      },
+      {
+        id: "frontier-general",
+        label: "边疆将军",
+        pressureFocus: "边防",
+        initialLeaning: 34,
+        innerVoice: "粮草一断，城塞先替朝堂承受后果。"
+      },
+      {
+        id: "local-household",
+        label: "地方百姓",
+        pressureFocus: "民生",
+        initialLeaning: 74,
+        innerVoice: "制度说是为国，落到日用便是负担。"
+      },
+      {
+        id: "salt-iron-merchant",
+        label: "盐铁商人",
+        pressureFocus: "商贾",
+        initialLeaning: 62,
+        innerVoice: "官府入市，豪强未必消失，生计却先被改写。"
+      }
+    ];
+
+    const experienceDirector = {
+      phases: ["pressure_entry", "standpoint_choice", "court_debate", "power_reveal", "after_echo", "judgment"],
+      pressureLabels: {
+        frontier: "边防",
+        treasury: "府库",
+        livelihood: "民生",
+        merchants: "商贾",
+        power: "权力"
+      },
+      supportLabel(value) {
+        if (value >= 90) return "核心史料直接支持";
+        if (value >= 75) return "史料加策展推断";
+        return "思想透镜解释";
+      },
+      phaseForScene(scene) {
+        if (state.experiencePhase === "pressure_entry" || state.experiencePhase === "standpoint_choice") return state.experiencePhase;
+        if (scene.key === "judgment") return "judgment";
+        if (scene.visualMode === "power-shadow") return "power_reveal";
+        if (scene.key === "network") return "power_reveal";
+        return "court_debate";
+      },
+      recordTrajectory(point) {
+        const index = state.stanceTrajectory.findIndex(item => item.stage === point.stage);
+        if (index >= 0) {
+          state.stanceTrajectory[index] = point;
+        } else {
+          state.stanceTrajectory.push(point);
+        }
+      }
     };
 
     const historicalPrelude = [
@@ -3726,7 +4053,7 @@ YANTIE_HTML = """<!doctype html>
       renderRail();
       renderStaticScenes();
       renderChapterMap();
-      await renderScene();
+      await renderExperience();
       startCanvas();
     }
 
@@ -3787,13 +4114,154 @@ YANTIE_HTML = """<!doctype html>
       const stage = document.querySelector(".stage");
       const world = document.querySelector(".scene-world");
       const opening = document.getElementById("courtPressureOpening");
-      const isPrologueActive = state.sceneIndex === 0 && phase === "map-pressure";
+      const isDirectorEntry = state.experiencePhase === "pressure_entry" || state.experiencePhase === "standpoint_choice";
+      const isPrologueActive = isDirectorEntry || (state.sceneIndex === 0 && phase === "map-pressure");
       stage.classList.toggle("is-prologue-active", isPrologueActive);
       stage.dataset.prologue = isPrologueActive ? "active" : "complete";
+      stage.dataset.experiencePhase = experienceDirector.phaseForScene(scene);
       world.dataset.dramaPhase = phase;
       opening.dataset.dramaPhase = phase;
       opening.dataset.visualMode = scene.visualMode || scene.key;
       opening.dataset.prologue = isPrologueActive ? "active" : "complete";
+    }
+
+    function supportMeta(value) {
+      return {
+        value,
+        label: experienceDirector.supportLabel(value)
+      };
+    }
+
+    function evidenceSupportFor(evidenceId) {
+      if (philosophyLensMeta[evidenceId]) return supportMeta(65);
+      if (/^ev:src_(yantielun|hanshu|shiji|zizhi)/.test(evidenceId)) return supportMeta(95);
+      return supportMeta(80);
+    }
+
+    function sceneSupportFor(scene) {
+      const hasLens = Array.isArray(scene.philosophyLens) && scene.philosophyLens.length > 0;
+      const hasHistory = Array.isArray(scene.historicalEvidence) && scene.historicalEvidence.length > 0;
+      if (hasHistory && hasLens) return supportMeta(80);
+      if (hasHistory) return supportMeta(95);
+      return supportMeta(65);
+    }
+
+    function supportMarkup(meta) {
+      return `
+        <div class="support-strength" title="证据支持强度，不是绝对真相概率">
+          <span>证据支持强度</span>
+          <div class="support-track"><i style="width: ${Number(meta.value)}%"></i></div>
+          <em>${Number(meta.value)}</em>
+        </div>
+        <p class="support-note">${escapeHtml(meta.label)}。这是证据支持强度，不是绝对真相概率。</p>
+      `;
+    }
+
+    function pressureRowsMarkup(pressure) {
+      return Object.entries(experienceDirector.pressureLabels).map(([key, label]) => {
+        const value = Number(pressure[key] || 0);
+        return `
+          <div class="pressure-row">
+            <span>${escapeHtml(label)}</span>
+            <div class="pressure-bar"><i style="width: ${value}%"></i></div>
+            <em>${value}</em>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function pressureSceneFor(item) {
+      return {
+        key: "map",
+        layer: "map",
+        visualMode: "background-map",
+        evidence: item.evidence,
+        historicalEvidence: item.evidence,
+        philosophyLens: []
+      };
+    }
+
+    function renderPressurePanel(item) {
+      const support = supportMeta(item.support);
+      document.getElementById("pressureDirectorPanel").innerHTML = `
+        <span class="pressure-time">${escapeHtml(item.time)}</span>
+        <h2>${escapeHtml(item.title)}</h2>
+        <p>${escapeHtml(item.narration)}</p>
+        <div class="pressure-grid" aria-label="历史压力变化">
+          ${pressureRowsMarkup(item.pressure)}
+        </div>
+        ${supportMarkup(support)}
+      `;
+    }
+
+    function renderStandpointPanel() {
+      document.getElementById("pressureDirectorPanel").innerHTML = `
+        <span class="pressure-time">入朝之前</span>
+        <h2>你先站在哪里？</h2>
+        <p>不要先选择正确答案。先选择你愿意承受哪一种压力，再进入盐铁会议。</p>
+        <div class="standpoint-grid" aria-label="初始身份选择">
+          ${standpointRoles.map(role => `
+            <button class="standpoint-card${state.userStandpoint === role.id ? " is-selected" : ""}" type="button" data-standpoint-id="${escapeHtml(role.id)}">
+              <strong>${escapeHtml(role.label)}</strong>
+              <span>${escapeHtml(role.pressureFocus)}压力 · 初始倾向 ${Number(role.initialLeaning)}/100</span>
+              <span>${escapeHtml(role.innerVoice)}</span>
+            </button>
+          `).join("")}
+        </div>
+        <p class="support-note">这一选择不会改变历史事实，只会记录你的进入视角，并进入最终观点变化图。</p>
+      `;
+    }
+
+    async function renderPressureEntry() {
+      const item = pressureTimeline[state.pressureIndex];
+      const scene = pressureSceneFor(item);
+      renderRoundVisual(scene);
+      renderDramaOverlay(scene);
+      renderPressurePanel(item);
+      document.getElementById("chapterKicker").textContent = "历史压力入场";
+      document.getElementById("sceneTitle").textContent = item.title;
+      document.getElementById("sceneCopy").textContent = item.narration;
+      document.getElementById("sceneQuote").textContent = "背景不是说明文字；背景正在发生。";
+      const advance = document.getElementById("advanceScene");
+      advance.disabled = false;
+      advance.textContent = state.pressureIndex === pressureTimeline.length - 1 ? "选择站位" : "继续经历";
+      document.getElementById("rewindScene").style.visibility = state.pressureIndex === 0 ? "hidden" : "visible";
+      document.querySelectorAll("[data-scene-layer]").forEach(layer => layer.classList.remove("is-active"));
+      document.getElementById("mapScene").classList.add("is-active");
+      document.getElementById("decisionDock").classList.add("is-empty");
+      closeEvidence();
+      pulseSound("map-pressure");
+    }
+
+    async function renderStandpointChoice() {
+      const item = pressureTimeline[pressureTimeline.length - 1];
+      const scene = pressureSceneFor(item);
+      renderRoundVisual(scene);
+      renderDramaOverlay(scene);
+      renderStandpointPanel();
+      document.getElementById("chapterKicker").textContent = "入朝之前 · 初始站队";
+      document.getElementById("sceneTitle").textContent = "选择你带入朝堂的压力";
+      document.getElementById("sceneCopy").textContent = "国家财政官、边疆将军、地方百姓、盐铁商人都没有说完整的谎；他们只是承担不同压力。";
+      document.getElementById("sceneQuote").textContent = state.userStandpoint ? standpointRoles.find(role => role.id === state.userStandpoint).innerVoice : "先站队，再进入会议；之后你可以被证据改变。";
+      const advance = document.getElementById("advanceScene");
+      advance.disabled = !state.userStandpoint;
+      advance.textContent = state.userStandpoint ? "带着立场入朝" : "先选择身份";
+      document.getElementById("rewindScene").style.visibility = "visible";
+      document.querySelectorAll("[data-scene-layer]").forEach(layer => layer.classList.remove("is-active"));
+      document.getElementById("mapScene").classList.add("is-active");
+      closeEvidence();
+    }
+
+    async function renderExperience() {
+      if (state.experiencePhase === "pressure_entry") {
+        await renderPressureEntry();
+        return;
+      }
+      if (state.experiencePhase === "standpoint_choice") {
+        await renderStandpointChoice();
+        return;
+      }
+      await renderScene();
     }
 
     function lensMetaFor(evidenceId) {
@@ -3810,8 +4278,8 @@ YANTIE_HTML = """<!doctype html>
 
     function sceneEvidenceButtons(scene) {
       const rawButtons = [
-        ...(scene.historicalEvidence || []).map((id, index) => ({ id, label: `史证 ${index + 1}` })),
-        ...(scene.philosophyLens || []).map(id => ({ id, label: lensMetaFor(id).label }))
+        ...(scene.historicalEvidence || []).map((id, index) => ({ id, label: `史证 ${index + 1}`, support: evidenceSupportFor(id) })),
+        ...(scene.philosophyLens || []).map(id => ({ id, label: lensMetaFor(id).label, support: evidenceSupportFor(id) }))
       ];
       const seen = new Set();
       return rawButtons.filter(item => {
@@ -3822,6 +4290,7 @@ YANTIE_HTML = """<!doctype html>
     }
 
     function renderSceneCaption(scene) {
+      const support = sceneSupportFor(scene);
       document.getElementById("debateHud").innerHTML = `
         <div class="scene-caption" data-visual-mode="${escapeHtml(scene.visualMode)}">
           <div class="debate-meta">
@@ -3830,6 +4299,7 @@ YANTIE_HTML = """<!doctype html>
             <span>${escapeHtml(scene.kicker)}</span>
           </div>
           <p class="debate-line">${escapeHtml(scene.line)}</p>
+          ${supportMarkup(support)}
         </div>
       `;
     }
@@ -3891,7 +4361,10 @@ YANTIE_HTML = """<!doctype html>
           ` : ""}
           <div class="evidence-seals" aria-label="本幕证据印记">
             ${evidenceButtons.map(item => `
-              <button class="evidence-seal" type="button" data-evidence-id="${escapeHtml(item.id)}">${escapeHtml(item.label)}</button>
+              <button class="evidence-seal" type="button" data-evidence-id="${escapeHtml(item.id)}">
+                ${escapeHtml(item.label)}
+                <em>证据支持强度 ${Number(item.support.value)}</em>
+              </button>
             `).join("")}
           </div>
       `;
@@ -4209,11 +4682,14 @@ YANTIE_HTML = """<!doctype html>
       document.getElementById("sceneTitle").textContent = scene.title;
       document.getElementById("sceneCopy").textContent = scene.copy;
       document.getElementById("sceneQuote").textContent = scene.quote;
-      document.getElementById("advanceScene").textContent = state.sceneIndex === 0 ? "进入朝堂" : state.sceneIndex === scenes.length - 1 ? "停在案前" : "继续进入";
+      const advanceButton = document.getElementById("advanceScene");
+      advanceButton.disabled = false;
+      advanceButton.textContent = state.sceneIndex === 0 ? "进入朝堂" : state.sceneIndex === scenes.length - 1 ? "停在案前" : "继续进入";
       document.getElementById("rewindScene").style.visibility = state.sceneIndex === 0 ? "hidden" : "visible";
       document.querySelectorAll("[data-scene-layer]").forEach(layer => layer.classList.remove("is-active"));
       const layerId = scene.key === "map" ? "mapScene" : scene.key === "court" ? "courtScene" : scene.key === "network" ? "networkScene" : "judgmentScene";
       document.getElementById(layerId).classList.add("is-active");
+      if (scene.key === "judgment") renderStanceTrajectoryPanel();
       closeEvidence();
       updateRail();
       await preloadSceneEvidence(scene);
@@ -4264,20 +4740,70 @@ YANTIE_HTML = """<!doctype html>
     }
 
     document.getElementById("advanceScene").addEventListener("click", async () => {
+      if (state.experiencePhase === "pressure_entry") {
+        if (state.pressureIndex < pressureTimeline.length - 1) {
+          state.pressureIndex += 1;
+        } else {
+          state.experiencePhase = "standpoint_choice";
+        }
+        await renderExperience();
+        return;
+      }
+      if (state.experiencePhase === "standpoint_choice") {
+        if (!state.userStandpoint) return;
+        state.experiencePhase = "court_debate";
+        state.sceneIndex = 1;
+        await renderExperience();
+        return;
+      }
       if (state.sceneIndex < scenes.length - 1) {
         state.sceneIndex += 1;
+        state.experiencePhase = experienceDirector.phaseForScene(scenes[state.sceneIndex]);
         await renderScene();
       }
     });
 
     document.getElementById("rewindScene").addEventListener("click", async () => {
+      if (state.experiencePhase === "pressure_entry") {
+        if (state.pressureIndex > 0) state.pressureIndex -= 1;
+        await renderExperience();
+        return;
+      }
+      if (state.experiencePhase === "standpoint_choice") {
+        state.experiencePhase = "pressure_entry";
+        state.pressureIndex = pressureTimeline.length - 1;
+        await renderExperience();
+        return;
+      }
       if (state.sceneIndex > 0) {
         state.sceneIndex -= 1;
-        await renderScene();
+        if (state.sceneIndex <= 0) {
+          state.experiencePhase = "pressure_entry";
+          state.pressureIndex = pressureTimeline.length - 1;
+          await renderExperience();
+        } else {
+          state.experiencePhase = experienceDirector.phaseForScene(scenes[state.sceneIndex]);
+          await renderScene();
+        }
       }
     });
 
     document.getElementById("revealEvidence").addEventListener("click", () => openEvidence());
+
+    document.getElementById("pressureDirectorPanel").addEventListener("click", async event => {
+      const roleNode = event.target.closest("[data-standpoint-id]");
+      if (!roleNode) return;
+      const role = standpointRoles.find(item => item.id === roleNode.dataset.standpointId);
+      if (!role) return;
+      state.userStandpoint = role.id;
+      experienceDirector.recordTrajectory({
+        stage: "standpoint",
+        label: role.label,
+        value: role.initialLeaning,
+        note: role.innerVoice
+      });
+      await renderStandpointChoice();
+    });
 
     document.getElementById("chapterMapToggle").addEventListener("click", openChapterMap);
 
@@ -4322,6 +4848,17 @@ YANTIE_HTML = """<!doctype html>
       const target = event.target.closest("[data-act-key]");
       if (!target) return;
       state.userChoices[target.dataset.actKey] = Number(target.value);
+      const act = conflictActs.find(item => item.key === target.dataset.actKey);
+      if (act) {
+        const leaning = leaningForAct(act);
+        experienceDirector.recordTrajectory({
+          stage: act.key,
+          label: act.kicker,
+          value: leaning.value,
+          note: leaning.label
+        });
+      }
+      if (scenes[state.sceneIndex]?.key === "judgment") renderStanceTrajectoryPanel();
     });
 
     document.getElementById("soundToggle").addEventListener("click", async () => {
@@ -4360,6 +4897,51 @@ YANTIE_HTML = """<!doctype html>
       }).join("\\n");
     }
 
+    function selectedStandpointRole() {
+      return standpointRoles.find(role => role.id === state.userStandpoint) || null;
+    }
+
+    function leaningForAct(act) {
+      const value = Number(state.userChoices[act.key] ?? 50);
+      return {
+        value,
+        label: value < 40 ? act.choiceLeft : value > 60 ? act.choiceRight : "保留张力"
+      };
+    }
+
+    function buildStanceTrajectoryItems() {
+      const role = selectedStandpointRole();
+      const items = [];
+      if (role) {
+        items.push(`入场身份：${role.label}。初始压力：${role.pressureFocus}。内心判断：${role.innerVoice}`);
+      } else {
+        items.push("入场身份：尚未选择。");
+      }
+      conflictActs.forEach(act => {
+        const leaning = leaningForAct(act);
+        items.push(`${act.kicker}：${leaning.label}（${leaning.value}/100）`);
+      });
+      const finalAct = conflictActs[conflictActs.length - 1];
+      const finalLeaning = leaningForAct(finalAct);
+      items.push(`最终倾向：带着“${finalLeaning.label}”离开朝堂；这仍是个人判断，不是历史事实。`);
+      return items;
+    }
+
+    function buildStanceTrajectorySummary() {
+      return `观点变化图：\\n${buildStanceTrajectoryItems().join("\\n")}`;
+    }
+
+    function renderStanceTrajectoryPanel() {
+      const panel = document.getElementById("stanceTrajectoryPanel");
+      if (!panel) return;
+      panel.innerHTML = `
+        <strong>观点变化图</strong>
+        <ol>
+          ${buildStanceTrajectoryItems().map(item => `<li>${escapeHtml(item)}</li>`).join("")}
+        </ol>
+      `;
+    }
+
     document.getElementById("judgmentForm").addEventListener("submit", async event => {
       event.preventDefault();
       const sceneEvidence = scenes.flatMap(scene => scene.evidence).filter((id, index, ids) => ids.indexOf(id) === index);
@@ -4369,6 +4951,7 @@ YANTIE_HTML = """<!doctype html>
       });
       const selectedEvidence = [...sceneEvidence, ...chapterEvidence].filter((id, index, ids) => ids.indexOf(id) === index);
       const reflectionText = document.getElementById("reflectionInput").value || "";
+      const trajectorySummary = buildStanceTrajectorySummary();
       const choiceSummary = `五幕显影选择：\\n${buildChoiceSummary()}`;
       const chapterSummary = buildChapterVisitSummary();
       const lensSummary = buildLensVisitSummary();
@@ -4378,7 +4961,7 @@ YANTIE_HTML = """<!doctype html>
         body: JSON.stringify({
           selected_claim_ids: ["claim_conflict_is_moral_and_fiscal", "claim_power_network_not_optional"],
           selected_evidence_ids: selectedEvidence,
-          personal_reflection: [choiceSummary, chapterSummary, lensSummary, reflectionText].filter(Boolean).join("\\n\\n") || null,
+          personal_reflection: [trajectorySummary, choiceSummary, chapterSummary, lensSummary, reflectionText].filter(Boolean).join("\\n\\n") || null,
           disposition: "modern_analogy_with_caution"
         })
       });

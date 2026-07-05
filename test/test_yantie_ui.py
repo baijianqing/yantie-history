@@ -89,6 +89,42 @@ class YantieWebUiTests(unittest.TestCase):
         for marker in forbidden_runtime_markers:
             self.assertNotIn(marker, html)
 
+    def test_yantie_page_exposes_v32_pressure_entry_and_standpoint_flow(self) -> None:
+        html = self.client.get("/yantie").text
+
+        self.assertIn("const pressureTimeline = [", html)
+        self.assertIn("const standpointRoles = [", html)
+        self.assertIn("const experienceDirector = {", html)
+        self.assertIn("stanceTrajectory", html)
+        for phase in ["pressure_entry", "standpoint_choice", "court_debate", "power_reveal", "after_echo", "judgment"]:
+            self.assertIn(phase, html)
+        for pressure in ["边防", "府库", "民生", "商贾", "权力"]:
+            self.assertIn(pressure, html)
+        for role in ["国家财政官", "边疆将军", "地方百姓", "盐铁商人"]:
+            self.assertIn(role, html)
+        for pressure_node in ["武帝余响", "北边急报", "府库吃紧", "盐铁入官", "民户承压", "未央宫召议"]:
+            self.assertIn(pressure_node, html)
+
+        self.assertIn("证据支持强度", html)
+        self.assertIn("不是绝对真相概率", html)
+        self.assertIn('id="pressureDirectorPanel"', html)
+        self.assertIn('id="stanceTrajectoryPanel"', html)
+        self.assertIn("观点变化图", html)
+        self.assertIn("selected_evidence_ids", html)
+        self.assertIn("personal_reflection", html)
+        self.assertIn("/judgment-cards", html)
+        self.assertNotIn("v3-court-anchors", html)
+        self.assertNotIn("role-silhouette", html)
+        self.assertNotIn("character-silhouette", html)
+
+    def test_yantie_page_hides_evidence_overlay_during_pressure_entry(self) -> None:
+        html = self.client.get("/yantie").text
+
+        self.assertIn(".stage.is-prologue-active #evidenceScrim", html)
+        self.assertIn(".stage.is-prologue-active #evidenceRibbon", html)
+        self.assertIn(".stage.is-prologue-active .evidence-seals", html)
+        self.assertIn('id="pressureDirectorPanel"', html)
+
     def test_yantie_page_is_guided_not_tab_driven(self) -> None:
         html = self.client.get("/yantie").text
 
