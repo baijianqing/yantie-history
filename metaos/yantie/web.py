@@ -404,84 +404,8 @@ YANTIE_HTML = """<!doctype html>
 
     .stage.is-prologue-active .drama-thread,
     .stage.is-prologue-active .drama-route-labels,
-    .stage.is-prologue-active .role-silhouette-row,
     .stage.is-prologue-active .drama-progress {
       display: none;
-    }
-
-    .role-silhouette-row {
-      position: absolute;
-      left: 8%;
-      right: 8%;
-      bottom: 94px;
-      display: grid;
-      grid-template-columns: 1fr 0.7fr 1fr;
-      align-items: end;
-      gap: clamp(10px, 3vw, 34px);
-      opacity: 0;
-      transform: translateY(18px);
-      transition: opacity 520ms ease, transform 700ms ease;
-    }
-
-    .scene-world[data-drama-phase="meeting-threshold"] .role-silhouette-row,
-    .scene-world[data-drama-phase="fiscal-pressure"] .role-silhouette-row,
-    .scene-world[data-drama-phase="livelihood-counter"] .role-silhouette-row,
-    .scene-world[data-drama-phase="power-shadow"] .role-silhouette-row {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .role-silhouette {
-      min-width: 0;
-      display: grid;
-      justify-items: center;
-      gap: 7px;
-      color: rgba(255,244,214,0.78);
-      font-size: 12px;
-      font-weight: 700;
-      text-align: center;
-    }
-
-    .role-silhouette::before {
-      content: "";
-      display: block;
-      width: min(92px, 22vw);
-      height: min(132px, 26vw);
-      border: 1px solid rgba(255,236,188,0.28);
-      border-radius: 48% 48% 10px 10px;
-      background:
-        radial-gradient(circle at 50% 22%, rgba(255,244,214,0.72) 0 12%, transparent 13%),
-        linear-gradient(180deg, rgba(255,244,214,0.2), rgba(9,13,19,0.78));
-      box-shadow: 0 20px 60px rgba(0,0,0,0.36);
-    }
-
-    .role-silhouette.is-sang::before {
-      background:
-        radial-gradient(circle at 50% 22%, rgba(207,229,255,0.76) 0 12%, transparent 13%),
-        linear-gradient(180deg, rgba(54,81,108,0.62), rgba(9,13,19,0.78));
-      box-shadow: 0 0 42px rgba(54,81,108,0.42);
-    }
-
-    .role-silhouette.is-literati::before {
-      background:
-        radial-gradient(circle at 50% 22%, rgba(220,247,223,0.78) 0 12%, transparent 13%),
-        linear-gradient(180deg, rgba(44,122,102,0.58), rgba(9,13,19,0.78));
-      box-shadow: 0 0 42px rgba(44,122,102,0.36);
-    }
-
-    .role-silhouette.is-huo {
-      align-self: start;
-      color: rgba(255,244,214,0.64);
-    }
-
-    .role-silhouette.is-huo::before {
-      width: min(118px, 24vw);
-      height: min(172px, 32vw);
-      background:
-        radial-gradient(circle at 50% 18%, rgba(154,36,28,0.62) 0 10%, transparent 12%),
-        linear-gradient(180deg, rgba(154,36,28,0.52), rgba(3,6,10,0.92));
-      box-shadow: 0 0 90px rgba(154,36,28,0.45);
-      opacity: 0.82;
     }
 
     .drama-progress {
@@ -812,6 +736,26 @@ YANTIE_HTML = """<!doctype html>
 
     .han-restored-basemap .region-boundary {
       stroke-dasharray: 10 9;
+    }
+
+    .han-restored-basemap .gis-grid {
+      opacity: 0.16;
+      stroke-dasharray: 4 14;
+    }
+
+    .han-restored-basemap .han-river {
+      fill: none;
+      stroke: rgba(86,128,150,0.64);
+      stroke-width: 5;
+      stroke-linecap: round;
+    }
+
+    .han-restored-basemap .frontier-ridge {
+      fill: none;
+      stroke: rgba(255,236,188,0.24);
+      stroke-width: 5;
+      stroke-linecap: round;
+      stroke-dasharray: 12 10;
     }
 
     .han-restored-basemap .region-label,
@@ -1342,17 +1286,6 @@ YANTIE_HTML = """<!doctype html>
         min-height: 440px;
       }
 
-      .role-silhouette-row {
-        left: 6%;
-        right: 6%;
-        bottom: 74px;
-        gap: 8px;
-      }
-
-      .role-silhouette {
-        font-size: 11px;
-      }
-
       .drama-route-labels {
         inset: 12px 10px auto 10px;
         font-size: 11px;
@@ -1456,12 +1389,7 @@ YANTIE_HTML = """<!doctype html>
             <span>均输</span>
             <span>长安</span>
           </div>
-          <p class="prologue-map-note">汉昭帝时期复原叙事地图；参考历史地理资料绘制，不作为精确 GIS 边界。</p>
-          <div class="role-silhouette-row">
-            <div class="role-silhouette is-sang">桑弘羊 · 财政国家</div>
-            <div class="role-silhouette is-huo">霍光阴影</div>
-            <div class="role-silhouette is-literati">贤良文学 · 民生德义</div>
-          </div>
+          <p class="prologue-map-note">开源 GIS 方案兼容的汉昭帝时期复原叙事地图；本地矢量层绘制，不伪装成精确测绘边界。</p>
           <div class="drama-progress" aria-hidden="true">
             <div class="drama-step"><span></span></div>
             <div class="drama-step"><span></span></div>
@@ -1473,7 +1401,7 @@ YANTIE_HTML = """<!doctype html>
           <svg id="hanMapScene" viewBox="0 0 1000 680" role="img" aria-label="动态汉代版图"></svg>
         </div>
         <div id="courtScene" class="court-layer" data-scene-layer="court">
-          <svg id="courtSvg" viewBox="0 0 1000 680" role="img" aria-label="朝堂席位与辩论"></svg>
+          <svg id="courtSvg" viewBox="0 0 1000 680" role="img" aria-label="朝堂压力场与辩论"></svg>
         </div>
         <div id="networkScene" class="network-layer" data-scene-layer="network">
           <svg id="powerNetworkScene" viewBox="0 0 1000 680" role="img" aria-label="权力关系网"></svg>
@@ -1802,7 +1730,7 @@ YANTIE_HTML = """<!doctype html>
             "quote": "桑弘羊建造酒榷盐铁，为国兴利，伐其功。",
             "speaker": "权力阴影",
             "stance": "权力边界",
-            "line": "辩论仍在继续，但谁能决定辩论的边界，已经站在席位之外。",
+            "line": "辩论仍在继续，但谁能决定辩论的边界，已经在发声之外。",
             "revealedConflict": "权力压过思想，让会议结果显得有限而残酷。",
             "dominantForce": "权力",
             "opposingVoices": [
@@ -3984,23 +3912,33 @@ YANTIE_HTML = """<!doctype html>
 
     function renderHanRestoredBasemap() {
       return `
-        <g class="han-restored-basemap" data-testid="han-restored-basemap" aria-label="汉昭帝时期复原叙事地图">
-          <path class="region-fill" d="M132 398 C134 305 190 244 288 226 C344 163 462 140 564 166 C678 158 814 232 856 354 C826 458 712 526 564 516 C474 575 344 562 250 506 C170 494 124 452 132 398 Z"
-            fill="url(#hanLand)" stroke="#5d4327" stroke-width="7" opacity="0.92"/>
-          <path class="region-fill" d="M254 250 C294 210 358 198 420 218 C440 260 430 315 388 344 C326 354 282 326 254 250 Z"
-            fill="rgba(196,146,69,0.22)" stroke="rgba(255,236,188,0.42)" stroke-width="3"/>
-          <path class="region-boundary" d="M236 214 C340 194 440 216 520 186 C606 158 704 186 798 250" fill="none" stroke="rgba(255,236,188,0.34)" stroke-width="3"/>
-          <path class="region-boundary" d="M354 176 C386 266 382 352 424 430 C448 476 506 500 570 516" fill="none" stroke="rgba(255,236,188,0.26)" stroke-width="3"/>
-          <path class="region-boundary" d="M512 226 C606 268 672 338 790 362" fill="none" stroke="rgba(255,236,188,0.28)" stroke-width="3"/>
-          <path d="M204 320 C304 300 386 314 472 288 C580 258 656 282 766 244" fill="none" stroke="rgba(87,126,150,0.7)" stroke-width="5" opacity="0.82"/>
-          <path d="M430 460 C536 496 628 520 764 492" fill="none" stroke="rgba(87,126,150,0.5)" stroke-width="5" opacity="0.56"/>
-          <path d="M190 220 C214 246 228 286 226 336" fill="none" stroke="rgba(255,244,214,0.22)" stroke-width="6" stroke-linecap="round"/>
+        <g class="han-restored-basemap" data-testid="han-restored-basemap" data-gis-mode="open-source-compatible" aria-label="开源 GIS 兼容的汉昭帝时期复原叙事地图">
+          <path class="gis-grid" d="M150 126 H860 M150 214 H860 M150 302 H860 M150 390 H860 M150 478 H860 M150 566 H860 M190 112 V588 M300 112 V588 M410 112 V588 M520 112 V588 M630 112 V588 M740 112 V588 M850 112 V588"
+            fill="none" stroke="rgba(255,244,214,0.5)" stroke-width="1"/>
+          <path class="region-fill" d="M126 338 C138 270 188 226 260 214 C310 166 390 146 474 156 C562 144 658 168 742 226 C830 286 872 354 854 430 C832 516 724 564 602 540 C508 594 380 592 274 534 C184 520 112 444 126 338 Z"
+            fill="url(#hanLand)" stroke="#5d4327" stroke-width="7" opacity="0.94"/>
+          <path class="region-fill" d="M182 214 C228 162 322 122 430 132 C498 134 562 150 626 180 C562 208 484 222 398 216 C314 210 246 226 182 214 Z"
+            fill="rgba(87,111,107,0.28)" stroke="rgba(255,236,188,0.32)" stroke-width="3"/>
+          <path class="region-fill" d="M252 264 C292 224 360 210 424 228 C456 270 444 326 398 356 C332 366 280 336 252 264 Z"
+            fill="rgba(196,146,69,0.26)" stroke="rgba(255,236,188,0.46)" stroke-width="3"/>
+          <path class="region-fill" d="M520 230 C626 212 744 250 820 340 C796 410 690 456 566 430 C534 368 516 300 520 230 Z"
+            fill="rgba(174,134,70,0.2)" stroke="rgba(255,236,188,0.34)" stroke-width="3"/>
+          <path class="region-fill" d="M442 440 C546 466 662 484 810 454 C762 526 652 568 528 542 C482 518 450 486 442 440 Z"
+            fill="rgba(64,111,91,0.22)" stroke="rgba(255,236,188,0.3)" stroke-width="3"/>
+          <path class="frontier-ridge" d="M174 194 C272 146 382 122 504 132 C638 142 744 184 824 246"/>
+          <path class="region-boundary" d="M242 242 C342 224 444 238 526 206 C618 174 728 206 816 282" fill="none" stroke="rgba(255,236,188,0.34)" stroke-width="3"/>
+          <path class="region-boundary" d="M354 184 C382 262 382 356 422 438 C452 496 506 520 574 536" fill="none" stroke="rgba(255,236,188,0.26)" stroke-width="3"/>
+          <path class="region-boundary" d="M510 236 C606 274 674 342 802 368" fill="none" stroke="rgba(255,236,188,0.28)" stroke-width="3"/>
+          <path class="han-river" d="M194 318 C300 300 386 314 474 288 C584 256 662 282 782 240"/>
+          <path class="han-river" d="M420 462 C538 498 632 520 778 492" opacity="0.64"/>
+          <path d="M186 224 C216 248 230 286 228 338" fill="none" stroke="rgba(255,244,214,0.22)" stroke-width="6" stroke-linecap="round"/>
           <path d="M304 190 C356 220 374 248 408 314" fill="none" stroke="rgba(255,244,214,0.22)" stroke-width="5" stroke-linecap="round"/>
-          <text class="region-label" x="364" y="266" fill="rgba(255,244,214,0.78)" font-size="24" text-anchor="middle">关中</text>
-          <text class="region-label" x="332" y="182" fill="rgba(255,244,214,0.56)" font-size="18" text-anchor="middle">河西 / 北边</text>
-          <text class="region-label" x="656" y="308" fill="rgba(255,244,214,0.54)" font-size="19" text-anchor="middle">山东腹地</text>
-          <text class="region-label" x="690" y="508" fill="rgba(255,244,214,0.48)" font-size="17" text-anchor="middle">江淮与山海</text>
-          <text class="map-source-label" x="858" y="626" fill="rgba(255,244,214,0.46)" font-size="14" text-anchor="end">复原叙事地图 · 非精确 GIS</text>
+          <text class="region-label" x="364" y="268" fill="rgba(255,244,214,0.8)" font-size="24" text-anchor="middle">关中</text>
+          <text class="region-label" x="340" y="166" fill="rgba(255,244,214,0.58)" font-size="18" text-anchor="middle">河西 / 北边郡</text>
+          <text class="region-label" x="666" y="308" fill="rgba(255,244,214,0.58)" font-size="19" text-anchor="middle">山东郡国</text>
+          <text class="region-label" x="690" y="510" fill="rgba(255,244,214,0.5)" font-size="17" text-anchor="middle">江淮与山海资源</text>
+          <text class="map-source-label" x="858" y="604" fill="rgba(255,244,214,0.54)" font-size="14" text-anchor="end">开源 GIS 方案兼容 · 本地简化矢量层</text>
+          <text class="map-source-label" x="858" y="628" fill="rgba(255,244,214,0.42)" font-size="13" text-anchor="end">参考历史地理资料复原 · 非精确测绘边界</text>
         </g>`;
     }
 
@@ -4068,16 +4006,18 @@ YANTIE_HTML = """<!doctype html>
       ];
       const activeActors = activeCourtActors(scene);
       const courtPressure = scene.visualMode === "fiscal-ascendant" || scene.visualMode === "livelihood-counter" || scene.visualMode === "power-shadow";
-      const v3CourtOpeningLayer = `
-        <g data-testid="v3-court-silhouettes" opacity="${courtPressure || scene.visualMode === "meeting-open" ? 0.96 : 0.62}">
-          <path d="M192 508 C204 432 222 370 260 326 C302 372 318 432 330 508 Z" fill="rgba(54,81,108,0.64)" stroke="rgba(207,229,255,0.58)" stroke-width="3"/>
-          <path d="M670 508 C682 432 700 370 738 326 C780 372 796 432 808 508 Z" fill="rgba(44,122,102,0.64)" stroke="rgba(220,247,223,0.58)" stroke-width="3"/>
-          <path d="M418 278 C438 196 468 150 500 126 C536 156 568 206 590 278 C540 252 474 252 418 278 Z" fill="rgba(154,36,28,0.64)" stroke="rgba(255,244,214,0.36)" stroke-width="3"/>
-          <path d="M500 190 C454 282 386 358 278 434 C452 388 552 388 724 434 C622 358 550 282 500 190 Z"
-            fill="rgba(154,36,28,${scene.visualMode === "power-shadow" ? 0.42 : 0.16})"/>
-          <text x="260" y="545" text-anchor="middle" fill="#cfe5ff" font-size="22">府库与边费</text>
-          <text x="738" y="545" text-anchor="middle" fill="#dcf7df" font-size="22">农桑与疾苦</text>
-          <text x="500" y="314" text-anchor="middle" fill="#ffe7b0" font-size="24">屏风之后</text>
+      const v3CourtPressureField = `
+        <g data-testid="v3-court-pressure-field" opacity="${courtPressure || scene.visualMode === "meeting-open" ? 0.92 : 0.5}">
+          <path d="M110 558 C268 426 350 336 500 210 C650 336 732 426 890 558"
+            fill="none" stroke="rgba(255,236,188,0.18)" stroke-width="4"/>
+          <path d="M500 136 C456 258 382 366 250 486 C420 426 578 426 750 486 C618 366 544 258 500 136 Z"
+            fill="rgba(154,36,28,${scene.visualMode === "power-shadow" ? 0.38 : 0.12})"/>
+          <path d="M246 474 C342 374 404 318 500 248" fill="none" stroke="rgba(54,81,108,0.46)" stroke-width="9" stroke-linecap="round"/>
+          <path d="M754 474 C658 374 596 318 500 248" fill="none" stroke="rgba(44,122,102,0.46)" stroke-width="9" stroke-linecap="round"/>
+          <path d="M500 148 C500 230 500 322 500 476" fill="none" stroke="rgba(154,36,28,0.42)" stroke-width="12" stroke-linecap="round"/>
+          <text x="270" y="522" text-anchor="middle" fill="#cfe5ff" font-size="22">财政压力</text>
+          <text x="730" y="522" text-anchor="middle" fill="#dcf7df" font-size="22">民生反问</text>
+          <text x="500" y="314" text-anchor="middle" fill="#ffe7b0" font-size="24">权力边界</text>
         </g>
       `;
       const openingLayer = scene.visualMode === "meeting-open" ? `
@@ -4102,7 +4042,7 @@ YANTIE_HTML = """<!doctype html>
         <path d="M140 608 L860 608" stroke="rgba(255,236,188,0.22)" stroke-width="4"/>
         <path d="M500 125 L500 608" stroke="rgba(255,236,188,0.16)" stroke-width="3"/>
         <path d="M292 382 C400 300 600 300 708 382" fill="none" stroke="#f3c46d" stroke-width="5" stroke-dasharray="14 16"/>
-        ${v3CourtOpeningLayer}
+        ${v3CourtPressureField}
         ${openingLayer}
         ${oppositionLayer}
         ${clashLayer}
@@ -4117,7 +4057,7 @@ YANTIE_HTML = """<!doctype html>
             <text x="${x}" y="${y + 8}" text-anchor="middle" fill="#fff4d6" font-size="24">${escapeHtml(actor ? actor.name : actorId)}</text>
           </g>`;
         }).join("")}
-        <text x="500" y="650" text-anchor="middle" fill="rgba(255,244,214,0.66)" font-size="22">朝堂不是中立空间，席位本身就是压力。</text>
+        <text x="500" y="650" text-anchor="middle" fill="rgba(255,244,214,0.66)" font-size="22">朝堂不是中立空间，发声始终处在压力之中。</text>
       `;
     }
 
