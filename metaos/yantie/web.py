@@ -272,6 +272,18 @@ YANTIE_HTML = """<!doctype html>
       box-shadow: var(--shadow);
     }
 
+    .story-panel,
+    .pressure-director-panel,
+    .restoration-status-panel,
+    .restoration-discovery-panel,
+    .scene-caption,
+    .decision-dock,
+    .chapter-map-panel,
+    .evidence-ribbon,
+    .judgment-form {
+      overflow-wrap: anywhere;
+    }
+
     .stage.is-prologue-active .scene-shell {
       grid-template-columns: 1fr;
       gap: 0;
@@ -286,6 +298,8 @@ YANTIE_HTML = """<!doctype html>
       z-index: 18;
       width: min(560px, calc(100vw - 36px));
       max-width: none;
+      max-height: min(44vh, 360px);
+      overflow: auto;
       pointer-events: auto;
     }
 
@@ -364,7 +378,7 @@ YANTIE_HTML = """<!doctype html>
     }
 
     .stage.is-prologue-active .prologue-map-note {
-      opacity: 1;
+      display: none;
     }
 
     .pressure-director-panel {
@@ -373,6 +387,8 @@ YANTIE_HTML = """<!doctype html>
       right: clamp(16px, 4vw, 42px);
       z-index: 7;
       width: min(430px, calc(100vw - 32px));
+      max-height: min(48vh, 360px);
+      overflow: auto;
       padding: 16px;
       border: 1px solid rgba(255,236,188,0.24);
       border-radius: 8px;
@@ -471,10 +487,12 @@ YANTIE_HTML = """<!doctype html>
 
     .restoration-discovery-panel {
       position: absolute;
-      left: clamp(16px, 5vw, 78px);
-      bottom: clamp(96px, 13vh, 132px);
+      right: clamp(16px, 5vw, 78px);
+      bottom: clamp(24px, 5vh, 42px);
       z-index: 9;
       width: min(340px, calc(100vw - 32px));
+      max-height: min(28vh, 190px);
+      overflow: auto;
       padding: 13px 14px;
       border: 1px solid rgba(243,196,109,0.34);
       border-radius: 8px;
@@ -718,6 +736,8 @@ YANTIE_HTML = """<!doctype html>
       display: grid;
       gap: 6px;
       max-width: min(520px, 72%);
+      max-height: min(42vh, 320px);
+      overflow: auto;
       padding: 10px 12px;
       border: 1px solid rgba(255,236,188,0.28);
       border-radius: 8px;
@@ -762,6 +782,8 @@ YANTIE_HTML = """<!doctype html>
       display: grid;
       gap: 12px;
       max-width: 700px;
+      max-height: min(52vh, 440px);
+      overflow: auto;
       padding: 14px 16px;
       border: 1px solid rgba(255,236,188,0.22);
       border-radius: 8px;
@@ -1420,6 +1442,8 @@ YANTIE_HTML = """<!doctype html>
       inset: auto 22px 22px 22px;
       display: grid;
       gap: 10px;
+      max-height: calc(100% - 44px);
+      overflow: auto;
       pointer-events: auto;
       opacity: 0;
       transform: translateY(18px);
@@ -1588,6 +1612,9 @@ YANTIE_HTML = """<!doctype html>
         right: 16px;
         bottom: 22px;
         width: auto;
+        max-height: 25vh;
+        overflow: auto;
+        padding-right: 4px;
       }
 
       .stage.is-prologue-active .scene-world {
@@ -1622,8 +1649,10 @@ YANTIE_HTML = """<!doctype html>
       .restoration-discovery-panel {
         left: 12px;
         right: 12px;
-        bottom: 106px;
+        bottom: 142px;
         width: auto;
+        max-height: 104px;
+        overflow: auto;
       }
 
       .standpoint-grid {
@@ -1635,7 +1664,20 @@ YANTIE_HTML = """<!doctype html>
       }
 
       .stage.is-prologue-active .scene-title {
-        font-size: 32px;
+        font-size: 28px;
+      }
+
+      .stage.is-prologue-active .chapter-kicker {
+        margin-bottom: 6px;
+        font-size: 12px;
+      }
+
+      .stage.is-prologue-active .scene-copy {
+        display: none;
+      }
+
+      .stage.is-prologue-active .scene-actions {
+        margin-top: 10px;
       }
 
       .scene-title {
@@ -1670,6 +1712,7 @@ YANTIE_HTML = """<!doctype html>
 
       .scene-caption {
         max-width: 100%;
+        max-height: 38vh;
         padding: 11px;
       }
 
@@ -1693,6 +1736,25 @@ YANTIE_HTML = """<!doctype html>
 
       .evidence-ribbon.is-open {
         transform: translateY(0);
+      }
+
+      .judgment-form {
+        inset: 12px;
+        max-height: calc(100% - 24px);
+      }
+
+      .stance-trajectory-panel {
+        max-height: 112px;
+        margin-bottom: 4px;
+      }
+
+      textarea {
+        min-height: 84px;
+      }
+
+      .judgment-output {
+        max-height: 96px;
+        overflow: auto;
       }
 
       .voice-pair {

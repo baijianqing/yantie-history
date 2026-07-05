@@ -151,6 +151,20 @@ class YantieWebUiTests(unittest.TestCase):
         self.assertIn("发现案卷", html)
         self.assertIn("发现一份竹简", html)
 
+    def test_yantie_page_has_overlap_resistant_layout_rules(self) -> None:
+        html = self.client.get("/yantie").text
+
+        self.assertIn("overflow-wrap: anywhere", html)
+        self.assertIn("max-height: min(44vh, 360px)", html)
+        self.assertIn("max-height: min(28vh, 190px)", html)
+        self.assertIn("max-height: min(42vh, 320px)", html)
+        self.assertIn("max-height: min(52vh, 440px)", html)
+        self.assertIn("max-height: calc(100% - 44px)", html)
+        self.assertIn(".stage.is-prologue-active .scene-copy", html)
+        self.assertIn("display: none", html)
+        self.assertIn(".judgment-output", html)
+        self.assertIn("max-height: 96px", html)
+
     def test_yantie_page_is_guided_not_tab_driven(self) -> None:
         html = self.client.get("/yantie").text
 
