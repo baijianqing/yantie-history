@@ -2,12 +2,13 @@ from __future__ import annotations
 
 import json
 import re
+from tempfile import TemporaryDirectory
 import unittest
 from pathlib import Path
 
 from fastapi.testclient import TestClient
 
-from metaos.yantie import create_yantie_web_app
+from metaos.yantie import create_yantie_web_app, export_yantie_static_site, render_yantie_static_html
 
 
 PACK_PATH = Path(__file__).resolve().parents[1] / "metaos" / "yantie" / "data" / "evidence_pack.json"
@@ -308,6 +309,10 @@ class YantieWebUiTests(unittest.TestCase):
         html = self.client.get("/yantie").text
 
         self.assertIn('const apiBase = "/api/yantie";', html)
+        self.assertIn('const yantieRuntimeMode = document.documentElement.dataset.yantieRuntime || "api";', html)
+        self.assertIn('const staticPackUrl = "data/evidence_pack.json";', html)
+        self.assertIn("getStaticData", html)
+        self.assertIn("createStaticJudgmentCard", html)
         self.assertIn('getData("/manifest")', html)
         self.assertIn('getData("/claims")', html)
         self.assertIn('/judgment-cards"', html)
@@ -316,6 +321,29 @@ class YantieWebUiTests(unittest.TestCase):
         self.assertNotIn("zhihu", html.lower())
         self.assertNotIn("elevenlabs", html.lower())
         self.assertNotIn("suno", html.lower())
+
+    def test_yantie_static_html_uses_github_pages_data_adapter(self) -> None:
+        html = render_yantie_static_html()
+
+        self.assertIn('<html lang="zh-CN" data-yantie-runtime="static">', html)
+        self.assertIn('static_github_pages: true', html)
+        self.assertIn("loadStaticPack", html)
+        self.assertIn("staticSearchEvidence", html)
+        self.assertIn("static_judgment:", html)
+        self.assertIn("data/evidence_pack.json", html)
+        self.assertNotIn("workers.dev", html.lower())
+
+    def test_yantie_static_site_export_writes_pages_bundle(self) -> None:
+        with TemporaryDirectory() as tmp_dir:
+            target = export_yantie_static_site(Path(tmp_dir) / "yantie")
+
+            index_path = target / "index.html"
+            pack_path = target / "data" / "evidence_pack.json"
+            self.assertTrue(index_path.exists())
+            self.assertTrue(pack_path.exists())
+            self.assertTrue((target / ".nojekyll").exists())
+            self.assertIn('data-yantie-runtime="static"', index_path.read_text(encoding="utf-8"))
+            self.assertEqual(json.loads(pack_path.read_text(encoding="utf-8"))["pack_id"], "yantie_meeting_v1")
 
     def test_standalone_app_serves_ui_and_api_together(self) -> None:
         ui_response = self.client.get("/")

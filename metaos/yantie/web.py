@@ -2,11 +2,18 @@
 
 from __future__ import annotations
 
+import shutil
+from pathlib import Path
+
 from fastapi import APIRouter, FastAPI
 from fastapi.responses import HTMLResponse, RedirectResponse
 
 from metaos import __version__
 from metaos.yantie.api import create_yantie_api_router
+
+
+DEFAULT_STATIC_SITE_DIR = Path(__file__).resolve().parents[2] / "docs" / "yantie"
+DEFAULT_EVIDENCE_PACK_PATH = Path(__file__).resolve().parent / "data" / "evidence_pack.json"
 
 
 def create_yantie_web_router() -> APIRouter:
@@ -32,6 +39,28 @@ def create_yantie_web_app() -> FastAPI:
     app.include_router(create_yantie_api_router())
     app.include_router(create_yantie_web_router())
     return app
+
+
+def render_yantie_static_html() -> str:
+    """Render the same UI with its data source switched to static JSON files."""
+
+    return YANTIE_HTML.replace(
+        '<html lang="zh-CN">',
+        '<html lang="zh-CN" data-yantie-runtime="static">',
+        1,
+    )
+
+
+def export_yantie_static_site(output_dir: str | Path = DEFAULT_STATIC_SITE_DIR) -> Path:
+    """Export the Yantie experience as a GitHub Pages compatible static site."""
+
+    target = Path(output_dir).resolve()
+    data_dir = target / "data"
+    data_dir.mkdir(parents=True, exist_ok=True)
+    (target / "index.html").write_text(render_yantie_static_html(), encoding="utf-8")
+    shutil.copyfile(DEFAULT_EVIDENCE_PACK_PATH, data_dir / "evidence_pack.json")
+    (target / ".nojekyll").write_text("", encoding="utf-8")
+    return target
 
 
 YANTIE_HTML = """<!doctype html>
@@ -1869,6 +1898,10 @@ YANTIE_HTML = """<!doctype html>
 
   <script>
     const apiBase = "/api/yantie";
+    const yantieRuntimeMode = document.documentElement.dataset.yantieRuntime || "api";
+    const isStaticRuntime = yantieRuntimeMode === "static";
+    const staticPackUrl = "data/evidence_pack.json";
+    let staticPackPromise = null;
     const state = {
       manifest: null,
       actors: [],
@@ -4351,10 +4384,332 @@ YANTIE_HTML = """<!doctype html>
     }
 
     async function getData(path, options = {}) {
+      if (isStaticRuntime) return getStaticData(path, options);
       const response = await fetch(apiBase + path, options);
       const body = await response.json();
       if (!response.ok) throw new Error(body.error ? body.error.message : "接口不可用");
       return body.data;
+    }
+
+    async function postData(path, payload) {
+      if (isStaticRuntime) {
+        return getStaticData(path, {
+          method: "POST",
+          body: JSON.stringify(payload)
+        });
+      }
+      const response = await fetch(apiBase + path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const body = await response.json();
+      if (!response.ok) throw new Error(body.error ? body.error.message : "接口不可用");
+      return body.data;
+    }
+
+    async function loadStaticPack() {
+      if (!staticPackPromise) {
+        staticPackPromise = fetch(staticPackUrl).then(async response => {
+          if (!response.ok) throw new Error("静态证据包不可用");
+          return response.json();
+        });
+      }
+      return staticPackPromise;
+    }
+
+    async function getStaticData(path, options = {}) {
+      const pack = await loadStaticPack();
+      const url = new URL(path, "https://static.yantie.local");
+      const route = url.pathname.replace(/^\\//, "");
+      const method = String(options.method || "GET").toUpperCase();
+      if (method === "POST" && route === "judgment-cards") {
+        return createStaticJudgmentCard(pack, JSON.parse(options.body || "{}"));
+      }
+      if (route === "manifest") return staticManifest(pack);
+      if (route === "theme") return pack.theme_spec;
+      if (route === "sources") return staticList(filterStaticSources(pack.sources, url.searchParams));
+      if (route === "actors") return staticList(staticActors(pack, url.searchParams));
+      if (route === "events") return staticList(filterStaticEvents(pack.events, url.searchParams));
+      if (route === "map-layers") return staticList(pack.map_layers || []);
+      if (route === "topics") return staticList(pack.topics || []);
+      if (route === "evidence/search") return staticSearchEvidence(pack, url.searchParams);
+      if (route.startsWith("evidence/")) return staticEvidenceById(pack, decodeURIComponent(route.slice("evidence/".length)));
+      if (route === "claims") return staticList(filterStaticClaims(pack, url.searchParams));
+      if (route === "relations") return staticList(filterStaticRelations(pack.relations || [], url.searchParams));
+      if (route === "curated-paths") return staticList(pack.curated_paths || []);
+      if (route.startsWith("curated-paths/")) {
+        const pathId = decodeURIComponent(route.slice("curated-paths/".length));
+        const curatedPath = (pack.curated_paths || []).find(item => item.path_id === pathId);
+        if (!curatedPath) throw new Error(`策展路径不存在：${pathId}`);
+        return curatedPath;
+      }
+      throw new Error(`静态接口不存在：${path}`);
+    }
+
+    function staticList(items) {
+      return { items, total: items.length };
+    }
+
+    function staticManifest(pack) {
+      const sourceTypeCounts = {};
+      (pack.sources || []).forEach(source => {
+        sourceTypeCounts[source.source_type] = (sourceTypeCounts[source.source_type] || 0) + 1;
+      });
+      return {
+        pack_id: pack.pack_id,
+        schema_version: pack.schema_version,
+        generated_at: pack.generated_at,
+        source_count: (pack.sources || []).length,
+        actor_count: (pack.actors || []).length,
+        event_count: (pack.events || []).length,
+        topic_count: (pack.topics || []).length,
+        evidence_count: (pack.evidence_units || []).length,
+        claim_count: (pack.claims || []).length,
+        relation_count: (pack.relations || []).length,
+        map_layer_count: (pack.map_layers || []).length,
+        source_type_counts: sourceTypeCounts,
+        features: {
+          runtime_rag: false,
+          vector_store: false,
+          external_echo_enabled: false,
+          local_judgment_cards: true,
+          static_github_pages: true
+        }
+      };
+    }
+
+    function staticActors(pack, params) {
+      const includeEvidenceSummary = params.get("include") === "evidence_summary";
+      return (pack.actors || []).map(actor => includeEvidenceSummary ? {
+        ...actor,
+        evidence_summary: {
+          evidence_count: (actor.evidence_ids || []).length,
+          evidence_ids: actor.evidence_ids || []
+        }
+      } : actor);
+    }
+
+    function filterStaticSources(items, params) {
+      return (items || []).filter(source =>
+        staticParamMatches(params, "source_type", source.source_type) &&
+        staticParamMatches(params, "authority_level", source.authority_level) &&
+        staticParamMatches(params, "delivery_policy", source.delivery_policy) &&
+        staticBoolParamMatches(params, "human_verified", source.human_verified)
+      );
+    }
+
+    function filterStaticEvents(items, params) {
+      return (items || []).filter(event =>
+        staticParamMatches(params, "event_type", event.event_type) &&
+        staticArrayParamMatches(params, "actor_id", event.actor_ids || []) &&
+        staticArrayParamMatches(params, "topic_id", event.topic_ids || [])
+      );
+    }
+
+    function filterStaticClaims(pack, params) {
+      const evidenceById = staticEvidenceMap(pack);
+      return (pack.claims || []).filter(claim =>
+        staticParamMatches(params, "claim_type", claim.claim_type) &&
+        staticParamMatches(params, "stance", claim.stance) &&
+        staticParamMatches(params, "display_zone", claim.display_zone) &&
+        staticClaimTouchesTopic(claim, params.get("topic_id"), evidenceById)
+      );
+    }
+
+    function filterStaticRelations(items, params) {
+      return (items || []).filter(relation =>
+        staticParamMatches(params, "from_id", relation.from_id) &&
+        staticParamMatches(params, "to_id", relation.to_id) &&
+        staticParamMatches(params, "relation_type", relation.relation_type) &&
+        staticParamMatches(params, "strength", relation.strength)
+      );
+    }
+
+    function staticParamMatches(params, key, value) {
+      return !params.has(key) || params.get(key) === String(value);
+    }
+
+    function staticArrayParamMatches(params, key, values) {
+      return !params.has(key) || values.includes(params.get(key));
+    }
+
+    function staticBoolParamMatches(params, key, value) {
+      if (!params.has(key)) return true;
+      return String(value) === params.get(key);
+    }
+
+    function staticClaimTouchesTopic(claim, topicId, evidenceById) {
+      if (!topicId) return true;
+      return [...(claim.evidence_ids || []), ...(claim.counterevidence_ids || [])].some(id => {
+        const evidence = evidenceById.get(id);
+        return evidence && (evidence.topic_ids || []).includes(topicId);
+      });
+    }
+
+    function staticEvidenceById(pack, evidenceId) {
+      const evidence = staticEvidenceMap(pack).get(evidenceId);
+      if (!evidence) throw new Error(`证据不存在：${evidenceId}`);
+      return evidence;
+    }
+
+    function staticEvidenceMap(pack) {
+      return new Map((pack.evidence_units || []).map(evidence => [evidence.evidence_id, evidence]));
+    }
+
+    function staticSourceMap(pack) {
+      return new Map((pack.sources || []).map(source => [source.source_id, source]));
+    }
+
+    function staticActorMap(pack) {
+      return new Map((pack.actors || []).map(actor => [actor.actor_id, actor]));
+    }
+
+    function staticEvidenceActorIds(pack) {
+      const actorIdsByEvidence = new Map();
+      (pack.actors || []).forEach(actor => {
+        (actor.evidence_ids || []).forEach(evidenceId => {
+          if (!actorIdsByEvidence.has(evidenceId)) actorIdsByEvidence.set(evidenceId, []);
+          actorIdsByEvidence.get(evidenceId).push(actor.actor_id);
+        });
+      });
+      return actorIdsByEvidence;
+    }
+
+    function staticSearchEvidence(pack, params) {
+      const sourceById = staticSourceMap(pack);
+      const actorById = staticActorMap(pack);
+      const actorIdsByEvidence = staticEvidenceActorIds(pack);
+      const claimEvidenceIds = staticEvidenceIdsForClaimType(pack, params.get("claim_type"));
+      const queryTerms = staticQueryTerms(params.get("q") || "");
+      const limit = Math.max(0, Math.min(Number(params.get("limit") || 20), 50));
+      const ranked = [];
+      (pack.evidence_units || []).forEach((evidence, index) => {
+        const source = sourceById.get(evidence.source_id);
+        if (!source) return;
+        if (params.has("source_id") && evidence.source_id !== params.get("source_id")) return;
+        if (params.has("source_type") && source.source_type !== params.get("source_type")) return;
+        if (params.has("topic_id") && !(evidence.topic_ids || []).includes(params.get("topic_id"))) return;
+        if (params.has("actor_id") && !(actorIdsByEvidence.get(evidence.evidence_id) || []).includes(params.get("actor_id"))) return;
+        if (claimEvidenceIds && !claimEvidenceIds.has(evidence.evidence_id)) return;
+        const match = staticScoreEvidence(evidence, source, actorById.get(evidence.speaker_actor_id || ""), queryTerms, pack);
+        if (queryTerms.length && match.score <= 0) return;
+        ranked.push({
+          index,
+          score: queryTerms.length ? match.score : 1,
+          result: {
+            evidence,
+            source,
+            speaker: actorById.get(evidence.speaker_actor_id || "") || null,
+            score: queryTerms.length ? match.score : 1,
+            matched_terms: match.matchedTerms,
+            match_reasons: queryTerms.length ? match.matchReasons : ["filter_match"]
+          }
+        });
+      });
+      ranked.sort((left, right) => right.score - left.score || left.index - right.index);
+      const results = ranked.slice(0, limit).map(item => item.result);
+      return {
+        items: results,
+        total: results.length,
+        archive_status: results.length ? "ok" : "archive_insufficient",
+        message: results.length ? null : "No verified evidence matches this query."
+      };
+    }
+
+    function staticQueryTerms(query) {
+      return Array.from(new Set(String(query).trim().toLowerCase().split(/[\\s,，。；;、！？?()（）《》"“”'‘’]+/).filter(Boolean)));
+    }
+
+    function staticScoreEvidence(evidence, source, speaker, queryTerms, pack) {
+      if (!queryTerms.length) return { score: 0, matchedTerms: [], matchReasons: [] };
+      const lexicalHits = staticLexicalHits(pack, evidence.evidence_id);
+      const haystack = [
+        evidence.evidence_id,
+        evidence.source_id,
+        evidence.canonical_location,
+        evidence.excerpt_original,
+        evidence.paraphrase_zh,
+        evidence.evidence_kind,
+        evidence.certainty,
+        source.title,
+        speaker ? speaker.name : "",
+        ...(evidence.topic_ids || []),
+        ...(evidence.value_tags || []),
+        ...lexicalHits
+      ].join(" ").toLowerCase();
+      const matchedTerms = queryTerms.filter(term => haystack.includes(term));
+      const lexicalMatchedTerms = queryTerms.filter(term => lexicalHits.some(token => token.toLowerCase().includes(term)));
+      const score = matchedTerms.length * 10 + lexicalMatchedTerms.length * 5;
+      const matchReasons = [];
+      if (matchedTerms.length) matchReasons.push("static_text_match");
+      if (lexicalMatchedTerms.length) matchReasons.push("static_lexical_index");
+      return { score, matchedTerms, matchReasons };
+    }
+
+    function staticLexicalHits(pack, evidenceId) {
+      const entries = pack.lexical_index && pack.lexical_index.entries ? pack.lexical_index.entries : {};
+      return Object.entries(entries).filter(([, ids]) => Array.isArray(ids) && ids.includes(evidenceId)).map(([token]) => token);
+    }
+
+    function staticEvidenceIdsForClaimType(pack, claimType) {
+      if (!claimType) return null;
+      const ids = new Set();
+      (pack.claims || []).forEach(claim => {
+        if (claim.claim_type !== claimType) return;
+        [...(claim.evidence_ids || []), ...(claim.counterevidence_ids || [])].forEach(id => ids.add(id));
+      });
+      return ids;
+    }
+
+    function createStaticJudgmentCard(pack, payload) {
+      const claimById = new Map((pack.claims || []).map(claim => [claim.claim_id, claim]));
+      const selectedClaims = (payload.selected_claim_ids || []).map(id => claimById.get(id)).filter(Boolean);
+      const selectedEvidenceIds = payload.selected_evidence_ids || [];
+      const linkedEvidenceIds = [];
+      const seen = new Set();
+      [...selectedEvidenceIds, ...selectedClaims.flatMap(claim => [...(claim.evidence_ids || []), ...(claim.counterevidence_ids || [])])].forEach(id => {
+        if (!seen.has(id)) {
+          seen.add(id);
+          linkedEvidenceIds.push(id);
+        }
+      });
+      return {
+        judgment_card_id: `static_judgment:${staticHash(JSON.stringify(payload))}`,
+        pack_id: pack.pack_id,
+        selected_claim_ids: payload.selected_claim_ids || [],
+        selected_evidence_ids: selectedEvidenceIds,
+        linked_evidence_ids: linkedEvidenceIds,
+        sections: staticJudgmentSections(selectedClaims, payload.personal_reflection || null),
+        disposition: payload.disposition,
+        caution: payload.disposition === "modern_analogy_with_caution" ? "Historical evidence cannot directly prove a present-day policy conclusion." : null,
+        history_boundary: "Personal reflection is not historical evidence.",
+        writes_to_evidence_pack: false
+      };
+    }
+
+    function staticJudgmentSections(claims, personalReflection) {
+      const sections = {
+        original_facts: [],
+        curatorial_inferences: [],
+        contested_views: [],
+        personal_reflection: personalReflection
+      };
+      claims.forEach(claim => {
+        if (claim.claim_type === "original_fact") sections.original_facts.push(claim);
+        if (claim.claim_type === "curatorial_inference") sections.curatorial_inferences.push(claim);
+        if (claim.claim_type === "contested_view") sections.contested_views.push(claim);
+      });
+      return sections;
+    }
+
+    function staticHash(value) {
+      let hash = 2166136261;
+      for (let index = 0; index < value.length; index += 1) {
+        hash ^= value.charCodeAt(index);
+        hash = Math.imul(hash, 16777619);
+      }
+      return (hash >>> 0).toString(16).padStart(8, "0");
     }
 
     async function getEvidence(evidenceId) {
@@ -5333,19 +5688,12 @@ YANTIE_HTML = """<!doctype html>
       const choiceSummary = `五幕显影选择：\\n${buildChoiceSummary()}`;
       const chapterSummary = buildChapterVisitSummary();
       const lensSummary = buildLensVisitSummary();
-      const response = await fetch(apiBase + "/judgment-cards", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          selected_claim_ids: ["claim_conflict_is_moral_and_fiscal", "claim_power_network_not_optional"],
-          selected_evidence_ids: selectedEvidence,
-          personal_reflection: [trajectorySummary, choiceSummary, chapterSummary, lensSummary, reflectionText].filter(Boolean).join("\\n\\n") || null,
-          disposition: "modern_analogy_with_caution"
-        })
+      const data = await postData("/judgment-cards", {
+        selected_claim_ids: ["claim_conflict_is_moral_and_fiscal", "claim_power_network_not_optional"],
+        selected_evidence_ids: selectedEvidence,
+        personal_reflection: [trajectorySummary, choiceSummary, chapterSummary, lensSummary, reflectionText].filter(Boolean).join("\\n\\n") || null,
+        disposition: "modern_analogy_with_caution"
       });
-      const body = await response.json();
-      if (!response.ok) throw new Error(body.error ? body.error.message : "判断卡生成失败");
-      const data = body.data;
       document.getElementById("judgmentOutput").textContent =
         `退朝案牍 ${data.judgment_card_id}\\n` +
         `原文事实 ${data.sections.original_facts.length} 条 · 策展推断 ${data.sections.curatorial_inferences.length} 条\\n` +

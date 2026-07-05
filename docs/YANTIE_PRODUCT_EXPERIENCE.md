@@ -300,3 +300,27 @@ V3.3 的目标是让用户打开页面的前 30 秒就感到“历史正在被�
 - 不新增外部依赖，不接实时模型，不生成史实。
 - 即时反馈只编排现有证据与策展文案；它是体验层，不是新的知识来源。
 - 移动端必须保持无横向溢出，热点反馈不得遮挡继续推进的主动作。
+
+## 16. GitHub Pages 静态发布
+
+任务标识：`YT-V3-005`
+
+静态发布版本用于解决 `workers.dev` 在中国大陆访问不稳定的问题。它不再依赖 FastAPI、Cloudflare Worker 或任何运行时后端，而是把当前盐铁会议体验导出到 `docs/yantie/`，由 GitHub Pages 直接托管。
+
+交付原则：
+- `docs/yantie/index.html` 使用同一套沉浸式 UI，但在 `<html>` 上标记 `data-yantie-runtime="static"`。
+- 静态版只读取 `docs/yantie/data/evidence_pack.json`，浏览器内模拟原有 `/api/yantie/*` 的只读响应。
+- 搜索、证据展开、章节图谱、哲学透镜和退朝案牍均在浏览器本地完成；判断卡不写入服务器，也不改写证据包。
+- 静态版不调用 Cloudflare、知乎接口、外部模型、RAG、向量库或实时生成史实。
+- FastAPI 版仍保留 `/yantie` 与 `/api/yantie/*`，用于本地开发、测试和后续需要后端能力的部署。
+
+发布路径：
+- 运行 `export_yantie_static_site()` 生成 `docs/yantie/`。
+- GitHub Pages 选择从 `docs/` 目录发布。
+- 发布后访问路径为 `https://<github-user>.github.io/<repo>/yantie/`。
+
+验收要求：
+- `docs/yantie/index.html`、`docs/yantie/data/evidence_pack.json` 和 `.nojekyll` 必须存在。
+- 静态 HTML 必须包含 `loadStaticPack`、`getStaticData`、`staticSearchEvidence`、`createStaticJudgmentCard`。
+- 页面不得依赖 `/api/yantie/*` 才能完成主体验；API 常量可以保留给本地模式使用。
+- 静态版与 API 版使用同一个证据包，不产生两套历史事实来源。
