@@ -1604,8 +1604,12 @@
       }
 
       .stage.is-prologue-active .map-layer svg {
+        position: absolute;
+        left: 0;
+        top: 102px;
         width: 100vw;
-        height: 100dvh;
+        height: clamp(260px, calc(100dvh - 400px), 444px);
+        max-height: calc(100dvh - 400px);
       }
 
       .stage.is-prologue-active .court-pressure-opening {
@@ -4819,8 +4823,9 @@
       const svg = document.getElementById("hanMapScene");
       const isMobile = window.matchMedia("(max-width: 640px)").matches;
       const isPrologue = document.querySelector(".stage")?.classList.contains("is-prologue-active");
-      svg.setAttribute("preserveAspectRatio", isMobile && isPrologue ? "xMidYMid slice" : "xMidYMid meet");
+      svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
       svg.dataset.mobileMapPriority = isMobile && isPrologue ? "true" : "false";
+      svg.dataset.mobileMapMode = isMobile && isPrologue ? "contain" : "standard";
     }
 
     function supportMeta(value) {
