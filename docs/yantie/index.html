@@ -1572,55 +1572,130 @@
       }
 
       .stage.is-prologue-active .scene-shell {
-        padding: 94px 0 0;
+        min-height: 100dvh;
+        padding: 70px 0 0;
+        display: block;
       }
 
       .stage.is-prologue-active .story-panel {
-        left: 16px;
-        right: 16px;
-        bottom: 22px;
+        left: 12px;
+        right: 12px;
+        bottom: calc(env(safe-area-inset-bottom) + 12px);
         width: auto;
-        max-height: 25vh;
+        max-height: 154px;
         overflow: auto;
-        padding-right: 4px;
+        padding: 12px;
+        border: 1px solid rgba(255,236,188,0.2);
+        border-radius: 10px;
+        background: linear-gradient(180deg, rgba(9,13,19,0.72), rgba(9,13,19,0.5));
+        box-shadow: 0 18px 58px rgba(0,0,0,0.42);
+        backdrop-filter: blur(14px);
+        scrollbar-width: none;
       }
 
       .stage.is-prologue-active .scene-world {
-        min-height: calc(100vh - 94px);
+        position: fixed;
+        inset: 0;
+        z-index: 1;
+        width: 100vw;
+        height: 100dvh;
+        min-height: 100dvh;
+        overflow: hidden;
+      }
+
+      .stage.is-prologue-active .map-layer svg {
+        width: 100vw;
+        height: 100dvh;
+      }
+
+      .stage.is-prologue-active .court-pressure-opening {
+        inset: 0;
       }
 
       .pressure-director-panel {
-        top: 236px;
         left: 12px;
         right: 12px;
         width: auto;
-        max-height: 30vh;
+        padding: 10px;
+      }
+
+      .stage.is-prologue-active[data-experience-phase="pressure_entry"] .pressure-director-panel {
+        top: auto;
+        bottom: calc(env(safe-area-inset-bottom) + 174px);
+        max-height: 124px;
         overflow: auto;
-        padding: 12px;
+        background: rgba(9,13,19,0.42);
+        backdrop-filter: blur(10px);
+      }
+
+      .stage.is-prologue-active[data-experience-phase="pressure_entry"] .pressure-director-panel h2,
+      .stage.is-prologue-active[data-experience-phase="pressure_entry"] .pressure-director-panel p,
+      .stage.is-prologue-active[data-experience-phase="pressure_entry"] .support-strength,
+      .stage.is-prologue-active[data-experience-phase="pressure_entry"] .support-note {
+        display: none;
+      }
+
+      .stage.is-prologue-active[data-experience-phase="pressure_entry"] .pressure-time {
+        margin-bottom: 6px;
+        font-size: 10px;
+      }
+
+      .stage.is-prologue-active[data-experience-phase="pressure_entry"] .pressure-grid {
+        gap: 5px;
+        margin: 0;
+      }
+
+      .stage.is-prologue-active[data-experience-phase="pressure_entry"] .pressure-row {
+        grid-template-columns: 38px minmax(0, 1fr) 24px;
+        gap: 6px;
+        font-size: 10px;
+      }
+
+      .stage.is-prologue-active[data-experience-phase="standpoint_choice"] .pressure-director-panel {
+        top: auto;
+        bottom: calc(env(safe-area-inset-bottom) + 174px);
+        max-height: 38vh;
+        overflow: auto;
       }
 
       .restoration-status-panel {
-        top: 104px;
+        top: 70px;
         left: 12px;
         right: 12px;
         width: auto;
-        max-height: 118px;
+        max-height: 38px;
         overflow: hidden;
-        padding: 11px;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 4px;
+        padding: 8px;
+        background: rgba(9,13,19,0.26);
+      }
+
+      .restoration-status-title {
+        display: none;
       }
 
       .restoration-step {
-        font-size: 11px;
-        line-height: 1.3;
+        gap: 0;
+        font-size: 0;
+        line-height: 0;
+      }
+
+      .restoration-step::before {
+        width: 100%;
+        height: 5px;
+        border-radius: 999px;
       }
 
       .restoration-discovery-panel {
         left: 12px;
         right: 12px;
-        bottom: 142px;
+        top: 116px;
+        bottom: auto;
         width: auto;
-        max-height: 104px;
+        max-height: 86px;
         overflow: auto;
+        padding: 9px 10px;
       }
 
       .standpoint-grid {
@@ -1632,7 +1707,8 @@
       }
 
       .stage.is-prologue-active .scene-title {
-        font-size: 28px;
+        font-size: 22px;
+        max-width: none;
       }
 
       .stage.is-prologue-active .chapter-kicker {
@@ -1641,11 +1717,30 @@
       }
 
       .stage.is-prologue-active .scene-copy {
-        display: none;
+        display: -webkit-box;
+        max-width: none;
+        margin-top: 6px;
+        font-size: 13px;
+        line-height: 1.45;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
       }
 
       .stage.is-prologue-active .scene-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
         margin-top: 10px;
+      }
+
+      .stage.is-prologue-active .scene-actions .primary {
+        width: 100%;
+        min-height: 44px;
+      }
+
+      .stage.is-prologue-active .scene-actions .ghost {
+        display: none;
       }
 
       .scene-title {
@@ -1694,11 +1789,14 @@
       }
 
       .evidence-ribbon {
-        top: 72px;
-        right: 10px;
-        bottom: 20px;
-        left: 10px;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
         width: auto;
+        max-height: none;
+        border-radius: 0;
+        z-index: 70;
         transform: translateY(calc(100% + 48px));
       }
 
@@ -4714,6 +4812,15 @@
       opening.dataset.dramaPhase = phase;
       opening.dataset.visualMode = scene.visualMode || scene.key;
       opening.dataset.prologue = isPrologueActive ? "active" : "complete";
+      syncMobileMapViewport();
+    }
+
+    function syncMobileMapViewport() {
+      const svg = document.getElementById("hanMapScene");
+      const isMobile = window.matchMedia("(max-width: 640px)").matches;
+      const isPrologue = document.querySelector(".stage")?.classList.contains("is-prologue-active");
+      svg.setAttribute("preserveAspectRatio", isMobile && isPrologue ? "xMidYMid slice" : "xMidYMid meet");
+      svg.dataset.mobileMapPriority = isMobile && isPrologue ? "true" : "false";
     }
 
     function supportMeta(value) {
@@ -5823,6 +5930,7 @@
         context.setTransform(ratio, 0, 0, ratio, 0, 0);
       };
       window.addEventListener("resize", resize);
+      window.addEventListener("resize", syncMobileMapViewport);
       resize();
 
       const draw = () => {
