@@ -545,11 +545,13 @@ YANTIE_HTML = """<!doctype html>
       transition: opacity 180ms ease, transform 220ms ease;
       pointer-events: none;
       backdrop-filter: blur(10px);
+      overscroll-behavior: contain;
     }
 
     .restoration-discovery-panel.is-visible {
       opacity: 1;
       transform: translateY(0);
+      pointer-events: auto;
     }
 
     .restoration-discovery-panel strong {
@@ -1772,11 +1774,12 @@ YANTIE_HTML = """<!doctype html>
         top: 114px;
         bottom: auto;
         width: auto;
-        max-height: min(24dvh, 154px);
+        max-height: min(34dvh, 220px);
         overflow: auto;
         padding: 11px 12px;
         scrollbar-width: thin;
         overscroll-behavior: contain;
+        touch-action: pan-y;
       }
 
       .restoration-discovery-panel strong {
