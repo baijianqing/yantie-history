@@ -529,6 +529,8 @@ YANTIE_HTML = """<!doctype html>
       right: clamp(16px, 5vw, 78px);
       bottom: clamp(24px, 5vh, 42px);
       z-index: 9;
+      display: grid;
+      gap: 5px;
       width: min(340px, calc(100vw - 32px));
       max-height: min(28vh, 190px);
       overflow: auto;
@@ -552,9 +554,10 @@ YANTIE_HTML = """<!doctype html>
 
     .restoration-discovery-panel strong {
       display: block;
-      margin-bottom: 5px;
+      margin: 0;
       color: #ffe7b0;
       font-size: 15px;
+      line-height: 1.38;
     }
 
     .restoration-discovery-panel span {
@@ -562,7 +565,8 @@ YANTIE_HTML = """<!doctype html>
       color: rgba(255,244,214,0.66);
       font-size: 12px;
       font-weight: 700;
-      margin-bottom: 4px;
+      line-height: 1.3;
+      margin: 0;
     }
 
     .restoration-discovery-panel p {
@@ -1765,12 +1769,24 @@ YANTIE_HTML = """<!doctype html>
       .restoration-discovery-panel {
         left: 12px;
         right: 12px;
-        top: 116px;
+        top: 114px;
         bottom: auto;
         width: auto;
-        max-height: 86px;
+        max-height: min(24dvh, 154px);
         overflow: auto;
-        padding: 9px 10px;
+        padding: 11px 12px;
+        scrollbar-width: thin;
+        overscroll-behavior: contain;
+      }
+
+      .restoration-discovery-panel strong {
+        font-size: 14px;
+        line-height: 1.36;
+      }
+
+      .restoration-discovery-panel p {
+        font-size: 12px;
+        line-height: 1.5;
       }
 
       .standpoint-grid {
