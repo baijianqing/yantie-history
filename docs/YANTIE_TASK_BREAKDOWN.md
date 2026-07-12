@@ -39,7 +39,8 @@ flowchart TB
     V3017B --> V3017C["YT-V3-017C<br/>冻结历史边界规则"]
     V3017C --> V3017D["YT-V3-017D<br/>一屏三要素与HUD"]
     V3017D --> V3017E["YT-V3-017E<br/>阅读恢复与减少动态"]
-    V3017E --> UI001
+    V3017E --> V3017F["YT-V3-017F<br/>模块化静态前端与状态"]
+    V3017F --> UI001
 ```
 
 并行规则：
@@ -426,6 +427,90 @@ HUD 渐进规则表：
 - 内容或状态版本不兼容时明确提示重新开始，不能静默进入错误场景。
 - 减少动态模式至少覆盖开场地图、关键证据阅读、霍光沉默和退朝案牍四个场景。
 - 声音关闭时，所有历史压力、沉默、证据发现和案牍结果仍可通过视觉和文字理解。
+
+### YT-V3-017F：制定模块化静态前端目录和 ExperienceState 字段
+
+- 任务 ID：`YT-V3-017F`
+- 价值：把后续静态前端从“单页面脚本堆功能”收束为“配置、状态、交互、呈现分层”的模块化静态应用边界，避免地图、HUD、证据、声音和按钮各自维护当前场景、当前焦点和用户轨迹。
+- 依赖：`YT-V3-017A`、`YT-V3-017B`、`YT-V3-017C`、`YT-V3-017D`、`YT-V3-017E`。
+- 允许修改范围：`docs/YANTIE_TASK_BREAKDOWN.md`；如发现 `docs/YANTIE_PRODUCT_EXPERIENCE.md` 中技术架构描述与本任务冲突，可在后续独立文档任务中更新。
+- 禁止修改范围：前端代码、API 代码、Pydantic Schema、证据包、测试文件、公共 Schema、迁移、依赖配置、根配置、运行态 `library/` 数据。
+- 输入：`docs/YANTIE_PRODUCT_EXPERIENCE.md` 中“模块化静态前端目录”“建立单一 ExperienceState”“本地会话恢复”和“Vite/TypeScript 升级触发条件”设计；`YT-V3-017B` 业务对象；`YT-V3-017D`/`YT-V3-017E` 的显示与恢复规则。
+- 输出：模块化静态前端目录契约、`ExperienceState` 字段表、状态所有权规则表、状态持久化边界表、Vite/TypeScript 升级触发条件表。
+- 接口：后续 UI 实现任务必须以唯一 `ExperienceState` 或等价状态对象驱动地图、HUD、证据、音频、阅读模式、恢复提示和主动作；组件不得各自维护“当前幕数”“当前焦点”“已读证据”或“用户判断轨迹”的独立真相源。
+- 验收标准：目录契约能在不引入新框架的情况下拆分 ES Modules；`ExperienceState` 字段覆盖主路径、阅读模式、中途恢复、减少动态和退朝案牍；每个状态字段都有所有者和可读消费者；本地持久化只存 ID、轨迹和设置，不存证据正文；升级触发条件明确，避免过早引入 React/Vite 或状态机库。
+- 测试命令：`git diff --check -- docs/YANTIE_TASK_BREAKDOWN.md`。
+- 回滚方式：删除本任务卡及其五张规则表，回退依赖图中的 `YT-V3-017F` 节点。
+- 文档更新：本任务卡即交付物；后续进入实现阶段时，应另开 ES Modules 纵切片任务，不得在本任务中直接拆分前端代码。
+
+模块化静态前端目录契约：
+
+| 目录 | 职责 | 第一阶段允许内容 | 禁止内容 |
+|------|------|------------------|----------|
+| `content/` | 静态体验配置和只读内容引用 | `scenes.json`、`map-layers.json`、`evidence-refs.json`、`lenses.json` 的设计目标 | 原始大部头史料、运行时用户状态、密钥 |
+| `domain/` | 业务对象与本地轨迹模型 | `experience-session`、`judgment-trace`、`evidence-encounter` 的等价模型 | DOM 操作、动画实现、API 请求细节 |
+| `engine/` | 体验调度与状态派生 | `experience-state`、`scene-resolver`、`audio-director`、`cognitive-load-controller` | 直接写 HTML、复制证据正文 |
+| `interaction/` | 用户动作入口 | 地图点击、主动作、证据展开、移动端返回、声音开关 | 直接改 DOM；绕过 `ExperienceState` 改业务轨迹 |
+| `presentation/` | 界面渲染 | map、scene、hud、evidence、dossier 的视图模块 | 保存业务状态；决定历史边界 |
+| `styles/` | 设计令牌、布局、动效与可访问性 | `tokens.css`、`layout.css`、`motion.css`、`accessibility.css` | 存放业务判断或证据数据 |
+
+`ExperienceState` 字段表：
+
+| 字段 | 类型或归属 | 用途 | 持久化规则 |
+|------|------------|------|------------|
+| `session_id` | 本地体验实例 ID | 区分一次完整体验 | 可持久化 |
+| `experience_version`、`content_version`、`state_version` | 版本标识 | 判断恢复兼容性 | 可持久化 |
+| `scene_id`、`phase` | 当前场景和阶段 | 驱动状态机与显示层 | 进行中会话可持久化 |
+| `emotion`、`focus_target` | 体验派生状态 | 控制镜头、焦点和认知负荷 | 不必长期持久化，可由场景恢复 |
+| `perspective_id`、`initial_choice_id` | 用户进入视角与首次取舍 | 生成主路径默认镜头和案牍开头 | 可持久化 |
+| `pressure_state` | 叙事压力状态 | 驱动 HUD 和地图压力表现 | 只存派生所需 ID 或轻量数值 |
+| `visited_evidence_ids` | 证据 ID 集合 | 恢复已发现证据与案牍引用 | 可持久化，不存证据正文 |
+| `judgment_trace` | 用户判断轨迹 | 记录初判、动摇、坚持、疑问 | 可持久化，只引用场景和证据 ID |
+| `reading_mode`、`overlay_state` | 阅读和浮层状态 | 控制案卷、透镜、移动端全屏阅读 | 临时状态优先使用 `sessionStorage` |
+| `audio_state`、`accessibility_state` | 声音与可访问性设置 | 控制静音、减少动态和阅读偏好 | 可持久化为用户设置 |
+| `completion_status` | `not_started|active|completed|abandoned` | 控制恢复提示和退朝后入口 | 可持久化 |
+
+状态所有权规则表：
+
+| 状态类别 | 唯一写入方 | 可读消费者 | 规则 |
+|----------|------------|------------|------|
+| 场景推进 | Director State Machine 或等价调度器 | 地图、HUD、场景视图、音频 | 组件不能自行增加幕数 |
+| 用户动作 | Interaction Layer | Experience Engine、JudgmentTrace | 先产生命名动作或领域事件，再更新状态 |
+| 判断轨迹 | Domain/Experience Engine | 案牍、HUD、恢复提示 | 只能追加或标记修正，不覆盖历史轨迹 |
+| 证据接触 | EvidenceEncounter 模型 | 阅读模式、案牍、深度探索入口 | 只保存证据 ID 和阅读深度 |
+| 音频与可访问性 | 用户设置入口 | 音频、动效、阅读模式 | 用户偏好优先于场景默认配置 |
+| 展示派生状态 | Experience Engine | Presentation Layer | 展示层只读派生状态，不写业务对象 |
+
+状态持久化边界表：
+
+| 存储位置 | 可存内容 | 不可存内容 | 使用场景 |
+|----------|----------|------------|----------|
+| `sessionStorage` | 当前 `scene_id`、临时浮层、阅读入口、短期焦点 | EvidenceUnit 正文、完整证据包、密钥 | 刷新页面后恢复当前场景 |
+| `localStorage` | 未完成体验 ID、版本、判断轨迹、已访问证据 ID、声音和减少动态设置 | 原始史料、长文证据、外部回声全文 | 中途离开后继续体验 |
+| IndexedDB | 仅在未来需要离线缓存轻量配置时评估 | 未授权文本、向量索引、运行态库数据 | 不是第一阶段默认选项 |
+| URL 参数 | 可选只读场景入口或分享 ID | 用户完整判断轨迹、证据正文 | 后续分享或调试时另立任务 |
+
+Vite/TypeScript 升级触发条件表：
+
+| 触发条件 | 是否立即触发 | 说明 |
+|----------|--------------|------|
+| 场景超过 15 到 20 个 | 否 | 当前先服务冻结主路径 |
+| 状态转移超过 30 条 | 否 | 先用小型状态表约束 |
+| 前端模块超过 10 个 | 观察 | 超过后再评估 Vite |
+| 需要会话恢复与版本迁移 | 观察 | 先定义状态字段，代码实现时再判断 |
+| 桌面与移动端呈现逻辑明显分叉 | 观察 | 若分叉扩大，应升级构建工具 |
+| 两人以上并行开发前端 | 否 | 当前仍按单任务推进 |
+| 需要稳定视觉回归 | 观察 | UI 实现阶段再定 |
+| 单页面文件超过 2000 到 3000 行 | 观察 | 先拆 ES Modules，不直接上 React |
+
+后续实现验收清单：
+
+- 静态前端可以在不依赖后端运行态的情况下加载主路径配置和证据引用。
+- 地图、HUD、证据、声音、案牍和主动作都从同一个 `ExperienceState` 读取当前场景和焦点。
+- 任一组件不得在自身内部维护独立的当前幕、已读证据、用户判断或音频偏好。
+- 本地恢复只保存 ID、轨迹和设置，不保存证据正文、原始史料、密钥或运行态 `library/` 数据。
+- 未来若引入 Vite、TypeScript、状态机库或 React/Vue，必须满足升级触发条件并另开任务。
+- 第一阶段目录拆分不得改变 GitHub Pages/静态页面承载能力。
 
 ## 4. 阶段进入条件
 
