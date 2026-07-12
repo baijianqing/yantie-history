@@ -40,7 +40,8 @@ flowchart TB
     V3017C --> V3017D["YT-V3-017D<br/>一屏三要素与HUD"]
     V3017D --> V3017E["YT-V3-017E<br/>阅读恢复与减少动态"]
     V3017E --> V3017F["YT-V3-017F<br/>模块化静态前端与状态"]
-    V3017F --> UI001
+    V3017F --> V3017G["YT-V3-017G<br/>事件与体验效果映射"]
+    V3017G --> UI001
 ```
 
 并行规则：
@@ -511,6 +512,84 @@ Vite/TypeScript 升级触发条件表：
 - 本地恢复只保存 ID、轨迹和设置，不保存证据正文、原始史料、密钥或运行态 `library/` 数据。
 - 未来若引入 Vite、TypeScript、状态机库或 React/Vue，必须满足升级触发条件并另开任务。
 - 第一阶段目录拆分不得改变 GitHub Pages/静态页面承载能力。
+
+### YT-V3-017G：定义领域事件与体验效果映射表
+
+- 任务 ID：`YT-V3-017G`
+- 价值：把“用户点击后发生什么”从直接操作 UI 改为“先产生领域事件，再由体验引擎派发效果”，让地图、HUD、证据、声音、案牍和判断轨迹遵守同一套因果链，避免后续每个组件各自写动画、改状态和解释历史含义。
+- 依赖：`YT-V3-017A`、`YT-V3-017B`、`YT-V3-017C`、`YT-V3-017D`、`YT-V3-017E`、`YT-V3-017F`。
+- 允许修改范围：`docs/YANTIE_TASK_BREAKDOWN.md`；如发现 `docs/YANTIE_PRODUCT_EXPERIENCE.md` 中事件命名或效果描述与本任务冲突，可在后续独立文档任务中更新。
+- 禁止修改范围：前端代码、API 代码、Pydantic Schema、证据包、测试文件、公共 Schema、迁移、依赖配置、根配置、运行态 `library/` 数据。
+- 输入：`docs/YANTIE_PRODUCT_EXPERIENCE.md` 中“事件与视觉效果解耦”设计；`YT-V3-017B` 业务对象；`YT-V3-017C` 历史边界；`YT-V3-017F` 的 `ExperienceState` 字段与状态所有权规则。
+- 输出：领域事件目录、体验效果目录、事件到效果映射表、事件处理边界规则、后续实现验收清单。
+- 接口：后续 UI 实现任务必须让用户动作先进入 `Interaction Layer` 并产生命名领域事件；`Experience Engine` 根据事件和当前 `ExperienceState` 派发体验效果；`Presentation Layer` 只消费效果和派生状态，不直接改写业务对象。
+- 验收标准：主路径关键动作均有领域事件；每个领域事件都有最小载荷和允许更新的状态字段；每个体验效果都标明消费者和可访问性替代；事件不得改写固定历史、EvidenceUnit 正文或 Claim；同一事件可映射多个效果，但效果不得反向决定历史意义。
+- 测试命令：`git diff --check -- docs/YANTIE_TASK_BREAKDOWN.md`。
+- 回滚方式：删除本任务卡及其四张规则表，回退依赖图中的 `YT-V3-017G` 节点。
+- 文档更新：本任务卡即交付物；后续进入实现阶段时，应另开事件路由或 Experience Engine 纵切片任务，不得在本任务中写运行代码。
+
+领域事件目录：
+
+| 事件 | 触发来源 | 最小载荷 | 允许更新状态 | 边界 |
+|------|----------|----------|--------------|------|
+| `PRESSURE_REVEALED` | 开场或场景推进 | `scene_id`、`pressure_key` | `phase`、`pressure_state`、`focus_target` | 只表达叙事压力，不冒充真实统计 |
+| `SUPPLY_ALLOCATED` / `SUPPLY_HELD` | 第一次取舍 | `choice_id`、`scene_id` | `initial_choice_id`、`perspective_id`、`judgment_trace` | 不改变会议结果 |
+| `PERSPECTIVE_CONFIRMED` | 入朝前确认 | `perspective_id` | `phase`、`focus_target` | 身份是体验入口，不是用户人格标签 |
+| `ARGUMENT_HEARD` | 财政/民生发言推进 | `scene_id`、`actor_id`、`argument_key` | `visited_argument_ids` 或等价派生状态 | 不补写无证据发言 |
+| `EVIDENCE_OPENED` | 展开竹简或案卷 | `evidence_id`、`scene_id`、`depth_level` | `visited_evidence_ids`、`overlay_state` | 只引用证据 ID，不复制正文 |
+| `READING_MODE_ENTERED` / `READING_MODE_EXITED` | 进入或退出阅读模式 | `evidence_id`、`return_scene_id` | `reading_mode`、`overlay_state`、`focus_target` | 必须可回到现场 |
+| `JUDGMENT_REVISED` | 坚持、修正或保留疑问 | `trace_step_id`、`position`、`trigger_ref` | `judgment_trace` | 只记录用户判断，不生成历史 Claim |
+| `POWER_SILENCE_REACHED` | 霍光沉默场景 | `scene_id` | `phase`、`emotion`、`focus_target` | 沉默表达权力边界，不虚构心理 |
+| `DOSSIER_GENERATED` | 退朝案牍 | `experience_id`、`trace_refs` | `completion_status`、`RetirementDossier` 等价本地产物 | 案牍不进入证据包 |
+| `AUDIO_TOGGLED` / `REDUCED_MOTION_CHANGED` | 用户设置 | `enabled` 或 `mode` | `audio_state`、`accessibility_state` | 用户偏好优先于场景默认 |
+
+体验效果目录：
+
+| 效果 | 消费者 | 用途 | 可访问性替代 |
+|------|--------|------|--------------|
+| `MAP_FOCUS_CHANGED` | 地图视图 | 镜头推进、拉远或聚焦对象 | 减少动态时使用静态关键帧 |
+| `PRESSURE_VISUAL_UPDATED` | 地图/HUD | 展示边防、府库、民生等压力变化 | 同步提供文字状态 |
+| `NARRATION_SHOWN` | 场景视图 | 给出一句场景解释或过渡 | 文本始终可见，不依赖声音 |
+| `HUD_MODE_CHANGED` | HUD 视图 | 控制 `none/world/scene/user/summary` | 移动端可折叠为一句状态 |
+| `EVIDENCE_PANEL_OPENED` | 证据视图 | 展开竹简摘要、案卷或文档模式 | 全屏阅读提供固定返回动作 |
+| `AUDIO_CUE_PLAYED` | 音频控制 | 播放环境音、转场或盖印声 | 声音关闭时不影响理解 |
+| `MOTION_PAUSED` | 地图/场景/音频 | 阅读、沉默或减少动态时暂停复杂效果 | 保留静态画面和文字 |
+| `DOSSIER_RENDERED` | 案牍视图 | 呈现判断轨迹和未解矛盾 | 可跳过书写动画直接查看 |
+
+事件到效果映射表：
+
+| 领域事件 | 必须触发的效果 | 可选效果 | 禁止效果 |
+|----------|----------------|----------|----------|
+| `PRESSURE_REVEALED` | `MAP_FOCUS_CHANGED`、`PRESSURE_VISUAL_UPDATED`、`NARRATION_SHOWN` | `AUDIO_CUE_PLAYED` | 显示伪精确财政/人口数字 |
+| `SUPPLY_ALLOCATED` / `SUPPLY_HELD` | `PRESSURE_VISUAL_UPDATED`、`NARRATION_SHOWN` | `MAP_FOCUS_CHANGED`、`AUDIO_CUE_PLAYED` | 改写历史会议结果 |
+| `PERSPECTIVE_CONFIRMED` | `HUD_MODE_CHANGED`、`NARRATION_SHOWN` | `MAP_FOCUS_CHANGED` | 给用户人格评分 |
+| `ARGUMENT_HEARD` | `NARRATION_SHOWN`、`HUD_MODE_CHANGED` | `PRESSURE_VISUAL_UPDATED` | 补写人物心理 |
+| `EVIDENCE_OPENED` | `EVIDENCE_PANEL_OPENED`、`HUD_MODE_CHANGED` | `MOTION_PAUSED`、`AUDIO_CUE_PLAYED` | 复制 EvidenceUnit 正文进用户状态 |
+| `READING_MODE_ENTERED` | `MOTION_PAUSED`、`EVIDENCE_PANEL_OPENED` | `HUD_MODE_CHANGED` | 隐藏返回现场动作 |
+| `JUDGMENT_REVISED` | `NARRATION_SHOWN`、`HUD_MODE_CHANGED` | `DOSSIER_RENDERED` 的预览状态 | 把用户判断显示为史实 |
+| `POWER_SILENCE_REACHED` | `MOTION_PAUSED`、`HUD_MODE_CHANGED`、`NARRATION_SHOWN` | `AUDIO_CUE_PLAYED` | 强制不可跳过长黑场 |
+| `DOSSIER_GENERATED` | `DOSSIER_RENDERED`、`HUD_MODE_CHANGED` | `MAP_FOCUS_CHANGED`、`AUDIO_CUE_PLAYED` | 写入证据包或 Claim |
+| `AUDIO_TOGGLED` / `REDUCED_MOTION_CHANGED` | `AUDIO_CUE_PLAYED` 或 `MOTION_PAUSED` 的状态更新 | `NARRATION_SHOWN` | 覆盖用户偏好 |
+
+事件处理边界规则：
+
+| 规则 | 说明 |
+|------|------|
+| 用户动作不直接改 DOM | 点击地图、按钮或竹简后，只能先产生命名事件，再由体验引擎派发效果 |
+| 事件只更新允许状态 | 事件只能更新 `ExperienceState`、`JudgmentTrace`、`EvidenceEncounter`、本地案牍等可变对象 |
+| 效果不携带历史结论 | 效果只表达呈现方式，不决定“谁对谁错” |
+| 固定历史不可被事件改写 | Event、Actor、Claim、EvidenceUnit 的史实字段不因用户动作变化 |
+| 减少动态和静音必须被尊重 | 派发效果前必须读取 `audio_state` 与 `accessibility_state` |
+| 错误事件必须降级 | 无效证据 ID、非法状态转移或缺少返回场景时，显示可恢复提示，不静默失败 |
+
+后续实现验收清单：
+
+- 主路径 10 个场景的主要动作都能映射到一个命名领域事件。
+- 每个领域事件都声明最小载荷、允许更新状态和禁止越界行为。
+- `Presentation Layer` 不直接写 `judgment_trace`、`visited_evidence_ids` 或 `completion_status`。
+- 关闭声音或开启减少动态后，事件仍产生等价文字和静态视觉反馈。
+- 非法事件、重复事件和版本不兼容事件都有可恢复处理规则。
+- 事件日志可用于退朝案牍回放，但不复制证据正文。
 
 ## 4. 阶段进入条件
 
