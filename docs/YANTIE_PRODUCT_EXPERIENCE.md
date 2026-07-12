@@ -3259,3 +3259,58 @@ React 不是 Experience Engine 的前提。先理清领域状态、场景配置�
 回滚方式：
 
 - revert 本次提交即可移除退朝后入口并恢复退朝 HUD 行为；未改证据包、API 契约、公共 Schema 或依赖。
+
+## 31. A1 实施记录：`YT-A1-UI-001C` 截图与移动端验收入口
+
+本轮不增加新的历史内容，也不改变主体验路径，而是为现有静态页面补充稳定验收入口。目标是让桌面端、移动端和减少动态效果场景都能被快速复现，避免每次发布前都必须从开场手动点到退朝。
+
+### 31.1 稳定入口
+
+静态页支持 `?acceptance=` 查询参数。普通用户不带参数进入时不受影响；验收时可以直接打开指定场景。
+
+| 验收 ID | 场景 | 重点检查 | 失败级别 |
+|---|---|---|---|
+| `opening-map` | 开场地图与北边压力 | 地图、旁白、主动作是否清晰 | blocking |
+| `first-choice` | 第一次取舍 | 压力入场是否能进入站位选择 | blocking |
+| `standpoint-entry` | 生成视角 | 身份不是评分卡，主动作明确 | major |
+| `court-entry` | 入朝 | 朝堂入口、人物与地图层级正常 | major |
+| `fiscal-livelihood` | 财政/民生冲突 | 冲突信息不挤压主动作 | major |
+| `key-evidence` | 关键证据 | 证据抽屉可读，不遮挡关键控件 | blocking |
+| `power-silence` | 霍光沉默 | 权力遮蔽一幕有足够留白 | manual_review |
+| `retirement-dossier` | 退朝案牍 | 输入区不被旁白或 HUD 遮挡 | blocking |
+| `post-court-explorer` | 退朝后探索入口 | 折叠入口可见、可展开、可降级 | major |
+
+示例：
+
+```text
+docs/yantie/index.html?acceptance=key-evidence
+docs/yantie/index.html?acceptance=retirement-dossier
+docs/yantie/index.html?acceptance=post-court-explorer
+```
+
+### 31.2 验收边界
+
+- 该入口只改变前端体验状态，不改史料、证据包、API 契约或公共 Schema。
+- 关键证据场景只打开当前幕的一条主线证据，不提前暴露长文证据阅读器。
+- 退朝后探索入口仍然只在退朝状态下开放。
+- `power-silence` 标记为人工复核，因为它更依赖留白、节奏和视觉感受，不能只靠 DOM 断言判断。
+- 如果 URL 参数不存在或无法识别，页面按正常主体验路径启动。
+
+### 31.3 后续截图验收要求
+
+每次发布前至少检查：
+
+- 桌面端：1440×960。
+- 移动端：390×844。
+- 减少动态效果：确认主动作、证据和案牍仍可读。
+- `key-evidence`、`retirement-dossier`、`post-court-explorer` 三个场景必须无遮挡。
+
+测试命令：
+
+- `python -m pytest test/test_yantie_ui.py`
+- `python -m pytest test`
+- `git diff --check -- metaos/yantie/web.py docs/yantie/index.html test/test_yantie_ui.py docs/YANTIE_PRODUCT_EXPERIENCE.md`
+
+回滚方式：
+
+- revert 本次提交即可移除 `?acceptance=` 验收入口；正常主体验路径、证据包和退朝后探索入口不受数据层影响。

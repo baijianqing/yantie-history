@@ -304,6 +304,33 @@ class YantieWebUiTests(unittest.TestCase):
         self.assertIn("退朝后开放全文争点；这里只读证据与解释边界，不改写案牍。", html)
         self.assertIn("正在回看权力遮蔽一幕；这不抹除你的退朝案牍。", html)
 
+    def test_yantie_a1_screenshot_acceptance_scenarios_are_declared(self) -> None:
+        html = self.client.get("/yantie").text
+
+        self.assertIn("const acceptanceScenarios = [", html)
+        self.assertIn("function applyAcceptanceScenarioFromQuery()", html)
+        self.assertIn('new URLSearchParams(window.location.search).get("acceptance")', html)
+        self.assertIn("stage.dataset.acceptanceScenario = scenario.id", html)
+        self.assertIn("sceneIndexForAcceptanceScenario(scenario)", html)
+        self.assertIn("seedAcceptanceTrajectory(scenario)", html)
+        self.assertIn("await applyAcceptanceScenarioFromQuery()", html)
+        self.assertIn("openKeyEvidence", html)
+        self.assertIn("expandPostCourtExplorer", html)
+        self.assertIn("viewportTags", html)
+        self.assertIn("failLevel", html)
+        for scenario in [
+            "opening-map",
+            "first-choice",
+            "standpoint-entry",
+            "court-entry",
+            "fiscal-livelihood",
+            "key-evidence",
+            "power-silence",
+            "retirement-dossier",
+            "post-court-explorer",
+        ]:
+            self.assertIn(f'id: "{scenario}"', html)
+
     def test_yantie_page_stages_background_before_five_conflict_acts(self) -> None:
         html = self.client.get("/yantie").text
 

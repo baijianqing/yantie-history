@@ -4584,8 +4584,172 @@
       evidence: [...(scene.historicalEvidence || []), ...(scene.philosophyLens || [])]
     }));
 
+    const acceptanceScenarios = [
+      {
+        id: "opening-map",
+        label: "Opening map and frontier pressure",
+        phase: "pressure_entry",
+        pressureIndex: 0,
+        viewportTags: ["desktop", "mobile"],
+        failLevel: "blocking"
+      },
+      {
+        id: "first-choice",
+        label: "First pressure choice",
+        phase: "pressure_entry",
+        pressureIndex: "last",
+        viewportTags: ["desktop", "mobile"],
+        failLevel: "blocking"
+      },
+      {
+        id: "standpoint-entry",
+        label: "Generated standpoint before court",
+        phase: "standpoint_choice",
+        pressureIndex: "last",
+        standpoint: "fiscal-official",
+        viewportTags: ["desktop", "mobile"],
+        failLevel: "major"
+      },
+      {
+        id: "court-entry",
+        label: "Court entry",
+        sceneActKey: "court",
+        phase: "court_debate",
+        standpoint: "fiscal-official",
+        viewportTags: ["desktop", "mobile"],
+        failLevel: "major"
+      },
+      {
+        id: "fiscal-livelihood",
+        label: "Fiscal and livelihood conflict",
+        sceneActKey: "act-livelihood",
+        phase: "court_debate",
+        standpoint: "local-household",
+        viewportTags: ["desktop", "mobile"],
+        failLevel: "major"
+      },
+      {
+        id: "key-evidence",
+        label: "Key evidence drawer",
+        sceneActKey: "act-livelihood",
+        phase: "court_debate",
+        standpoint: "local-household",
+        openKeyEvidence: true,
+        viewportTags: ["desktop", "mobile"],
+        failLevel: "blocking"
+      },
+      {
+        id: "power-silence",
+        label: "Huo Guang silence",
+        sceneActKey: "act-power",
+        phase: "power_reveal",
+        standpoint: "frontier-general",
+        viewportTags: ["desktop", "mobile"],
+        failLevel: "manual_review"
+      },
+      {
+        id: "retirement-dossier",
+        label: "Retirement dossier",
+        sceneActKey: "judgment",
+        phase: "judgment",
+        standpoint: "fiscal-official",
+        completed: true,
+        viewportTags: ["desktop", "mobile"],
+        failLevel: "blocking"
+      },
+      {
+        id: "post-court-explorer",
+        label: "Post-court exploration entrance",
+        sceneActKey: "judgment",
+        phase: "judgment",
+        standpoint: "fiscal-official",
+        completed: true,
+        expandPostCourtExplorer: true,
+        viewportTags: ["desktop", "mobile"],
+        failLevel: "major"
+      }
+    ];
+
     function currentScene() {
       return scenes[state.sceneIndex];
+    }
+
+    function sceneIndexForAcceptanceScenario(scenario) {
+      if (!scenario.sceneActKey) return 0;
+      if (scenario.sceneActKey === "judgment") {
+        return scenes.findIndex(scene => scene.key === "judgment");
+      }
+      return scenes.findIndex(scene => scene.actKey === scenario.sceneActKey || scene.key === scenario.sceneActKey);
+    }
+
+    function seedAcceptanceTrajectory(scenario) {
+      if (state.stanceTrajectory.length) return;
+      const role = standpointRoles.find(item => item.id === (scenario.standpoint || "fiscal-official"));
+      if (role) {
+        state.userStandpoint = role.id;
+        experienceDirector.recordTrajectory({
+          stage: "standpoint",
+          label: role.label,
+          value: role.initialLeaning,
+          note: role.innerVoice
+        });
+      }
+      experienceDirector.recordTrajectory({
+        stage: "acceptance",
+        label: scenario.label,
+        value: 50,
+        note: "Stable screenshot acceptance entry; not a user judgment."
+      });
+    }
+
+    function waitForAcceptancePaint() {
+      return new Promise(resolve => {
+        requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(resolve, 120)));
+      });
+    }
+
+    async function applyAcceptanceScenarioFromQuery() {
+      const scenarioId = new URLSearchParams(window.location.search).get("acceptance");
+      if (!scenarioId) return;
+      const scenario = acceptanceScenarios.find(item => item.id === scenarioId);
+      if (!scenario) return;
+
+      closeChapterMap();
+      closeEvidence();
+      const stage = document.querySelector(".stage");
+      delete stage.dataset.acceptanceScenario;
+      document.getElementById("historyBoundary").textContent =
+        `Acceptance scenario: ${scenario.label}. Failure level: ${scenario.failLevel}.`;
+
+      state.completionStatus = scenario.completed ? "completed" : "active";
+      state.userStandpoint = scenario.standpoint || state.userStandpoint || null;
+      state.pressureIndex = scenario.pressureIndex === "last"
+        ? pressureTimeline.length - 1
+        : Number(scenario.pressureIndex || 0);
+
+      if (scenario.phase === "pressure_entry" || scenario.phase === "standpoint_choice") {
+        state.sceneIndex = 0;
+        state.experiencePhase = scenario.phase;
+        if (scenario.standpoint) seedAcceptanceTrajectory(scenario);
+        await renderExperience();
+      } else {
+        const sceneIndex = sceneIndexForAcceptanceScenario(scenario);
+        if (sceneIndex >= 0) state.sceneIndex = sceneIndex;
+        state.experiencePhase = scenario.phase || experienceDirector.phaseForScene(scenes[state.sceneIndex]);
+        seedAcceptanceTrajectory(scenario);
+        await renderScene();
+      }
+
+      if (scenario.openKeyEvidence) {
+        await openEvidence(primaryEvidenceIdsForScene(currentScene())[0]);
+      }
+      if (scenario.expandPostCourtExplorer) {
+        const postCourtDetails = document.querySelector("#postCourtExplorer details");
+        if (postCourtDetails) postCourtDetails.open = true;
+        syncMainExperienceControls();
+      }
+      await waitForAcceptancePaint();
+      stage.dataset.acceptanceScenario = scenario.id;
     }
 
     function isPostCourtUnlocked() {
@@ -4643,6 +4807,7 @@
       renderStaticScenes();
       renderChapterMap();
       await renderExperience();
+      await applyAcceptanceScenarioFromQuery();
       startCanvas();
       updateSoundButton();
     }
