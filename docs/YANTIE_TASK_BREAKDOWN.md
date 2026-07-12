@@ -36,7 +36,8 @@ flowchart TB
     ZH001 --> E2E001
     A002 --> V3017A["YT-V3-017A<br/>冻结主体验路径"]
     V3017A --> V3017B["YT-V3-017B<br/>定义体验业务对象"]
-    V3017B --> UI001
+    V3017B --> V3017C["YT-V3-017C<br/>冻结历史边界规则"]
+    V3017C --> UI001
 ```
 
 并行规则：
@@ -241,6 +242,63 @@ flowchart TB
 | 证据使用 | 引用 EvidenceUnit ID、出处、短摘和白话转述 | 在用户状态中复制或改写证据原文 |
 | 思想透镜 | 帮助解释义利、治道、儒法分歧 | 冒充盐铁会议现场证据 |
 | 退朝案牍 | 记录用户判断、证据触发点和未解矛盾 | 进入证据包或覆盖 Claim |
+
+### YT-V3-017C：编写固定历史与可变体验边界规则
+
+- 任务 ID：`YT-V3-017C`
+- 价值：把“历史不能被用户选择改写、体验可以改变呈现路径”变成后续 UI、Schema 和测试都能执行的边界规则，避免沉浸式交互为了戏剧效果补写史实、混淆哲学透镜与会议证据，或把用户的判断轨迹误当成历史结论。
+- 依赖：`YT-V3-017A`、`YT-V3-017B`、`docs/YANTIE_SOURCE_AUDIT.md`、`docs/YANTIE_EVIDENCE_PACK_SCHEMA.md`。
+- 允许修改范围：`docs/YANTIE_TASK_BREAKDOWN.md`；如发现来源审计或证据包 Schema 有机械冲突，可在后续独立任务中更新对应文档。
+- 禁止修改范围：前端代码、API 代码、Pydantic Schema、证据包内容、测试文件、公共 Schema、迁移、根配置、运行态 `library/` 数据。
+- 输入：`YT-V3-017B` 的业务对象表、`docs/YANTIE_EVIDENCE_PACK_SCHEMA.md` 的 EvidenceUnit/Claim/Source 规则、`docs/YANTIE_SOURCE_AUDIT.md` 的来源边界。
+- 输出：历史边界规则表、信息类型展示规则表、用户动作许可矩阵、后续实现验收清单。
+- 接口：后续 UI 与 Schema 实现任务必须把 `history_boundary` 或等价字段作为场景/动作/证据呈现的设计约束；任何用户动作只能改变 `HistoricalExperience`、`JudgmentTrace`、`EvidenceEncounter`、`RetirementDossier`，不得改变 EvidenceUnit、Claim、Event、Actor 的历史事实字段。
+- 验收标准：所有主体验场景都能归入固定历史、可变体验或禁止表达；每类信息都有明确视觉和交互边界；用户动作许可矩阵能覆盖主路径 10 个场景；后续 UI 不得绕过该边界默认开放改写历史的操作。
+- 测试命令：`git diff --check -- docs/YANTIE_TASK_BREAKDOWN.md`。
+- 回滚方式：删除本任务卡及其四张规则表，回退依赖图中的 `YT-V3-017C` 节点。
+- 文档更新：本任务卡即交付物；后续实现阶段如需要字段落地，应另开 Schema 或 UI 任务，不得在本任务中直接实现。
+
+历史边界规则表：
+
+| 边界类型 | 定义 | 来源或归属 | 允许呈现 | 禁止呈现 |
+|----------|------|------------|----------|----------|
+| 固定历史事实 | 会议时间、人物身份、政策背景、会议结果、史料原文和可定位出处 | `EvidenceUnit`、`Claim`、`Event`、`Actor` | 按证据包展示，可做轻量转述 | 用户选择改变结果；为了戏剧性补写无证据事实 |
+| 固定解释边界 | 会议事实、后世评价、思想透镜和策展推断之间的分类边界 | `claim_type`、`evidence_kind`、`value_tags` | 用不同视觉样式区分 | 把哲学透镜显示成会议现场证据 |
+| 可变体验路径 | 信息出现顺序、镜头、默认视角、证据发现路径、阅读深度 | `HistoricalExperience`、`SceneDefinition` | 根据用户状态调整节奏和焦点 | 把体验路径变化写成历史变化 |
+| 可变用户判断 | 用户初判、动摇、坚持、保留疑问、个人反思 | `JudgmentTrace`、`RetirementDossier` | 作为用户案牍和复盘呈现 | 显示为系统可靠结论或历史 Claim |
+| 禁止表达 | 改写会议结果、虚构人物心理、伪造发言、叙事压力冒充统计 | 无合法归属 | 不得出现 | 不得通过文案、动画、数值或案牍暗示 |
+
+信息类型展示规则表：
+
+| 信息类型 | 数据来源 | 推荐视觉 | 交互规则 | 必须提示 |
+|----------|----------|----------|----------|----------|
+| 史实证据 | `EvidenceUnit.review_status=verified` | 纸色、直角来源章 | 可从证据印记进入竹简摘要或案卷详情 | 出处、定位、证据类型 |
+| 策展推断 | `Claim.claim_type=curatorial_inference` | 中性色、虚线边框 | 只能解释关系，不作为独立事实 | 推断依据和不确定性 |
+| 思想透镜 | 带 `philosophy_lens` 等标签的 EvidenceUnit/Claim | 冷灰或青色、镜纹 | 退朝后或轻提示出现，不默认打断主线 | “用于理解思想，不是会议事实” |
+| 用户判断 | `JudgmentTrace`、`RetirementDossier` | 手写墨迹或朱批 | 可在退朝案牍中编辑个人反思 | “这是你的判断，不是历史结论” |
+| 当代回声 | `external_echo` 或后续外部入口 | 独立延伸区样式 | 只在退朝后主动开放 | “不属于历史证据链” |
+
+用户动作许可矩阵：
+
+| 动作 | 是否允许 | 可改变对象 | 不可改变对象 | 备注 |
+|------|----------|------------|--------------|------|
+| 选择初始取舍 | 允许 | `HistoricalExperience.initial_choice_id`、`perspective_id` | `Event`、`Claim`、会议结果 | 只改变进入视角和默认镜头 |
+| 调整判断 | 允许 | `JudgmentTrace.trace_steps`、`final_position` | `Claim.statement`、`EvidenceUnit` | 必须记录触发场景或证据 |
+| 展开证据 | 允许 | `EvidenceEncounter.depth_level` | EvidenceUnit 原文和出处 | 不复制或改写证据正文 |
+| 查看哲学透镜 | 允许 | `EvidenceEncounter` 或本地阅读状态 | 会议事实分类 | 必须标识为解释视角 |
+| 生成退朝案牍 | 允许 | `RetirementDossier` | 证据包、历史 Claim | 只能总结用户轨迹和已接触证据 |
+| 改变会议结果 | 禁止 | 无 | 所有历史对象 | UI 不得提供该动作 |
+| 补写人物心理 | 禁止 | 无 | Actor、Event、Claim | 只能呈现已证实立场和发言 |
+| 将当代回声写入历史证据 | 禁止 | 无 | EvidenceUnit、Claim.evidence_ids | 只能作为延伸讨论 |
+
+后续实现验收清单：
+
+- 主路径 10 个场景均标注 `history_boundary=fixed_fact|curatorial_inference|mutable_experience|user_reflection|forbidden` 中的合法类型。
+- 任何用户动作都不得修改 EvidenceUnit、Claim、Event、Actor 的历史事实字段。
+- 哲学透镜和当代回声在视觉上与史实证据明显不同。
+- 退朝案牍只引用已接触证据 ID、用户轨迹和个人反思，不进入证据包。
+- 叙事压力只能显示为体验压力，不得显示为真实财政、人口或军费统计。
+- 测试或人工检查应覆盖至少：第一次取舍、关键证据发现、霍光沉默、退朝案牍、当代回声入口。
 
 ## 4. 阶段进入条件
 
