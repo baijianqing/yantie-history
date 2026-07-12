@@ -271,6 +271,39 @@ class YantieWebUiTests(unittest.TestCase):
         self.assertNotIn("初始倾向 ${Number(role.initialLeaning)}/100", html)
         self.assertNotIn("匹配度", html)
 
+    def test_yantie_judgment_dossier_input_is_not_covered_by_caption_hud(self) -> None:
+        html = self.client.get("/yantie").text
+
+        self.assertIn('.stage[data-experience-phase="judgment"] .debate-hud', html)
+        self.assertIn('.stage[data-experience-phase="judgment"] .judgment-form', html)
+        self.assertIn("z-index: 12", html)
+
+    def test_yantie_a1_post_court_explorer_is_gated_and_degraded(self) -> None:
+        html = self.client.get("/yantie").text
+
+        self.assertIn('id="postCourtExplorer"', html)
+        self.assertIn('aria-label="退朝后深度探索"', html)
+        self.assertIn("postCourtExplorer.hidden = !postCourtUnlocked", html)
+        for action in [
+            "chapter-map",
+            "philosophy-lens",
+            "power-network",
+            "second-perspective",
+            "external-echo",
+        ]:
+            self.assertIn(f'data-post-court-action="{action}"', html)
+        for explore_type in [
+            "historical_evidence",
+            "philosophy_lens",
+            "power_relation",
+            "user_judgment",
+            "external_echo",
+        ]:
+            self.assertIn(f'data-explore-type="{explore_type}"', html)
+        self.assertIn("external_echo 暂不可用，不进入史证链。", html)
+        self.assertIn("退朝后开放全文争点；这里只读证据与解释边界，不改写案牍。", html)
+        self.assertIn("正在回看权力遮蔽一幕；这不抹除你的退朝案牍。", html)
+
     def test_yantie_page_stages_background_before_five_conflict_acts(self) -> None:
         html = self.client.get("/yantie").text
 

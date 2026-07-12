@@ -832,6 +832,14 @@ YANTIE_HTML = """<!doctype html>
       line-height: 1.55;
     }
 
+    .stage[data-experience-phase="judgment"] .debate-hud {
+      display: none;
+    }
+
+    .stage[data-experience-phase="judgment"] .judgment-form {
+      z-index: 12;
+    }
+
     .decision-dock {
       grid-column: 1;
       grid-row: 2;
@@ -1531,6 +1539,87 @@ YANTIE_HTML = """<!doctype html>
       white-space: pre-wrap;
     }
 
+    .post-court-explorer {
+      border: 1px solid rgba(255,236,188,0.2);
+      border-radius: 8px;
+      background: rgba(9,13,19,0.52);
+      overflow: hidden;
+    }
+
+    .post-court-explorer[hidden] {
+      display: none;
+    }
+
+    .post-court-explorer summary {
+      cursor: pointer;
+      padding: 10px 12px;
+      color: #f3c46d;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    .post-court-explorer summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .post-court-explorer summary::after {
+      content: "展开";
+      float: right;
+      color: rgba(255,244,214,0.62);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .post-court-explorer details[open] summary::after {
+      content: "收起";
+    }
+
+    .post-court-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      padding: 0 10px 10px;
+    }
+
+    .post-court-entry {
+      display: grid;
+      gap: 4px;
+      min-height: 76px;
+      padding: 10px;
+      text-align: left;
+      align-content: start;
+      border-color: rgba(255,236,188,0.22);
+      background: rgba(255,244,214,0.06);
+    }
+
+    .post-court-entry strong,
+    .post-court-entry span {
+      display: block;
+    }
+
+    .post-court-entry strong {
+      color: #fff4d6;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .post-court-entry span {
+      color: rgba(255,244,214,0.66);
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    .post-court-entry[disabled] {
+      cursor: not-allowed;
+      opacity: 0.56;
+    }
+
+    .post-court-entry[data-explore-type="historical_evidence"] { border-color: rgba(243,196,109,0.52); }
+    .post-court-entry[data-explore-type="philosophy_lens"] { border-color: rgba(104,166,188,0.56); }
+    .post-court-entry[data-explore-type="power_relation"] { border-color: rgba(154,36,28,0.58); }
+    .post-court-entry[data-explore-type="user_judgment"] { border-color: rgba(255,244,214,0.34); }
+    .post-court-entry[data-explore-type="external_echo"] { border-style: dashed; }
+
     .stance-trajectory-panel {
       max-height: 174px;
       margin-bottom: 10px;
@@ -1929,6 +2018,16 @@ YANTIE_HTML = """<!doctype html>
         overflow: auto;
       }
 
+      .post-court-grid {
+        grid-template-columns: 1fr;
+        max-height: 220px;
+        overflow: auto;
+      }
+
+      .post-court-entry {
+        min-height: auto;
+      }
+
       .voice-pair {
         grid-template-columns: 1fr;
       }
@@ -2020,6 +2119,33 @@ YANTIE_HTML = """<!doctype html>
             <div id="stanceTrajectoryPanel" class="stance-trajectory-panel" aria-label="观点变化图"></div>
             <textarea id="reflectionInput" placeholder="写下你的退朝案牍：当边费、与民争利和权力阴影同时成立时，制度应废止、修正，还是保留并审计？"></textarea>
             <button class="primary" type="submit">钤下案牍</button>
+            <div id="postCourtExplorer" class="post-court-explorer" aria-label="退朝后深度探索" hidden>
+              <details>
+                <summary>退朝后继续探索</summary>
+                <div class="post-court-grid">
+                  <button class="post-court-entry" type="button" data-post-court-action="chapter-map" data-explore-type="historical_evidence">
+                    <strong>回看全文争点</strong>
+                    <span>打开六十篇争点图谱，只读史实证据。</span>
+                  </button>
+                  <button class="post-court-entry" type="button" data-post-court-action="philosophy-lens" data-explore-type="philosophy_lens">
+                    <strong>换个角度看</strong>
+                    <span>查看儒法、义利、治道等解释透镜。</span>
+                  </button>
+                  <button class="post-court-entry" type="button" data-post-court-action="power-network" data-explore-type="power_relation">
+                    <strong>朝堂权力结构</strong>
+                    <span>回到霍光沉默与权力边界一幕。</span>
+                  </button>
+                  <button class="post-court-entry" type="button" data-post-court-action="second-perspective" data-explore-type="user_judgment" disabled>
+                    <strong>从另一席位再入朝</strong>
+                    <span>保留第一次轨迹；下一轮开放。</span>
+                  </button>
+                  <button class="post-court-entry" type="button" data-post-court-action="external-echo" data-explore-type="external_echo" disabled>
+                    <strong>后世与当代讨论</strong>
+                    <span>external_echo 暂不可用，不进入史证链。</span>
+                  </button>
+                </div>
+              </details>
+            </div>
             <div id="judgmentOutput" class="judgment-output">你的退朝案牍不会写入历史证据包。</div>
           </form>
         </div>
@@ -4559,6 +4685,11 @@ YANTIE_HTML = """<!doctype html>
       chapterButton.disabled = !postCourtUnlocked;
       chapterButton.setAttribute("aria-hidden", chapterButton.hidden ? "true" : "false");
       chapterButton.textContent = postCourtUnlocked ? "退朝后争点" : "退朝后开放";
+      const postCourtExplorer = document.getElementById("postCourtExplorer");
+      if (postCourtExplorer) {
+        postCourtExplorer.hidden = !postCourtUnlocked;
+        postCourtExplorer.setAttribute("aria-hidden", postCourtExplorer.hidden ? "true" : "false");
+      }
     }
 
     async function boot() {
@@ -5768,6 +5899,33 @@ YANTIE_HTML = """<!doctype html>
     });
 
     document.getElementById("chapterMapToggle").addEventListener("click", openChapterMap);
+
+    document.getElementById("postCourtExplorer").addEventListener("click", async event => {
+      const target = event.target.closest("[data-post-court-action]");
+      if (!target || target.disabled) return;
+      const action = target.dataset.postCourtAction;
+      if (action === "chapter-map") {
+        document.getElementById("historyBoundary").textContent = "退朝后开放全文争点；这里只读证据与解释边界，不改写案牍。";
+        openChapterMap();
+        return;
+      }
+      if (action === "philosophy-lens") {
+        document.getElementById("historyBoundary").textContent = "思想透镜是解释视角，不是会议事实；请在各篇争点中查看。";
+        openChapterMap();
+        return;
+      }
+      if (action === "power-network") {
+        const powerIndex = scenes.findIndex(scene => scene.actKey === "act-power");
+        if (powerIndex >= 0) {
+          closeChapterMap();
+          closeEvidence();
+          state.sceneIndex = powerIndex;
+          state.experiencePhase = experienceDirector.phaseForScene(scenes[state.sceneIndex]);
+          document.getElementById("historyBoundary").textContent = "正在回看权力遮蔽一幕；这不抹除你的退朝案牍。";
+          await renderScene();
+        }
+      }
+    });
 
     document.getElementById("chapterMapScrim").addEventListener("click", closeChapterMap);
 
