@@ -331,6 +331,32 @@ class YantieWebUiTests(unittest.TestCase):
         ]:
             self.assertIn(f'id: "{scenario}"', html)
 
+    def test_yantie_a1_acceptance_runner_tracks_declared_scenarios(self) -> None:
+        script = (Path(__file__).resolve().parents[1] / "scripts" / "check-yantie-acceptance.mjs").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn("const scenarios = [", script)
+        self.assertIn("const viewports = [", script)
+        self.assertIn("inspectScenario(page, scenario, viewport)", script)
+        self.assertIn("page.waitForFunction", script)
+        self.assertIn("reducedMotion: \"reduce\"", script)
+        self.assertIn("dossier overlaps debate HUD", script)
+        self.assertIn("post-court details not expanded", script)
+        self.assertIn("Manual review recommended", script)
+        for scenario in [
+            "opening-map",
+            "first-choice",
+            "standpoint-entry",
+            "court-entry",
+            "fiscal-livelihood",
+            "key-evidence",
+            "power-silence",
+            "retirement-dossier",
+            "post-court-explorer",
+        ]:
+            self.assertIn(f'"{scenario}"', script)
+
     def test_yantie_page_stages_background_before_five_conflict_acts(self) -> None:
         html = self.client.get("/yantie").text
 

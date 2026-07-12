@@ -3314,3 +3314,53 @@ docs/yantie/index.html?acceptance=post-court-explorer
 回滚方式：
 
 - revert 本次提交即可移除 `?acceptance=` 验收入口；正常主体验路径、证据包和退朝后探索入口不受数据层影响。
+
+## 32. A1 实施记录：`YT-A1-UI-001C` 验收脚本固化
+
+本轮把上一节的截图与移动端验收入口固化为仓库脚本：`scripts/check-yantie-acceptance.mjs`。它不改变页面体验，也不新增史料，只把发布前人工复制的 Playwright 检查变成可重复命令。
+
+### 32.1 命令
+
+默认检查本地静态导出：
+
+```text
+node scripts/check-yantie-acceptance.mjs
+```
+
+脚本会自动：
+
+- 在本地启动 `docs/yantie/` 静态服务器。
+- 依次打开 9 个 `?acceptance=` 场景。
+- 覆盖 1440×960 桌面端、390×844 移动端、390×844 reduced-motion。
+- 检查主动作、关键证据抽屉、退朝案牍输入区、退朝后探索入口和 HUD 遮挡。
+- 将 `power-silence` 标为人工复核项，不用 DOM 断言替代留白与节奏判断。
+
+如需保留截图，可显式传入目录：
+
+```text
+node scripts/check-yantie-acceptance.mjs --screenshot-dir tmp/yantie-acceptance
+```
+
+如需检查已部署页面：
+
+```text
+node scripts/check-yantie-acceptance.mjs --base-url https://baijianqing.github.io/yantie-history/yantie/
+```
+
+### 32.2 验收边界
+
+- 脚本只读取静态页面状态，不写入历史证据、Claim、API 或运行态数据。
+- 默认不生成截图文件，避免平时运行后污染工作区。
+- 如果当前 Node 环境缺少 Playwright，脚本会明确失败并提示安装或使用带 Playwright 的运行环境。
+- 脚本与 `test/test_yantie_ui.py` 共同维护验收 ID，防止页面入口和验收矩阵漂移。
+
+测试命令：
+
+- `node scripts/check-yantie-acceptance.mjs`
+- `python -m pytest test/test_yantie_ui.py`
+- `python -m pytest test`
+- `git diff --check -- scripts/check-yantie-acceptance.mjs test/test_yantie_ui.py docs/YANTIE_PRODUCT_EXPERIENCE.md`
+
+回滚方式：
+
+- revert 本次提交即可移除固化脚本和对应测试断言；不影响已发布静态页、证据包、API 契约或公共 Schema。
