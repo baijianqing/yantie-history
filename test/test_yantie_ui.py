@@ -221,6 +221,56 @@ class YantieWebUiTests(unittest.TestCase):
         self.assertNotIn('class="tabs"', html)
         self.assertNotIn('id="claimTabs"', html)
 
+    def test_yantie_a1_main_experience_slice_contract_is_declared(self) -> None:
+        html = self.client.get("/yantie").text
+
+        self.assertIn('data-main-experience-slice="YT-A1-UI-001A"', html)
+        self.assertIn('id: "YT-A1-UI-001A"', html)
+        self.assertIn("keyEvidenceLimit: 1", html)
+        self.assertIn("allowFullChapterMapBeforeDossier: false", html)
+        for phase in [
+            "pressure_entry",
+            "first_choice",
+            "perspective_formed",
+            "court_entry",
+            "fiscal_livelihood_conflict",
+            "key_evidence",
+            "judgment_shift",
+            "power_silence",
+            "retirement_dossier",
+        ]:
+            self.assertIn(phase, html)
+        for hidden_surface in [
+            "sixty_chapter_map",
+            "full_philosophy_lenses",
+            "long_evidence_reader",
+            "contemporary_echo",
+        ]:
+            self.assertIn(hidden_surface, html)
+
+    def test_yantie_a1_mainline_gates_deep_exploration_until_dossier(self) -> None:
+        html = self.client.get("/yantie").text
+
+        self.assertIn("function isPostCourtUnlocked()", html)
+        self.assertIn("function primaryEvidenceIdsForScene(scene)", html)
+        self.assertIn("function syncMainExperienceControls()", html)
+        self.assertIn("chapterButton.hidden = !postCourtUnlocked", html)
+        self.assertIn("chapterButton.disabled = !postCourtUnlocked", html)
+        self.assertIn('chapterButton.textContent = postCourtUnlocked ? "退朝后争点" : "退朝后开放"', html)
+        self.assertIn("诸篇争锋将在退朝案牍后开放；当前主线只保留关键证据。", html)
+        self.assertIn("primaryEvidenceIdsForScene(scene).map", html)
+        self.assertIn('data-mainline-hidden="true"', html)
+        self.assertIn('data-mainline-mode="${postCourtUnlocked ? "post-court" : "key-evidence"}"', html)
+        self.assertIn("isPostCourtUnlocked() ? scene.evidence : primaryEvidenceIdsForScene(scene)", html)
+
+    def test_yantie_a1_standpoint_choice_is_not_a_score_card(self) -> None:
+        html = self.client.get("/yantie").text
+
+        self.assertIn("${escapeHtml(role.pressureFocus)}压力 · 入朝视角", html)
+        self.assertIn("value: role.initialLeaning", html)
+        self.assertNotIn("初始倾向 ${Number(role.initialLeaning)}/100", html)
+        self.assertNotIn("匹配度", html)
+
     def test_yantie_page_stages_background_before_five_conflict_acts(self) -> None:
         html = self.client.get("/yantie").text
 

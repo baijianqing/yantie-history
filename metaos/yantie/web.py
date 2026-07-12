@@ -371,6 +371,18 @@ YANTIE_HTML = """<!doctype html>
       display: none;
     }
 
+    .stage[data-main-experience-slice="YT-A1-UI-001A"] [hidden] {
+      display: none !important;
+    }
+
+    .stage[data-main-experience-slice="YT-A1-UI-001A"] .issue-strip[data-mainline-hidden="true"] {
+      display: none;
+    }
+
+    .stage[data-main-experience-slice="YT-A1-UI-001A"] .evidence-seals[data-mainline-mode="key-evidence"] {
+      margin-top: 14px;
+    }
+
     .stage.is-prologue-active .scene-actions {
       margin-top: 18px;
     }
@@ -1937,7 +1949,7 @@ YANTIE_HTML = """<!doctype html>
   </style>
 </head>
 <body>
-  <main class="stage" data-testid="immersive-yantie-scene">
+  <main class="stage" data-testid="immersive-yantie-scene" data-main-experience-slice="YT-A1-UI-001A" data-completion-status="active">
     <canvas id="sceneCanvas" class="scene-canvas" aria-hidden="true"></canvas>
     <div class="grain" aria-hidden="true"></div>
     <div class="vignette" aria-hidden="true"></div>
@@ -2057,6 +2069,7 @@ YANTIE_HTML = """<!doctype html>
       animationTick: 0,
       experiencePhase: "pressure_entry",
       pressureIndex: 0,
+      completionStatus: "active",
       userStandpoint: null,
       stanceTrajectory: [],
       restorationFocus: null,
@@ -2202,6 +2215,30 @@ YANTIE_HTML = """<!doctype html>
         innerVoice: "官府入市，豪强未必消失，生计却先被改写。"
       }
     ];
+
+    const mainExperienceSlice = {
+      id: "YT-A1-UI-001A",
+      path: [
+        "pressure_entry",
+        "first_choice",
+        "perspective_formed",
+        "court_entry",
+        "fiscal_livelihood_conflict",
+        "key_evidence",
+        "judgment_shift",
+        "power_silence",
+        "retirement_dossier"
+      ],
+      keyEvidenceLimit: 1,
+      postCourtUnlockPhase: "judgment",
+      allowFullChapterMapBeforeDossier: false,
+      forbiddenMainlineSurfaces: [
+        "sixty_chapter_map",
+        "full_philosophy_lenses",
+        "long_evidence_reader",
+        "contemporary_echo"
+      ]
+    };
 
     const experienceDirector = {
       phases: ["pressure_entry", "standpoint_choice", "court_debate", "power_reveal", "after_echo", "judgment"],
@@ -4492,6 +4529,38 @@ YANTIE_HTML = """<!doctype html>
       evidence: [...(scene.historicalEvidence || []), ...(scene.philosophyLens || [])]
     }));
 
+    function currentScene() {
+      return scenes[state.sceneIndex];
+    }
+
+    function isPostCourtUnlocked() {
+      const scene = currentScene();
+      return state.completionStatus === "completed" || state.experiencePhase === mainExperienceSlice.postCourtUnlockPhase || scene?.key === "judgment";
+    }
+
+    function primaryEvidenceIdsForScene(scene) {
+      const historicalEvidence = Array.isArray(scene?.historicalEvidence) ? scene.historicalEvidence : [];
+      const fallbackEvidence = Array.isArray(scene?.evidence) ? scene.evidence : [];
+      return (historicalEvidence.length ? historicalEvidence : fallbackEvidence).slice(0, mainExperienceSlice.keyEvidenceLimit);
+    }
+
+    function syncMainExperienceControls() {
+      const stage = document.querySelector(".stage");
+      const scene = currentScene();
+      const postCourtUnlocked = isPostCourtUnlocked();
+      const hasKeyEvidence = primaryEvidenceIdsForScene(scene).length > 0;
+      stage.dataset.completionStatus = state.completionStatus;
+      stage.dataset.experiencePhase = state.experiencePhase;
+      const revealButton = document.getElementById("revealEvidence");
+      revealButton.hidden = state.experiencePhase === "pressure_entry" || state.experiencePhase === "standpoint_choice" || !hasKeyEvidence;
+      revealButton.setAttribute("aria-hidden", revealButton.hidden ? "true" : "false");
+      const chapterButton = document.getElementById("chapterMapToggle");
+      chapterButton.hidden = !postCourtUnlocked;
+      chapterButton.disabled = !postCourtUnlocked;
+      chapterButton.setAttribute("aria-hidden", chapterButton.hidden ? "true" : "false");
+      chapterButton.textContent = postCourtUnlocked ? "退朝后争点" : "退朝后开放";
+    }
+
     async function boot() {
       document.getElementById("packStatus").textContent = "历史正在复原";
       renderRestorationStatus(pressureTimeline[0]);
@@ -5031,7 +5100,7 @@ YANTIE_HTML = """<!doctype html>
           ${standpointRoles.map(role => `
             <button class="standpoint-card${state.userStandpoint === role.id ? " is-selected" : ""}" type="button" data-standpoint-id="${escapeHtml(role.id)}">
               <strong>${escapeHtml(role.label)}</strong>
-              <span>${escapeHtml(role.pressureFocus)}压力 · 初始倾向 ${Number(role.initialLeaning)}/100</span>
+              <span>${escapeHtml(role.pressureFocus)}压力 · 入朝视角</span>
               <span>${escapeHtml(role.innerVoice)}</span>
             </button>
           `).join("")}
@@ -5059,6 +5128,7 @@ YANTIE_HTML = """<!doctype html>
       document.getElementById("mapScene").classList.add("is-active");
       document.getElementById("decisionDock").classList.add("is-empty");
       closeEvidence();
+      syncMainExperienceControls();
       pulseSound("map-pressure");
       await syncMusicToExperience();
     }
@@ -5081,6 +5151,7 @@ YANTIE_HTML = """<!doctype html>
       document.querySelectorAll("[data-scene-layer]").forEach(layer => layer.classList.remove("is-active"));
       document.getElementById("mapScene").classList.add("is-active");
       closeEvidence();
+      syncMainExperienceControls();
       await syncMusicToExperience();
     }
 
@@ -5109,10 +5180,11 @@ YANTIE_HTML = """<!doctype html>
     }
 
     function sceneEvidenceButtons(scene) {
-      const rawButtons = [
+      const postCourtUnlocked = isPostCourtUnlocked();
+      const rawButtons = postCourtUnlocked ? [
         ...(scene.historicalEvidence || []).map((id, index) => ({ id, label: `发现竹简 ${index + 1}`, support: evidenceSupportFor(id) })),
         ...(scene.philosophyLens || []).map(id => ({ id, label: lensMetaFor(id).label, support: evidenceSupportFor(id) }))
-      ];
+      ] : primaryEvidenceIdsForScene(scene).map((id, index) => ({ id, label: `关键案卷 ${index + 1}`, support: evidenceSupportFor(id) }));
       const seen = new Set();
       return rawButtons.filter(item => {
         if (seen.has(item.id)) return false;
@@ -5150,6 +5222,7 @@ YANTIE_HTML = """<!doctype html>
       const tensionAfter = scene.tensionAfter || scene.tension || {};
       const voices = scene.opposingVoices || [];
       const evidenceButtons = sceneEvidenceButtons(scene);
+      const postCourtUnlocked = isPostCourtUnlocked();
       const dock = document.getElementById("decisionDock");
       dock.classList.toggle("is-empty", false);
       dock.innerHTML = `
@@ -5185,12 +5258,12 @@ YANTIE_HTML = """<!doctype html>
               </div>
             </div>
           ` : ""}
-          ${issues.length ? `
-            <div class="issue-strip" aria-label="全文争点矩阵旁路">
+          ${issues.length && postCourtUnlocked ? `
+            <div class="issue-strip" aria-label="全文争点矩阵旁路" data-mainline-hidden="false">
               ${issues.map(issue => `<span class="issue-pill" title="${escapeHtml(issue.summary)}">${escapeHtml(issue.issue)}</span>`).join("")}
             </div>
-          ` : ""}
-          <div class="evidence-seals" aria-label="本幕证据印记">
+          ` : `<div class="issue-strip" data-mainline-hidden="true" aria-hidden="true"></div>`}
+          <div class="evidence-seals" aria-label="本幕证据印记" data-mainline-mode="${postCourtUnlocked ? "post-court" : "key-evidence"}">
             ${evidenceButtons.map(item => `
               <button class="evidence-seal" type="button" data-evidence-id="${escapeHtml(item.id)}">
                 ${escapeHtml(item.label)}
@@ -5510,6 +5583,11 @@ YANTIE_HTML = """<!doctype html>
     }
 
     function openChapterMap() {
+      if (mainExperienceSlice.allowFullChapterMapBeforeDossier === false && !isPostCourtUnlocked()) {
+        document.getElementById("historyBoundary").textContent = "诸篇争锋将在退朝案牍后开放；当前主线只保留关键证据。";
+        syncMainExperienceControls();
+        return;
+      }
       state.chapterMapOpen = true;
       renderChapterMap();
       document.getElementById("chapterMapPanel").classList.add("is-open");
@@ -5525,6 +5603,7 @@ YANTIE_HTML = """<!doctype html>
 
     async function renderScene() {
       const scene = scenes[state.sceneIndex];
+      if (scene.key === "judgment") state.completionStatus = "completed";
       renderRoundVisual(scene);
       renderSceneCaption(scene);
       renderDecisionDock(scene);
@@ -5541,6 +5620,7 @@ YANTIE_HTML = """<!doctype html>
       document.getElementById(layerId).classList.add("is-active");
       if (scene.key === "judgment") renderStanceTrajectoryPanel();
       closeEvidence();
+      syncMainExperienceControls();
       updateRail();
       await preloadSceneEvidence(scene);
       pulseSound(scene.visualMode || scene.key);
@@ -5553,7 +5633,8 @@ YANTIE_HTML = """<!doctype html>
 
     async function openEvidence(focusEvidenceId = null) {
       const scene = scenes[state.sceneIndex];
-      const evidenceIds = focusEvidenceId ? [focusEvidenceId] : scene.evidence;
+      const evidenceIds = focusEvidenceId ? [focusEvidenceId] : (isPostCourtUnlocked() ? scene.evidence : primaryEvidenceIdsForScene(scene));
+      if (!evidenceIds.length) return;
       const evidenceItems = await Promise.all(evidenceIds.map(getEvidence));
       evidenceItems.forEach(evidence => {
         if (isPhilosophyLensEvidence(evidence)) state.visitedLensIds.add(evidence.evidence_id);
@@ -5851,6 +5932,8 @@ YANTIE_HTML = """<!doctype html>
         `退朝案牍 ${data.judgment_card_id}\\n` +
         `原文事实 ${data.sections.original_facts.length} 条 · 策展推断 ${data.sections.curatorial_inferences.length} 条\\n` +
         `${data.history_boundary}\\n${data.caution || ""}`;
+      state.completionStatus = "completed";
+      syncMainExperienceControls();
       pulseSound("judgment");
     });
 
