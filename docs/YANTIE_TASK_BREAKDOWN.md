@@ -35,7 +35,8 @@ flowchart TB
     UI001 --> E2E001["YT-A1-E2E-001<br/>验收与截图"]
     ZH001 --> E2E001
     A002 --> V3017A["YT-V3-017A<br/>冻结主体验路径"]
-    V3017A --> UI001
+    V3017A --> V3017B["YT-V3-017B<br/>定义体验业务对象"]
+    V3017B --> UI001
 ```
 
 并行规则：
@@ -193,6 +194,53 @@ flowchart TB
 | 第二视角体验 | 主线结束前不允许切换身份 | 退朝后提示“从另一席位再入朝” | 否 |
 | 音乐与环境音控制 | 主线中只保留静音/开启声音 | 设置中开放音乐段落、环境音和减少动态效果 | 是，作为辅助设置 |
 | 退朝案牍复盘 | 主线终点自动生成 | 退朝后可展开完整判断轨迹和证据列表 | 是，作为主交付物 |
+
+### YT-V3-017B：定义体验业务对象
+
+- 任务 ID：`YT-V3-017B`
+- 价值：把“用户经历一次历史判断”从界面流程上升为稳定业务对象，避免后续前端只围绕按钮、弹窗和页面状态开发，无法追踪用户如何进入朝堂、如何接触证据、如何动摇和如何形成退朝案牍。
+- 依赖：`YT-V3-017A`、`docs/YANTIE_PRODUCT_EXPERIENCE.md` 中 V3.13 的业务对象设计。
+- 允许修改范围：`docs/YANTIE_TASK_BREAKDOWN.md`；如发现对象字段与体验文档冲突，可在后续独立文档任务中更新 `docs/YANTIE_PRODUCT_EXPERIENCE.md`。
+- 禁止修改范围：Pydantic Schema、API 代码、前端代码、证据包、测试文件、公共 Schema、迁移、根配置、运行态 `library/` 数据。
+- 输入：`YT-V3-017A` 主体验路径表、`docs/YANTIE_PRODUCT_EXPERIENCE.md` 的 `HistoricalExperience`、`JudgmentTrace`、`SceneDefinition`、`EvidenceEncounter`、`RetirementDossier` 定义。
+- 输出：盐铁体验业务对象表、对象关系表、固定历史与可变体验边界清单、后续 Schema/前端实现任务的接口约束。
+- 接口：后续实现任务必须以本文的业务对象为概念接口；`HistoricalExperience` 只能引用证据包对象 ID 和本地用户状态，不得复制或改写 EvidenceUnit、Claim、Event 原文；`RetirementDossier` 是用户体验产物，不是历史证据。
+- 验收标准：五个对象都有职责、最小字段、生命周期和禁止事项；对象关系能覆盖一次主体验从进入到退朝的完整链路；固定历史与可变体验边界不允许被 UI 实现绕过；任务卡满足仓库要求的必填字段。
+- 测试命令：`git diff --check -- docs/YANTIE_TASK_BREAKDOWN.md`。
+- 回滚方式：删除本任务卡及其对象表，回退依赖图中的 `YT-V3-017B` 节点。
+- 文档更新：本任务卡即交付物；后续若进入实现阶段，应另开 Schema 或前端任务，不得把本文设计视为已经实现的代码契约。
+
+业务对象表：
+
+| 对象 | 职责 | 最小字段 | 生命周期 | 禁止事项 |
+|------|------|----------|----------|----------|
+| `HistoricalExperience` | 表示用户的一次盐铁会议体验实例 | `experience_id`、`experience_version`、`current_scene_id`、`started_at`、`completed_at`、`initial_choice_id`、`perspective_id`、`completion_status`、`audio_enabled`、`reduced_motion` | `not_started -> active -> completed / abandoned` | 不存储史料全文；不改写会议结果；不承担证据判断 |
+| `JudgmentTrace` | 记录用户判断如何变化 | `trace_id`、`experience_id`、`initial_position`、`trace_steps`、`final_position`、`remaining_questions` | 随体验追加，退朝时冻结为案牍输入 | 不把倾向分数伪装成历史结论；不自动生成政治评价 |
+| `SceneDefinition` | 定义业务意义上的场景 | `scene_id`、`phase`、`historical_situation`、`core_conflict`、`primary_action`、`allowed_actions`、`evidence_refs`、`history_mutability` | 随体验版本发布，运行时只读 | 不写人物虚构心理；不允许用户改变固定历史 |
+| `EvidenceEncounter` | 记录用户如何接触证据 | `encounter_id`、`experience_id`、`evidence_id`、`scene_id`、`encounter_mode`、`depth_level`、`caused_judgment_change` | 用户接触证据时追加 | 不复制 EvidenceUnit 正文；不把哲学透镜标为会议事实 |
+| `RetirementDossier` | 退朝后的核心交付物 | `dossier_id`、`experience_id`、`perspective_id`、`initial_position`、`turning_points`、`evidence_used`、`final_position`、`unresolved_conflicts`、`personal_reflection` | 退朝生成，可本地修订个人反思 | 不进入证据包；不替代历史 Claim；不自动纳入当代回声 |
+
+对象关系表：
+
+| 来源对象 | 关系 | 目标对象 | 说明 |
+|----------|------|----------|------|
+| `HistoricalExperience` | contains | `JudgmentTrace` | 一次体验有一条判断轨迹 |
+| `HistoricalExperience` | visits | `SceneDefinition` | 体验按场景顺序推进 |
+| `HistoricalExperience` | records | `EvidenceEncounter` | 用户每次接触证据都形成 encounter |
+| `JudgmentTrace` | references | `EvidenceEncounter` | 只有接触过的证据才能解释观点变化 |
+| `RetirementDossier` | summarizes | `JudgmentTrace` | 案牍从轨迹生成，不凭空总结 |
+| `RetirementDossier` | cites | `EvidenceUnit` ID | 只引用证据 ID 和出处，不复制证据包 |
+| `SceneDefinition` | references | `EvidenceUnit` ID | 场景只能引用已验证证据 |
+
+固定历史与可变体验边界：
+
+| 类型 | 可做 | 不可做 |
+|------|------|--------|
+| 固定历史 | 展示会议背景、人物身份、政策结果、史料原文和出处 | 让用户选择改变会议结果；补写未证实发言 |
+| 可变体验 | 改变进入视角、镜头顺序、证据发现路径、判断轨迹和个人反思 | 把体验变化写成历史事实 |
+| 证据使用 | 引用 EvidenceUnit ID、出处、短摘和白话转述 | 在用户状态中复制或改写证据原文 |
+| 思想透镜 | 帮助解释义利、治道、儒法分歧 | 冒充盐铁会议现场证据 |
+| 退朝案牍 | 记录用户判断、证据触发点和未解矛盾 | 进入证据包或覆盖 Claim |
 
 ## 4. 阶段进入条件
 
