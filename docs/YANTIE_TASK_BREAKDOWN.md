@@ -48,6 +48,7 @@ flowchart TB
     A2MAT005B --> A2MAT005C["YT-A2-MAT-005C<br/>退朝透镜分组"]
     A2MAT005C --> A2MAT006["YT-A2-MAT-006<br/>经学语境计划"]
     A2MAT006 --> A2MAT006A["YT-A2-MAT-006A<br/>汉书短摘核验"]
+    A2MAT006A --> A2MAT006B["YT-A2-MAT-006B<br/>繁露短摘核验"]
     A002 --> V3017A["YT-V3-017A<br/>冻结主体验路径"]
     V3017A --> V3017B["YT-V3-017B<br/>定义体验业务对象"]
     V3017B --> V3017C["YT-V3-017C<br/>冻结历史边界规则"]
@@ -1093,3 +1094,18 @@ A1 首批允许任务表：
 - 测试命令：`git diff --check -- docs/YANTIE_A2_HANSHU_CLASSICS_VERIFICATION.md docs/YANTIE_A2_CLASSICS_CONTEXT_PLAN.md docs/YANTIE_A2_MATERIAL_GAP.md docs/YANTIE_TASK_BREAKDOWN.md test/test_yantie_material_docs.py`；`python -m pytest test/test_yantie_material_docs.py`；必要时执行 `python -m pytest test -k yantie`。
 - 回滚方式：删除 `docs/YANTIE_A2_HANSHU_CLASSICS_VERIFICATION.md`，移除本任务对经学计划、材料缺口、任务图和测试的更新；不影响 evidence pack、UI 或运行代码。
 - 文档更新：本任务卡、《汉书》候选短摘核验文档、经学语境计划和 A2 材料缺口状态。
+
+### YT-A2-MAT-006B：《春秋繁露》版本性质与候选短摘核验
+
+- 任务 ID：`YT-A2-MAT-006B`
+- 价值：`YT-A2-MAT-006A` 已核验《汉书》经学语境材料，但德刑、天人、王道和春秋义法透镜仍需要《春秋繁露》候选材料补足。本任务先冻结传世文本、作者归属和候选短摘边界，避免把《春秋繁露》误作盐铁会议现场证据或董仲舒无争议亲撰文本。
+- 依赖：`YT-A2-MAT-006A`、`docs/YANTIE_A2_CLASSICS_CONTEXT_PLAN.md`、可公开核验的《春秋繁露》文本入口、现代研究书目边界。
+- 允许修改范围：`docs/YANTIE_A2_CHUNQIU_FANLU_VERIFICATION.md`、`docs/YANTIE_A2_CLASSICS_CONTEXT_PLAN.md`、`docs/YANTIE_A2_MATERIAL_GAP.md`、`docs/YANTIE_TASK_BREAKDOWN.md`、`test/test_yantie_material_docs.py`。
+- 禁止修改范围：evidence pack、UI、API、公共 Schema、搜索逻辑、后端运行时代码、迁移、根配置、运行态 `library/` 数据、现代校注本全文、现代译文、论文或专著长段内容。
+- 输入：《春秋繁露》候选篇章、`CLC-LENS-001..006` 经学透镜计划、`YT-A2-MAT-006A` 的《汉书》候选短摘、A2 材料边界。
+- 输出：《春秋繁露》版本性质与候选短摘核验文档、12 条候选短摘、对应透镜映射、文本风险说明和材料文档测试。
+- 接口：本任务只登记候选短摘；正式写入 evidence pack 必须由 `YT-A2-MAT-006C` 执行；所有候选短摘只能候选为 `philosophy_lens`、`classics_context` 或 `curatorial_inference`。
+- 验收标准：核验文档至少列出 10 条候选短摘；每条短摘都包含材料层、候选短摘、对应透镜、推荐标签、版本状态、文本性质、版权边界和入包判断；文档明确传世文本和作者归属风险；不支撑 `original_fact` Claim；不出现长段摘录或引用块。
+- 测试命令：`git diff --check -- docs/YANTIE_A2_CHUNQIU_FANLU_VERIFICATION.md docs/YANTIE_A2_CLASSICS_CONTEXT_PLAN.md docs/YANTIE_A2_MATERIAL_GAP.md docs/YANTIE_TASK_BREAKDOWN.md test/test_yantie_material_docs.py`；`python -m pytest test/test_yantie_material_docs.py`；必要时执行 `python -m pytest test -k yantie`。
+- 回滚方式：删除 `docs/YANTIE_A2_CHUNQIU_FANLU_VERIFICATION.md`，移除本任务对经学计划、材料缺口、任务图和测试的更新；不影响 evidence pack、UI 或运行代码。
+- 文档更新：本任务卡、《春秋繁露》候选短摘核验文档、经学语境计划和 A2 材料缺口状态。

@@ -8,6 +8,7 @@ HUANG_LAO_PLAN = ROOT / "docs" / "YANTIE_A2_HUANG_LAO_MATERIAL_PLAN.md"
 HUANGDI_SIJING_VERIFICATION = ROOT / "docs" / "YANTIE_A2_HUANGDI_SIJING_VERIFICATION.md"
 CLASSICS_CONTEXT_PLAN = ROOT / "docs" / "YANTIE_A2_CLASSICS_CONTEXT_PLAN.md"
 HANSHU_CLASSICS_VERIFICATION = ROOT / "docs" / "YANTIE_A2_HANSHU_CLASSICS_VERIFICATION.md"
+CHUNQIU_FANLU_VERIFICATION = ROOT / "docs" / "YANTIE_A2_CHUNQIU_FANLU_VERIFICATION.md"
 
 
 def test_yantie_modern_research_index_keeps_copyright_boundary():
@@ -201,6 +202,50 @@ def test_yantie_hanshu_classics_candidate_quotes_are_short_and_structured():
     sections = re.split(r"^### ", text, flags=re.MULTILINE)[1:]
     for section in sections:
         if not section.startswith("HSC-Q"):
+            continue
+        for field in required_fields:
+            assert field in section
+
+
+def test_yantie_chunqiu_fanlu_verification_keeps_textual_boundary():
+    text = CHUNQIU_FANLU_VERIFICATION.read_text(encoding="utf-8")
+
+    assert "YT-A2-MAT-006B" in text
+    assert "YT-A2-MAT-006C" in text
+    assert "《春秋繁露》" in text
+    assert "传世文本" in text
+    assert "作者归属" in text
+    assert "received_text_authorship_debated" in text
+    assert "不支撑 `original_fact` Claim" in text
+    assert "不作为盐铁会议现场事实" in text
+    assert "本轮不修改 UI、API、Schema、evidence pack 或运行态数据" in text
+    assert "\n> " not in text
+
+
+def test_yantie_chunqiu_fanlu_candidate_quotes_are_short_and_structured():
+    text = CHUNQIU_FANLU_VERIFICATION.read_text(encoding="utf-8")
+    cards = re.findall(r"^### (CFF-Q\d{3})：(.+)$", text, flags=re.MULTILINE)
+
+    assert len(cards) == 12
+
+    required_fields = [
+        "- 材料层：",
+        "- 候选短摘：",
+        "- 对应透镜：",
+        "- 推荐标签：",
+        "- 版本状态：candidate-from-ctext",
+        "- 文本性质：received_text_authorship_debated",
+        "- 版权边界：",
+        "- 入包判断：",
+    ]
+    excerpts = re.findall(r"- 候选短摘：`([^`]+)`", text)
+
+    assert len(excerpts) == 12
+    assert all(len(excerpt) <= 12 for excerpt in excerpts)
+
+    sections = re.split(r"^### ", text, flags=re.MULTILINE)[1:]
+    for section in sections:
+        if not section.startswith("CFF-Q"):
             continue
         for field in required_fields:
             assert field in section
