@@ -37,6 +37,11 @@ flowchart TB
     API001 --> ZH001["YT-A1-ZHIHU-001<br/>知乎外部回声"]
     UI001 --> E2E001["YT-A1-E2E-001<br/>验收与截图"]
     ZH001 --> E2E001
+    E2E001 --> A2000["YT-A2-000<br/>材料补强门禁"]
+    A2000 --> A2MAT001["YT-A2-MAT-001<br/>通鉴会议纪事"]
+    A2000 --> A2MAT002["YT-A2-MAT-002<br/>制度背景补强"]
+    A2000 --> A2MAT003["YT-A2-MAT-003<br/>文本与后世评价"]
+    A2000 --> A2MAT004["YT-A2-MAT-004<br/>现代研究书目卡"]
     A002 --> V3017A["YT-V3-017A<br/>冻结主体验路径"]
     V3017A --> V3017B["YT-V3-017B<br/>定义体验业务对象"]
     V3017B --> V3017C["YT-V3-017C<br/>冻结历史边界规则"]
@@ -915,3 +920,80 @@ A1 首批允许任务表：
 - 不包含 Access Secret、API Key、Cookie 或认证 Header。
 - 包含 `evidence_pack.json`、Schema、前端、只读 API 和必要静态资产。
 - 包含来源清单、引用说明、不可交付材料清单和已知不足。
+
+## 6. A2 材料补强任务
+
+### YT-A2-000：A2 材料补强门禁
+
+- 任务 ID：`YT-A2-000`
+- 价值：A1 已经完成可试玩闭环，A2 开始前必须先冻结材料缺口和进入边界，避免把未经核验的会议纪事、制度背景、后世评说或现代研究直接塞进 evidence pack 或首次主体验。
+- 依赖：`YT-A1-E2E-001`、当前 evidence pack、`docs/YANTIE_SOURCE_AUDIT.md`、`AGENTS.md` 的任务契约要求。
+- 允许修改范围：`docs/YANTIE_A2_MATERIAL_GAP.md`、`docs/YANTIE_TASK_BREAKDOWN.md`。
+- 禁止修改范围：`docs/yantie/index.html`、`metaos/yantie/web.py`、evidence pack、Schema、API、测试文件、迁移、根配置、运行态 `library/` 数据。
+- 输入：当前 evidence pack 的来源与 EvidenceUnit 数量、A2 材料缺口判断、A1 主体验边界、现有来源审计文档。
+- 输出：A2 材料缺口文档、A2 首批任务卡、主体验与深度探索的材料进入边界。
+- 接口：本任务只输出文档契约；后续任何材料入包任务必须引用本门禁，并继续使用现有 Source、EvidenceUnit、Claim 和材料类型边界。
+- 验收标准：`docs/YANTIE_A2_MATERIAL_GAP.md` 明确五类材料缺口、优先级和交付边界；本文件登记 `YT-A2-MAT-001..004`；每个任务卡都包含必填字段；未修改代码、UI、证据包或运行态数据。
+- 测试命令：`git diff --check -- docs/YANTIE_A2_MATERIAL_GAP.md docs/YANTIE_TASK_BREAKDOWN.md`。
+- 回滚方式：删除 `docs/YANTIE_A2_MATERIAL_GAP.md`，移除本节和依赖图中的 A2 节点。
+- 文档更新：本任务卡和 `docs/YANTIE_A2_MATERIAL_GAP.md` 即本轮文档交付物。
+
+### YT-A2-MAT-001：《资治通鉴》会议纪事证据补强
+
+- 任务 ID：`YT-A2-MAT-001`
+- 价值：《资治通鉴》卷023 已在设计中承担会议纪事补充，但当前 evidence pack 中没有对应 EvidenceUnit；需要补齐编年材料，帮助校验会议起因、争论轮廓和有限结果。
+- 依赖：`YT-A2-000`、`docs/YANTIE_SOURCE_AUDIT.md`、现有 evidence pack Schema、可公开访问或本地已授权的《资治通鉴》卷023文本。
+- 允许修改范围：evidence pack、与盐铁证据包直接相关的测试文件、`docs/YANTIE_A2_MATERIAL_GAP.md` 或一份直接相关的材料说明文档。
+- 禁止修改范围：UI、API、公共 Schema、迁移、根配置、运行态 `library/` 数据、未经授权的整卷原文入库。
+- 输入：《资治通鉴》卷023盐铁会议相关条目、当前 source id 规划、会议纪事缺口清单。
+- 输出：`src_zizhi_tongjian_023` 对应的候选或正式 EvidenceUnit，覆盖会议起因、双方争点、政策结果和纪事边界；必要时补充 Claim 引用。
+- 接口：沿用现有 Source、EvidenceUnit、Claim 结构；材料类型应标记为历史纪事或会议背景，不得标为哲学透镜或当代回声；默认不进入首次主体验，除非后续任务单独验收为主线关键证据。
+- 验收标准：新增材料均有卷篇定位、短摘、白话说明、来源链接或本地授权说明、人工核验状态；不复制整卷原文；能解释为什么通鉴材料是后出编年史而非会议原始记录。
+- 测试命令：`python -m pytest test -k yantie_pack`；必要时执行 `python -m pytest test`。
+- 回滚方式：移除新增的通鉴 source/evidence/claim/test/doc 更新，恢复 evidence pack 到任务前状态。
+- 文档更新：更新 `docs/YANTIE_A2_MATERIAL_GAP.md` 中会议纪事状态，并记录是否进入主线候选证据。
+
+### YT-A2-MAT-002：盐铁、均输、平准、酒榷制度背景补强
+
+- 任务 ID：`YT-A2-MAT-002`
+- 价值：当前主体验已经呈现财政和民生压力，但《汉书·食货志》《史记·平准书》的制度证据偏薄；需要补足盐铁官营、均输、平准、酒榷、算缗和边费材料，支撑用户理解“为什么非争不可”。
+- 依赖：`YT-A2-000`、现有 `src_hanshu_shihuo`、`src_shiji_pingzhun`、来源审计文档、当前 evidence pack Schema。
+- 允许修改范围：evidence pack、与盐铁证据包直接相关的测试文件、`docs/YANTIE_A2_MATERIAL_GAP.md` 或一份直接相关的制度材料说明文档。
+- 禁止修改范围：UI、API、公共 Schema、迁移、根配置、运行态 `library/` 数据、无来源的财政数字或戏剧化推断。
+- 输入：《汉书·食货志》《史记·平准书》中的制度背景材料，当前 A1 主体验中的压力线和证据引用。
+- 输出：制度背景 EvidenceUnit 候选或正式入包材料，至少覆盖盐铁、均输、平准、酒榷、算缗、边费和商贾逻辑中的核心项。
+- 接口：材料应进入历史制度背景分类；可作为退朝后深度探索，也可在后续任务中被验收为主线轻提示；不得直接改变 A1 的固定历史结果。
+- 验收标准：每条材料能区分“制度背景”与“会议现场发言”；来源、卷篇、短摘、白话说明和人工核验状态完整；不把压力值包装成真实统计。
+- 测试命令：`python -m pytest test -k yantie_pack`；必要时执行 `python -m pytest test`。
+- 回滚方式：移除新增制度 EvidenceUnit、Claim、测试和材料说明，恢复 evidence pack 到任务前状态。
+- 文档更新：更新 `docs/YANTIE_A2_MATERIAL_GAP.md` 的制度背景缺口和已补强状态。
+
+### YT-A2-MAT-003：《盐铁论》文本性质与后世评价补强
+
+- 任务 ID：`YT-A2-MAT-003`
+- 价值：用户需要知道《盐铁论》不是会议录音，而是桓宽整理后的争论文本；同时应理解贤良文学、制度人物和后世目录学评价的边界，避免把文本立场误读为未央宫现场原声。
+- 依赖：`YT-A2-000`、现有《盐铁论》证据、`src_yantielun_siku`、可公开访问或已授权的序跋、目录学与人物背景材料。
+- 允许修改范围：evidence pack、与盐铁证据包直接相关的测试文件、`docs/YANTIE_A2_MATERIAL_GAP.md` 或一份直接相关的文本与接受史材料说明文档。
+- 禁止修改范围：UI、API、公共 Schema、迁移、根配置、运行态 `library/` 数据、未经授权的现代研究全文、把后世评价当作会议事实。
+- 输入：桓宽与《盐铁论》成书性质材料、贤良文学身份说明、孔仅、东郭咸阳、卜式等制度人物背景、后世目录学评价。
+- 输出：文本性质、人物背景、后世评价相关 EvidenceUnit 或策展说明，必要时补充 contested_view 或 curatorial_inference 类型的 Claim。
+- 接口：会议事实、文本整理、后世评说必须使用不同材料类型和展示边界；后世评说默认只进入退朝后深度探索。
+- 验收标准：至少补足文本性质、贤良文学身份、制度人物背景、后世评价中的关键缺口；所有材料都有来源定位和人工核验；不把后世评价写成主线事实。
+- 测试命令：`python -m pytest test -k yantie_pack`；必要时执行 `python -m pytest test`。
+- 回滚方式：移除新增文本性质、人物背景、后世评价材料及对应测试和文档更新。
+- 文档更新：更新 `docs/YANTIE_A2_MATERIAL_GAP.md` 的文本与人物、后世评说状态。
+
+### YT-A2-MAT-004：现代研究书目卡与版权边界
+
+- 任务 ID：`YT-A2-MAT-004`
+- 价值：现代研究可以帮助用户理解盐铁会议的研究史和争议定位，但版权和材料性质必须先被明确；本任务只交付书目卡和观点定位，不把现代论文或专著全文塞进证据包。
+- 依赖：`YT-A2-000`、来源审计文档、可公开检索的现代研究目录信息、版权边界规则。
+- 允许修改范围：`docs/YANTIE_A2_MATERIAL_GAP.md`、可新增一份现代研究书目卡文档、与书目卡校验直接相关的轻量测试或检查脚本。
+- 禁止修改范围：UI、API、公共 Schema、evidence pack 正式历史证据、迁移、根配置、运行态 `library/` 数据、现代研究全文或长段摘录。
+- 输入：现代研究书目、公开链接、作者和出版信息、核心观点摘要、版权或访问边界。
+- 输出：现代研究书目卡，包含标题、作者、出版信息、公开链接、观点定位、版权边界、人工核验状态和是否可进入 evidence pack 的判断。
+- 接口：现代研究默认属于退朝后延伸阅读或研究史定位；不得作为会议事实的直接证据；如需进入 evidence pack，必须另开任务并明确材料类型。
+- 验收标准：每张书目卡不含全文或长段摘录；观点摘要为原创概括；所有链接和版权边界可复核；外部当代讨论继续标记为 `external_echo`。
+- 测试命令：`git diff --check -- docs/YANTIE_A2_MATERIAL_GAP.md docs/YANTIE_A2_MODERN_RESEARCH_INDEX.md`；如新增检查脚本，再执行对应最小测试。
+- 回滚方式：删除新增书目卡文档或本任务新增段落，不影响 evidence pack、UI 或运行代码。
+- 文档更新：更新 `docs/YANTIE_A2_MATERIAL_GAP.md` 的现代研究与版权边界状态。

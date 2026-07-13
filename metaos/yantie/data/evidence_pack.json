@@ -22,11 +22,20 @@
       "note": "Public-domain classical text; selected short excerpts used only as historical evidence or philosophy lenses."
     },
     {
+      "source_id": "src_zizhi_tongjian_023",
+      "title": "资治通鉴/卷023 汉纪十五",
+      "license_status": "public_domain_text",
+      "delivery_policy": "excerpt_allowed",
+      "excerpt_count": 4,
+      "human_verified": true,
+      "note": "Public-domain later chronicle; selected short excerpts used to cross-check meeting chronology, not as a verbatim transcript."
+    },
+    {
       "source_id": "src_hanshu_shihuo",
       "title": "汉书/卷024下 食货志",
       "license_status": "public_domain_text",
       "delivery_policy": "excerpt_allowed",
-      "excerpt_count": 3,
+      "excerpt_count": 9,
       "human_verified": true,
       "note": "Public-domain classical text; selected short excerpts used only as historical evidence or philosophy lenses."
     },
@@ -35,7 +44,7 @@
       "title": "史记/卷030 平准书",
       "license_status": "public_domain_text",
       "delivery_policy": "excerpt_allowed",
-      "excerpt_count": 5,
+      "excerpt_count": 11,
       "human_verified": true,
       "note": "Public-domain classical text; selected short excerpts used only as historical evidence or philosophy lenses."
     },
@@ -324,6 +333,17 @@
       "license_status": "public_domain_text",
       "canonical_url": "https://zh.wikisource.org/zh-hans/%E6%BC%A2%E6%9B%B8/%E5%8D%B7007",
       "citation_style": "《汉书·昭帝纪》",
+      "delivery_policy": "excerpt_allowed",
+      "human_verified": true
+    },
+    {
+      "source_id": "src_zizhi_tongjian_023",
+      "title": "资治通鉴/卷023 汉纪十五",
+      "source_type": "chronicle",
+      "authority_level": "core",
+      "license_status": "public_domain_text",
+      "canonical_url": "https://zh.wikisource.org/wiki/%E8%B3%87%E6%B2%BB%E9%80%9A%E9%91%91/%E5%8D%B7023",
+      "citation_style": "《资治通鉴》卷二十三",
       "delivery_policy": "excerpt_allowed",
       "human_verified": true
     },
@@ -1397,6 +1417,93 @@
       "review_status": "verified"
     },
     {
+      "evidence_id": "ev:src_zizhi_tongjian_023:shiyuan06:meeting_question:aa230001",
+      "source_id": "src_zizhi_tongjian_023",
+      "canonical_location": "卷二十三·汉纪十五·始元六年二月",
+      "excerpt_original": "诏有司问郡国所举贤良、文学，民所疾苦、教化之要",
+      "paraphrase_zh": "《资治通鉴》把会议起点放在始元六年二月，朝廷询问郡国所举贤良文学关于民间疾苦和教化要务的意见。",
+      "evidence_kind": "event_record",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_meeting_process"
+      ],
+      "value_tags": [
+        "later_chronicle",
+        "meeting_chronology"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain later chronicle, short excerpt.",
+      "review_status": "verified",
+      "adjacent_context_note": "《资治通鉴》为后出编年史，可用于校验会议纪事，不等同于会议原始记录。"
+    },
+    {
+      "evidence_id": "ev:src_zizhi_tongjian_023:shiyuan06:literati_petition:aa230002",
+      "source_id": "src_zizhi_tongjian_023",
+      "canonical_location": "卷二十三·汉纪十五·始元六年二月",
+      "excerpt_original": "愿罢盐、铁、酒榷、均输官，毋与天下争利",
+      "paraphrase_zh": "通鉴概括贤良文学的主张为请求罢盐铁、酒榷和均输官，理由是国家不应与天下争利。",
+      "evidence_kind": "event_record",
+      "speaker_actor_id": "actor_literati",
+      "topic_ids": [
+        "topic_state_monopoly",
+        "topic_liquor_monopoly",
+        "topic_equal_transport"
+      ],
+      "value_tags": [
+        "later_chronicle",
+        "abolish_monopoly",
+        "anti_profit_governance"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain later chronicle, short excerpt.",
+      "review_status": "verified",
+      "adjacent_context_note": "该条是通鉴对贤良文学答对的编年概括，应与《盐铁论》正文互证使用。"
+    },
+    {
+      "evidence_id": "ev:src_zizhi_tongjian_023:shiyuan06:sang_reply:aa230003",
+      "source_id": "src_zizhi_tongjian_023",
+      "canonical_location": "卷二十三·汉纪十五·始元六年二月",
+      "excerpt_original": "此国家大业，所以制四夷，安边足用之本，不可废也",
+      "paraphrase_zh": "通鉴概括桑弘羊的答辩：盐铁等制度是国家大业，是制四夷、安边和足用的根本，不能废止。",
+      "evidence_kind": "event_record",
+      "speaker_actor_id": "actor_sang_hongyang",
+      "topic_ids": [
+        "topic_state_monopoly",
+        "topic_frontier_finance"
+      ],
+      "value_tags": [
+        "later_chronicle",
+        "state_capacity",
+        "frontier_security"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain later chronicle, short excerpt.",
+      "review_status": "verified",
+      "adjacent_context_note": "该条是通鉴对桑弘羊答辩的编年概括，适合作会议纪事骨架，不替代《盐铁论》详细论辩。"
+    },
+    {
+      "evidence_id": "ev:src_zizhi_tongjian_023:shiyuan06:liquor_office_abolished:aa230004",
+      "source_id": "src_zizhi_tongjian_023",
+      "canonical_location": "卷二十三·汉纪十五·始元六年秋七月",
+      "excerpt_original": "秋，七月，罢榷酤官，从贤良、文学之议也",
+      "paraphrase_zh": "通鉴把始元六年秋七月罢榷酤官解释为采纳贤良文学部分意见，说明会议结果是有限让步。",
+      "evidence_kind": "policy_record",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_meeting_result",
+        "topic_liquor_monopoly"
+      ],
+      "value_tags": [
+        "later_chronicle",
+        "partial_reform",
+        "liquor_monopoly_abolished"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain later chronicle, short excerpt.",
+      "review_status": "verified",
+      "adjacent_context_note": "该条可与《汉书·昭帝纪》罢榷酤官互证，但不表示盐铁均输全部废止。"
+    },
+    {
       "evidence_id": "ev:src_hanshu_zhaodi:juan007:rebellion_record:ddee0011",
       "source_id": "src_hanshu_zhaodi",
       "canonical_location": "卷七·元凤元年",
@@ -1464,6 +1571,130 @@
       ],
       "value_tags": [
         "fiscal_shortage"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, short excerpt.",
+      "review_status": "verified"
+    },
+    {
+      "evidence_id": "ev:src_hanshu_shihuo:juan024:private_salt_iron_wealth:a2b20001",
+      "source_id": "src_hanshu_shihuo",
+      "canonical_location": "卷二十四下·食货志",
+      "excerpt_original": "冶铸煮盐，财或累万金，而不佐公家之急",
+      "paraphrase_zh": "《食货志》把私人冶铸、煮盐积累巨富而不支援公家急需，作为国家介入山海之利的背景。",
+      "evidence_kind": "policy_record",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_state_monopoly",
+        "topic_frontier_finance"
+      ],
+      "value_tags": [
+        "private_salt_iron_wealth",
+        "state_revenue_need",
+        "institutional_background"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, short excerpt.",
+      "review_status": "verified"
+    },
+    {
+      "evidence_id": "ev:src_hanshu_shihuo:juan024:suanmin_commerce_tax:a2b20002",
+      "source_id": "src_hanshu_shihuo",
+      "canonical_location": "卷二十四下·食货志",
+      "excerpt_original": "率缗钱二千而算一",
+      "paraphrase_zh": "算缗要求商贾按资产自占纳算，是武帝财政汲取商贾财富的重要制度。",
+      "evidence_kind": "policy_record",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_frontier_finance"
+      ],
+      "value_tags": [
+        "suanmin",
+        "merchant_tax",
+        "institutional_background"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, short excerpt.",
+      "review_status": "verified"
+    },
+    {
+      "evidence_id": "ev:src_hanshu_shihuo:juan024:gaomin_breaks_merchants:a2b20003",
+      "source_id": "src_hanshu_shihuo",
+      "canonical_location": "卷二十四下·食货志",
+      "excerpt_original": "商贾中家以上大氐破",
+      "paraphrase_zh": "告缗推行后，中等以上商贾多遭告发和破产，显示财政征收对社会结构的冲击。",
+      "evidence_kind": "policy_record",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_frontier_finance",
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "gaomin",
+        "merchant_pressure",
+        "institutional_background"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, short excerpt.",
+      "review_status": "verified"
+    },
+    {
+      "evidence_id": "ev:src_hanshu_shihuo:juan024:bad_iron_price_complaint:a2b20004",
+      "source_id": "src_hanshu_shihuo",
+      "canonical_location": "卷二十四下·食货志",
+      "excerpt_original": "器苦恶，贾贵，或彊令民买之",
+      "paraphrase_zh": "卜式批评郡国官营盐铁不便，铁器质量差、价格贵，甚至强令民众购买。",
+      "evidence_kind": "policy_record",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_state_monopoly"
+      ],
+      "value_tags": [
+        "monopoly_abuse",
+        "people_livelihood",
+        "institutional_background"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, short excerpt.",
+      "review_status": "verified"
+    },
+    {
+      "evidence_id": "ev:src_hanshu_shihuo:juan024:equal_transport_supports_war:a2b20005",
+      "source_id": "src_hanshu_shihuo",
+      "canonical_location": "卷二十四下·食货志",
+      "excerpt_original": "大农以均输调盐铁助赋",
+      "paraphrase_zh": "《食货志》把均输调盐铁与三年连兵、初郡供给相连，说明制度承担战事财政支持功能。",
+      "evidence_kind": "policy_record",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_equal_transport",
+        "topic_frontier_finance"
+      ],
+      "value_tags": [
+        "equal_transport",
+        "frontier_finance",
+        "institutional_background"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, short excerpt.",
+      "review_status": "verified"
+    },
+    {
+      "evidence_id": "ev:src_hanshu_shihuo:juan024:pingzhun_mechanism:a2b20006",
+      "source_id": "src_hanshu_shihuo",
+      "canonical_location": "卷二十四下·食货志",
+      "excerpt_original": "贵则卖之，贱则买之",
+      "paraphrase_zh": "平准通过国家低买高卖调节物价，目标是抑制富商牟大利和物价腾跃。",
+      "evidence_kind": "policy_record",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_price_leveling",
+        "topic_equal_transport"
+      ],
+      "value_tags": [
+        "price_leveling",
+        "market_intervention",
+        "institutional_background"
       ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
@@ -1558,6 +1789,129 @@
       ],
       "value_tags": [
         "fiscal_effectiveness"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, short excerpt.",
+      "review_status": "verified"
+    },
+    {
+      "evidence_id": "ev:src_shiji_pingzhun:juan030:private_salt_iron_wealth:a2b20007",
+      "source_id": "src_shiji_pingzhun",
+      "canonical_location": "卷三十·平准书",
+      "excerpt_original": "冶铸煮盐，财或累万金",
+      "paraphrase_zh": "《平准书》同样把冶铸煮盐带来的私人巨富，放在国家财政紧张与抑制兼并的背景中。",
+      "evidence_kind": "policy_record",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_state_monopoly",
+        "topic_frontier_finance"
+      ],
+      "value_tags": [
+        "private_salt_iron_wealth",
+        "state_revenue_need",
+        "institutional_background"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, short excerpt.",
+      "review_status": "verified"
+    },
+    {
+      "evidence_id": "ev:src_shiji_pingzhun:juan030:salt_iron_state_assets:a2b20008",
+      "source_id": "src_shiji_pingzhun",
+      "canonical_location": "卷三十·平准书",
+      "excerpt_original": "山海，天地之藏也，皆宜属少府",
+      "paraphrase_zh": "孔仅、东郭咸阳主张山海资源应纳入官府财政体系，成为盐铁官营的制度理由。",
+      "evidence_kind": "policy_record",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_state_monopoly"
+      ],
+      "value_tags": [
+        "state_monopoly_rationale",
+        "mountain_sea_resources",
+        "institutional_background"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, short excerpt.",
+      "review_status": "verified"
+    },
+    {
+      "evidence_id": "ev:src_shiji_pingzhun:juan030:suanmin_assessment:a2b20009",
+      "source_id": "src_shiji_pingzhun",
+      "canonical_location": "卷三十·平准书",
+      "excerpt_original": "率缗钱二千而一算",
+      "paraphrase_zh": "《平准书》记录商贾按缗钱计税的算缗制度，是国家向商贾资产征收的机制。",
+      "evidence_kind": "policy_record",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_frontier_finance"
+      ],
+      "value_tags": [
+        "suanmin",
+        "merchant_tax",
+        "institutional_background"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, short excerpt.",
+      "review_status": "verified"
+    },
+    {
+      "evidence_id": "ev:src_shiji_pingzhun:juan030:gaomin_confiscation:a2b2000a",
+      "source_id": "src_shiji_pingzhun",
+      "canonical_location": "卷三十·平准书",
+      "excerpt_original": "得民财物以亿计",
+      "paraphrase_zh": "告缗执行后，官府没收大量财物、奴婢、田宅，说明财政汲取力度和社会震荡。",
+      "evidence_kind": "policy_record",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_frontier_finance",
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "gaomin",
+        "confiscation",
+        "institutional_background"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, short excerpt.",
+      "review_status": "verified"
+    },
+    {
+      "evidence_id": "ev:src_shiji_pingzhun:juan030:bad_iron_complaint:a2b2000b",
+      "source_id": "src_shiji_pingzhun",
+      "canonical_location": "卷三十·平准书",
+      "excerpt_original": "铁器苦恶，贾贵，或彊令民卖买之",
+      "paraphrase_zh": "《平准书》保存卜式对官营盐铁的批评：铁器差、价格高，还可能强制交易。",
+      "evidence_kind": "policy_record",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_state_monopoly"
+      ],
+      "value_tags": [
+        "monopoly_abuse",
+        "people_livelihood",
+        "institutional_background"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, short excerpt.",
+      "review_status": "verified"
+    },
+    {
+      "evidence_id": "ev:src_shiji_pingzhun:juan030:pingzhun_market_mechanism:a2b2000c",
+      "source_id": "src_shiji_pingzhun",
+      "canonical_location": "卷三十·平准书",
+      "excerpt_original": "贵即卖之，贱则买之",
+      "paraphrase_zh": "平准由大农统摄天下货物，贵时卖、贱时买，以压低物价波动和富商利润。",
+      "evidence_kind": "policy_record",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_price_leveling",
+        "topic_equal_transport"
+      ],
+      "value_tags": [
+        "price_leveling",
+        "market_intervention",
+        "institutional_background"
       ],
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
@@ -3517,7 +3871,8 @@
       "stance": "explains_context",
       "evidence_ids": [
         "ev:src_yantielun:juan01_benyi:meeting_opening:a1b2c3d4",
-        "ev:src_hanshu_zhaodi:juan007:meeting_edict:ccddeeff"
+        "ev:src_hanshu_zhaodi:juan007:meeting_edict:ccddeeff",
+        "ev:src_zizhi_tongjian_023:shiyuan06:meeting_question:aa230001"
       ],
       "counterevidence_ids": [],
       "external_reference_ids": [],
@@ -3530,7 +3885,8 @@
       "statement": "贤良文学明确请求罢盐铁、酒榷、均输，理由是国家与民争利、伤害务本之风。",
       "stance": "opposes_state_monopoly",
       "evidence_ids": [
-        "ev:src_yantielun:juan01_benyi:literati_abolish:0a1b2c3d"
+        "ev:src_yantielun:juan01_benyi:literati_abolish:0a1b2c3d",
+        "ev:src_zizhi_tongjian_023:shiyuan06:literati_petition:aa230002"
       ],
       "counterevidence_ids": [
         "ev:src_yantielun:juan01_benyi:border_finance:1a2b3c4d"
@@ -3546,7 +3902,8 @@
       "stance": "supports_state_monopoly",
       "evidence_ids": [
         "ev:src_yantielun:juan01_benyi:border_finance:1a2b3c4d",
-        "ev:src_yantielun:juan01_benyi:military_strategy_reply:55667788"
+        "ev:src_yantielun:juan01_benyi:military_strategy_reply:55667788",
+        "ev:src_zizhi_tongjian_023:shiyuan06:sang_reply:aa230003"
       ],
       "counterevidence_ids": [
         "ev:src_yantielun:juan01_jingeng:agriculture_base:88990011"
@@ -3590,6 +3947,7 @@
       "stance": "explains_context",
       "evidence_ids": [
         "ev:src_hanshu_zhaodi:juan007:abolish_liquor_office:ddccbbaa",
+        "ev:src_zizhi_tongjian_023:shiyuan06:liquor_office_abolished:aa230004",
         "ev:src_yantielun_siku:preface:partial_result:1234abcd"
       ],
       "counterevidence_ids": [],

@@ -69,6 +69,109 @@ class YantieEvidencePackDataTests(unittest.TestCase):
                 self.assertNotEqual(source.source_type, SourceType.external_echo, claim.claim_id)
                 self.assertEqual(evidence.review_status, ReviewStatus.verified, claim.claim_id)
 
+    def test_zizhi_tongjian_chronicle_evidence_covers_meeting_outline(self) -> None:
+        pack = load_pack()
+        sources_by_id = {source.source_id: source for source in pack.sources}
+        manifest_by_id = {entry.source_id: entry for entry in pack.source_manifest}
+        evidence_by_id = {evidence.evidence_id: evidence for evidence in pack.evidence_units}
+
+        source = sources_by_id["src_zizhi_tongjian_023"]
+        self.assertEqual(source.source_type, SourceType.chronicle)
+        self.assertEqual(source.delivery_policy.value, "excerpt_allowed")
+        self.assertTrue(source.human_verified)
+
+        chronicle_evidence = [
+            evidence for evidence in pack.evidence_units if evidence.source_id == "src_zizhi_tongjian_023"
+        ]
+        self.assertEqual(len(chronicle_evidence), 4)
+        self.assertEqual(manifest_by_id["src_zizhi_tongjian_023"].excerpt_count, len(chronicle_evidence))
+
+        expected_ids = {
+            "ev:src_zizhi_tongjian_023:shiyuan06:meeting_question:aa230001",
+            "ev:src_zizhi_tongjian_023:shiyuan06:literati_petition:aa230002",
+            "ev:src_zizhi_tongjian_023:shiyuan06:sang_reply:aa230003",
+            "ev:src_zizhi_tongjian_023:shiyuan06:liquor_office_abolished:aa230004",
+        }
+        self.assertEqual({evidence.evidence_id for evidence in chronicle_evidence}, expected_ids)
+
+        for evidence in chronicle_evidence:
+            self.assertEqual(evidence.review_status, ReviewStatus.verified)
+            self.assertIn("later_chronicle", evidence.value_tags)
+            self.assertIn("Public-domain later chronicle", evidence.copyright_note)
+            self.assertTrue(evidence.adjacent_context_note)
+            self.assertTrue(
+                "通鉴" in evidence.adjacent_context_note or "互证" in evidence.adjacent_context_note
+            )
+
+        cited_ids = {
+            evidence_id
+            for claim in pack.claims
+            for evidence_id in claim.evidence_ids
+            if evidence_id in expected_ids
+        }
+        self.assertEqual(cited_ids, expected_ids)
+        for evidence_id in expected_ids:
+            self.assertEqual(evidence_by_id[evidence_id].certainty.value, "direct_text")
+
+    def test_hanshu_shiji_institutional_background_covers_a2_fiscal_system(self) -> None:
+        pack = load_pack()
+        sources_by_id = {source.source_id: source for source in pack.sources}
+        manifest_by_id = {entry.source_id: entry for entry in pack.source_manifest}
+        evidence_by_id = {evidence.evidence_id: evidence for evidence in pack.evidence_units}
+
+        self.assertEqual(sources_by_id["src_hanshu_shihuo"].source_type, SourceType.institutional_history)
+        self.assertEqual(sources_by_id["src_shiji_pingzhun"].source_type, SourceType.institutional_history)
+
+        hanshu_evidence = [
+            evidence for evidence in pack.evidence_units if evidence.source_id == "src_hanshu_shihuo"
+        ]
+        shiji_evidence = [
+            evidence for evidence in pack.evidence_units if evidence.source_id == "src_shiji_pingzhun"
+        ]
+        self.assertEqual(len(hanshu_evidence), 9)
+        self.assertEqual(len(shiji_evidence), 11)
+        self.assertEqual(manifest_by_id["src_hanshu_shihuo"].excerpt_count, len(hanshu_evidence))
+        self.assertEqual(manifest_by_id["src_shiji_pingzhun"].excerpt_count, len(shiji_evidence))
+
+        expected_ids = {
+            "ev:src_hanshu_shihuo:juan024:private_salt_iron_wealth:a2b20001",
+            "ev:src_hanshu_shihuo:juan024:suanmin_commerce_tax:a2b20002",
+            "ev:src_hanshu_shihuo:juan024:gaomin_breaks_merchants:a2b20003",
+            "ev:src_hanshu_shihuo:juan024:bad_iron_price_complaint:a2b20004",
+            "ev:src_hanshu_shihuo:juan024:equal_transport_supports_war:a2b20005",
+            "ev:src_hanshu_shihuo:juan024:pingzhun_mechanism:a2b20006",
+            "ev:src_shiji_pingzhun:juan030:private_salt_iron_wealth:a2b20007",
+            "ev:src_shiji_pingzhun:juan030:salt_iron_state_assets:a2b20008",
+            "ev:src_shiji_pingzhun:juan030:suanmin_assessment:a2b20009",
+            "ev:src_shiji_pingzhun:juan030:gaomin_confiscation:a2b2000a",
+            "ev:src_shiji_pingzhun:juan030:bad_iron_complaint:a2b2000b",
+            "ev:src_shiji_pingzhun:juan030:pingzhun_market_mechanism:a2b2000c",
+        }
+
+        for evidence_id in expected_ids:
+            evidence = evidence_by_id[evidence_id]
+            self.assertEqual(evidence.review_status, ReviewStatus.verified)
+            self.assertEqual(evidence.certainty.value, "direct_text")
+            self.assertIn("institutional_background", evidence.value_tags)
+            self.assertIn(evidence.source_id, {"src_hanshu_shihuo", "src_shiji_pingzhun"})
+
+        required_tags = {
+            "private_salt_iron_wealth",
+            "suanmin",
+            "gaomin",
+            "monopoly_abuse",
+            "equal_transport",
+            "price_leveling",
+            "market_intervention",
+            "institutional_background",
+        }
+        covered_tags = {
+            value_tag
+            for evidence_id in expected_ids
+            for value_tag in evidence_by_id[evidence_id].value_tags
+        }
+        self.assertTrue(required_tags.issubset(covered_tags))
+
     def test_lexical_index_supports_fixed_mvp_queries(self) -> None:
         pack = load_pack()
 
