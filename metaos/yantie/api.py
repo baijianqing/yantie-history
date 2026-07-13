@@ -35,6 +35,7 @@ from metaos.yantie.search import (
     load_default_evidence_pack,
     search_evidence,
 )
+from metaos.yantie.zhihu_adapter import ZhihuExternalEchoAdapter, create_yantie_external_echo_router
 
 
 class JudgmentDisposition(str, Enum):
@@ -57,11 +58,17 @@ class CreateJudgmentCardRequest(YantieModel):
         return self
 
 
-def create_yantie_api_router(*, pack: EvidencePack | None = None) -> APIRouter:
+def create_yantie_api_router(
+    *,
+    pack: EvidencePack | None = None,
+    external_echo_adapter: ZhihuExternalEchoAdapter | None = None,
+) -> APIRouter:
     """Build the YT-A1-API-001 read-only router."""
 
     evidence_pack = pack or load_default_evidence_pack()
+    echo_adapter = external_echo_adapter or ZhihuExternalEchoAdapter.from_env()
     router = APIRouter(prefix="/api/yantie", tags=["yantie"])
+    router.include_router(create_yantie_external_echo_router(pack=evidence_pack, adapter=echo_adapter))
 
     @router.get("/manifest")
     def get_manifest() -> dict[str, Any]:
@@ -84,7 +91,7 @@ def create_yantie_api_router(*, pack: EvidencePack | None = None) -> APIRouter:
                 "features": {
                     "runtime_rag": False,
                     "vector_store": False,
-                    "external_echo_enabled": False,
+                    "external_echo_enabled": echo_adapter.is_configured,
                     "local_judgment_cards": True,
                 },
             },
