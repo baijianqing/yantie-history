@@ -278,7 +278,12 @@ class YantieWebUiTests(unittest.TestCase):
         html = self.client.get("/yantie").text
 
         self.assertIn('.stage[data-experience-phase="judgment"] .debate-hud', html)
+        self.assertIn('.stage[data-experience-phase="judgment"] #judgmentSvg', html)
         self.assertIn('.stage[data-experience-phase="judgment"] .judgment-form', html)
+        self.assertIn("opacity: 0.24", html)
+        self.assertIn("opacity: 0.16", html)
+        self.assertIn("display: none", html)
+        self.assertIn("background: linear-gradient(180deg, #090d13, #0d1118)", html)
         self.assertIn("z-index: 12", html)
 
     def test_yantie_a1_post_court_explorer_is_gated_and_degraded(self) -> None:
@@ -405,8 +410,11 @@ class YantieWebUiTests(unittest.TestCase):
         self.assertIn("const viewports = [", script)
         self.assertIn("inspectScenario(page, scenario, viewport)", script)
         self.assertIn("page.waitForFunction", script)
+        self.assertIn('scenario === "retirement-dossier" || scenario === "post-court-explorer"', script)
+        self.assertIn('Number(window.getComputedStyle(document.querySelector(".judgment-form")).opacity', script)
         self.assertIn("reducedMotion: \"reduce\"", script)
         self.assertIn("dossier overlaps debate HUD", script)
+        self.assertIn("judgment backdrop too prominent", script)
         self.assertIn("post-court details not expanded", script)
         self.assertIn("Manual review recommended", script)
         for scenario in [

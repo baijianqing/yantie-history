@@ -151,6 +151,13 @@ async function inspectScenario(page, scenario, viewport) {
     scenario,
     { timeout: 10000 },
   );
+  if (scenario === "retirement-dossier" || scenario === "post-court-explorer") {
+    await page.waitForFunction(
+      () => Number(window.getComputedStyle(document.querySelector(".judgment-form")).opacity || "0") > 0.98,
+      null,
+      { timeout: 10000 },
+    );
+  }
 
   return page.evaluate(({ scenario: scenarioId, viewport: viewportSpec }) => {
     function metrics(selector) {
@@ -182,6 +189,10 @@ async function inspectScenario(page, scenario, viewport) {
     const evidence = metrics("#evidenceRibbon");
     const dossier = metrics(".judgment-form");
     const debateHud = metrics("#debateHud");
+    const judgmentBackdrop = metrics("#judgmentSvg");
+    const judgmentBackdropOpacity = Number(
+      window.getComputedStyle(document.querySelector("#judgmentSvg") || document.body).opacity || "1",
+    );
     const postCourt = metrics("#postCourtExplorer");
     const details = document.querySelector("#postCourtExplorer details");
     const failures = [];
@@ -201,6 +212,9 @@ async function inspectScenario(page, scenario, viewport) {
       if (!dossier.visible) failures.push("judgment form hidden");
       if (debateHud.visible) failures.push("debate HUD visible during judgment");
       if (overlaps(dossier.rect, debateHud.rect)) failures.push("dossier overlaps debate HUD");
+      if (judgmentBackdrop.visible && judgmentBackdropOpacity > 0.45) {
+        failures.push("judgment backdrop too prominent");
+      }
     }
 
     if (scenarioId === "post-court-explorer") {

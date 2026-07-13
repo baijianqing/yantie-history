@@ -836,8 +836,19 @@ YANTIE_HTML = """<!doctype html>
       display: none;
     }
 
+    .stage[data-experience-phase="judgment"] #judgmentSvg {
+      opacity: 0.24;
+      filter: saturate(0.72);
+    }
+
     .stage[data-experience-phase="judgment"] .judgment-form {
       z-index: 12;
+      padding: 16px;
+      border: 1px solid rgba(255,236,188,0.24);
+      border-radius: 10px;
+      background: linear-gradient(180deg, #090d13, #0d1118);
+      box-shadow: 0 18px 52px rgba(0,0,0,0.38);
+      backdrop-filter: blur(12px);
     }
 
     .decision-dock {
@@ -2052,6 +2063,12 @@ YANTIE_HTML = """<!doctype html>
       .judgment-form {
         inset: 12px;
         max-height: calc(100% - 24px);
+        padding: 12px;
+      }
+
+      .stage[data-experience-phase="judgment"] #judgmentSvg {
+        opacity: 0.16;
+        display: none;
       }
 
       .stance-trajectory-panel {
