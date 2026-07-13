@@ -62,7 +62,7 @@
       "title": "盐铁论四库提要",
       "license_status": "public_domain_text",
       "delivery_policy": "excerpt_allowed",
-      "excerpt_count": 2,
+      "excerpt_count": 8,
       "human_verified": true,
       "note": "Public-domain classical text; selected short excerpts used only as historical evidence or philosophy lenses."
     },
@@ -2005,6 +2005,135 @@
       ],
       "value_tags": [
         "textual_bias",
+        "later_reception"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain later commentary, short excerpt.",
+      "review_status": "verified"
+    },
+    {
+      "evidence_id": "ev:src_yantielun_siku:preface:huan_kuan_author:a2c30001",
+      "source_id": "src_yantielun_siku",
+      "canonical_location": "四库提要",
+      "excerpt_original": "汉桓宽撰。宽字次公，汝南人",
+      "paraphrase_zh": "四库提要将《盐铁论》归于西汉桓宽撰，并提供其字号、籍贯和仕宦背景，适合用于文本史说明而非会议现场证据。",
+      "evidence_kind": "biographical_context",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_meeting_process"
+      ],
+      "value_tags": [
+        "huan_kuan",
+        "textual_history",
+        "later_reception"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain later commentary, short excerpt.",
+      "review_status": "verified"
+    },
+    {
+      "evidence_id": "ev:src_yantielun_siku:preface:text_compilation:a2c30002",
+      "source_id": "src_yantielun_siku",
+      "canonical_location": "四库提要",
+      "excerpt_original": "宽集其所论，为书凡六十篇",
+      "paraphrase_zh": "四库提要把《盐铁论》描述为桓宽汇集相关议论而成六十篇，提示它是整理成书的争论文本，不是会议录音。",
+      "evidence_kind": "later_evaluation",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_meeting_process"
+      ],
+      "value_tags": [
+        "compilation",
+        "sixty_chapters",
+        "not_transcript",
+        "textual_history",
+        "later_reception"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain later commentary, short excerpt.",
+      "review_status": "verified"
+    },
+    {
+      "evidence_id": "ev:src_yantielun_siku:preface:connected_chapters:a2c30003",
+      "source_id": "src_yantielun_siku",
+      "canonical_location": "四库提要",
+      "excerpt_original": "篇各标目，实则反覆问答，诸篇皆首尾相属",
+      "paraphrase_zh": "四库提要指出六十篇虽各有篇名，实际由反复问答和前后相属的论证组成，适合作为争点图谱的文本结构依据。",
+      "evidence_kind": "later_evaluation",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_meeting_process"
+      ],
+      "value_tags": [
+        "chapter_structure",
+        "dialogue_structure",
+        "textual_history",
+        "later_reception"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain later commentary, short excerpt.",
+      "review_status": "verified"
+    },
+    {
+      "evidence_id": "ev:src_yantielun_siku:preface:named_literati:a2c30004",
+      "source_id": "src_yantielun_siku",
+      "canonical_location": "四库提要",
+      "excerpt_original": "记贤良茂陵唐生、文学鲁万生等六十余人",
+      "paraphrase_zh": "四库提要说明书末《杂论》记有贤良、文学等六十余人姓名，可用于说明文本保留参与者线索，但仍属后世提要中的文本说明。",
+      "evidence_kind": "later_evaluation",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_power_network",
+        "topic_meeting_process"
+      ],
+      "value_tags": [
+        "named_literati",
+        "participant_trace",
+        "textual_history",
+        "later_reception"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain later commentary, short excerpt.",
+      "review_status": "verified"
+    },
+    {
+      "evidence_id": "ev:src_yantielun_siku:preface:confucian_catalog:a2c30005",
+      "source_id": "src_yantielun_siku",
+      "canonical_location": "四库提要",
+      "excerpt_original": "皆述先王，称《六经》，故诸史列之儒家",
+      "paraphrase_zh": "四库提要解释《盐铁论》虽论食货，却大量称述先王与六经，因此旧史多将其列入儒家。",
+      "evidence_kind": "later_evaluation",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "confucian_catalog",
+        "catalog_history",
+        "textual_history",
+        "later_reception"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain later commentary, short excerpt.",
+      "review_status": "verified"
+    },
+    {
+      "evidence_id": "ev:src_yantielun_siku:preface:qianqingtang_catalog:a2c30006",
+      "source_id": "src_yantielun_siku",
+      "canonical_location": "四库提要",
+      "excerpt_original": "《千顷堂书目》改隶史部食货类中，循名而失其实矣",
+      "paraphrase_zh": "四库提要批评《千顷堂书目》按题名把《盐铁论》改隶史部食货类，认为这会误失其儒家论辩性质。",
+      "evidence_kind": "later_evaluation",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values",
+        "topic_state_monopoly"
+      ],
+      "value_tags": [
+        "catalog_history",
+        "food_money_category",
+        "confucian_catalog",
+        "textual_history",
         "later_reception"
       ],
       "certainty": "direct_text",
@@ -4039,7 +4168,11 @@
       "stance": "evaluates_afterlife",
       "evidence_ids": [
         "ev:src_yantielun_siku:preface:che_qianqiu_critique:abcdef12",
-        "ev:src_yantielun_siku:preface:partial_result:1234abcd"
+        "ev:src_yantielun_siku:preface:partial_result:1234abcd",
+        "ev:src_yantielun_siku:preface:text_compilation:a2c30002",
+        "ev:src_yantielun_siku:preface:connected_chapters:a2c30003",
+        "ev:src_yantielun_siku:preface:confucian_catalog:a2c30005",
+        "ev:src_yantielun_siku:preface:qianqingtang_catalog:a2c30006"
       ],
       "counterevidence_ids": [
         "ev:src_yantielun:juan01_benyi:meeting_opening:a1b2c3d4"
@@ -4278,7 +4411,9 @@
       "to_id": "src_yantielun",
       "relation_type": "contextualizes",
       "evidence_ids": [
-        "ev:src_yantielun_siku:preface:che_qianqiu_critique:abcdef12"
+        "ev:src_yantielun_siku:preface:che_qianqiu_critique:abcdef12",
+        "ev:src_yantielun_siku:preface:text_compilation:a2c30002",
+        "ev:src_yantielun_siku:preface:connected_chapters:a2c30003"
       ],
       "strength": "contextual_inference",
       "note": "Later commentary warns that the text's framing is not neutral stenography."

@@ -172,6 +172,67 @@ class YantieEvidencePackDataTests(unittest.TestCase):
         }
         self.assertTrue(required_tags.issubset(covered_tags))
 
+    def test_siku_textual_history_marks_yantie_as_compiled_later_framed_text(self) -> None:
+        pack = load_pack()
+        sources_by_id = {source.source_id: source for source in pack.sources}
+        manifest_by_id = {entry.source_id: entry for entry in pack.source_manifest}
+        evidence_by_id = {evidence.evidence_id: evidence for evidence in pack.evidence_units}
+        claims_by_id = {claim.claim_id: claim for claim in pack.claims}
+
+        source = sources_by_id["src_yantielun_siku"]
+        self.assertEqual(source.source_type, SourceType.later_commentary)
+        self.assertEqual(source.delivery_policy.value, "excerpt_allowed")
+        self.assertTrue(source.human_verified)
+
+        siku_evidence = [
+            evidence for evidence in pack.evidence_units if evidence.source_id == "src_yantielun_siku"
+        ]
+        self.assertEqual(len(siku_evidence), 8)
+        self.assertEqual(manifest_by_id["src_yantielun_siku"].excerpt_count, len(siku_evidence))
+
+        expected_ids = {
+            "ev:src_yantielun_siku:preface:huan_kuan_author:a2c30001",
+            "ev:src_yantielun_siku:preface:text_compilation:a2c30002",
+            "ev:src_yantielun_siku:preface:connected_chapters:a2c30003",
+            "ev:src_yantielun_siku:preface:named_literati:a2c30004",
+            "ev:src_yantielun_siku:preface:confucian_catalog:a2c30005",
+            "ev:src_yantielun_siku:preface:qianqingtang_catalog:a2c30006",
+        }
+
+        for evidence_id in expected_ids:
+            evidence = evidence_by_id[evidence_id]
+            self.assertEqual(evidence.review_status, ReviewStatus.verified)
+            self.assertEqual(evidence.certainty.value, "direct_text")
+            self.assertIn("textual_history", evidence.value_tags)
+            self.assertIn("later_reception", evidence.value_tags)
+            self.assertNotEqual(evidence.evidence_kind.value, "event_record")
+
+        required_tags = {
+            "huan_kuan",
+            "compilation",
+            "not_transcript",
+            "chapter_structure",
+            "named_literati",
+            "confucian_catalog",
+            "catalog_history",
+        }
+        covered_tags = {
+            value_tag
+            for evidence_id in expected_ids
+            for value_tag in evidence_by_id[evidence_id].value_tags
+        }
+        self.assertTrue(required_tags.issubset(covered_tags))
+
+        framing_claim = claims_by_id["claim_text_has_later_framing"]
+        self.assertTrue(
+            {
+                "ev:src_yantielun_siku:preface:text_compilation:a2c30002",
+                "ev:src_yantielun_siku:preface:connected_chapters:a2c30003",
+                "ev:src_yantielun_siku:preface:confucian_catalog:a2c30005",
+                "ev:src_yantielun_siku:preface:qianqingtang_catalog:a2c30006",
+            }.issubset(set(framing_claim.evidence_ids))
+        )
+
     def test_lexical_index_supports_fixed_mvp_queries(self) -> None:
         pack = load_pack()
 
