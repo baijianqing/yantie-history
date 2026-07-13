@@ -59,6 +59,7 @@ flowchart TB
     A2MAT008 --> A2MAT009["YT-A2-MAT-009<br/>贤良文学身份归并"]
     A2MAT009 --> A2MAT010["YT-A2-MAT-010<br/>材料计数校验"]
     A2MAT010 --> A2MAT011["YT-A2-MAT-011<br/>黄老分组状态收口"]
+    A2MAT011 --> A2MAT012["YT-A2-MAT-012<br/>思想透镜验收场景"]
     A002 --> V3017A["YT-V3-017A<br/>冻结主体验路径"]
     V3017A --> V3017B["YT-V3-017B<br/>定义体验业务对象"]
     V3017B --> V3017C["YT-V3-017C<br/>冻结历史边界规则"]
@@ -1269,3 +1270,18 @@ A1 首批允许任务表：
 - 测试命令：`git diff --check -- docs/YANTIE_A2_MATERIAL_GAP.md docs/YANTIE_TASK_BREAKDOWN.md test/test_yantie_material_docs.py`；`python -m pytest test/test_yantie_material_docs.py`；必要时执行 `python -m pytest test -k yantie` 和 `python -m pytest test`。
 - 回滚方式：移除 011 任务图节点、任务卡、A2 材料门禁文档中的 005C/011 状态补登和材料文档测试断言。
 - 文档更新：更新本任务卡和 A2 材料门禁文档，说明黄老透镜分组已完成状态收口。
+
+### YT-A2-MAT-012：退朝后思想透镜验收场景覆盖
+
+- 任务 ID：`YT-A2-MAT-012`
+- 价值：A2 已把黄老、经学语境等思想透镜放入退朝后分组，单元测试已验证配置存在，但 Playwright 静态验收只覆盖材料导览，尚未真实走过“退朝后打开思想透镜并看到分组材料”的路径。本任务补齐该验收场景，防止退朝后思想透镜入口在后续 UI 调整中失效。
+- 依赖：`YT-A2-MAT-005C`、`YT-A2-MAT-006D`、`YT-A2-MAT-011`、`scripts/check-yantie-acceptance.mjs`、现有退朝后入口和 UI/E2E 测试。
+- 允许修改范围：`scripts/check-yantie-acceptance.mjs`、`test/test_yantie_ui.py`、`test/test_yantie_e2e.py`、`docs/YANTIE_TASK_BREAKDOWN.md`。
+- 禁止修改范围：evidence pack、UI 内容、API、公共 Schema、搜索代码、运行态 `library/` 数据、迁移、根配置、新增史料、现代研究全文。
+- 输入：退朝后 `philosophy-lens` 入口、`#philosophyLensPanel`、`philosophyLensGroups`、现有 acceptance query 场景。
+- 输出：`philosophy-lens` acceptance runner 场景、思想透镜面板可见性检查、黄老/经学分组存在检查、测试覆盖和本任务卡。
+- 接口：验收 runner 通过 `?acceptance=post-court-explorer` 进入退朝后状态，再触发 `[data-post-court-action="philosophy-lens"]`；必须检查 `#philosophyLensPanel` 可见、`data-lens-boundary="philosophy_lens"`、`huang_lao` 与 `classics_context` 分组存在，且至少一个透镜证据按钮可见。
+- 验收标准：Playwright runner 总检查数从 30 增至 33；`philosophy-lens` 覆盖 desktop、mobile、reduced-motion；UI/E2E 测试声明该场景；不改变用户主体验、证据包或 UI 内容。
+- 测试命令：`git diff --check -- scripts/check-yantie-acceptance.mjs test/test_yantie_ui.py test/test_yantie_e2e.py docs/YANTIE_TASK_BREAKDOWN.md`；`python -m pytest test/test_yantie_ui.py test/test_yantie_e2e.py`；`node scripts/check-yantie-acceptance.mjs`；必要时执行 `python -m pytest test -k yantie` 和 `python -m pytest test`。
+- 回滚方式：移除 `philosophy-lens` runner 场景、思想透镜检查、测试断言和任务卡，恢复 012 前验收矩阵。
+- 文档更新：本任务卡即本轮文档交付物。

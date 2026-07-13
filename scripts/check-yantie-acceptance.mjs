@@ -19,6 +19,7 @@ const scenarios = [
   "retirement-dossier",
   "post-court-explorer",
   "material-guide",
+  "philosophy-lens",
 ];
 
 const viewports = [
@@ -146,7 +147,7 @@ function screenshotPath(options, viewport, scenario) {
 }
 
 function pageScenarioFor(scenario) {
-  if (scenario === "material-guide") return "post-court-explorer";
+  if (scenario === "material-guide" || scenario === "philosophy-lens") return "post-court-explorer";
   return scenario;
 }
 
@@ -158,7 +159,12 @@ async function inspectScenario(page, scenario, viewport) {
     pageScenario,
     { timeout: 10000 },
   );
-  if (scenario === "retirement-dossier" || scenario === "post-court-explorer" || scenario === "material-guide") {
+  if (
+    scenario === "retirement-dossier" ||
+    scenario === "post-court-explorer" ||
+    scenario === "material-guide" ||
+    scenario === "philosophy-lens"
+  ) {
     await page.waitForFunction(
       () => Number(window.getComputedStyle(document.querySelector(".judgment-form")).opacity || "0") > 0.98,
       null,
@@ -170,6 +176,20 @@ async function inspectScenario(page, scenario, viewport) {
     await page.waitForFunction(
       () => {
         const panel = document.querySelector("#materialGuidePanel");
+        if (!panel || panel.hidden) return false;
+        const style = window.getComputedStyle(panel);
+        const rect = panel.getBoundingClientRect();
+        return style.display !== "none" && style.visibility !== "hidden" && rect.width > 0 && rect.height > 0;
+      },
+      null,
+      { timeout: 10000 },
+    );
+  }
+  if (scenario === "philosophy-lens") {
+    await page.locator('[data-post-court-action="philosophy-lens"]').click();
+    await page.waitForFunction(
+      () => {
+        const panel = document.querySelector("#philosophyLensPanel");
         if (!panel || panel.hidden) return false;
         const style = window.getComputedStyle(panel);
         const rect = panel.getBoundingClientRect();
@@ -216,9 +236,13 @@ async function inspectScenario(page, scenario, viewport) {
     );
     const postCourt = metrics("#postCourtExplorer");
     const materialGuide = metrics("#materialGuidePanel");
+    const philosophyLens = metrics("#philosophyLensPanel");
     const details = document.querySelector("#postCourtExplorer details");
     const materialGuidePanel = document.querySelector("#materialGuidePanel");
     const materialCards = document.querySelectorAll("[data-material-guide-id]");
+    const philosophyLensPanel = document.querySelector("#philosophyLensPanel");
+    const lensTabs = document.querySelectorAll("[data-lens-group]");
+    const lensButtons = document.querySelectorAll("[data-lens-evidence-id]");
     const failures = [];
 
     if (stage?.dataset.acceptanceScenario !== pageScenarioId) failures.push("wrong acceptance scenario");
@@ -241,7 +265,7 @@ async function inspectScenario(page, scenario, viewport) {
       }
     }
 
-    if (scenarioId === "post-court-explorer" || scenarioId === "material-guide") {
+    if (scenarioId === "post-court-explorer" || scenarioId === "material-guide" || scenarioId === "philosophy-lens") {
       if (!postCourt.visible) failures.push("post-court explorer hidden");
       if (!details?.open) failures.push("post-court details not expanded");
     }
@@ -254,6 +278,19 @@ async function inspectScenario(page, scenario, viewport) {
       if (materialCards.length < 1) failures.push("material guide has no cards");
     }
 
+    if (scenarioId === "philosophy-lens") {
+      if (!philosophyLens.visible) failures.push("philosophy lens panel hidden");
+      if (philosophyLensPanel?.dataset.lensBoundary !== "philosophy_lens") {
+        failures.push("philosophy lens boundary missing");
+      }
+      if (lensTabs.length < 4) failures.push("philosophy lens groups missing");
+      if (!document.querySelector('[data-lens-group="huang_lao"]')) failures.push("huang lao lens group missing");
+      if (!document.querySelector('[data-lens-group="classics_context"]')) {
+        failures.push("classics context lens group missing");
+      }
+      if (lensButtons.length < 1) failures.push("philosophy lens has no evidence buttons");
+    }
+
     return {
       viewport: viewportSpec.name,
       scenario: scenarioId,
@@ -263,6 +300,7 @@ async function inspectScenario(page, scenario, viewport) {
       dossierVisible: dossier.visible,
       postCourtVisible: postCourt.visible,
       materialGuideVisible: materialGuide.visible,
+      philosophyLensVisible: philosophyLens.visible,
       manualReview: scenarioId === "power-silence",
       failures,
     };

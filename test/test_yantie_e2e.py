@@ -115,6 +115,7 @@ def test_yantie_e2e_acceptance_runner_covers_delivery_gate() -> None:
         "retirement-dossier",
         "post-court-explorer",
         "material-guide",
+        "philosophy-lens",
     ]:
         assert f'"{scenario}"' in script
 
@@ -127,7 +128,11 @@ def test_yantie_e2e_acceptance_runner_covers_delivery_gate() -> None:
     assert "post-court details not expanded" in script
     assert "pageScenarioFor(scenario)" in script
     assert '[data-post-court-action="material-guide"]' in script
+    assert '[data-post-court-action="philosophy-lens"]' in script
     assert "#materialGuidePanel" in script
+    assert "#philosophyLensPanel" in script
     assert "material guide boundary missing" in script
     assert "material guide has no cards" in script
+    assert "philosophy lens boundary missing" in script
+    assert "philosophy lens has no evidence buttons" in script
     assert 'scenarioId === "power-silence"' in script

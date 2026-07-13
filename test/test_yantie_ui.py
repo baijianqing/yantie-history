@@ -509,18 +509,26 @@ class YantieWebUiTests(unittest.TestCase):
         self.assertIn("const viewports = [", script)
         self.assertIn("inspectScenario(page, scenario, viewport)", script)
         self.assertIn("function pageScenarioFor(scenario)", script)
-        self.assertIn('if (scenario === "material-guide") return "post-court-explorer"', script)
+        self.assertIn(
+            'if (scenario === "material-guide" || scenario === "philosophy-lens") return "post-court-explorer"',
+            script,
+        )
         self.assertIn("page.waitForFunction", script)
-        self.assertIn('scenario === "retirement-dossier" || scenario === "post-court-explorer"', script)
+        self.assertIn('scenario === "retirement-dossier" ||', script)
+        self.assertIn('scenario === "philosophy-lens"', script)
         self.assertIn('Number(window.getComputedStyle(document.querySelector(".judgment-form")).opacity', script)
         self.assertIn('[data-post-court-action="material-guide"]', script)
+        self.assertIn('[data-post-court-action="philosophy-lens"]', script)
         self.assertIn("#materialGuidePanel", script)
+        self.assertIn("#philosophyLensPanel", script)
         self.assertIn("reducedMotion: \"reduce\"", script)
         self.assertIn("dossier overlaps debate HUD", script)
         self.assertIn("judgment backdrop too prominent", script)
         self.assertIn("post-court details not expanded", script)
         self.assertIn("material guide boundary missing", script)
         self.assertIn("material guide has no cards", script)
+        self.assertIn("philosophy lens boundary missing", script)
+        self.assertIn("philosophy lens has no evidence buttons", script)
         self.assertIn("Manual review recommended", script)
         for scenario in [
             "opening-map",
@@ -533,6 +541,7 @@ class YantieWebUiTests(unittest.TestCase):
             "retirement-dossier",
             "post-court-explorer",
             "material-guide",
+            "philosophy-lens",
         ]:
             self.assertIn(f'"{scenario}"', script)
 
