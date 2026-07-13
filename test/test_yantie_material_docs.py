@@ -15,13 +15,23 @@ CHUNQIU_FANLU_VERIFICATION = ROOT / "docs" / "YANTIE_A2_CHUNQIU_FANLU_VERIFICATI
 def test_yantie_material_gap_tracks_post_court_ui_status():
     text = MATERIAL_GAP.read_text(encoding="utf-8")
 
-    for task_id in ["YT-A2-MAT-006D", "YT-A2-MAT-006E", "YT-A2-MAT-006F", "YT-A2-MAT-006G"]:
+    for task_id in [
+        "YT-A2-MAT-006D",
+        "YT-A2-MAT-006E",
+        "YT-A2-MAT-006F",
+        "YT-A2-MAT-006G",
+        "YT-A2-MAT-007",
+        "YT-A2-MAT-008",
+    ]:
         assert task_id in text
 
     assert "退朝后 `classics_context` 思想透镜分组" in text
     assert "退朝后材料导览入口" in text
     assert "`material-guide` Playwright 验收场景" in text
     assert "`YT-A2-MAT-006G` | A2 材料状态文档收口" in text
+    assert "`YT-A2-MAT-008` | 酒榷制度背景补强" in text
+    assert "《汉书·武帝纪》“初榷酒酤”" in text
+    assert "酒榷细节仍需后续任务补足" not in text
     assert "如需进入主线轻提示，需另开任务验收" in text
     assert "经学透镜的退朝后分组、材料导览和 UI 呈现仍需后续任务补强" not in text
     assert "不修改 Schema、API、搜索逻辑、迁移或运行态数据" in text

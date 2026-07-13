@@ -278,9 +278,18 @@
       "title": "汉书·武帝纪",
       "license_status": "public_domain_text",
       "delivery_policy": "excerpt_allowed",
+      "excerpt_count": 2,
+      "human_verified": true,
+      "note": "Public-domain Hanshu chronicle; selected very short excerpts used as Wudi-era institutional background and classics-context lens, not as Yantie meeting evidence."
+    },
+    {
+      "source_id": "src_tongdian_shihuo_11",
+      "title": "通典·食货十一·榷酤",
+      "license_status": "public_domain_text",
+      "delivery_policy": "excerpt_allowed",
       "excerpt_count": 1,
       "human_verified": true,
-      "note": "Public-domain Hanshu chronicle; one very short excerpt used only as Wudi-era classics-context philosophy lens, not as Yantie meeting evidence."
+      "note": "Public-domain Tang institutional history; one short excerpt explains liquor monopoly mechanism as later institutional context, not as Yantie meeting fact."
     },
     {
       "source_id": "src_hanshu_rulin",
@@ -697,6 +706,17 @@
       "license_status": "public_domain_text",
       "canonical_url": "https://ctext.org/han-shu/wu-di-ji/zh",
       "citation_style": "班固：《汉书·武帝纪》",
+      "delivery_policy": "excerpt_allowed",
+      "human_verified": true
+    },
+    {
+      "source_id": "src_tongdian_shihuo_11",
+      "title": "通典·食货十一·榷酤",
+      "source_type": "institutional_history",
+      "authority_level": "comparison",
+      "license_status": "public_domain_text",
+      "canonical_url": "https://zh.wikisource.org/wiki/%E9%80%9A%E5%85%B8/%E5%8D%B7011",
+      "citation_style": "杜佑：《通典·食货十一·榷酤》",
       "delivery_policy": "excerpt_allowed",
       "human_verified": true
     },
@@ -1565,6 +1585,52 @@
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, short excerpt.",
       "review_status": "verified"
+    },
+    {
+      "evidence_id": "ev:src_hanshu_wudi:juan006:first_liquor_monopoly:a2b2000d",
+      "source_id": "src_hanshu_wudi",
+      "canonical_location": "卷六·武帝纪·天汉三年春二月",
+      "excerpt_original": "初榷酒酤",
+      "paraphrase_zh": "《武帝纪》记载武帝天汉三年开始榷酒酤，这是始元六年讨论酒榷的制度前史。",
+      "evidence_kind": "policy_record",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_liquor_monopoly",
+        "topic_state_monopoly",
+        "topic_frontier_finance"
+      ],
+      "value_tags": [
+        "liquor_monopoly_origin",
+        "wudi_fiscal_policy",
+        "institutional_background"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, short excerpt.",
+      "review_status": "verified",
+      "adjacent_context_note": "Wudi-era policy background; not evidence that liquor monopoly was created at the Yantie meeting."
+    },
+    {
+      "evidence_id": "ev:src_tongdian_shihuo_11:juan011:liquor_monopoly_definition:a2b2000e",
+      "source_id": "src_tongdian_shihuo_11",
+      "canonical_location": "卷十一·食货十一·榷酤",
+      "excerpt_original": "禁人酤酿，独官开置",
+      "paraphrase_zh": "《通典》在榷酤条下解释汉代榷酒酤为禁止民间酤酿、由官府开置取利，可用于说明酒榷制度含义；它是后出制度汇编，不是会议现场材料。",
+      "evidence_kind": "policy_record",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_liquor_monopoly",
+        "topic_state_monopoly"
+      ],
+      "value_tags": [
+        "liquor_monopoly_mechanism",
+        "state_monopoly",
+        "institutional_background",
+        "later_institutional_explanation"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain institutional history, short excerpt.",
+      "review_status": "verified",
+      "adjacent_context_note": "Later institutional compilation and commentary; use to explain mechanism, not as original Han court record."
     },
     {
       "evidence_id": "ev:src_zizhi_tongjian_023:shiyuan06:meeting_question:aa230001",
@@ -5134,9 +5200,17 @@
         "ev:src_yantielun:juan01_benyi:great_officer_equal_transport:77889900"
       ],
       "榷酤": [
+        "ev:src_hanshu_wudi:juan006:first_liquor_monopoly:a2b2000d",
+        "ev:src_tongdian_shihuo_11:juan011:liquor_monopoly_definition:a2b2000e",
         "ev:src_hanshu_zhaodi:juan007:meeting_edict:ccddeeff",
         "ev:src_hanshu_zhaodi:juan007:abolish_liquor_office:ddccbbaa",
         "ev:src_yantielun_siku:preface:partial_result:1234abcd"
+      ],
+      "酒榷": [
+        "ev:src_hanshu_wudi:juan006:first_liquor_monopoly:a2b2000d",
+        "ev:src_tongdian_shihuo_11:juan011:liquor_monopoly_definition:a2b2000e",
+        "ev:src_yantielun:juan01_benyi:literati_abolish:0a1b2c3d",
+        "ev:src_yantielun:juan01_benyi:border_finance:1a2b3c4d"
       ],
       "边费": [
         "ev:src_yantielun:juan01_benyi:border_finance:1a2b3c4d",

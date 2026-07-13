@@ -55,6 +55,7 @@ flowchart TB
     A2MAT006E --> A2MAT006F["YT-A2-MAT-006F<br/>材料导览验收"]
     A2MAT006F --> A2MAT006G["YT-A2-MAT-006G<br/>材料状态收口"]
     A2MAT006G --> A2MAT007["YT-A2-MAT-007<br/>制度人物Actor补强"]
+    A2MAT007 --> A2MAT008["YT-A2-MAT-008<br/>酒榷制度背景补强"]
     A002 --> V3017A["YT-V3-017A<br/>冻结主体验路径"]
     V3017A --> V3017B["YT-V3-017B<br/>定义体验业务对象"]
     V3017B --> V3017C["YT-V3-017C<br/>冻结历史边界规则"]
@@ -1205,3 +1206,18 @@ A1 首批允许任务表：
 - 测试命令：`git diff --check -- metaos/yantie/data/evidence_pack.json docs/yantie/data/evidence_pack.json test/test_yantie_pack.py docs/YANTIE_TASK_BREAKDOWN.md docs/YANTIE_A2_MATERIAL_GAP.md`；`python -m pytest test/test_yantie_pack.py`；必要时执行 `python -m pytest test -k yantie` 和 `python -m pytest test`。
 - 回滚方式：移除 3 个 actors、event actor 关联、lexical_index entries、pack 测试和文档状态更新，恢复到 007 前证据包。
 - 文档更新：更新本任务卡和 A2 材料缺口状态，说明制度人物背景已完成首轮 Actor 化，后续只补酒榷细节和贤良文学身份。
+
+### YT-A2-MAT-008：酒榷制度背景补强
+
+- 任务 ID：`YT-A2-MAT-008`
+- 价值：A2 材料缺口中仍保留“酒榷细节”，但当前 evidence pack 主要覆盖会议中“议罢榷酤”和结果“罢榷酤官”，缺少武帝时期初设酒榷和“榷酤”制度含义。补齐这层背景后，用户退朝后能理解为什么酒榷成为有限让步对象，而不是把它误读为会议现场临时议题。
+- 依赖：`YT-A2-MAT-002`、`YT-A2-MAT-007`、`src_hanshu_wudi`、双份 evidence pack、pack 测试。
+- 允许修改范围：`metaos/yantie/data/evidence_pack.json`、`docs/yantie/data/evidence_pack.json`、`test/test_yantie_pack.py`、`docs/YANTIE_TASK_BREAKDOWN.md`、`docs/YANTIE_A2_MATERIAL_GAP.md`、`test/test_yantie_material_docs.py`。
+- 禁止修改范围：UI、API、公共 Schema、搜索代码、运行态 `library/` 数据、迁移、根配置、现代研究全文、未经核验材料、把后出制度解释写成会议现场事实。
+- 输入：《汉书·武帝纪》天汉三年“初榷酒酤”短摘、《通典·食货十一·榷酤》制度解释短摘、现有 `topic_liquor_monopoly`、`lexical_index`。
+- 输出：`src_tongdian_shihuo_11` source/source manifest、2 条酒榷制度背景 EvidenceUnit、`榷酤`/`酒榷` lexical index、pack 测试和材料状态文档更新。
+- 接口：新增材料只作为 `institutional_background`；《汉书·武帝纪》条目说明武帝时期制度前史，《通典》条目说明后出制度解释；二者不得进入会议现场发言、不得新增 `original_fact` Claim，除非后续单独验收。
+- 验收标准：双份 evidence pack 同步；`src_hanshu_wudi` excerpt_count 与实际 evidence 数一致；新增 `src_tongdian_shihuo_11` 为 verified public-domain institutional source；2 条新增 EvidenceUnit 均为 verified、direct_text、policy_record、无 speaker_actor_id、带 `topic_liquor_monopoly` 与 `institutional_background`；`酒榷` 和 `榷酤` 均可检索到新增证据；不修改 UI/API/Schema。
+- 测试命令：`git diff --check -- metaos/yantie/data/evidence_pack.json docs/yantie/data/evidence_pack.json test/test_yantie_pack.py docs/YANTIE_TASK_BREAKDOWN.md docs/YANTIE_A2_MATERIAL_GAP.md test/test_yantie_material_docs.py`；`python -m pytest test/test_yantie_pack.py test/test_yantie_material_docs.py`；必要时执行 `python -m pytest test -k yantie` 和 `python -m pytest test`。
+- 回滚方式：移除新增 `src_tongdian_shihuo_11`、2 条酒榷 EvidenceUnit、lexical_index 新增引用、pack 测试和文档状态更新，并把 `src_hanshu_wudi` excerpt_count 恢复到 1。
+- 文档更新：更新本任务卡、A2 材料缺口状态和材料文档测试，说明酒榷制度背景已完成首轮入包，后续只需决定是否进入主线轻提示。

@@ -223,6 +223,44 @@ class YantieEvidencePackDataTests(unittest.TestCase):
             expected_actor_evidence["actor_bu_shi"],
         )
 
+    def test_liquor_monopoly_background_has_origin_and_mechanism_evidence(self) -> None:
+        pack = load_pack()
+        sources_by_id = {source.source_id: source for source in pack.sources}
+        manifest_by_id = {entry.source_id: entry for entry in pack.source_manifest}
+        evidence_by_id = {evidence.evidence_id: evidence for evidence in pack.evidence_units}
+
+        self.assertEqual(sources_by_id["src_hanshu_wudi"].source_type, SourceType.chronicle)
+        self.assertEqual(
+            sources_by_id["src_tongdian_shihuo_11"].source_type,
+            SourceType.institutional_history,
+        )
+        self.assertEqual(manifest_by_id["src_hanshu_wudi"].excerpt_count, 2)
+        self.assertEqual(manifest_by_id["src_tongdian_shihuo_11"].excerpt_count, 1)
+
+        expected_ids = {
+            "ev:src_hanshu_wudi:juan006:first_liquor_monopoly:a2b2000d",
+            "ev:src_tongdian_shihuo_11:juan011:liquor_monopoly_definition:a2b2000e",
+        }
+
+        for evidence_id in expected_ids:
+            evidence = evidence_by_id[evidence_id]
+            self.assertEqual(evidence.review_status, ReviewStatus.verified)
+            self.assertEqual(evidence.certainty.value, "direct_text")
+            self.assertEqual(evidence.evidence_kind.value, "policy_record")
+            self.assertIsNone(evidence.speaker_actor_id)
+            self.assertIn("topic_liquor_monopoly", evidence.topic_ids)
+            self.assertIn("institutional_background", evidence.value_tags)
+            self.assertIn("not", evidence.adjacent_context_note or "")
+
+        self.assertTrue(expected_ids.issubset(set(pack.lexical_index.entries["榷酤"])))
+        self.assertTrue(expected_ids.issubset(set(pack.lexical_index.entries["酒榷"])))
+
+        original_fact_claims = [
+            claim for claim in pack.claims if claim.claim_type == ClaimType.original_fact
+        ]
+        for claim in original_fact_claims:
+            self.assertFalse(expected_ids.intersection(claim.evidence_ids), claim.claim_id)
+
     def test_siku_textual_history_marks_yantie_as_compiled_later_framed_text(self) -> None:
         pack = load_pack()
         sources_by_id = {source.source_id: source for source in pack.sources}
@@ -402,7 +440,7 @@ class YantieEvidencePackDataTests(unittest.TestCase):
         }
         expected_counts = {
             "src_hanshu_dong_zhongshu": 1,
-            "src_hanshu_wudi": 1,
+            "src_hanshu_wudi": 2,
             "src_hanshu_rulin": 1,
             "src_chunqiu_fanlu": 3,
         }
