@@ -22,6 +22,7 @@ def test_yantie_material_gap_tracks_post_court_ui_status():
         "YT-A2-MAT-006G",
         "YT-A2-MAT-007",
         "YT-A2-MAT-008",
+        "YT-A2-MAT-009",
     ]:
         assert task_id in text
 
@@ -30,8 +31,11 @@ def test_yantie_material_gap_tracks_post_court_ui_status():
     assert "`material-guide` Playwright 验收场景" in text
     assert "`YT-A2-MAT-006G` | A2 材料状态文档收口" in text
     assert "`YT-A2-MAT-008` | 酒榷制度背景补强" in text
+    assert "`YT-A2-MAT-009` | 贤良文学身份 Actor 证据归并" in text
     assert "《汉书·武帝纪》“初榷酒酤”" in text
+    assert "贤良文学身份材料已归并到 `actor_literati`" in text
     assert "酒榷细节仍需后续任务补足" not in text
+    assert "贤良文学身份仍需后续补足" not in text
     assert "如需进入主线轻提示，需另开任务验收" in text
     assert "经学透镜的退朝后分组、材料导览和 UI 呈现仍需后续任务补强" not in text
     assert "不修改 Schema、API、搜索逻辑、迁移或运行态数据" in text

@@ -223,6 +223,57 @@ class YantieEvidencePackDataTests(unittest.TestCase):
             expected_actor_evidence["actor_bu_shi"],
         )
 
+    def test_literati_actor_identity_is_evidence_backed(self) -> None:
+        pack = load_pack()
+        actors_by_id = {actor.actor_id: actor for actor in pack.actors}
+        evidence_by_id = {evidence.evidence_id: evidence for evidence in pack.evidence_units}
+
+        identity_ids = {
+            "ev:src_yantielun:juan01_benyi:meeting_opening:a1b2c3d4",
+            "ev:src_hanshu_zhaodi:juan007:recommend_worthy:f00d1234",
+            "ev:src_hanshu_zhaodi:juan007:call_literati:aa11bb22",
+            "ev:src_hanshu_zhaodi:juan007:meeting_edict:ccddeeff",
+            "ev:src_zizhi_tongjian_023:shiyuan06:meeting_question:aa230001",
+            "ev:src_yantielun_siku:preface:named_literati:a2c30004",
+        }
+        argument_ids = {
+            "ev:src_yantielun:juan01_benyi:literati_abolish:0a1b2c3d",
+            "ev:src_yantielun:juan01_benyi:virtue_vs_profit:44556677",
+        }
+
+        literati = actors_by_id["actor_literati"]
+        self.assertEqual(literati.meeting_position.value, "literati_opposition")
+        self.assertEqual(literati.role_title, "郡国所举贤良、文学之士")
+        self.assertTrue(identity_ids.issubset(set(literati.evidence_ids)))
+        self.assertTrue(argument_ids.issubset(set(literati.evidence_ids)))
+
+        for evidence_id in identity_ids:
+            evidence = evidence_by_id[evidence_id]
+            self.assertEqual(evidence.review_status, ReviewStatus.verified)
+            self.assertIsNone(evidence.speaker_actor_id)
+            self.assertIn(
+                evidence.evidence_kind.value,
+                {"event_record", "later_evaluation"},
+            )
+
+        self.assertTrue(identity_ids.issubset(set(pack.lexical_index.entries["贤良文学"])))
+        self.assertTrue(
+            {
+                "ev:src_hanshu_zhaodi:juan007:recommend_worthy:f00d1234",
+                "ev:src_hanshu_zhaodi:juan007:meeting_edict:ccddeeff",
+            }.issubset(set(pack.lexical_index.entries["贤良"]))
+        )
+        self.assertTrue(
+            {
+                "ev:src_hanshu_zhaodi:juan007:call_literati:aa11bb22",
+                "ev:src_yantielun_siku:preface:named_literati:a2c30004",
+            }.issubset(set(pack.lexical_index.entries["文学"]))
+        )
+        self.assertEqual(
+            pack.lexical_index.entries["文学高第"],
+            ["ev:src_hanshu_zhaodi:juan007:call_literati:aa11bb22"],
+        )
+
     def test_liquor_monopoly_background_has_origin_and_mechanism_evidence(self) -> None:
         pack = load_pack()
         sources_by_id = {source.source_id: source for source in pack.sources}

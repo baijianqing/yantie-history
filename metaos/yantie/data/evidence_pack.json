@@ -821,6 +821,12 @@
         "people_livelihood"
       ],
       "evidence_ids": [
+        "ev:src_yantielun:juan01_benyi:meeting_opening:a1b2c3d4",
+        "ev:src_hanshu_zhaodi:juan007:recommend_worthy:f00d1234",
+        "ev:src_hanshu_zhaodi:juan007:call_literati:aa11bb22",
+        "ev:src_hanshu_zhaodi:juan007:meeting_edict:ccddeeff",
+        "ev:src_zizhi_tongjian_023:shiyuan06:meeting_question:aa230001",
+        "ev:src_yantielun_siku:preface:named_literati:a2c30004",
         "ev:src_yantielun:juan01_benyi:literati_abolish:0a1b2c3d",
         "ev:src_yantielun:juan01_benyi:virtue_vs_profit:44556677"
       ]
@@ -5184,7 +5190,30 @@
       ],
       "贤良文学": [
         "ev:src_yantielun:juan01_benyi:meeting_opening:a1b2c3d4",
+        "ev:src_hanshu_zhaodi:juan007:recommend_worthy:f00d1234",
+        "ev:src_hanshu_zhaodi:juan007:call_literati:aa11bb22",
+        "ev:src_hanshu_zhaodi:juan007:meeting_edict:ccddeeff",
+        "ev:src_zizhi_tongjian_023:shiyuan06:meeting_question:aa230001",
+        "ev:src_yantielun_siku:preface:named_literati:a2c30004"
+      ],
+      "贤良": [
+        "ev:src_hanshu_zhaodi:juan007:recommend_worthy:f00d1234",
+        "ev:src_hanshu_zhaodi:juan007:meeting_edict:ccddeeff",
+        "ev:src_zizhi_tongjian_023:shiyuan06:meeting_question:aa230001",
+        "ev:src_yantielun_siku:preface:named_literati:a2c30004"
+      ],
+      "文学": [
+        "ev:src_hanshu_zhaodi:juan007:call_literati:aa11bb22",
+        "ev:src_hanshu_zhaodi:juan007:meeting_edict:ccddeeff",
+        "ev:src_zizhi_tongjian_023:shiyuan06:meeting_question:aa230001",
+        "ev:src_yantielun_siku:preface:named_literati:a2c30004"
+      ],
+      "郡国文学": [
+        "ev:src_hanshu_zhaodi:juan007:call_literati:aa11bb22",
         "ev:src_hanshu_zhaodi:juan007:meeting_edict:ccddeeff"
+      ],
+      "文学高第": [
+        "ev:src_hanshu_zhaodi:juan007:call_literati:aa11bb22"
       ],
       "霍光": [
         "ev:src_hanshu_zhaodi:juan007:huo_in_power:33445566",

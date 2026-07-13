@@ -56,6 +56,7 @@ flowchart TB
     A2MAT006F --> A2MAT006G["YT-A2-MAT-006G<br/>材料状态收口"]
     A2MAT006G --> A2MAT007["YT-A2-MAT-007<br/>制度人物Actor补强"]
     A2MAT007 --> A2MAT008["YT-A2-MAT-008<br/>酒榷制度背景补强"]
+    A2MAT008 --> A2MAT009["YT-A2-MAT-009<br/>贤良文学身份归并"]
     A002 --> V3017A["YT-V3-017A<br/>冻结主体验路径"]
     V3017A --> V3017B["YT-V3-017B<br/>定义体验业务对象"]
     V3017B --> V3017C["YT-V3-017C<br/>冻结历史边界规则"]
@@ -1221,3 +1222,18 @@ A1 首批允许任务表：
 - 测试命令：`git diff --check -- metaos/yantie/data/evidence_pack.json docs/yantie/data/evidence_pack.json test/test_yantie_pack.py docs/YANTIE_TASK_BREAKDOWN.md docs/YANTIE_A2_MATERIAL_GAP.md test/test_yantie_material_docs.py`；`python -m pytest test/test_yantie_pack.py test/test_yantie_material_docs.py`；必要时执行 `python -m pytest test -k yantie` 和 `python -m pytest test`。
 - 回滚方式：移除新增 `src_tongdian_shihuo_11`、2 条酒榷 EvidenceUnit、lexical_index 新增引用、pack 测试和文档状态更新，并把 `src_hanshu_wudi` excerpt_count 恢复到 1。
 - 文档更新：更新本任务卡、A2 材料缺口状态和材料文档测试，说明酒榷制度背景已完成首轮入包，后续只需决定是否进入主线轻提示。
+
+### YT-A2-MAT-009：贤良文学身份 Actor 证据归并
+
+- 任务 ID：`YT-A2-MAT-009`
+- 价值：A2 文本与人物缺口仍保留“贤良文学身份”，但现有 evidence pack 已有昭帝朝举贤良、始元五年郡国文学高第、始元六年询问贤良文学和《四库提要》杂论列名等证据。当前问题不是缺摘录，而是 `actor_literati` 只挂了观点证据，身份来源没有结构化归并。本任务用现有 verified 证据补齐 Actor 证据链和检索词。
+- 依赖：`YT-A2-MAT-003`、`YT-A2-MAT-008`、现有 `actor_literati`、双份 evidence pack、pack 测试。
+- 允许修改范围：`metaos/yantie/data/evidence_pack.json`、`docs/yantie/data/evidence_pack.json`、`test/test_yantie_pack.py`、`docs/YANTIE_TASK_BREAKDOWN.md`、`docs/YANTIE_A2_MATERIAL_GAP.md`、`test/test_yantie_material_docs.py`。
+- 禁止修改范围：UI、API、公共 Schema、搜索代码、运行态 `library/` 数据、迁移、根配置、新增未经核验史料、现代研究全文、把后世目录学说明写成会议现场事实。
+- 输入：现有贤良文学身份相关 EvidenceUnit、`actor_literati`、`lexical_index`。
+- 输出：`actor_literati.evidence_ids` 身份证据归并、`贤良`/`文学`/`郡国文学`/`文学高第` lexical index、pack 测试和材料状态文档更新。
+- 接口：本任务不新增 Actor、不新增 EvidenceUnit、不新增 Claim；身份材料只说明参与来源和文本保留线索，观点材料继续说明其反盐铁酒榷均输立场。
+- 验收标准：双份 evidence pack 同步；`actor_literati` 同时引用身份来源证据和观点证据；身份来源证据均为 verified，且无 `speaker_actor_id`；`贤良文学`、`贤良`、`文学`、`郡国文学`、`文学高第` 均可通过 lexical index 命中对应证据；A2 材料缺口不再声称“贤良文学身份仍需补足”。
+- 测试命令：`git diff --check -- metaos/yantie/data/evidence_pack.json docs/yantie/data/evidence_pack.json test/test_yantie_pack.py docs/YANTIE_TASK_BREAKDOWN.md docs/YANTIE_A2_MATERIAL_GAP.md test/test_yantie_material_docs.py`；`python -m pytest test/test_yantie_pack.py test/test_yantie_material_docs.py`；必要时执行 `python -m pytest test -k yantie` 和 `python -m pytest test`。
+- 回滚方式：恢复 `actor_literati.evidence_ids`、移除新增 lexical_index 条目/引用、移除 pack 测试和文档状态更新。
+- 文档更新：更新本任务卡、A2 材料缺口状态和材料文档测试，说明贤良文学身份已完成首轮 Actor 证据归并，后续如需补具体姓名、地域或社会构成，应另开候选材料核验任务。
