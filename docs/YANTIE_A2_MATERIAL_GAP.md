@@ -23,6 +23,9 @@ A1 已完成可试玩闭环。A2 的第一步不是继续增加页面功能，�
 - `YT-A2-MAT-006A` 执行后，新增 `docs/YANTIE_A2_HANSHU_CLASSICS_VERIFICATION.md`，核验《汉书·董仲舒传》《汉书·武帝纪》《汉书·儒林传》12 条经学语境候选短摘；本轮仍不入 evidence pack。
 - `YT-A2-MAT-006B` 执行后，新增 `docs/YANTIE_A2_CHUNQIU_FANLU_VERIFICATION.md`，核验《春秋繁露》的文本性质、版本风险和 12 条候选短摘；本轮仍不入 evidence pack。
 - `YT-A2-MAT-006C` 执行后，新增 `src_hanshu_dong_zhongshu`、`src_hanshu_wudi`、`src_hanshu_rulin`、`src_chunqiu_fanlu` 4 个 source 和 6 条经学语境 EvidenceUnit；它们只作为 `philosophy_lens`/`classics_context`，不支撑 `original_fact` Claim。
+- `YT-A2-MAT-006D` 执行后，退朝后思想透镜已新增 `classics_context` 分组，用户可以从经学语境分组查看 6 条经学透镜材料。
+- `YT-A2-MAT-006E` 执行后，退朝后深度探索已新增“材料导览”入口，按会议纪事、制度背景、文本与后世评价、黄老思想、经学语境和现代研究六类说明材料边界。
+- `YT-A2-MAT-006F` 执行后，Playwright 静态验收已覆盖材料导览入口、`post_court_only` 边界和材料卡片可见性，desktop、mobile、reduced-motion 三种视口均纳入检查。
 
 A2 材料默认不进入首次主体验。它们只进入退朝后深度探索，除非后续单独验收为主线关键证据。
 
@@ -33,7 +36,7 @@ A2 材料默认不进入首次主体验。它们只进入退朝后深度探索�
 | 会议纪事 | `YT-A2-MAT-001` 已补《资治通鉴》卷023 4 条纪事 EvidenceUnit | 仍需在后续 UI 中决定是否只作退朝后探索，或验收为主线关键证据 | 已覆盖始元六年二月召问、贤良文学请罢、桑弘羊答辩、秋七月罢榷酤 | 退朝后深度探索；可候选为主线关键证据 | 可，已形成可定位 EvidenceUnit |
 | 制度背景 | `YT-A2-MAT-002` 已补《汉书·食货志》6 条、《史记·平准书》6 条制度背景 EvidenceUnit | 酒榷细节与制度人物背景仍需后续任务补足 | 首轮已覆盖国家财政制度、商贾征收、山海资源、官营弊端、均输和平准机制 | 退朝后深度探索；少量可作为场景轻提示 | 可，需标明制度背景而非会议现场 |
 | 文本与人物 | `YT-A2-MAT-003` 已补《四库全书总目提要》6 条文本史 EvidenceUnit | 贤良文学身份和孔仅、东郭咸阳、卜式等制度人物背景仍需后续补足 | 首轮已区分会议事实、文本编纂和后世目录学评价 | 退朝后深度探索 | 部分可；文本性质多为策展解释 |
-| 思想史 | 已有哲学透镜；`YT-A2-MAT-005B` 已补入 6 条《黄帝四经》黄老透镜；`YT-A2-MAT-006C` 已补入 6 条《汉书》/《春秋繁露》经学语境透镜 | 经学透镜的退朝后分组、材料导览和 UI 呈现仍需后续任务补强 | 解释儒法、黄老、经学、义利、国家能力和政治正当性等思想来源 | 退朝后思想透镜 | 不直接支撑会议事实 |
+| 思想史 | 已有哲学透镜；`YT-A2-MAT-005B` 已补入 6 条《黄帝四经》黄老透镜；`YT-A2-MAT-006C` 已补入 6 条《汉书》/《春秋繁露》经学语境透镜；`YT-A2-MAT-006D` 至 `YT-A2-MAT-006F` 已完成退朝后经学分组、材料导览和验收覆盖 | 如需进入主线轻提示，需另开任务验收；当前仍默认留在退朝后 | 解释儒法、黄老、经学、义利、国家能力和政治正当性等思想来源 | 退朝后思想透镜；退朝后材料导览 | 不直接支撑会议事实 |
 | 后世评说 | 《四库提要》已完成首轮补强，`YT-A2-MAT-004` 已建立现代研究书目卡和版权边界 | 历代序跋仍可后续补充；现代研究如需入包需另开契约任务 | 作为退朝后延伸阅读和研究史定位 | 退朝后延伸阅读 | 通常不支撑会议事实；可支撑接受史或研究史说明 |
 
 ## 3. 交付边界
@@ -54,7 +57,7 @@ A2 材料默认不进入首次主体验。它们只进入退朝后深度探索�
 | P0 | 《汉书·食货志》《史记·平准书》制度背景 | 已完成首轮入包，后续补酒榷细节和制度人物背景 | 12 条制度背景 EvidenceUnit 与标签体系 |
 | P0 | 后世评价边界 | 退朝后探索需要可信边界，避免混入主线事实 | 后世评价材料分级规则 |
 | P1 | 《盐铁论》文本性质与人物背景 | 已完成首轮文本性质入包，后续补贤良文学和制度人物背景 | 6 条四库提要文本史 EvidenceUnit |
-| P1 | 汉初至武帝思想语境 | 黄老与《黄帝四经》已完成计划冻结、候选短摘核验和首轮入包；经学、董仲舒和财政国家语境已完成计划冻结、《汉书》候选短摘核验、《春秋繁露》候选短摘核验和首轮入包 | 6 条黄老 EvidenceUnit、6 条经学语境 EvidenceUnit、黄老材料计划、经学语境计划与核验文档 |
+| P1 | 汉初至武帝思想语境 | 黄老与《黄帝四经》已完成计划冻结、候选短摘核验和首轮入包；经学、董仲舒和财政国家语境已完成计划冻结、《汉书》候选短摘核验、《春秋繁露》候选短摘核验、首轮入包、退朝后分组和材料导览验收 | 6 条黄老 EvidenceUnit、6 条经学语境 EvidenceUnit、黄老材料计划、经学语境计划与核验文档、退朝后思想透镜分组、材料导览入口和 Playwright 验收 |
 | P2 | 现代研究书目卡 | 已完成首轮书目卡与版权边界；后续如需入包另开任务 | `docs/YANTIE_A2_MODERN_RESEARCH_INDEX.md` 7 张书目卡 |
 | P2 | 当代回声 | 只作退朝后反思，不作历史证据 | `external_echo` 候选清单 |
 
@@ -73,6 +76,10 @@ A2 材料默认不进入首次主体验。它们只进入退朝后深度探索�
 | `YT-A2-MAT-006A` | 《汉书》经学语境候选短摘核验 | 核验《董仲舒传》《武帝纪》《儒林传》12 条候选短摘和入包边界 | 退朝后思想透镜候选 |
 | `YT-A2-MAT-006B` | 《春秋繁露》版本性质与候选短摘核验 | 核验《春秋繁露》文本风险、12 条候选短摘和入包边界 | 退朝后思想透镜候选 |
 | `YT-A2-MAT-006C` | 经学语境思想透镜入包 | 将 6 条《汉书》/《春秋繁露》短摘写入双份 evidence pack，并用测试约束边界 | 退朝后思想透镜 |
+| `YT-A2-MAT-006D` | 退朝后经学语境透镜分组入口 | 将 006C 经学透镜放入退朝后 `classics_context` 分组 | 退朝后思想透镜 |
+| `YT-A2-MAT-006E` | 退朝后 A2 材料导览入口 | 用材料导览说明 A2 六类材料的入口、边界和状态 | 退朝后深度探索 |
+| `YT-A2-MAT-006F` | 材料导览验收场景覆盖 | 用 Playwright 验证材料导览在三类视口下真实可见 | 退朝后验收矩阵 |
+| `YT-A2-MAT-006G` | A2 材料状态文档收口 | 同步 006D/006E/006F 完成状态，防止材料缺口文档继续保留过期判断 | 材料门禁文档 |
 
 ## 6. 本轮验收
 
@@ -85,13 +92,17 @@ A2 材料默认不进入首次主体验。它们只进入退朝后深度探索�
 - `YT-A2-MAT-006A` 新增《汉书》经学语境候选短摘核验文档，并确认 12 条候选短摘不支撑 `original_fact` Claim。
 - `YT-A2-MAT-006B` 新增《春秋繁露》版本性质与候选短摘核验文档，并确认传世文本和作者归属风险。
 - `YT-A2-MAT-006C` 新增 6 条经学语境 EvidenceUnit，并确认它们不作为会议事实证据，不被 `original_fact` Claim 引用。
+- `YT-A2-MAT-006D` 新增退朝后 `classics_context` 思想透镜分组，并确认经学语境材料仍不进入首次主体验。
+- `YT-A2-MAT-006E` 新增退朝后材料导览入口，并确认材料导览只说明来源层级和边界，不写入 evidence pack。
+- `YT-A2-MAT-006F` 新增 `material-guide` Playwright 验收场景，并确认材料导览入口、边界标记和卡片在三种视口下可见。
+- `YT-A2-MAT-006G` 同步本材料门禁文档和任务拆分文档中的 A2 当前状态。
 - 在 `docs/YANTIE_TASK_BREAKDOWN.md` 登记 A2 首批任务卡。
-- 本轮涉及 evidence pack 的改动仅限 `YT-A2-MAT-006C` 双份 pack、pack 测试和材料状态文档；不修改 `docs/yantie/index.html`、`metaos/yantie/web.py`、Schema、API 或运行态数据。
+- 本轮涉及 evidence pack 的改动仅限 `YT-A2-MAT-006C` 双份 pack、pack 测试和材料状态文档；涉及 UI 的改动仅限 `YT-A2-MAT-006D`、`YT-A2-MAT-006E` 的退朝后只读入口；涉及验收脚本的改动仅限 `YT-A2-MAT-006F`；不修改 Schema、API、搜索逻辑、迁移或运行态数据。
 - 每个 A2 任务卡都包含：任务 ID、价值、依赖、允许修改范围、禁止修改范围、输入、输出、接口、验收标准、测试命令、回滚方式、文档更新。
 - 执行：
 
 ```powershell
-git diff --check -- docs/YANTIE_A2_CHUNQIU_FANLU_VERIFICATION.md docs/YANTIE_A2_HANSHU_CLASSICS_VERIFICATION.md docs/YANTIE_A2_CLASSICS_CONTEXT_PLAN.md docs/YANTIE_A2_MATERIAL_GAP.md docs/YANTIE_TASK_BREAKDOWN.md metaos/yantie/data/evidence_pack.json docs/yantie/data/evidence_pack.json test/test_yantie_pack.py test/test_yantie_material_docs.py
+git diff --check -- docs/YANTIE_A2_CHUNQIU_FANLU_VERIFICATION.md docs/YANTIE_A2_HANSHU_CLASSICS_VERIFICATION.md docs/YANTIE_A2_CLASSICS_CONTEXT_PLAN.md docs/YANTIE_A2_MATERIAL_GAP.md docs/YANTIE_TASK_BREAKDOWN.md metaos/yantie/data/evidence_pack.json docs/yantie/data/evidence_pack.json test/test_yantie_pack.py test/test_yantie_material_docs.py test/test_yantie_ui.py test/test_yantie_e2e.py scripts/check-yantie-acceptance.mjs
 python -m pytest test -k yantie_pack
 python -m pytest test/test_yantie_material_docs.py
 ```

@@ -3,12 +3,28 @@ import re
 
 
 ROOT = Path(__file__).resolve().parents[1]
+MATERIAL_GAP = ROOT / "docs" / "YANTIE_A2_MATERIAL_GAP.md"
 MODERN_RESEARCH_INDEX = ROOT / "docs" / "YANTIE_A2_MODERN_RESEARCH_INDEX.md"
 HUANG_LAO_PLAN = ROOT / "docs" / "YANTIE_A2_HUANG_LAO_MATERIAL_PLAN.md"
 HUANGDI_SIJING_VERIFICATION = ROOT / "docs" / "YANTIE_A2_HUANGDI_SIJING_VERIFICATION.md"
 CLASSICS_CONTEXT_PLAN = ROOT / "docs" / "YANTIE_A2_CLASSICS_CONTEXT_PLAN.md"
 HANSHU_CLASSICS_VERIFICATION = ROOT / "docs" / "YANTIE_A2_HANSHU_CLASSICS_VERIFICATION.md"
 CHUNQIU_FANLU_VERIFICATION = ROOT / "docs" / "YANTIE_A2_CHUNQIU_FANLU_VERIFICATION.md"
+
+
+def test_yantie_material_gap_tracks_post_court_ui_status():
+    text = MATERIAL_GAP.read_text(encoding="utf-8")
+
+    for task_id in ["YT-A2-MAT-006D", "YT-A2-MAT-006E", "YT-A2-MAT-006F", "YT-A2-MAT-006G"]:
+        assert task_id in text
+
+    assert "退朝后 `classics_context` 思想透镜分组" in text
+    assert "退朝后材料导览入口" in text
+    assert "`material-guide` Playwright 验收场景" in text
+    assert "`YT-A2-MAT-006G` | A2 材料状态文档收口" in text
+    assert "如需进入主线轻提示，需另开任务验收" in text
+    assert "经学透镜的退朝后分组、材料导览和 UI 呈现仍需后续任务补强" not in text
+    assert "不修改 Schema、API、搜索逻辑、迁移或运行态数据" in text
 
 
 def test_yantie_modern_research_index_keeps_copyright_boundary():

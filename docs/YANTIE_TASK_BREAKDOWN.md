@@ -53,6 +53,7 @@ flowchart TB
     A2MAT006C --> A2MAT006D["YT-A2-MAT-006D<br/>经学透镜分组"]
     A2MAT006D --> A2MAT006E["YT-A2-MAT-006E<br/>退朝材料导览"]
     A2MAT006E --> A2MAT006F["YT-A2-MAT-006F<br/>材料导览验收"]
+    A2MAT006F --> A2MAT006G["YT-A2-MAT-006G<br/>材料状态收口"]
     A002 --> V3017A["YT-V3-017A<br/>冻结主体验路径"]
     V3017A --> V3017B["YT-V3-017B<br/>定义体验业务对象"]
     V3017B --> V3017C["YT-V3-017C<br/>冻结历史边界规则"]
@@ -1172,4 +1173,19 @@ A1 首批允许任务表：
 - 验收标准：Playwright runner 总检查数从 27 增至 30；`material-guide` 覆盖 desktop、mobile、reduced-motion；UI/E2E 测试声明该场景；不改变用户主体验和证据包。
 - 测试命令：`git diff --check -- scripts/check-yantie-acceptance.mjs test/test_yantie_ui.py test/test_yantie_e2e.py docs/YANTIE_TASK_BREAKDOWN.md`；`python -m pytest test/test_yantie_ui.py test/test_yantie_e2e.py`；`node scripts/check-yantie-acceptance.mjs`；必要时执行 `python -m pytest test -k yantie` 和 `python -m pytest test`。
 - 回滚方式：移除 `material-guide` runner 场景、材料导览检查、测试断言和任务卡，恢复 006F 前验收矩阵。
+- 文档更新：本任务卡即文档交付。
+
+### YT-A2-MAT-006G：A2 材料状态文档收口
+
+- 任务 ID：`YT-A2-MAT-006G`
+- 价值：`docs/YANTIE_A2_MATERIAL_GAP.md` 已记录到经学语境入包，但没有同步 `YT-A2-MAT-006D`、`YT-A2-MAT-006E`、`YT-A2-MAT-006F` 的退朝后 UI 和验收完成状态，容易让后续任务误判“经学分组、材料导览和 UI 呈现仍未完成”。本任务把材料门禁文档同步到当前真实进度。
+- 依赖：`YT-A2-MAT-006D`、`YT-A2-MAT-006E`、`YT-A2-MAT-006F`、`docs/YANTIE_A2_MATERIAL_GAP.md`、材料文档测试。
+- 允许修改范围：`docs/YANTIE_A2_MATERIAL_GAP.md`、`docs/YANTIE_TASK_BREAKDOWN.md`、`test/test_yantie_material_docs.py`。
+- 禁止修改范围：evidence pack、UI、API、公共 Schema、搜索逻辑、验收 runner、迁移、根配置、运行态 `library/` 数据、现代研究全文、外部当代回声接口。
+- 输入：006D/006E/006F 已完成状态、材料导览边界、现有 A2 材料门禁文档。
+- 输出：更新后的 A2 材料状态、A2 首批任务表、验收说明、材料文档测试和本任务卡。
+- 接口：本任务只同步文档状态；不得把任何 A2 材料改为首次主体验默认入口；不得新增或修改 EvidenceUnit、Claim、前端入口、Playwright 场景或 API。
+- 验收标准：材料缺口文档明确记录 006D/006E/006F 完成状态；“思想史”缺口不再声称经学分组、材料导览和 UI 呈现仍待补强；A2 首批任务表包含 006D/006E/006F/006G；材料文档测试覆盖该状态。
+- 测试命令：`git diff --check -- docs/YANTIE_A2_MATERIAL_GAP.md docs/YANTIE_TASK_BREAKDOWN.md test/test_yantie_material_docs.py`；`python -m pytest test/test_yantie_material_docs.py`；必要时执行 `python -m pytest test -k yantie` 和 `python -m pytest test`。
+- 回滚方式：移除本任务对材料缺口文档、任务图、任务卡和材料文档测试的更新，恢复 006F 后文档状态。
 - 文档更新：本任务卡即文档交付。
