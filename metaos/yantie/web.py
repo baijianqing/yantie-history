@@ -34,13 +34,13 @@ def create_yantie_web_router() -> APIRouter:
     return router
 
 
-def create_yantie_web_app() -> FastAPI:
+def create_yantie_web_app(*, external_echo_adapter=None) -> FastAPI:
     """Create a standalone app for local playtesting and screenshots."""
 
     app = FastAPI(title="Yantie Meeting Reconstruction", version=__version__)
     if DEFAULT_STATIC_ASSET_DIR.exists():
         app.mount("/assets", StaticFiles(directory=str(DEFAULT_STATIC_ASSET_DIR)), name="yantie-assets")
-    app.include_router(create_yantie_api_router())
+    app.include_router(create_yantie_api_router(external_echo_adapter=external_echo_adapter))
     app.include_router(create_yantie_web_router())
     return app
 

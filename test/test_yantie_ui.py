@@ -6,9 +6,12 @@ from tempfile import TemporaryDirectory
 import unittest
 from pathlib import Path
 
+import httpx
 from fastapi.testclient import TestClient
 
 from metaos.yantie import create_yantie_web_app, export_yantie_static_site, render_yantie_static_html
+from metaos.yantie.search import load_default_evidence_pack
+from metaos.yantie.zhihu_adapter import ZhihuAdapterConfig, ZhihuExternalEchoAdapter
 
 
 PACK_PATH = Path(__file__).resolve().parents[1] / "metaos" / "yantie" / "data" / "evidence_pack.json"
@@ -313,6 +316,58 @@ class YantieWebUiTests(unittest.TestCase):
         self.assertIn("external_echo 暂不可用，不进入史证链。", html)
         self.assertIn("退朝后开放全文争点；这里只读证据与解释边界，不改写案牍。", html)
         self.assertIn("正在回看权力遮蔽一幕；这不抹除你的退朝案牍。", html)
+
+    def test_yantie_runtime_external_echo_mock_path_is_post_court_only(self) -> None:
+        pack = load_default_evidence_pack()
+        claim_count_before = len(pack.claims)
+        evidence_count_before = len(pack.evidence_units)
+
+        def handler(request: httpx.Request) -> httpx.Response:
+            self.assertEqual(request.url.path, "/api/v1/content/zhihu_search")
+            self.assertEqual(request.url.params["count"], "3")
+            return httpx.Response(
+                200,
+                json={
+                    "data": {
+                        "items": [
+                            {
+                                "title": "当代讨论：国家、市场与民生",
+                                "url": "https://www.zhihu.com/question/yantie-example",
+                                "summary": "只作为退朝后的外部回声，不属于会议史实证据。",
+                            }
+                        ]
+                    }
+                },
+            )
+
+        adapter = ZhihuExternalEchoAdapter(
+            ZhihuAdapterConfig(access_secret="mock-secret"),
+            transport=httpx.MockTransport(handler),
+        )
+        client = TestClient(create_yantie_web_app(external_echo_adapter=adapter))
+
+        manifest = client.get("/api/yantie/manifest")
+        self.assertEqual(manifest.status_code, 200)
+        self.assertTrue(manifest.json()["data"]["features"]["external_echo_enabled"])
+
+        html = client.get("/yantie").text
+        self.assertIn("function syncExternalEchoEntry(postCourtUnlocked)", html)
+        self.assertIn('data-post-court-action="external-echo"', html)
+        self.assertIn("externalButton.disabled = !enabled", html)
+
+        response = client.get(
+            "/api/yantie/external/zhihu/search",
+            params={"q": "盐铁会议 国家 市场 民生", "count": 3},
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()["data"]
+        self.assertEqual(data["source_boundary"], "external_echo")
+        self.assertFalse(data["can_support_claims"])
+        self.assertFalse(data["writes_to_evidence_pack"])
+        self.assertEqual(data["items"][0]["source_boundary"], "external_echo")
+        self.assertEqual(data["items"][0]["title"], "当代讨论：国家、市场与民生")
+        self.assertEqual(len(pack.claims), claim_count_before)
+        self.assertEqual(len(pack.evidence_units), evidence_count_before)
 
     def test_yantie_a1_screenshot_acceptance_scenarios_are_declared(self) -> None:
         html = self.client.get("/yantie").text
