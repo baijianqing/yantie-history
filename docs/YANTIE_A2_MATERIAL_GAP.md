@@ -30,6 +30,7 @@ A1 已完成可试玩闭环。A2 的第一步不是继续增加页面功能，�
 - `YT-A2-MAT-007` 执行后，孔仅、东郭咸阳、卜式已作为 `background_actor` 进入双份 evidence pack，并关联现有 verified 制度证据、盐铁官营形成事件和 lexical index。
 - `YT-A2-MAT-008` 执行后，《汉书·武帝纪》“初榷酒酤”和《通典·食货十一·榷酤》制度解释已进入双份 evidence pack，用作酒榷制度背景，不作为会议现场发言。
 - `YT-A2-MAT-009` 执行后，贤良文学身份材料已归并到 `actor_literati`，并补充 `贤良`、`文学`、`郡国文学`、`文学高第` 等 lexical index 入口；本轮不新增 EvidenceUnit 或 Claim。
+- `YT-A2-MAT-010` 执行后，本材料门禁文档的 source、EvidenceUnit、Claim 计数由自动化测试和真实 evidence pack 对齐，后续入包必须同步更新计数行。
 
 A2 材料默认不进入首次主体验。它们只进入退朝后深度探索，除非后续单独验收为主线关键证据。
 
@@ -87,6 +88,7 @@ A2 材料默认不进入首次主体验。它们只进入退朝后深度探索�
 | `YT-A2-MAT-007` | 制度人物 Actor 补强 | 将孔仅、东郭咸阳、卜式作为背景人物接入 actors、事件和 lexical index | 退朝后深度探索；可支持制度人物检索 |
 | `YT-A2-MAT-008` | 酒榷制度背景补强 | 补武帝时期初设酒榷和榷酤制度含义，解释会议有限让步对象 | 退朝后深度探索；可候选为主线轻提示 |
 | `YT-A2-MAT-009` | 贤良文学身份 Actor 证据归并 | 将现有贤良文学身份材料接入 `actor_literati` 和 lexical index | 退朝后深度探索；可支持身份检索 |
+| `YT-A2-MAT-010` | A2 材料状态计数一致性测试 | 用测试绑定材料门禁计数和真实 evidence pack 数量 | 材料门禁文档 |
 
 ## 6. 本轮验收
 
@@ -106,8 +108,9 @@ A2 材料默认不进入首次主体验。它们只进入退朝后深度探索�
 - `YT-A2-MAT-007` 新增 3 个制度背景 Actor，并确认孔仅、东郭咸阳、卜式不作为始元六年会议发言者。
 - `YT-A2-MAT-008` 新增 2 条酒榷制度背景 EvidenceUnit，并确认《通典》只作后出制度解释，不作为会议现场材料。
 - `YT-A2-MAT-009` 不新增 EvidenceUnit 或 Claim，只将现有贤良文学身份材料归并到 Actor 和 lexical index。
+- `YT-A2-MAT-010` 新增材料状态计数一致性测试，防止本文件的 source、EvidenceUnit、Claim 计数与真实 evidence pack 漂移。
 - 在 `docs/YANTIE_TASK_BREAKDOWN.md` 登记 A2 首批任务卡。
-- 本轮涉及 evidence pack 的改动仅限 `YT-A2-MAT-006C` 经学透镜入包、`YT-A2-MAT-007` 制度人物 Actor 化、`YT-A2-MAT-008` 酒榷制度背景补强和 `YT-A2-MAT-009` 贤良文学身份归并；涉及 UI 的改动仅限 `YT-A2-MAT-006D`、`YT-A2-MAT-006E` 的退朝后只读入口；涉及验收脚本的改动仅限 `YT-A2-MAT-006F`；不修改 Schema、API、搜索逻辑、迁移或运行态数据。
+- 本轮涉及 evidence pack 的改动仅限 `YT-A2-MAT-006C` 经学透镜入包、`YT-A2-MAT-007` 制度人物 Actor 化、`YT-A2-MAT-008` 酒榷制度背景补强和 `YT-A2-MAT-009` 贤良文学身份归并；涉及 UI 的改动仅限 `YT-A2-MAT-006D`、`YT-A2-MAT-006E` 的退朝后只读入口；涉及验收脚本的改动仅限 `YT-A2-MAT-006F`；`YT-A2-MAT-010` 只新增文档计数测试和门禁说明；不修改 Schema、API、搜索逻辑、迁移或运行态数据。
 - 每个 A2 任务卡都包含：任务 ID、价值、依赖、允许修改范围、禁止修改范围、输入、输出、接口、验收标准、测试命令、回滚方式、文档更新。
 - 执行：
 

@@ -57,6 +57,7 @@ flowchart TB
     A2MAT006G --> A2MAT007["YT-A2-MAT-007<br/>制度人物Actor补强"]
     A2MAT007 --> A2MAT008["YT-A2-MAT-008<br/>酒榷制度背景补强"]
     A2MAT008 --> A2MAT009["YT-A2-MAT-009<br/>贤良文学身份归并"]
+    A2MAT009 --> A2MAT010["YT-A2-MAT-010<br/>材料计数校验"]
     A002 --> V3017A["YT-V3-017A<br/>冻结主体验路径"]
     V3017A --> V3017B["YT-V3-017B<br/>定义体验业务对象"]
     V3017B --> V3017C["YT-V3-017C<br/>冻结历史边界规则"]
@@ -1237,3 +1238,18 @@ A1 首批允许任务表：
 - 测试命令：`git diff --check -- metaos/yantie/data/evidence_pack.json docs/yantie/data/evidence_pack.json test/test_yantie_pack.py docs/YANTIE_TASK_BREAKDOWN.md docs/YANTIE_A2_MATERIAL_GAP.md test/test_yantie_material_docs.py`；`python -m pytest test/test_yantie_pack.py test/test_yantie_material_docs.py`；必要时执行 `python -m pytest test -k yantie` 和 `python -m pytest test`。
 - 回滚方式：恢复 `actor_literati.evidence_ids`、移除新增 lexical_index 条目/引用、移除 pack 测试和文档状态更新。
 - 文档更新：更新本任务卡、A2 材料缺口状态和材料文档测试，说明贤良文学身份已完成首轮 Actor 证据归并，后续如需补具体姓名、地域或社会构成，应另开候选材料核验任务。
+
+### YT-A2-MAT-010：A2 材料状态计数一致性测试
+
+- 任务 ID：`YT-A2-MAT-010`
+- 价值：A2 连续入包后，材料门禁文档中的 source、EvidenceUnit、Claim 数量容易与真实 evidence pack 漂移。本任务用自动化测试把文档计数和真实证据包绑定，避免后续材料补强时只改包、不改门禁状态。
+- 依赖：`YT-A2-MAT-009`、`docs/YANTIE_A2_MATERIAL_GAP.md`、`metaos/yantie/data/evidence_pack.json`、材料文档测试。
+- 允许修改范围：`test/test_yantie_material_docs.py`、`docs/YANTIE_TASK_BREAKDOWN.md`、`docs/YANTIE_A2_MATERIAL_GAP.md`。
+- 禁止修改范围：evidence pack、UI、API、公共 Schema、搜索代码、运行态 `library/` 数据、迁移、根配置、现代研究全文、新增史料。
+- 输入：当前 evidence pack、`EvidencePack` Schema、A2 材料门禁文档中的材料状态计数行。
+- 输出：材料状态计数一致性测试、任务卡和材料门禁说明。
+- 接口：测试读取 `metaos/yantie/data/evidence_pack.json`，并校验 `docs/YANTIE_A2_MATERIAL_GAP.md` 中 `evidence pack 当前有 X 个 source、Y 条 EvidenceUnit、Z 条 Claim。` 与真实 source、EvidenceUnit、Claim 数量一致；本任务只做门禁保护，不改变材料内容。
+- 验收标准：计数行存在且可解析；source、EvidenceUnit、Claim 三项数量与真实 evidence pack 一致；计数缺失或漂移时测试失败；不修改 evidence pack、UI 或运行代码。
+- 测试命令：`git diff --check -- test/test_yantie_material_docs.py docs/YANTIE_TASK_BREAKDOWN.md docs/YANTIE_A2_MATERIAL_GAP.md`；`python -m pytest test/test_yantie_material_docs.py`；必要时执行 `python -m pytest test -k yantie` 和 `python -m pytest test`。
+- 回滚方式：移除计数一致性测试、任务图节点、任务卡和材料状态文档更新。
+- 文档更新：更新本任务卡和 A2 材料门禁文档，说明材料状态计数已由测试保护。

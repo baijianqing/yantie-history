@@ -1,15 +1,36 @@
+import json
 from pathlib import Path
 import re
+
+from metaos.yantie import EvidencePack
 
 
 ROOT = Path(__file__).resolve().parents[1]
 MATERIAL_GAP = ROOT / "docs" / "YANTIE_A2_MATERIAL_GAP.md"
+EVIDENCE_PACK = ROOT / "metaos" / "yantie" / "data" / "evidence_pack.json"
 MODERN_RESEARCH_INDEX = ROOT / "docs" / "YANTIE_A2_MODERN_RESEARCH_INDEX.md"
 HUANG_LAO_PLAN = ROOT / "docs" / "YANTIE_A2_HUANG_LAO_MATERIAL_PLAN.md"
 HUANGDI_SIJING_VERIFICATION = ROOT / "docs" / "YANTIE_A2_HUANGDI_SIJING_VERIFICATION.md"
 CLASSICS_CONTEXT_PLAN = ROOT / "docs" / "YANTIE_A2_CLASSICS_CONTEXT_PLAN.md"
 HANSHU_CLASSICS_VERIFICATION = ROOT / "docs" / "YANTIE_A2_HANSHU_CLASSICS_VERIFICATION.md"
 CHUNQIU_FANLU_VERIFICATION = ROOT / "docs" / "YANTIE_A2_CHUNQIU_FANLU_VERIFICATION.md"
+
+
+def test_yantie_material_gap_pack_counts_match_evidence_pack():
+    text = MATERIAL_GAP.read_text(encoding="utf-8")
+    payload = json.loads(EVIDENCE_PACK.read_text(encoding="utf-8"))
+    pack = EvidencePack.model_validate(payload)
+
+    match = re.search(
+        r"evidence pack 当前有 (\d+) 个 source、(\d+) 条 EvidenceUnit、(\d+) 条 Claim。",
+        text,
+    )
+
+    assert match
+    source_count, evidence_count, claim_count = map(int, match.groups())
+    assert source_count == len(pack.sources)
+    assert evidence_count == len(pack.evidence_units)
+    assert claim_count == len(pack.claims)
 
 
 def test_yantie_material_gap_tracks_post_court_ui_status():
@@ -23,6 +44,7 @@ def test_yantie_material_gap_tracks_post_court_ui_status():
         "YT-A2-MAT-007",
         "YT-A2-MAT-008",
         "YT-A2-MAT-009",
+        "YT-A2-MAT-010",
     ]:
         assert task_id in text
 
@@ -32,6 +54,7 @@ def test_yantie_material_gap_tracks_post_court_ui_status():
     assert "`YT-A2-MAT-006G` | A2 材料状态文档收口" in text
     assert "`YT-A2-MAT-008` | 酒榷制度背景补强" in text
     assert "`YT-A2-MAT-009` | 贤良文学身份 Actor 证据归并" in text
+    assert "`YT-A2-MAT-010` | A2 材料状态计数一致性测试" in text
     assert "《汉书·武帝纪》“初榷酒酤”" in text
     assert "贤良文学身份材料已归并到 `actor_literati`" in text
     assert "酒榷细节仍需后续任务补足" not in text
