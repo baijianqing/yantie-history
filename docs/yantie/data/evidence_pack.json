@@ -254,6 +254,15 @@
       "excerpt_count": 1,
       "human_verified": true,
       "note": "Public-domain classical text; selected short excerpts used only as historical evidence or philosophy lenses."
+    },
+    {
+      "source_id": "src_huangdi_sijing",
+      "title": "????/?????",
+      "license_status": "public_domain_text",
+      "delivery_policy": "excerpt_allowed",
+      "excerpt_count": 6,
+      "human_verified": true,
+      "note": "Public-domain Huang-Lao silk text; selected very short excerpts used only as philosophy lenses, not as Yantie meeting evidence."
     }
   ],
   "theme_spec": {
@@ -619,6 +628,17 @@
       "license_status": "public_domain_text",
       "canonical_url": "https://zh.wikisource.org/wiki/%E6%B7%AE%E5%8D%97%E5%AD%90/%E4%B8%BB%E8%A1%93%E8%A8%93",
       "citation_style": "《淮南子·主术训》",
+      "delivery_policy": "excerpt_allowed",
+      "human_verified": true
+    },
+    {
+      "source_id": "src_huangdi_sijing",
+      "title": "????/??????????????",
+      "source_type": "primary_text",
+      "authority_level": "comparison",
+      "license_status": "public_domain_text",
+      "canonical_url": "https://ctext.org/wiki.pl?if=en&res=580017",
+      "citation_style": "??????",
       "delivery_policy": "excerpt_allowed",
       "human_verified": true
     }
@@ -3990,6 +4010,145 @@
       "copyright_note": "Public-domain classical text, short excerpt used as philosophy lens.",
       "review_status": "verified",
       "adjacent_context_note": "This is a philosophy lens (法为准绳), not evidence that the source discussed the Yantie meeting. 制度不只是约束百姓，也应约束权力本身。"
+    },
+    {
+      "evidence_id": "ev:src_huangdi_sijing:jingfa:dao_generates_law:a2d50001",
+      "source_id": "src_huangdi_sijing",
+      "canonical_location": "??",
+      "excerpt_original": "???",
+      "paraphrase_zh": "??????????????????????????????????????",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "huang_lao",
+        "dao_fa",
+        "law_constraint",
+        "institutional_order"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, very short excerpt used as Huang-Lao philosophy lens.",
+      "review_status": "verified",
+      "adjacent_context_note": "This is a philosophy lens (????), not evidence that the source discussed the Yantie meeting. ???????????????"
+    },
+    {
+      "evidence_id": "ev:src_huangdi_sijing:jingfa:law_standard_rectification:a2d50002",
+      "source_id": "src_huangdi_sijing",
+      "canonical_location": "??",
+      "excerpt_original": "???????",
+      "paraphrase_zh": "?????????????????????????????????????",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "huang_lao",
+        "law_constraint",
+        "institutional_order",
+        "political_rectitude"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, very short excerpt used as Huang-Lao philosophy lens.",
+      "review_status": "verified",
+      "adjacent_context_note": "This is a philosophy lens (????), not evidence that the source discussed the Yantie meeting. ??????????????"
+    },
+    {
+      "evidence_id": "ev:src_huangdi_sijing:shiliujing:reduce_harsh_affairs:a2d50003",
+      "source_id": "src_huangdi_sijing",
+      "canonical_location": "???",
+      "excerpt_original": "???",
+      "paraphrase_zh": "???????????????????????????????????????",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "huang_lao",
+        "wuwei_governance",
+        "people_livelihood",
+        "ruler_restraint"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, very short excerpt used as Huang-Lao philosophy lens.",
+      "review_status": "verified",
+      "adjacent_context_note": "This is a philosophy lens (????), not evidence that the source discussed the Yantie meeting. ????????????????"
+    },
+    {
+      "evidence_id": "ev:src_huangdi_sijing:shiliujing:do_not_seize_people_time:a2d50004",
+      "source_id": "src_huangdi_sijing",
+      "canonical_location": "???",
+      "excerpt_original": "????",
+      "paraphrase_zh": "???????????????????????????????????????????",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "huang_lao",
+        "timely_governance",
+        "labor_burden",
+        "people_livelihood"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, very short excerpt used as Huang-Lao philosophy lens.",
+      "review_status": "verified",
+      "adjacent_context_note": "This is a philosophy lens (????), not evidence that the source discussed the Yantie meeting. ??????????????"
+    },
+    {
+      "evidence_id": "ev:src_huangdi_sijing:cheng:name_reality_alignment:a2d50005",
+      "source_id": "src_huangdi_sijing",
+      "canonical_location": "?",
+      "excerpt_original": "??????",
+      "paraphrase_zh": "??????????????????????????????????????????",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "huang_lao",
+        "xing_ming",
+        "name_reality",
+        "institutional_accountability"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, very short excerpt used as Huang-Lao philosophy lens.",
+      "review_status": "verified",
+      "adjacent_context_note": "This is a philosophy lens (????), not evidence that the source discussed the Yantie meeting. ???????????????"
+    },
+    {
+      "evidence_id": "ev:src_huangdi_sijing:shiliujing:utmost_stillness_sage:a2d50006",
+      "source_id": "src_huangdi_sijing",
+      "canonical_location": "???",
+      "excerpt_original": "????",
+      "paraphrase_zh": "?????????????????????????????????????????",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_power_network",
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "huang_lao",
+        "wuwei_governance",
+        "ruler_restraint",
+        "power_boundary"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text, very short excerpt used as Huang-Lao philosophy lens.",
+      "review_status": "verified",
+      "adjacent_context_note": "This is a philosophy lens (????), not evidence that the source discussed the Yantie meeting. ?????????????????"
     }
   ],
   "claims": [

@@ -113,7 +113,7 @@
 | 任务 | 目标 | 修改范围 |
 |---|---|---|
 | `YT-A2-MAT-005A` | 已核验《黄帝四经》版本、来源、版权和候选短摘 | `docs/YANTIE_A2_HUANGDI_SIJING_VERIFICATION.md` |
-| `YT-A2-MAT-005B` | 将 4-6 条《黄帝四经》思想透镜入 evidence pack | evidence pack、pack 测试、材料说明 |
+| `YT-A2-MAT-005B` | 已将 6 条《黄帝四经》思想透镜入 evidence pack | evidence pack、pack 测试、材料说明 |
 | `YT-A2-MAT-005C` | 将退朝后思想透镜分组为儒家、法家、黄老、制度国家 | UI、UI 测试、截图验收 |
 | `YT-A2-MAT-006` | 补董仲舒、经学语境和武帝以后政治正当性材料 | 文档或 evidence pack，另开任务 |
 

@@ -44,6 +44,7 @@ flowchart TB
     A2000 --> A2MAT004["YT-A2-MAT-004<br/>现代研究书目卡"]
     A2000 --> A2MAT005["YT-A2-MAT-005<br/>黄老思想史补强"]
     A2MAT005 --> A2MAT005A["YT-A2-MAT-005A<br/>四经短摘核验"]
+    A2MAT005A --> A2MAT005B["YT-A2-MAT-005B<br/>黄老透镜入包"]
     A002 --> V3017A["YT-V3-017A<br/>冻结主体验路径"]
     V3017A --> V3017B["YT-V3-017B<br/>定义体验业务对象"]
     V3017B --> V3017C["YT-V3-017C<br/>冻结历史边界规则"]
@@ -1029,3 +1030,18 @@ A1 首批允许任务表：
 - 测试命令：`git diff --check -- docs/YANTIE_A2_HUANGDI_SIJING_VERIFICATION.md docs/YANTIE_A2_HUANG_LAO_MATERIAL_PLAN.md docs/YANTIE_A2_MATERIAL_GAP.md docs/YANTIE_TASK_BREAKDOWN.md test/test_yantie_material_docs.py`；`python -m pytest test/test_yantie_material_docs.py`；必要时执行 `python -m pytest test -k yantie`。
 - 回滚方式：删除新增核验文档，移除本任务对黄老计划、材料缺口、任务拆分和测试的更新；不影响 evidence pack、UI 或运行代码。
 - 文档更新：更新 `docs/YANTIE_A2_HUANG_LAO_MATERIAL_PLAN.md` 和 `docs/YANTIE_A2_MATERIAL_GAP.md` 的 `YT-A2-MAT-005A` 状态。
+
+### YT-A2-MAT-005B：《黄帝四经》思想透镜入 evidence pack
+
+- 任务 ID：`YT-A2-MAT-005B`
+- 价值：`YT-A2-MAT-005A` 已核验候选短摘；本任务将其中 4-6 条正式写入 evidence pack，补足汉初黄老“道法、无为、名实、时令、权力节制”透镜，避免盐铁会议只被读成简单儒法二分。
+- 依赖：`YT-A2-MAT-005A`、现有 EvidenceUnit Schema、双份 evidence pack、pack 测试。
+- 允许修改范围：`metaos/yantie/data/evidence_pack.json`、`docs/yantie/data/evidence_pack.json`、`test/test_yantie_pack.py`、`docs/YANTIE_A2_HUANGDI_SIJING_VERIFICATION.md`、`docs/YANTIE_A2_HUANG_LAO_MATERIAL_PLAN.md`、`docs/YANTIE_A2_MATERIAL_GAP.md`、`docs/YANTIE_TASK_BREAKDOWN.md`。
+- 禁止修改范围：UI、API、公共 Schema、迁移、根配置、运行态 `library/` 数据、现代整理本全文、现代译文、长段帛书释文、图版或摹本。
+- 输入：`YT-A2-MAT-005A` 的候选短摘、来源层、推荐标签和入包条件。
+- 输出：`src_huangdi_sijing` source、对应 source manifest、4-6 条 verified `philosophy_lens` EvidenceUnit、pack 测试和材料状态更新。
+- 接口：黄老材料只进入思想透镜层，不得挂到 `original_fact` Claim；后续 UI 分组和章节点位引用另由 `YT-A2-MAT-005C` 处理。
+- 验收标准：双份 evidence pack 同步；新增透镜均有 `philosophy_lens`、`huang_lao`、短摘、白话说明、版权说明和边界说明；source manifest `excerpt_count` 与实际数量一致；没有任何 `original_fact` Claim 仅依赖或引用黄老透镜。
+- 测试命令：`git diff --check -- metaos/yantie/data/evidence_pack.json docs/yantie/data/evidence_pack.json test/test_yantie_pack.py docs/YANTIE_A2_HUANGDI_SIJING_VERIFICATION.md docs/YANTIE_A2_HUANG_LAO_MATERIAL_PLAN.md docs/YANTIE_A2_MATERIAL_GAP.md docs/YANTIE_TASK_BREAKDOWN.md`；`python -m pytest test -k yantie_pack`；必要时执行 `python -m pytest test -k yantie`。
+- 回滚方式：移除 `src_huangdi_sijing` source、manifest、EvidenceUnit、测试和文档状态更新，恢复双份 evidence pack 到任务前状态。
+- 文档更新：更新黄老计划、核验文档和 A2 材料缺口状态。

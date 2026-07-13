@@ -286,6 +286,57 @@ class YantieEvidencePackDataTests(unittest.TestCase):
                 claim.claim_id,
             )
 
+    def test_huangdi_sijing_huang_lao_lenses_are_bounded(self) -> None:
+        pack = load_pack()
+        sources_by_id = {source.source_id: source for source in pack.sources}
+        manifest_by_id = {entry.source_id: entry for entry in pack.source_manifest}
+        evidence_by_id = {evidence.evidence_id: evidence for evidence in pack.evidence_units}
+
+        source = sources_by_id["src_huangdi_sijing"]
+        self.assertEqual(source.source_type, SourceType.primary_text)
+        self.assertEqual(source.delivery_policy.value, "excerpt_allowed")
+        self.assertTrue(source.human_verified)
+
+        huang_lao_evidence = [
+            evidence for evidence in pack.evidence_units if evidence.source_id == "src_huangdi_sijing"
+        ]
+        self.assertEqual(len(huang_lao_evidence), 6)
+        self.assertEqual(manifest_by_id["src_huangdi_sijing"].excerpt_count, len(huang_lao_evidence))
+
+        expected_ids = {
+            "ev:src_huangdi_sijing:jingfa:dao_generates_law:a2d50001",
+            "ev:src_huangdi_sijing:jingfa:law_standard_rectification:a2d50002",
+            "ev:src_huangdi_sijing:shiliujing:reduce_harsh_affairs:a2d50003",
+            "ev:src_huangdi_sijing:shiliujing:do_not_seize_people_time:a2d50004",
+            "ev:src_huangdi_sijing:cheng:name_reality_alignment:a2d50005",
+            "ev:src_huangdi_sijing:shiliujing:utmost_stillness_sage:a2d50006",
+        }
+        self.assertEqual({evidence.evidence_id for evidence in huang_lao_evidence}, expected_ids)
+
+        for evidence in huang_lao_evidence:
+            self.assertEqual(evidence.review_status, ReviewStatus.verified)
+            self.assertEqual(evidence.certainty.value, "direct_text")
+            self.assertEqual(evidence.evidence_kind.value, "speech_argument")
+            self.assertIn("philosophy_lens", evidence.value_tags)
+            self.assertIn("huang_lao", evidence.value_tags)
+            self.assertLessEqual(len(evidence.excerpt_original or ""), 12)
+            self.assertIn("Huang-Lao philosophy lens", evidence.copyright_note)
+            self.assertIn("not evidence", evidence.adjacent_context_note or "")
+            self.assertIn("Yantie meeting", evidence.adjacent_context_note or "")
+
+        original_fact_claims = [
+            claim for claim in pack.claims if claim.claim_type == ClaimType.original_fact
+        ]
+        for claim in original_fact_claims:
+            self.assertFalse(
+                any(evidence_id in expected_ids for evidence_id in claim.evidence_ids),
+                claim.claim_id,
+            )
+            self.assertTrue(
+                any("philosophy_lens" not in evidence_by_id[evidence_id].value_tags for evidence_id in claim.evidence_ids),
+                claim.claim_id,
+            )
+
     def test_yantielun_chapter_evidence_covers_all_sixty_chapters(self) -> None:
         pack = load_pack()
 

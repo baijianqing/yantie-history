@@ -6,7 +6,7 @@
 
 ## 1. 核验结论
 
-本轮只把《黄帝四经》相关材料推进到“可候选、待入包”的状态，暂不进入 evidence pack。
+`YT-A2-MAT-005A` 先把《黄帝四经》相关材料推进到“可候选、待入包”的状态；`YT-A2-MAT-005B` 已将其中 6 条极短短摘正式写入 evidence pack，且只作为 `philosophy_lens` 使用。
 
 当前可确认的边界：
 
@@ -36,7 +36,7 @@
 
 ## 3. 候选短摘
 
-以下短摘只用于 `YT-A2-MAT-005B` 前的候选核验，不直接入包。每条候选都必须在正式入包前重新核对底本、上下文和版权边界。
+以下短摘用于 `YT-A2-MAT-005B` 前的候选核验；本轮已选择其中 6 条进入 evidence pack。每条正式入包材料仍必须保留底本、上下文和版权边界。
 
 ### HLQ-001：道生法
 
@@ -114,7 +114,7 @@
 |---|---|---|
 | 现代校注本全文 | 版权和整理劳动边界不清 | 只作为书目卡或人工核验底本 |
 | 英译本或现代译文 | 译文版权独立 | 只作现代研究书目，不摘录 |
-| 长段帛书释文 | 超出候选短摘范围 | `YT-A2-MAT-005B` 再逐条核验 |
+| 长段帛书释文 | 超出候选短摘范围 | 后续如需扩展，另开任务逐条核验 |
 | 图版、摹本和展陈图片 | 涉及图像版权和授权 | 不进入 evidence pack |
 | “黄帝四经四篇”精确著录短摘 | 本轮尚未完成行级定位 | 后续从《汉书·艺文志》单独核验 |
 
@@ -130,9 +130,24 @@
 6. 同步更新 `metaos/yantie/data/evidence_pack.json` 和 `docs/yantie/data/evidence_pack.json`。
 7. 更新 pack 测试，确保黄老透镜数量、标签、版权说明和边界说明可校验。
 
-## 6. 本轮验收
+## 6. 005B 入包结果
 
-- 新增本核验文档，列出 5 个来源层和 7 条候选短摘。
+本轮 `YT-A2-MAT-005B` 选择 6 条候选短摘正式入包：
+
+| EvidenceUnit | 短摘 | 进入状态 |
+|---|---|---|
+| `ev:src_huangdi_sijing:jingfa:dao_generates_law:a2d50001` | 道生法 | 已入包 |
+| `ev:src_huangdi_sijing:jingfa:law_standard_rectification:a2d50002` | 法度者正之至也 | 已入包 |
+| `ev:src_huangdi_sijing:shiliujing:reduce_harsh_affairs:a2d50003` | 省苛事 | 已入包 |
+| `ev:src_huangdi_sijing:shiliujing:do_not_seize_people_time:a2d50004` | 毋夺民时 | 已入包 |
+| `ev:src_huangdi_sijing:cheng:name_reality_alignment:a2d50005` | 名实相应则定 | 已入包 |
+| `ev:src_huangdi_sijing:shiliujing:utmost_stillness_sage:a2d50006` | 至静者圣 | 已入包 |
+
+`HLQ-007`“文武并行”暂不入包，留待后续讨论刑德、文武与国家行动节奏时再判断。
+
+## 7. 本轮验收
+
+- 新增本核验文档，列出 5 个来源层和 7 条候选短摘，并在 `YT-A2-MAT-005B` 选择 6 条入包。
 - 每条短摘都有材料层、对应透镜、推荐标签、版本状态、版权边界和入包判断。
-- 明确本轮不修改 UI、API、Schema、evidence pack 或运行态数据。
+- 明确本轮不修改 UI、API、Schema 或运行态数据；仅 `YT-A2-MAT-005B` 修改双份 evidence pack。
 - 明确《黄帝四经》材料不得支撑 `original_fact` Claim。

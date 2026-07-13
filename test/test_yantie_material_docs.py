@@ -85,10 +85,11 @@ def test_yantie_huangdi_sijing_verification_keeps_candidate_boundary():
     text = HUANGDI_SIJING_VERIFICATION.read_text(encoding="utf-8")
 
     assert "YT-A2-MAT-005A" in text
-    assert "暂不进入 evidence pack" in text
+    assert "YT-A2-MAT-005B" in text
+    assert "6 条极短短摘正式写入 evidence pack" in text
     assert "不支撑 `original_fact` Claim" in text
     assert "不复制现代整理本、校注本、译本、论文或专著的长段内容" in text
-    assert "本轮不修改 UI、API、Schema、evidence pack 或运行态数据" in text
+    assert "本轮不修改 UI、API、Schema 或运行态数据" in text
     assert "\n> " not in text
 
 
