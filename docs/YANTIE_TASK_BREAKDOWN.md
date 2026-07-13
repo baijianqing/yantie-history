@@ -49,6 +49,7 @@ flowchart TB
     A2MAT005C --> A2MAT006["YT-A2-MAT-006<br/>经学语境计划"]
     A2MAT006 --> A2MAT006A["YT-A2-MAT-006A<br/>汉书短摘核验"]
     A2MAT006A --> A2MAT006B["YT-A2-MAT-006B<br/>繁露短摘核验"]
+    A2MAT006B --> A2MAT006C["YT-A2-MAT-006C<br/>经学透镜入包"]
     A002 --> V3017A["YT-V3-017A<br/>冻结主体验路径"]
     V3017A --> V3017B["YT-V3-017B<br/>定义体验业务对象"]
     V3017B --> V3017C["YT-V3-017C<br/>冻结历史边界规则"]
@@ -1109,3 +1110,18 @@ A1 首批允许任务表：
 - 测试命令：`git diff --check -- docs/YANTIE_A2_CHUNQIU_FANLU_VERIFICATION.md docs/YANTIE_A2_CLASSICS_CONTEXT_PLAN.md docs/YANTIE_A2_MATERIAL_GAP.md docs/YANTIE_TASK_BREAKDOWN.md test/test_yantie_material_docs.py`；`python -m pytest test/test_yantie_material_docs.py`；必要时执行 `python -m pytest test -k yantie`。
 - 回滚方式：删除 `docs/YANTIE_A2_CHUNQIU_FANLU_VERIFICATION.md`，移除本任务对经学计划、材料缺口、任务图和测试的更新；不影响 evidence pack、UI 或运行代码。
 - 文档更新：本任务卡、《春秋繁露》候选短摘核验文档、经学语境计划和 A2 材料缺口状态。
+
+### YT-A2-MAT-006C：经学语境思想透镜入 evidence pack
+
+- 任务 ID：`YT-A2-MAT-006C`
+- 价值：`YT-A2-MAT-006A` 与 `YT-A2-MAT-006B` 已核验候选短摘；本任务从《汉书》和《春秋繁露》中选择 6 条正式入包，补足经学正当性、德刑、天人、王道与官学制度透镜，同时继续避免它们成为盐铁会议事实证据。
+- 依赖：`YT-A2-MAT-006A`、`YT-A2-MAT-006B`、双份 evidence pack、pack 测试、现有 `philosophy_lens` 边界。
+- 允许修改范围：`metaos/yantie/data/evidence_pack.json`、`docs/yantie/data/evidence_pack.json`、`test/test_yantie_pack.py`、`docs/YANTIE_A2_CLASSICS_CONTEXT_PLAN.md`、`docs/YANTIE_A2_MATERIAL_GAP.md`、`docs/YANTIE_TASK_BREAKDOWN.md`。
+- 禁止修改范围：UI、API、公共 Schema、搜索逻辑、后端运行时代码、迁移、根配置、运行态 `library/` 数据、现代校注本全文、现代译文、论文或专著长段内容。
+- 输入：006A/006B 候选短摘、Source/EvidenceUnit Schema、现有 Claim 边界、`philosophy_lens` 测试约束。
+- 输出：`src_hanshu_dong_zhongshu`、`src_hanshu_wudi`、`src_hanshu_rulin`、`src_chunqiu_fanlu` source/source manifest，6 条 verified 经学语境透镜 EvidenceUnit，pack 测试和材料状态文档更新。
+- 接口：新增材料只进入 `philosophy_lens`、`classics_context`、`institutional_context` 或 `curatorial_inference` 解释层，不得被 `original_fact` Claim 引用；后续 UI 分组与材料导览由 `YT-A2-MAT-006D` 或后续 UI 任务处理。
+- 验收标准：双份 evidence pack 同步；新增 6 条均为 verified、direct_text、speech_argument，短摘不超过 12 个汉字，带 `classics_context` 与 `philosophy_lens` 标签；`src_chunqiu_fanlu` evidence 必须带 `received_text_authorship_debated`；没有任何 `original_fact` Claim 引用这些经学透镜。
+- 测试命令：`git diff --check -- metaos/yantie/data/evidence_pack.json docs/yantie/data/evidence_pack.json test/test_yantie_pack.py docs/YANTIE_A2_CLASSICS_CONTEXT_PLAN.md docs/YANTIE_A2_MATERIAL_GAP.md docs/YANTIE_TASK_BREAKDOWN.md`；`python -m pytest test -k yantie_pack`；`python -m pytest test/test_yantie_material_docs.py`；必要时执行 `python -m pytest test -k yantie` 和 `python -m pytest test`。
+- 回滚方式：移除 4 个新增 source/source manifest、6 条新增 EvidenceUnit、lexical_index 新增引用、pack 测试和文档状态更新，恢复双份 evidence pack 到任务前状态。
+- 文档更新：更新经学语境计划、A2 材料缺口和本任务拆分文档，记录 006C 已完成入包但默认仍只进入退朝后思想透镜或深度探索。

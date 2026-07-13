@@ -2,7 +2,7 @@
 
 状态：A2 材料门禁文档  
 任务 ID：`YT-A2-000`  
-文档性质：材料缺口、交付边界和后续任务契约；本轮不修改 evidence pack、UI 或运行代码。
+文档性质：材料缺口、交付边界和后续任务契约；已记录 A2 材料入包进度，后续任务仍需按任务契约控制 evidence pack、UI 与运行代码边界。
 
 ## 1. 门禁目标
 
@@ -10,7 +10,7 @@ A1 已完成可试玩闭环。A2 的第一步不是继续增加页面功能，�
 
 当前材料状态：
 
-- evidence pack 当前约有 28 个 source、140 条 EvidenceUnit、13 条 Claim。
+- evidence pack 当前有 33 个 source、152 条 EvidenceUnit、13 条 Claim。
 - 《盐铁论》相关 EvidenceUnit 约 70 条。
 - `YT-A2-MAT-001` 执行后，《资治通鉴》卷023 已补入 1 个 chronicle source 和 4 条会议纪事 EvidenceUnit，用于校验会议召问、贤良文学请罢、桑弘羊答辩和七月罢榷酤结果。
 - `YT-A2-MAT-002` 执行后，《汉书·食货志》已扩至 9 条 EvidenceUnit，《史记·平准书》已扩至 11 条 EvidenceUnit，首轮覆盖盐铁官营、均输、平准、算缗、告缗、商贾财富、官营弊端和边费逻辑。
@@ -22,6 +22,7 @@ A1 已完成可试玩闭环。A2 的第一步不是继续增加页面功能，�
 - `YT-A2-MAT-006` 执行后，新增 `docs/YANTIE_A2_CLASSICS_CONTEXT_PLAN.md`，将董仲舒、经学语境和武帝文治正当性列为思想史第二优先级；本轮只冻结候选来源、6 个经学透镜和进入边界，不入 evidence pack。
 - `YT-A2-MAT-006A` 执行后，新增 `docs/YANTIE_A2_HANSHU_CLASSICS_VERIFICATION.md`，核验《汉书·董仲舒传》《汉书·武帝纪》《汉书·儒林传》12 条经学语境候选短摘；本轮仍不入 evidence pack。
 - `YT-A2-MAT-006B` 执行后，新增 `docs/YANTIE_A2_CHUNQIU_FANLU_VERIFICATION.md`，核验《春秋繁露》的文本性质、版本风险和 12 条候选短摘；本轮仍不入 evidence pack。
+- `YT-A2-MAT-006C` 执行后，新增 `src_hanshu_dong_zhongshu`、`src_hanshu_wudi`、`src_hanshu_rulin`、`src_chunqiu_fanlu` 4 个 source 和 6 条经学语境 EvidenceUnit；它们只作为 `philosophy_lens`/`classics_context`，不支撑 `original_fact` Claim。
 
 A2 材料默认不进入首次主体验。它们只进入退朝后深度探索，除非后续单独验收为主线关键证据。
 
@@ -32,7 +33,7 @@ A2 材料默认不进入首次主体验。它们只进入退朝后深度探索�
 | 会议纪事 | `YT-A2-MAT-001` 已补《资治通鉴》卷023 4 条纪事 EvidenceUnit | 仍需在后续 UI 中决定是否只作退朝后探索，或验收为主线关键证据 | 已覆盖始元六年二月召问、贤良文学请罢、桑弘羊答辩、秋七月罢榷酤 | 退朝后深度探索；可候选为主线关键证据 | 可，已形成可定位 EvidenceUnit |
 | 制度背景 | `YT-A2-MAT-002` 已补《汉书·食货志》6 条、《史记·平准书》6 条制度背景 EvidenceUnit | 酒榷细节与制度人物背景仍需后续任务补足 | 首轮已覆盖国家财政制度、商贾征收、山海资源、官营弊端、均输和平准机制 | 退朝后深度探索；少量可作为场景轻提示 | 可，需标明制度背景而非会议现场 |
 | 文本与人物 | `YT-A2-MAT-003` 已补《四库全书总目提要》6 条文本史 EvidenceUnit | 贤良文学身份和孔仅、东郭咸阳、卜式等制度人物背景仍需后续补足 | 首轮已区分会议事实、文本编纂和后世目录学评价 | 退朝后深度探索 | 部分可；文本性质多为策展解释 |
-| 思想史 | 已有哲学透镜；`YT-A2-MAT-005B` 已补入 6 条《黄帝四经》黄老透镜；`YT-A2-MAT-006` 已冻结经学语境计划；`YT-A2-MAT-006A` 已核验 12 条《汉书》候选短摘；`YT-A2-MAT-006B` 已核验 12 条《春秋繁露》候选短摘 | 经学候选短摘正式入包和退朝后分组仍需后续任务补强 | 解释儒法、黄老、经学、义利、国家能力和政治正当性等思想来源 | 退朝后思想透镜 | 不直接支撑会议事实 |
+| 思想史 | 已有哲学透镜；`YT-A2-MAT-005B` 已补入 6 条《黄帝四经》黄老透镜；`YT-A2-MAT-006C` 已补入 6 条《汉书》/《春秋繁露》经学语境透镜 | 经学透镜的退朝后分组、材料导览和 UI 呈现仍需后续任务补强 | 解释儒法、黄老、经学、义利、国家能力和政治正当性等思想来源 | 退朝后思想透镜 | 不直接支撑会议事实 |
 | 后世评说 | 《四库提要》已完成首轮补强，`YT-A2-MAT-004` 已建立现代研究书目卡和版权边界 | 历代序跋仍可后续补充；现代研究如需入包需另开契约任务 | 作为退朝后延伸阅读和研究史定位 | 退朝后延伸阅读 | 通常不支撑会议事实；可支撑接受史或研究史说明 |
 
 ## 3. 交付边界
@@ -53,7 +54,7 @@ A2 材料默认不进入首次主体验。它们只进入退朝后深度探索�
 | P0 | 《汉书·食货志》《史记·平准书》制度背景 | 已完成首轮入包，后续补酒榷细节和制度人物背景 | 12 条制度背景 EvidenceUnit 与标签体系 |
 | P0 | 后世评价边界 | 退朝后探索需要可信边界，避免混入主线事实 | 后世评价材料分级规则 |
 | P1 | 《盐铁论》文本性质与人物背景 | 已完成首轮文本性质入包，后续补贤良文学和制度人物背景 | 6 条四库提要文本史 EvidenceUnit |
-| P1 | 汉初至武帝思想语境 | 黄老与《黄帝四经》已完成计划冻结、候选短摘核验和首轮入包；经学、董仲舒和财政国家语境已完成计划冻结、《汉书》候选短摘核验和《春秋繁露》候选短摘核验，后续需做入包判断 | 6 条黄老 EvidenceUnit、黄老材料计划、核验文档、经学语境计划、《汉书》候选短摘核验与《春秋繁露》候选短摘核验 |
+| P1 | 汉初至武帝思想语境 | 黄老与《黄帝四经》已完成计划冻结、候选短摘核验和首轮入包；经学、董仲舒和财政国家语境已完成计划冻结、《汉书》候选短摘核验、《春秋繁露》候选短摘核验和首轮入包 | 6 条黄老 EvidenceUnit、6 条经学语境 EvidenceUnit、黄老材料计划、经学语境计划与核验文档 |
 | P2 | 现代研究书目卡 | 已完成首轮书目卡与版权边界；后续如需入包另开任务 | `docs/YANTIE_A2_MODERN_RESEARCH_INDEX.md` 7 张书目卡 |
 | P2 | 当代回声 | 只作退朝后反思，不作历史证据 | `external_echo` 候选清单 |
 
@@ -71,6 +72,7 @@ A2 材料默认不进入首次主体验。它们只进入退朝后深度探索�
 | `YT-A2-MAT-006` | 董仲舒、经学语境与政治正当性材料补强计划 | 冻结经学候选来源层、6 个候选透镜和进入边界 | 退朝后思想透镜 |
 | `YT-A2-MAT-006A` | 《汉书》经学语境候选短摘核验 | 核验《董仲舒传》《武帝纪》《儒林传》12 条候选短摘和入包边界 | 退朝后思想透镜候选 |
 | `YT-A2-MAT-006B` | 《春秋繁露》版本性质与候选短摘核验 | 核验《春秋繁露》文本风险、12 条候选短摘和入包边界 | 退朝后思想透镜候选 |
+| `YT-A2-MAT-006C` | 经学语境思想透镜入包 | 将 6 条《汉书》/《春秋繁露》短摘写入双份 evidence pack，并用测试约束边界 | 退朝后思想透镜 |
 
 ## 6. 本轮验收
 
@@ -82,12 +84,14 @@ A2 材料默认不进入首次主体验。它们只进入退朝后深度探索�
 - `YT-A2-MAT-006` 新增经学语境计划文档，并确认董仲舒、《春秋公羊传》和《春秋繁露》默认只作退朝后思想透镜或深度探索，不作为盐铁会议现场事实。
 - `YT-A2-MAT-006A` 新增《汉书》经学语境候选短摘核验文档，并确认 12 条候选短摘不支撑 `original_fact` Claim。
 - `YT-A2-MAT-006B` 新增《春秋繁露》版本性质与候选短摘核验文档，并确认传世文本和作者归属风险。
+- `YT-A2-MAT-006C` 新增 6 条经学语境 EvidenceUnit，并确认它们不作为会议事实证据，不被 `original_fact` Claim 引用。
 - 在 `docs/YANTIE_TASK_BREAKDOWN.md` 登记 A2 首批任务卡。
-- 不修改 `docs/yantie/index.html`、`metaos/yantie/web.py`、evidence pack、Schema、API 或运行态数据。
+- 本轮涉及 evidence pack 的改动仅限 `YT-A2-MAT-006C` 双份 pack、pack 测试和材料状态文档；不修改 `docs/yantie/index.html`、`metaos/yantie/web.py`、Schema、API 或运行态数据。
 - 每个 A2 任务卡都包含：任务 ID、价值、依赖、允许修改范围、禁止修改范围、输入、输出、接口、验收标准、测试命令、回滚方式、文档更新。
 - 执行：
 
 ```powershell
-git diff --check -- docs/YANTIE_A2_CHUNQIU_FANLU_VERIFICATION.md docs/YANTIE_A2_HANSHU_CLASSICS_VERIFICATION.md docs/YANTIE_A2_CLASSICS_CONTEXT_PLAN.md docs/YANTIE_A2_MATERIAL_GAP.md docs/YANTIE_TASK_BREAKDOWN.md test/test_yantie_material_docs.py
+git diff --check -- docs/YANTIE_A2_CHUNQIU_FANLU_VERIFICATION.md docs/YANTIE_A2_HANSHU_CLASSICS_VERIFICATION.md docs/YANTIE_A2_CLASSICS_CONTEXT_PLAN.md docs/YANTIE_A2_MATERIAL_GAP.md docs/YANTIE_TASK_BREAKDOWN.md metaos/yantie/data/evidence_pack.json docs/yantie/data/evidence_pack.json test/test_yantie_pack.py test/test_yantie_material_docs.py
+python -m pytest test -k yantie_pack
 python -m pytest test/test_yantie_material_docs.py
 ```

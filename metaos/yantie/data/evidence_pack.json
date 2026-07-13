@@ -263,6 +263,42 @@
       "excerpt_count": 6,
       "human_verified": true,
       "note": "Public-domain Huang-Lao silk text; selected very short excerpts used only as philosophy lenses, not as Yantie meeting evidence."
+    },
+    {
+      "source_id": "src_hanshu_dong_zhongshu",
+      "title": "汉书·董仲舒传",
+      "license_status": "public_domain_text",
+      "delivery_policy": "excerpt_allowed",
+      "excerpt_count": 1,
+      "human_verified": true,
+      "note": "Public-domain Hanshu biography; one very short excerpt used only as classics-context philosophy lens, not as Yantie meeting evidence."
+    },
+    {
+      "source_id": "src_hanshu_wudi",
+      "title": "汉书·武帝纪",
+      "license_status": "public_domain_text",
+      "delivery_policy": "excerpt_allowed",
+      "excerpt_count": 1,
+      "human_verified": true,
+      "note": "Public-domain Hanshu chronicle; one very short excerpt used only as Wudi-era classics-context philosophy lens, not as Yantie meeting evidence."
+    },
+    {
+      "source_id": "src_hanshu_rulin",
+      "title": "汉书·儒林传",
+      "license_status": "public_domain_text",
+      "delivery_policy": "excerpt_allowed",
+      "excerpt_count": 1,
+      "human_verified": true,
+      "note": "Public-domain Hanshu institutional history; one very short excerpt used only as official-classics context lens, not as Yantie meeting evidence."
+    },
+    {
+      "source_id": "src_chunqiu_fanlu",
+      "title": "春秋繁露",
+      "license_status": "public_domain_text",
+      "delivery_policy": "excerpt_allowed",
+      "excerpt_count": 3,
+      "human_verified": true,
+      "note": "Public-domain received Chunqiu Fanlu text; authorship and textual layers are debated. Very short excerpts are used only as philosophy lenses, not as Yantie meeting evidence."
     }
   ],
   "theme_spec": {
@@ -639,6 +675,50 @@
       "license_status": "public_domain_text",
       "canonical_url": "https://ctext.org/wiki.pl?if=en&res=580017",
       "citation_style": "??????",
+      "delivery_policy": "excerpt_allowed",
+      "human_verified": true
+    },
+    {
+      "source_id": "src_hanshu_dong_zhongshu",
+      "title": "汉书·董仲舒传",
+      "source_type": "biography",
+      "authority_level": "comparison",
+      "license_status": "public_domain_text",
+      "canonical_url": "https://ctext.org/han-shu/dong-zhong-shu-zhuan/zh",
+      "citation_style": "班固：《汉书·董仲舒传》",
+      "delivery_policy": "excerpt_allowed",
+      "human_verified": true
+    },
+    {
+      "source_id": "src_hanshu_wudi",
+      "title": "汉书·武帝纪",
+      "source_type": "chronicle",
+      "authority_level": "comparison",
+      "license_status": "public_domain_text",
+      "canonical_url": "https://ctext.org/han-shu/wu-di-ji/zh",
+      "citation_style": "班固：《汉书·武帝纪》",
+      "delivery_policy": "excerpt_allowed",
+      "human_verified": true
+    },
+    {
+      "source_id": "src_hanshu_rulin",
+      "title": "汉书·儒林传",
+      "source_type": "institutional_history",
+      "authority_level": "comparison",
+      "license_status": "public_domain_text",
+      "canonical_url": "https://ctext.org/han-shu/ru-lin-zhuan/zh",
+      "citation_style": "班固：《汉书·儒林传》",
+      "delivery_policy": "excerpt_allowed",
+      "human_verified": true
+    },
+    {
+      "source_id": "src_chunqiu_fanlu",
+      "title": "春秋繁露",
+      "source_type": "primary_text",
+      "authority_level": "comparison",
+      "license_status": "public_domain_text",
+      "canonical_url": "https://ctext.org/chun-qiu-fan-lu/zh",
+      "citation_style": "《春秋繁露》",
       "delivery_policy": "excerpt_allowed",
       "human_verified": true
     }
@@ -4149,6 +4229,150 @@
       "copyright_note": "Public-domain classical text, very short excerpt used as Huang-Lao philosophy lens.",
       "review_status": "verified",
       "adjacent_context_note": "This is a philosophy lens (????), not evidence that the source discussed the Yantie meeting. ?????????????????"
+    },
+    {
+      "evidence_id": "ev:src_hanshu_dong_zhongshu:zhuan:school_officials:a2d60001",
+      "source_id": "src_hanshu_dong_zhongshu",
+      "canonical_location": "董仲舒传",
+      "excerpt_original": "立學校之官",
+      "paraphrase_zh": "《董仲舒传》把学校之官与举贤制度联系到武帝以后经学制度化语境；这里仅说明经学入政背景，不是盐铁会议事实。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "classics_context",
+        "official_classics",
+        "school_officials",
+        "institutional_context",
+        "curatorial_inference"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text. Classics context philosophy lens; very short excerpt only.",
+      "review_status": "verified",
+      "adjacent_context_note": "Classics context philosophy lens only; not evidence for the Yantie meeting, and not evidence that any meeting speaker quoted this text."
+    },
+    {
+      "evidence_id": "ev:src_hanshu_wudi:zan:six_classics:a2d60002",
+      "source_id": "src_hanshu_wudi",
+      "canonical_location": "武帝纪·赞",
+      "excerpt_original": "表章六經",
+      "paraphrase_zh": "《武帝纪》赞语以“表章六经”概括武帝文治正当性，可帮助理解盐铁会议背后的武帝国家遗产。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values",
+        "topic_frontier_finance"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "classics_context",
+        "wudi_context",
+        "six_classics",
+        "political_legitimacy",
+        "curatorial_inference"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text. Classics context philosophy lens; very short excerpt only.",
+      "review_status": "verified",
+      "adjacent_context_note": "Classics context philosophy lens only; not evidence for the Yantie meeting, and not evidence that any meeting speaker quoted this text."
+    },
+    {
+      "evidence_id": "ev:src_hanshu_rulin:zhuan:doctor_disciples:a2d60003",
+      "source_id": "src_hanshu_rulin",
+      "canonical_location": "儒林传",
+      "excerpt_original": "為博士官置弟子",
+      "paraphrase_zh": "《儒林传》记录博士弟子制度，说明经学如何进入官学和人才制度；这里不作为会议现场证据。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "classics_context",
+        "doctor_disciples",
+        "official_classics",
+        "institutional_context"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain classical text. Classics context philosophy lens; very short excerpt only.",
+      "review_status": "verified",
+      "adjacent_context_note": "Classics context philosophy lens only; not evidence for the Yantie meeting, and not evidence that any meeting speaker quoted this text."
+    },
+    {
+      "evidence_id": "ev:src_chunqiu_fanlu:jiyi:virtue_over_punishment:a2d60004",
+      "source_id": "src_chunqiu_fanlu",
+      "canonical_location": "基义",
+      "excerpt_original": "厚其德而簡其刑",
+      "paraphrase_zh": "这条短摘可作为德刑次序透镜，提示制度不只讲效率，也会被放入德义秩序中理解。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "classics_context",
+        "chunqiu_fanlu",
+        "virtue_punishment",
+        "statecraft",
+        "received_text_authorship_debated"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain received text. Classics context philosophy lens; very short excerpt only.",
+      "review_status": "verified",
+      "adjacent_context_note": "Classics context philosophy lens only; not evidence for the Yantie meeting, and not evidence that any meeting speaker quoted this received text. Authorship debated; use for later classics-context framing only."
+    },
+    {
+      "evidence_id": "ev:src_chunqiu_fanlu:renfutianshu:heaven_human_correspondence:a2d60005",
+      "source_id": "src_chunqiu_fanlu",
+      "canonical_location": "人副天数",
+      "excerpt_original": "人副天數",
+      "paraphrase_zh": "这条短摘用作天人对应透镜，说明古人如何把政治责任和天道秩序联结；它不是现代因果判断。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "classics_context",
+        "chunqiu_fanlu",
+        "heaven_human_response",
+        "correlative_cosmology",
+        "received_text_authorship_debated"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain received text. Classics context philosophy lens; very short excerpt only.",
+      "review_status": "verified",
+      "adjacent_context_note": "Classics context philosophy lens only; not evidence for the Yantie meeting, and not evidence that any meeting speaker quoted this received text. Authorship debated; use for later classics-context framing only."
+    },
+    {
+      "evidence_id": "ev:src_chunqiu_fanlu:sandai:mandate_legitimacy:a2d60006",
+      "source_id": "src_chunqiu_fanlu",
+      "canonical_location": "三代改制质文",
+      "excerpt_original": "王者必受命",
+      "paraphrase_zh": "这条短摘用作王道与受命透镜，解释经学语境下制度与政治正当性的关系；不直接支撑盐铁政策事实。",
+      "evidence_kind": "speech_argument",
+      "speaker_actor_id": null,
+      "topic_ids": [
+        "topic_confucian_legalist_values"
+      ],
+      "value_tags": [
+        "philosophy_lens",
+        "classics_context",
+        "chunqiu_fanlu",
+        "mandate",
+        "political_legitimacy",
+        "received_text_authorship_debated"
+      ],
+      "certainty": "direct_text",
+      "copyright_note": "Public-domain received text. Classics context philosophy lens; very short excerpt only.",
+      "review_status": "verified",
+      "adjacent_context_note": "Classics context philosophy lens only; not evidence for the Yantie meeting, and not evidence that any meeting speaker quoted this received text. Authorship debated; use for later classics-context framing only."
     }
   ],
   "claims": [
@@ -5323,6 +5547,41 @@
       ],
       "灾异": [
         "ev:src_xunzi_tianlun:tianlun:nature_constant:aa110008"
+      ],
+      "经学": [
+        "ev:src_hanshu_dong_zhongshu:zhuan:school_officials:a2d60001",
+        "ev:src_hanshu_rulin:zhuan:doctor_disciples:a2d60003"
+      ],
+      "六经": [
+        "ev:src_hanshu_wudi:zan:six_classics:a2d60002"
+      ],
+      "董仲舒": [
+        "ev:src_hanshu_dong_zhongshu:zhuan:school_officials:a2d60001"
+      ],
+      "博士": [
+        "ev:src_hanshu_rulin:zhuan:doctor_disciples:a2d60003"
+      ],
+      "春秋繁露": [
+        "ev:src_chunqiu_fanlu:jiyi:virtue_over_punishment:a2d60004",
+        "ev:src_chunqiu_fanlu:renfutianshu:heaven_human_correspondence:a2d60005",
+        "ev:src_chunqiu_fanlu:sandai:mandate_legitimacy:a2d60006"
+      ],
+      "德刑": [
+        "ev:src_chunqiu_fanlu:jiyi:virtue_over_punishment:a2d60004"
+      ],
+      "天人": [
+        "ev:src_chunqiu_fanlu:renfutianshu:heaven_human_correspondence:a2d60005"
+      ],
+      "受命": [
+        "ev:src_chunqiu_fanlu:sandai:mandate_legitimacy:a2d60006"
+      ],
+      "思想透镜": [
+        "ev:src_hanshu_dong_zhongshu:zhuan:school_officials:a2d60001",
+        "ev:src_hanshu_wudi:zan:six_classics:a2d60002",
+        "ev:src_hanshu_rulin:zhuan:doctor_disciples:a2d60003",
+        "ev:src_chunqiu_fanlu:jiyi:virtue_over_punishment:a2d60004",
+        "ev:src_chunqiu_fanlu:renfutianshu:heaven_human_correspondence:a2d60005",
+        "ev:src_chunqiu_fanlu:sandai:mandate_legitimacy:a2d60006"
       ]
     }
   }

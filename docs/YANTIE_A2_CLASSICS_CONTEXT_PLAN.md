@@ -2,7 +2,7 @@
 
 状态：A2 思想史材料计划文档  
 任务 ID：`YT-A2-MAT-006`  
-文档性质：候选来源、解释边界与后续任务契约；本轮不修改 UI、API、Schema、evidence pack 或运行态数据。
+文档性质：候选来源、解释边界与后续任务契约；`YT-A2-MAT-006C` 已将 6 条经学语境短摘作为 `philosophy_lens` 写入 evidence pack，但仍不修改 UI、API、Schema 或运行态数据。
 
 ## 1. 为什么要补经学语境
 
@@ -24,7 +24,7 @@ A2 已经补入黄老与《黄帝四经》材料，避免把盐铁会议读成�
 3. 不用“罢黜百家，独尊儒术”概括全部武帝政治；如使用，只作为后世通行概括，并回到《汉书·武帝纪》“罢黜百家，表章六经”和《汉书·董仲舒传》“推明孔氏，抑黜百家”等可定位文本。
 4. 《春秋繁露》文本层次复杂，后续如入包，只能作为董仲舒相关思想传统或经学解释材料，必须标注版本来源和文本性质，不直接支撑会议事实 Claim。
 5. 经学材料默认只进入退朝后思想透镜或深度探索；只有另行验收后，才可作为主线轻提示。
-6. 本轮只做计划与契约，不进入 evidence pack，不新增 Claim，不修改 UI。
+6. `YT-A2-MAT-006C` 仅将已核验短摘以 `philosophy_lens`/`classics_context` 写入 evidence pack，不新增 Claim，不修改 UI。
 
 ## 3. 候选来源层
 
@@ -125,12 +125,14 @@ A2 已经补入黄老与《黄帝四经》材料，避免把盐铁会议读成�
 
 - `YT-A2-MAT-006A` 已新增 `docs/YANTIE_A2_HANSHU_CLASSICS_VERIFICATION.md`，核验 12 条《汉书》经学语境候选短摘；这些短摘仍只是候选材料，不进入 evidence pack。
 - `YT-A2-MAT-006B` 已新增 `docs/YANTIE_A2_CHUNQIU_FANLU_VERIFICATION.md`，核验《春秋繁露》的文本性质、版本风险和 12 条候选短摘；这些短摘仍只是候选材料，不进入 evidence pack。
+- `YT-A2-MAT-006C` 已从 006A/006B 候选材料中选择 6 条短摘写入双份 evidence pack：3 条《汉书》经学制度/武帝文治语境，3 条《春秋繁露》德刑、天人和受命透镜；它们只作为 `philosophy_lens`/`classics_context`，不支撑 `original_fact` Claim。
 
 ## 7. 本轮验收
 
 - 新增本计划文档，确认董仲舒、经学语境与武帝文治正当性是 A2 思想史第二优先级。
 - 明确经学材料默认不进入首次主体验，不作为盐铁会议现场事实。
 - 形成 6 个候选思想透镜，均包含材料方向、解释目标、体验作用、推荐标签、默认入口和入包条件。
-- `YT-A2-MAT-006A` 已形成《汉书》候选短摘核验文档，但正式入包仍需 `YT-A2-MAT-006C` 单独执行。
-- `YT-A2-MAT-006B` 已形成《春秋繁露》候选短摘核验文档，并明确其传世文本和作者归属风险。
-- 不修改 UI、API、公共 Schema、evidence pack 或运行态数据。
+- `YT-A2-MAT-006A` 已形成《汉书》候选短摘核验文档，并由 `YT-A2-MAT-006C` 选择 3 条正式入包。
+- `YT-A2-MAT-006B` 已形成《春秋繁露》候选短摘核验文档，并由 `YT-A2-MAT-006C` 选择 3 条正式入包，同时保留传世文本和作者归属风险说明。
+- `YT-A2-MAT-006C` 已新增 `src_hanshu_dong_zhongshu`、`src_hanshu_wudi`、`src_hanshu_rulin`、`src_chunqiu_fanlu` 4 个 source 和 6 条 verified 经学语境透镜 EvidenceUnit。
+- 本阶段不修改 UI、API、公共 Schema 或运行态数据；经学材料默认仍只进入退朝后思想透镜或深度探索。

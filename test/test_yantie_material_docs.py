@@ -137,7 +137,9 @@ def test_yantie_classics_context_plan_keeps_lens_boundary():
     assert "philosophy_lens" in text
     assert "不把董仲舒或《春秋繁露》当作盐铁会议现场证据" in text
     assert "不声称桑弘羊、贤良文学或霍光直接引用" in text
-    assert "本轮不修改 UI、API、Schema、evidence pack 或运行态数据" in text
+    assert "YT-A2-MAT-006C" in text
+    assert "不新增 Claim，不修改 UI" in text
+    assert "本阶段不修改 UI、API、公共 Schema 或运行态数据" in text
     assert "\n> " not in text
 
 

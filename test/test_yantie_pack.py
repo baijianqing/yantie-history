@@ -263,7 +263,7 @@ class YantieEvidencePackDataTests(unittest.TestCase):
         lens_evidence = [
             evidence for evidence in pack.evidence_units if "philosophy_lens" in evidence.value_tags
         ]
-        self.assertGreaterEqual(len(lens_evidence), 24)
+        self.assertGreaterEqual(len(lens_evidence), 30)
 
         for evidence in lens_evidence:
             source = sources_by_id[evidence.source_id]
@@ -323,6 +323,80 @@ class YantieEvidencePackDataTests(unittest.TestCase):
             self.assertIn("Huang-Lao philosophy lens", evidence.copyright_note)
             self.assertIn("not evidence", evidence.adjacent_context_note or "")
             self.assertIn("Yantie meeting", evidence.adjacent_context_note or "")
+
+        original_fact_claims = [
+            claim for claim in pack.claims if claim.claim_type == ClaimType.original_fact
+        ]
+        for claim in original_fact_claims:
+            self.assertFalse(
+                any(evidence_id in expected_ids for evidence_id in claim.evidence_ids),
+                claim.claim_id,
+            )
+            self.assertTrue(
+                any("philosophy_lens" not in evidence_by_id[evidence_id].value_tags for evidence_id in claim.evidence_ids),
+                claim.claim_id,
+            )
+
+    def test_classics_context_lenses_are_bounded(self) -> None:
+        pack = load_pack()
+        sources_by_id = {source.source_id: source for source in pack.sources}
+        manifest_by_id = {entry.source_id: entry for entry in pack.source_manifest}
+        evidence_by_id = {evidence.evidence_id: evidence for evidence in pack.evidence_units}
+
+        expected_source_types = {
+            "src_hanshu_dong_zhongshu": SourceType.biography,
+            "src_hanshu_wudi": SourceType.chronicle,
+            "src_hanshu_rulin": SourceType.institutional_history,
+            "src_chunqiu_fanlu": SourceType.primary_text,
+        }
+        expected_counts = {
+            "src_hanshu_dong_zhongshu": 1,
+            "src_hanshu_wudi": 1,
+            "src_hanshu_rulin": 1,
+            "src_chunqiu_fanlu": 3,
+        }
+        expected_ids = {
+            "ev:src_hanshu_dong_zhongshu:zhuan:school_officials:a2d60001",
+            "ev:src_hanshu_wudi:zan:six_classics:a2d60002",
+            "ev:src_hanshu_rulin:zhuan:doctor_disciples:a2d60003",
+            "ev:src_chunqiu_fanlu:jiyi:virtue_over_punishment:a2d60004",
+            "ev:src_chunqiu_fanlu:renfutianshu:heaven_human_correspondence:a2d60005",
+            "ev:src_chunqiu_fanlu:sandai:mandate_legitimacy:a2d60006",
+        }
+
+        for source_id, expected_type in expected_source_types.items():
+            source = sources_by_id[source_id]
+            self.assertEqual(source.source_type, expected_type)
+            self.assertEqual(source.delivery_policy.value, "excerpt_allowed")
+            self.assertTrue(source.human_verified)
+            self.assertEqual(manifest_by_id[source_id].excerpt_count, expected_counts[source_id])
+
+        classics_evidence = [
+            evidence
+            for evidence in pack.evidence_units
+            if evidence.evidence_id in expected_ids
+        ]
+        self.assertEqual({evidence.evidence_id for evidence in classics_evidence}, expected_ids)
+
+        for evidence in classics_evidence:
+            self.assertEqual(evidence.review_status, ReviewStatus.verified)
+            self.assertEqual(evidence.certainty.value, "direct_text")
+            self.assertEqual(evidence.evidence_kind.value, "speech_argument")
+            self.assertIn("topic_confucian_legalist_values", evidence.topic_ids)
+            self.assertIn("philosophy_lens", evidence.value_tags)
+            self.assertIn("classics_context", evidence.value_tags)
+            self.assertLessEqual(len(evidence.excerpt_original or ""), 12)
+            self.assertIn("Classics context philosophy lens", evidence.copyright_note)
+            self.assertIn("not evidence", evidence.adjacent_context_note or "")
+            self.assertIn("Yantie meeting", evidence.adjacent_context_note or "")
+
+        fanlu_evidence = [
+            evidence for evidence in classics_evidence if evidence.source_id == "src_chunqiu_fanlu"
+        ]
+        self.assertEqual(len(fanlu_evidence), 3)
+        for evidence in fanlu_evidence:
+            self.assertIn("received_text_authorship_debated", evidence.value_tags)
+            self.assertIn("Authorship debated", evidence.adjacent_context_note or "")
 
         original_fact_claims = [
             claim for claim in pack.claims if claim.claim_type == ClaimType.original_fact
