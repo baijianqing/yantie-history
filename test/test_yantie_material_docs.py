@@ -5,6 +5,7 @@ import re
 ROOT = Path(__file__).resolve().parents[1]
 MODERN_RESEARCH_INDEX = ROOT / "docs" / "YANTIE_A2_MODERN_RESEARCH_INDEX.md"
 HUANG_LAO_PLAN = ROOT / "docs" / "YANTIE_A2_HUANG_LAO_MATERIAL_PLAN.md"
+HUANGDI_SIJING_VERIFICATION = ROOT / "docs" / "YANTIE_A2_HUANGDI_SIJING_VERIFICATION.md"
 
 
 def test_yantie_modern_research_index_keeps_copyright_boundary():
@@ -75,6 +76,45 @@ def test_yantie_huang_lao_candidate_lenses_have_required_fields():
     sections = re.split(r"^### ", text, flags=re.MULTILINE)[1:]
     for section in sections:
         if not section.startswith("HLS-LENS-"):
+            continue
+        for field in required_fields:
+            assert field in section
+
+
+def test_yantie_huangdi_sijing_verification_keeps_candidate_boundary():
+    text = HUANGDI_SIJING_VERIFICATION.read_text(encoding="utf-8")
+
+    assert "YT-A2-MAT-005A" in text
+    assert "暂不进入 evidence pack" in text
+    assert "不支撑 `original_fact` Claim" in text
+    assert "不复制现代整理本、校注本、译本、论文或专著的长段内容" in text
+    assert "本轮不修改 UI、API、Schema、evidence pack 或运行态数据" in text
+    assert "\n> " not in text
+
+
+def test_yantie_huangdi_sijing_candidate_quotes_are_short_and_structured():
+    text = HUANGDI_SIJING_VERIFICATION.read_text(encoding="utf-8")
+    cards = re.findall(r"^### (HLQ-\d{3})：(.+)$", text, flags=re.MULTILINE)
+
+    assert len(cards) == 7
+
+    required_fields = [
+        "- 材料层：",
+        "- 候选短摘：",
+        "- 对应透镜：",
+        "- 推荐标签：",
+        "- 版本状态：candidate-from-ctext",
+        "- 版权边界：",
+        "- 入包判断：",
+    ]
+    excerpts = re.findall(r"- 候选短摘：`([^`]+)`", text)
+
+    assert len(excerpts) == 7
+    assert all(len(excerpt) <= 12 for excerpt in excerpts)
+
+    sections = re.split(r"^### ", text, flags=re.MULTILINE)[1:]
+    for section in sections:
+        if not section.startswith("HLQ-"):
             continue
         for field in required_fields:
             assert field in section

@@ -43,6 +43,7 @@ flowchart TB
     A2000 --> A2MAT003["YT-A2-MAT-003<br/>文本与后世评价"]
     A2000 --> A2MAT004["YT-A2-MAT-004<br/>现代研究书目卡"]
     A2000 --> A2MAT005["YT-A2-MAT-005<br/>黄老思想史补强"]
+    A2MAT005 --> A2MAT005A["YT-A2-MAT-005A<br/>四经短摘核验"]
     A002 --> V3017A["YT-V3-017A<br/>冻结主体验路径"]
     V3017A --> V3017B["YT-V3-017B<br/>定义体验业务对象"]
     V3017B --> V3017C["YT-V3-017C<br/>冻结历史边界规则"]
@@ -1013,3 +1014,18 @@ A1 首批允许任务表：
 - 测试命令：`git diff --check -- docs/YANTIE_A2_MATERIAL_GAP.md docs/YANTIE_TASK_BREAKDOWN.md docs/YANTIE_A2_HUANG_LAO_MATERIAL_PLAN.md test/test_yantie_material_docs.py`；如新增检查脚本，再执行对应最小测试。
 - 回滚方式：删除新增黄老材料计划文档，移除本任务对材料缺口、依赖图和测试的更新；不影响 evidence pack、UI 或运行代码。
 - 文档更新：更新 `docs/YANTIE_A2_MATERIAL_GAP.md` 的思想史缺口和优先级状态。
+
+### YT-A2-MAT-005A：《黄帝四经》版本、来源、版权和候选短摘核验
+
+- 任务 ID：`YT-A2-MAT-005A`
+- 价值：`YT-A2-MAT-005` 已确认《黄帝四经》是汉初黄老思想补强的第一优先级；在正式入 evidence pack 之前，必须先核验版本、来源层、版权边界和候选短摘，避免把现代整理本或未经定位的长段文本误作证据。
+- 依赖：`YT-A2-MAT-005`、`docs/YANTIE_A2_HUANG_LAO_MATERIAL_PLAN.md`、可公开核验的《黄帝四经》文本入口、马王堆出土信息、现代研究书目卡边界。
+- 允许修改范围：`docs/YANTIE_A2_HUANGDI_SIJING_VERIFICATION.md`、`docs/YANTIE_A2_HUANG_LAO_MATERIAL_PLAN.md`、`docs/YANTIE_A2_MATERIAL_GAP.md`、`docs/YANTIE_TASK_BREAKDOWN.md`、与材料文档校验直接相关的轻量测试。
+- 禁止修改范围：UI、API、公共 Schema、evidence pack 正式材料、迁移、根配置、运行态 `library/` 数据、现代整理本全文、现代译文、长段帛书释文、图版或摹本。
+- 输入：《黄帝四经》候选篇章、公开文本入口、出土实物信息、现代研究书目、现有 HLS-LENS 候选透镜。
+- 输出：《黄帝四经》核验文档，包含来源层、公开入口、候选短摘、版本状态、版权边界、入包判断和 `YT-A2-MAT-005B` 入包条件。
+- 接口：本任务只输出候选材料清单；候选短摘不得进入 evidence pack；正式入包必须由 `YT-A2-MAT-005B` 执行，并同步更新双份 evidence pack 和 pack 测试。
+- 验收标准：至少列出 5 条候选短摘；每条短摘都包含材料层、对应透镜、推荐标签、版本状态、版权边界和入包判断；文档明确不支撑 `original_fact` Claim；不出现长段摘录或引用块。
+- 测试命令：`git diff --check -- docs/YANTIE_A2_HUANGDI_SIJING_VERIFICATION.md docs/YANTIE_A2_HUANG_LAO_MATERIAL_PLAN.md docs/YANTIE_A2_MATERIAL_GAP.md docs/YANTIE_TASK_BREAKDOWN.md test/test_yantie_material_docs.py`；`python -m pytest test/test_yantie_material_docs.py`；必要时执行 `python -m pytest test -k yantie`。
+- 回滚方式：删除新增核验文档，移除本任务对黄老计划、材料缺口、任务拆分和测试的更新；不影响 evidence pack、UI 或运行代码。
+- 文档更新：更新 `docs/YANTIE_A2_HUANG_LAO_MATERIAL_PLAN.md` 和 `docs/YANTIE_A2_MATERIAL_GAP.md` 的 `YT-A2-MAT-005A` 状态。
