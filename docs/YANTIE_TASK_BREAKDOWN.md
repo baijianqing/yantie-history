@@ -58,6 +58,7 @@ flowchart TB
     A2MAT007 --> A2MAT008["YT-A2-MAT-008<br/>酒榷制度背景补强"]
     A2MAT008 --> A2MAT009["YT-A2-MAT-009<br/>贤良文学身份归并"]
     A2MAT009 --> A2MAT010["YT-A2-MAT-010<br/>材料计数校验"]
+    A2MAT010 --> A2MAT011["YT-A2-MAT-011<br/>黄老分组状态收口"]
     A002 --> V3017A["YT-V3-017A<br/>冻结主体验路径"]
     V3017A --> V3017B["YT-V3-017B<br/>定义体验业务对象"]
     V3017B --> V3017C["YT-V3-017C<br/>冻结历史边界规则"]
@@ -1253,3 +1254,18 @@ A1 首批允许任务表：
 - 测试命令：`git diff --check -- test/test_yantie_material_docs.py docs/YANTIE_TASK_BREAKDOWN.md docs/YANTIE_A2_MATERIAL_GAP.md`；`python -m pytest test/test_yantie_material_docs.py`；必要时执行 `python -m pytest test -k yantie` 和 `python -m pytest test`。
 - 回滚方式：移除计数一致性测试、任务图节点、任务卡和材料状态文档更新。
 - 文档更新：更新本任务卡和 A2 材料门禁文档，说明材料状态计数已由测试保护。
+
+### YT-A2-MAT-011：黄老透镜分组状态收口
+
+- 任务 ID：`YT-A2-MAT-011`
+- 价值：`YT-A2-MAT-005C` 已在退朝后思想透镜中提供黄老分组，并已有 UI 测试覆盖，但 A2 材料门禁文档仍未把 005C 列入已完成状态。该遗漏会让 A2 思想史材料进度看起来少一环。本任务只补齐状态文档与材料文档测试，不重新修改 UI。
+- 依赖：`YT-A2-MAT-005C`、`YT-A2-MAT-010`、退朝后思想透镜 UI 测试、A2 材料门禁文档。
+- 允许修改范围：`docs/YANTIE_A2_MATERIAL_GAP.md`、`docs/YANTIE_TASK_BREAKDOWN.md`、`test/test_yantie_material_docs.py`。
+- 禁止修改范围：evidence pack、UI、API、公共 Schema、搜索代码、运行态 `library/` 数据、迁移、根配置、现代研究全文、新增史料。
+- 输入：现有 `philosophyLensGroups` 黄老分组、`test/test_yantie_ui.py` 中的退朝后思想透镜分组测试、A2 材料门禁文档。
+- 输出：A2 材料门禁文档中的 005C 完成状态、011 收口任务卡和材料文档测试。
+- 接口：本任务只校准文档状态；不新增 `EvidenceUnit`、不修改 `philosophyLensGroups`、不改变退朝后入口行为。
+- 验收标准：A2 材料门禁文档列出 `YT-A2-MAT-005C`；文档说明黄老分组只在退朝后开放，且不进入首次主体验；材料文档测试覆盖 005C 和 011 的状态行；不修改 evidence pack 或 UI。
+- 测试命令：`git diff --check -- docs/YANTIE_A2_MATERIAL_GAP.md docs/YANTIE_TASK_BREAKDOWN.md test/test_yantie_material_docs.py`；`python -m pytest test/test_yantie_material_docs.py`；必要时执行 `python -m pytest test -k yantie` 和 `python -m pytest test`。
+- 回滚方式：移除 011 任务图节点、任务卡、A2 材料门禁文档中的 005C/011 状态补登和材料文档测试断言。
+- 文档更新：更新本任务卡和 A2 材料门禁文档，说明黄老透镜分组已完成状态收口。

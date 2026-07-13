@@ -37,6 +37,7 @@ def test_yantie_material_gap_tracks_post_court_ui_status():
     text = MATERIAL_GAP.read_text(encoding="utf-8")
 
     for task_id in [
+        "YT-A2-MAT-005C",
         "YT-A2-MAT-006D",
         "YT-A2-MAT-006E",
         "YT-A2-MAT-006F",
@@ -45,16 +46,20 @@ def test_yantie_material_gap_tracks_post_court_ui_status():
         "YT-A2-MAT-008",
         "YT-A2-MAT-009",
         "YT-A2-MAT-010",
+        "YT-A2-MAT-011",
     ]:
         assert task_id in text
 
+    assert "退朝后黄老思想透镜分组" in text
     assert "退朝后 `classics_context` 思想透镜分组" in text
     assert "退朝后材料导览入口" in text
     assert "`material-guide` Playwright 验收场景" in text
+    assert "`YT-A2-MAT-005C` | 退朝后思想透镜分组入口" in text
     assert "`YT-A2-MAT-006G` | A2 材料状态文档收口" in text
     assert "`YT-A2-MAT-008` | 酒榷制度背景补强" in text
     assert "`YT-A2-MAT-009` | 贤良文学身份 Actor 证据归并" in text
     assert "`YT-A2-MAT-010` | A2 材料状态计数一致性测试" in text
+    assert "`YT-A2-MAT-011` | 黄老透镜分组状态收口" in text
     assert "《汉书·武帝纪》“初榷酒酤”" in text
     assert "贤良文学身份材料已归并到 `actor_literati`" in text
     assert "酒榷细节仍需后续任务补足" not in text
