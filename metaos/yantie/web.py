@@ -4672,6 +4672,36 @@ YANTIE_HTML = """<!doctype html>
             "label": "至静者圣",
             "family": "黄老",
             "note": "以静与节制观察权力何时应当停手。"
+      },
+      "ev:src_hanshu_dong_zhongshu:zhuan:school_officials:a2d60001": {
+            "label": "学校之官",
+            "family": "经学官学",
+            "note": "从官学与举贤制度看经学如何进入国家治理语境。"
+      },
+      "ev:src_hanshu_wudi:zan:six_classics:a2d60002": {
+            "label": "表章六经",
+            "family": "武帝文治",
+            "note": "把武帝财政国家遗产放回六经正当性语言中理解。"
+      },
+      "ev:src_hanshu_rulin:zhuan:doctor_disciples:a2d60003": {
+            "label": "博士弟子",
+            "family": "经学官学",
+            "note": "理解贤良文学为何不只是读书人，而处在官学制度扩展之后。"
+      },
+      "ev:src_chunqiu_fanlu:jiyi:virtue_over_punishment:a2d60004": {
+            "label": "德刑次序",
+            "family": "德刑",
+            "note": "从德与刑的次序看制度效率如何接受德义检验。"
+      },
+      "ev:src_chunqiu_fanlu:renfutianshu:heaven_human_correspondence:a2d60005": {
+            "label": "天人相副",
+            "family": "天人",
+            "note": "把政治责任放入天人感应和秩序想象中理解。"
+      },
+      "ev:src_chunqiu_fanlu:sandai:mandate_legitimacy:a2d60006": {
+            "label": "王者受命",
+            "family": "王道正当性",
+            "note": "用王道与受命语言理解制度为什么需要政治正当性。"
       }
 };
 
@@ -4845,6 +4875,20 @@ YANTIE_HTML = """<!doctype html>
           "ev:src_xunzi_wangzhi:wangzhi:market_tax_light:aa220008",
           "ev:src_liji_wangzhi:wangzhi:nine_year_storage:aa220016",
           "ev:src_huainanzi_zhushu:zhushu:law_as_measure:aa220017"
+        ]
+      },
+      {
+        "id": "classics_context",
+        "label": "经学语境",
+        "summary": "从官学、六经、德刑、天人和王道正当性看武帝以后政策争论的语言环境。",
+        "boundary": "思想透镜，不是会议事实；《汉书》与《春秋繁露》只在退朝后帮助理解经学语境，不替会议人物补写引文。",
+        "evidenceIds": [
+          "ev:src_hanshu_dong_zhongshu:zhuan:school_officials:a2d60001",
+          "ev:src_hanshu_wudi:zan:six_classics:a2d60002",
+          "ev:src_hanshu_rulin:zhuan:doctor_disciples:a2d60003",
+          "ev:src_chunqiu_fanlu:jiyi:virtue_over_punishment:a2d60004",
+          "ev:src_chunqiu_fanlu:renfutianshu:heaven_human_correspondence:a2d60005",
+          "ev:src_chunqiu_fanlu:sandai:mandate_legitimacy:a2d60006"
         ]
       }
     ];
@@ -6207,7 +6251,7 @@ YANTIE_HTML = """<!doctype html>
       if (details) details.open = true;
       hidePostCourtExplorationPanels("philosophy");
       renderPhilosophyLensPanel("confucian");
-      document.getElementById("historyBoundary").textContent = "思想透镜是解释视角，不是会议事实；黄老、儒家、法家和制度国家只在退朝后开放。";
+      document.getElementById("historyBoundary").textContent = "思想透镜是解释视角，不是会议事实；经学、黄老、儒家、法家和制度国家只在退朝后开放。";
       pulseSound("evidence");
     }
 

@@ -333,8 +333,11 @@ class YantieWebUiTests(unittest.TestCase):
         groups = json.loads(group_match.group(1))
         groups_by_id = {group["id"]: group for group in groups}
 
-        self.assertEqual(set(groups_by_id), {"confucian", "legalist", "huang_lao", "institutional_state"})
-        self.assertEqual([group["label"] for group in groups], ["儒家", "法家", "黄老", "制度国家"])
+        self.assertEqual(
+            set(groups_by_id),
+            {"confucian", "legalist", "huang_lao", "institutional_state", "classics_context"},
+        )
+        self.assertEqual([group["label"] for group in groups], ["儒家", "法家", "黄老", "制度国家", "经学语境"])
         self.assertEqual(
             groups_by_id["huang_lao"]["evidenceIds"],
             [
@@ -344,6 +347,17 @@ class YantieWebUiTests(unittest.TestCase):
                 "ev:src_huangdi_sijing:shiliujing:do_not_seize_people_time:a2d50004",
                 "ev:src_huangdi_sijing:cheng:name_reality_alignment:a2d50005",
                 "ev:src_huangdi_sijing:shiliujing:utmost_stillness_sage:a2d50006",
+            ],
+        )
+        self.assertEqual(
+            groups_by_id["classics_context"]["evidenceIds"],
+            [
+                "ev:src_hanshu_dong_zhongshu:zhuan:school_officials:a2d60001",
+                "ev:src_hanshu_wudi:zan:six_classics:a2d60002",
+                "ev:src_hanshu_rulin:zhuan:doctor_disciples:a2d60003",
+                "ev:src_chunqiu_fanlu:jiyi:virtue_over_punishment:a2d60004",
+                "ev:src_chunqiu_fanlu:renfutianshu:heaven_human_correspondence:a2d60005",
+                "ev:src_chunqiu_fanlu:sandai:mandate_legitimacy:a2d60006",
             ],
         )
         for group in groups:
@@ -358,7 +372,8 @@ class YantieWebUiTests(unittest.TestCase):
         self.assertIn("data-lens-evidence-id", html)
         self.assertIn('if (action === "philosophy-lens")', html)
         self.assertIn("openPhilosophyLensExplorer()", html)
-        self.assertIn("黄老、儒家、法家和制度国家只在退朝后开放", html)
+        self.assertIn("经学、黄老、儒家、法家和制度国家只在退朝后开放", html)
+        self.assertIn("ev:src_chunqiu_fanlu:jiyi:virtue_over_punishment:a2d60004", html)
 
     def test_yantie_runtime_external_echo_mock_path_is_post_court_only(self) -> None:
         pack = load_default_evidence_pack()
@@ -553,7 +568,7 @@ class YantieWebUiTests(unittest.TestCase):
             if "philosophy_lens" in evidence["value_tags"]
         }
 
-        self.assertGreaterEqual(len(lens_meta), 24)
+        self.assertGreaterEqual(len(lens_meta), 30)
         for chapter in chapter_map:
             self.assertTrue(chapter["philosophyLens"], chapter["title"])
             for evidence_id in chapter["philosophyLens"]:
