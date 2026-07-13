@@ -114,6 +114,7 @@ def test_yantie_e2e_acceptance_runner_covers_delivery_gate() -> None:
         "power-silence",
         "retirement-dossier",
         "post-court-explorer",
+        "material-guide",
     ]:
         assert f'"{scenario}"' in script
 
@@ -124,4 +125,9 @@ def test_yantie_e2e_acceptance_runner_covers_delivery_gate() -> None:
     assert '--screenshot-dir <path>' in script
     assert "dossier overlaps debate HUD" in script
     assert "post-court details not expanded" in script
+    assert "pageScenarioFor(scenario)" in script
+    assert '[data-post-court-action="material-guide"]' in script
+    assert "#materialGuidePanel" in script
+    assert "material guide boundary missing" in script
+    assert "material guide has no cards" in script
     assert 'scenarioId === "power-silence"' in script

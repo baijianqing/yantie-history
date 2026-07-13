@@ -18,6 +18,7 @@ const scenarios = [
   "power-silence",
   "retirement-dossier",
   "post-court-explorer",
+  "material-guide",
 ];
 
 const viewports = [
@@ -144,22 +145,42 @@ function screenshotPath(options, viewport, scenario) {
   return path.join(options.screenshotDir, `${viewport.name}-${scenario}.png`);
 }
 
+function pageScenarioFor(scenario) {
+  if (scenario === "material-guide") return "post-court-explorer";
+  return scenario;
+}
+
 async function inspectScenario(page, scenario, viewport) {
-  await page.goto(`${page.baseAcceptanceUrl}?acceptance=${scenario}`, { waitUntil: "load" });
+  const pageScenario = pageScenarioFor(scenario);
+  await page.goto(`${page.baseAcceptanceUrl}?acceptance=${pageScenario}`, { waitUntil: "load" });
   await page.waitForFunction(
     scenarioId => document.querySelector(".stage")?.dataset.acceptanceScenario === scenarioId,
-    scenario,
+    pageScenario,
     { timeout: 10000 },
   );
-  if (scenario === "retirement-dossier" || scenario === "post-court-explorer") {
+  if (scenario === "retirement-dossier" || scenario === "post-court-explorer" || scenario === "material-guide") {
     await page.waitForFunction(
       () => Number(window.getComputedStyle(document.querySelector(".judgment-form")).opacity || "0") > 0.98,
       null,
       { timeout: 10000 },
     );
   }
+  if (scenario === "material-guide") {
+    await page.locator('[data-post-court-action="material-guide"]').click();
+    await page.waitForFunction(
+      () => {
+        const panel = document.querySelector("#materialGuidePanel");
+        if (!panel || panel.hidden) return false;
+        const style = window.getComputedStyle(panel);
+        const rect = panel.getBoundingClientRect();
+        return style.display !== "none" && style.visibility !== "hidden" && rect.width > 0 && rect.height > 0;
+      },
+      null,
+      { timeout: 10000 },
+    );
+  }
 
-  return page.evaluate(({ scenario: scenarioId, viewport: viewportSpec }) => {
+  return page.evaluate(({ scenario: scenarioId, pageScenario: pageScenarioId, viewport: viewportSpec }) => {
     function metrics(selector) {
       const node = document.querySelector(selector);
       if (!node) return { exists: false, visible: false, rect: null };
@@ -194,10 +215,13 @@ async function inspectScenario(page, scenario, viewport) {
       window.getComputedStyle(document.querySelector("#judgmentSvg") || document.body).opacity || "1",
     );
     const postCourt = metrics("#postCourtExplorer");
+    const materialGuide = metrics("#materialGuidePanel");
     const details = document.querySelector("#postCourtExplorer details");
+    const materialGuidePanel = document.querySelector("#materialGuidePanel");
+    const materialCards = document.querySelectorAll("[data-material-guide-id]");
     const failures = [];
 
-    if (stage?.dataset.acceptanceScenario !== scenarioId) failures.push("wrong acceptance scenario");
+    if (stage?.dataset.acceptanceScenario !== pageScenarioId) failures.push("wrong acceptance scenario");
     if (!(document.querySelector("#sceneTitle")?.textContent || "").trim()) failures.push("empty scene title");
     if (!advance.visible) failures.push("primary action hidden");
 
@@ -217,9 +241,17 @@ async function inspectScenario(page, scenario, viewport) {
       }
     }
 
-    if (scenarioId === "post-court-explorer") {
+    if (scenarioId === "post-court-explorer" || scenarioId === "material-guide") {
       if (!postCourt.visible) failures.push("post-court explorer hidden");
       if (!details?.open) failures.push("post-court details not expanded");
+    }
+
+    if (scenarioId === "material-guide") {
+      if (!materialGuide.visible) failures.push("material guide hidden");
+      if (materialGuidePanel?.dataset.materialBoundary !== "post_court_only") {
+        failures.push("material guide boundary missing");
+      }
+      if (materialCards.length < 1) failures.push("material guide has no cards");
     }
 
     return {
@@ -230,10 +262,11 @@ async function inspectScenario(page, scenario, viewport) {
       evidenceOpen: document.querySelector("#evidenceRibbon")?.classList.contains("is-open") || false,
       dossierVisible: dossier.visible,
       postCourtVisible: postCourt.visible,
+      materialGuideVisible: materialGuide.visible,
       manualReview: scenarioId === "power-silence",
       failures,
     };
-  }, { scenario, viewport });
+  }, { scenario, pageScenario, viewport });
 }
 
 async function run() {

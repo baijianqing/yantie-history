@@ -52,6 +52,7 @@ flowchart TB
     A2MAT006B --> A2MAT006C["YT-A2-MAT-006C<br/>经学透镜入包"]
     A2MAT006C --> A2MAT006D["YT-A2-MAT-006D<br/>经学透镜分组"]
     A2MAT006D --> A2MAT006E["YT-A2-MAT-006E<br/>退朝材料导览"]
+    A2MAT006E --> A2MAT006F["YT-A2-MAT-006F<br/>材料导览验收"]
     A002 --> V3017A["YT-V3-017A<br/>冻结主体验路径"]
     V3017A --> V3017B["YT-V3-017B<br/>定义体验业务对象"]
     V3017B --> V3017C["YT-V3-017C<br/>冻结历史边界规则"]
@@ -1157,3 +1158,18 @@ A1 首批允许任务表：
 - 测试命令：`git diff --check -- metaos/yantie/web.py docs/yantie/index.html test/test_yantie_ui.py docs/YANTIE_TASK_BREAKDOWN.md`；`python -m pytest test/test_yantie_ui.py`；必要时执行 `python -m pytest test -k yantie` 和 `python -m pytest test`。
 - 回滚方式：移除 `materialGuideEntries`、材料导览入口、材料导览面板、相关事件处理、UI 测试和本任务卡，恢复 006E 前退朝后探索入口。
 - 文档更新：本任务卡即文档交付；A2 材料状态文档后续可另开文档收口任务同步状态。
+
+### YT-A2-MAT-006F：材料导览验收场景覆盖
+
+- 任务 ID：`YT-A2-MAT-006F`
+- 价值：`YT-A2-MAT-006E` 已新增退朝后材料导览，但此前 Playwright 验收只覆盖退朝后探索容器是否展开，不能证明材料导览入口、边界文案和卡片真实可见。本任务把材料导览纳入静态验收矩阵。
+- 依赖：`YT-A2-MAT-006E`、`scripts/check-yantie-acceptance.mjs`、现有 acceptance query 场景、UI/E2E 测试。
+- 允许修改范围：`scripts/check-yantie-acceptance.mjs`、`test/test_yantie_ui.py`、`test/test_yantie_e2e.py`、`docs/YANTIE_TASK_BREAKDOWN.md`。
+- 禁止修改范围：evidence pack、UI 业务行为、API、公共 Schema、搜索逻辑、迁移、根配置、运行态 `library/` 数据、外部当代回声接口。
+- 输入：`material-guide` 退朝后入口、`materialGuidePanel`、`materialGuideEntries`、现有 Playwright 验收场景。
+- 输出：`material-guide` acceptance runner 场景、材料导览可见性检查、测试覆盖和本任务卡。
+- 接口：验收 runner 通过 `?acceptance=post-court-explorer` 进入退朝后状态，再触发 `[data-post-court-action="material-guide"]`；必须检查 `#materialGuidePanel` 可见、`data-material-boundary="post_court_only"`、至少一个 `data-material-guide-id` 卡片存在，且 `#postCourtExplorer details` 已展开。
+- 验收标准：Playwright runner 总检查数从 27 增至 30；`material-guide` 覆盖 desktop、mobile、reduced-motion；UI/E2E 测试声明该场景；不改变用户主体验和证据包。
+- 测试命令：`git diff --check -- scripts/check-yantie-acceptance.mjs test/test_yantie_ui.py test/test_yantie_e2e.py docs/YANTIE_TASK_BREAKDOWN.md`；`python -m pytest test/test_yantie_ui.py test/test_yantie_e2e.py`；`node scripts/check-yantie-acceptance.mjs`；必要时执行 `python -m pytest test -k yantie` 和 `python -m pytest test`。
+- 回滚方式：移除 `material-guide` runner 场景、材料导览检查、测试断言和任务卡，恢复 006F 前验收矩阵。
+- 文档更新：本任务卡即文档交付。

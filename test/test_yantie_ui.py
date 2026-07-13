@@ -508,13 +508,19 @@ class YantieWebUiTests(unittest.TestCase):
         self.assertIn("const scenarios = [", script)
         self.assertIn("const viewports = [", script)
         self.assertIn("inspectScenario(page, scenario, viewport)", script)
+        self.assertIn("function pageScenarioFor(scenario)", script)
+        self.assertIn('if (scenario === "material-guide") return "post-court-explorer"', script)
         self.assertIn("page.waitForFunction", script)
         self.assertIn('scenario === "retirement-dossier" || scenario === "post-court-explorer"', script)
         self.assertIn('Number(window.getComputedStyle(document.querySelector(".judgment-form")).opacity', script)
+        self.assertIn('[data-post-court-action="material-guide"]', script)
+        self.assertIn("#materialGuidePanel", script)
         self.assertIn("reducedMotion: \"reduce\"", script)
         self.assertIn("dossier overlaps debate HUD", script)
         self.assertIn("judgment backdrop too prominent", script)
         self.assertIn("post-court details not expanded", script)
+        self.assertIn("material guide boundary missing", script)
+        self.assertIn("material guide has no cards", script)
         self.assertIn("Manual review recommended", script)
         for scenario in [
             "opening-map",
@@ -526,6 +532,7 @@ class YantieWebUiTests(unittest.TestCase):
             "power-silence",
             "retirement-dossier",
             "post-court-explorer",
+            "material-guide",
         ]:
             self.assertIn(f'"{scenario}"', script)
 
