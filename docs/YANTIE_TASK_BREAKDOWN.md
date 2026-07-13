@@ -51,6 +51,7 @@ flowchart TB
     A2MAT006A --> A2MAT006B["YT-A2-MAT-006B<br/>繁露短摘核验"]
     A2MAT006B --> A2MAT006C["YT-A2-MAT-006C<br/>经学透镜入包"]
     A2MAT006C --> A2MAT006D["YT-A2-MAT-006D<br/>经学透镜分组"]
+    A2MAT006D --> A2MAT006E["YT-A2-MAT-006E<br/>退朝材料导览"]
     A002 --> V3017A["YT-V3-017A<br/>冻结主体验路径"]
     V3017A --> V3017B["YT-V3-017B<br/>定义体验业务对象"]
     V3017B --> V3017C["YT-V3-017C<br/>冻结历史边界规则"]
@@ -1141,3 +1142,18 @@ A1 首批允许任务表：
 - 测试命令：`git diff --check -- metaos/yantie/web.py docs/yantie/index.html test/test_yantie_ui.py docs/YANTIE_TASK_BREAKDOWN.md`；`python -m pytest test/test_yantie_ui.py`；必要时执行 `python -m pytest test -k yantie` 和 `python -m pytest test`。
 - 回滚方式：移除 `classics_context` 分组、6 条 lens meta、边界文案、UI 测试和任务卡，恢复 006D 前的思想透镜面板。
 - 文档更新：本任务卡即文档交付；材料状态已由 006C 冻结，后续如需主线轻提示另开任务。
+
+### YT-A2-MAT-006E：退朝后 A2 材料导览入口
+
+- 任务 ID：`YT-A2-MAT-006E`
+- 价值：A2 已补入会议纪事、制度背景、文本与后世评价、黄老、经学语境和现代研究书目卡；用户退朝后需要一个材料分层导览，知道哪些是历史证据、哪些是思想透镜、哪些只是延伸阅读，而不是在多个入口之间迷路。
+- 依赖：`YT-A2-MAT-001` 至 `YT-A2-MAT-006D`、现有退朝后深度探索入口、`postCourtExplorer`、UI 测试。
+- 允许修改范围：`metaos/yantie/web.py`、`docs/yantie/index.html`、`test/test_yantie_ui.py`、`docs/YANTIE_TASK_BREAKDOWN.md`。
+- 禁止修改范围：evidence pack、API、公共 Schema、搜索逻辑、后端运行时代码、迁移、根配置、运行态 `library/` 数据、现代研究全文、外部当代回声接口。
+- 输入：A2 已完成材料状态、现有退朝后深度探索面板、材料边界规则。
+- 输出：`materialGuideEntries` 前端只读配置、退朝后“材料导览”入口、材料导览面板、边界提示、UI 测试和本任务卡。
+- 接口：材料导览仅在退朝后 `postCourtExplorer` 中开放；它只显示材料层级、状态、默认入口和边界，不打开新证据包写入路径，不修改 `RetirementDossier`，不把思想透镜或现代研究变成会议事实。
+- 验收标准：退朝后深度探索包含 `material-guide` 入口；材料导览列出会议纪事、制度背景、文本与后世评价、黄老思想、经学语境、现代研究六类；面板标明 `material_boundary=post_court_only` 与 `writes_to_evidence_pack=false`；首次主体验不默认展开材料导览。
+- 测试命令：`git diff --check -- metaos/yantie/web.py docs/yantie/index.html test/test_yantie_ui.py docs/YANTIE_TASK_BREAKDOWN.md`；`python -m pytest test/test_yantie_ui.py`；必要时执行 `python -m pytest test -k yantie` 和 `python -m pytest test`。
+- 回滚方式：移除 `materialGuideEntries`、材料导览入口、材料导览面板、相关事件处理、UI 测试和本任务卡，恢复 006E 前退朝后探索入口。
+- 文档更新：本任务卡即文档交付；A2 材料状态文档后续可另开文档收口任务同步状态。

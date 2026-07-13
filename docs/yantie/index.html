@@ -1556,6 +1556,7 @@
 
     .post-court-entry[data-explore-type="historical_evidence"] { border-color: rgba(243,196,109,0.52); }
     .post-court-entry[data-explore-type="philosophy_lens"] { border-color: rgba(104,166,188,0.56); }
+    .post-court-entry[data-explore-type="material_guide"] { border-color: rgba(183,205,133,0.56); }
     .post-court-entry[data-explore-type="power_relation"] { border-color: rgba(154,36,28,0.58); }
     .post-court-entry[data-explore-type="user_judgment"] { border-color: rgba(255,244,214,0.34); }
     .post-court-entry[data-explore-type="external_echo"] { border-style: dashed; }
@@ -1630,6 +1631,65 @@
     .philosophy-lens-panel > strong {
       color: #d8f4ff;
       font-size: 13px;
+    }
+
+    .material-guide-panel {
+      display: grid;
+      gap: 10px;
+      margin: 0 10px 10px;
+      padding: 12px;
+      border: 1px solid rgba(183,205,133,0.42);
+      border-radius: 8px;
+      background: rgba(9,13,19,0.5);
+      color: rgba(255,244,214,0.74);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .material-guide-panel[hidden] {
+      display: none;
+    }
+
+    .material-guide-panel > strong {
+      color: #e6f5b8;
+      font-size: 13px;
+    }
+
+    .material-guide-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .material-guide-card {
+      display: grid;
+      gap: 6px;
+      padding: 10px;
+      border: 1px solid rgba(183,205,133,0.26);
+      border-radius: 8px;
+      background: rgba(255,244,214,0.05);
+    }
+
+    .material-guide-card h4,
+    .material-guide-card p {
+      margin: 0;
+    }
+
+    .material-guide-card h4 {
+      color: #fff4d6;
+      font-size: 13px;
+    }
+
+    .material-guide-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      color: rgba(255,244,214,0.58);
+      font-size: 11px;
+    }
+
+    .material-guide-card small {
+      color: rgba(255,244,214,0.52);
     }
 
     .lens-group-tabs,
@@ -2103,6 +2163,15 @@
         overflow: auto;
       }
 
+      .material-guide-panel {
+        max-height: 220px;
+        overflow: auto;
+      }
+
+      .material-guide-grid {
+        grid-template-columns: 1fr;
+      }
+
       .post-court-entry {
         min-height: auto;
       }
@@ -2210,6 +2279,10 @@
                     <strong>换个角度看</strong>
                     <span>查看儒法、义利、治道等解释透镜。</span>
                   </button>
+                  <button class="post-court-entry" type="button" data-post-court-action="material-guide" data-explore-type="material_guide">
+                    <strong>材料导览</strong>
+                    <span>查看 A2 补强材料的层级、入口和边界。</span>
+                  </button>
                   <button class="post-court-entry" type="button" data-post-court-action="power-network" data-explore-type="power_relation">
                     <strong>朝堂权力结构</strong>
                     <span>回到霍光沉默与权力边界一幕。</span>
@@ -2228,6 +2301,9 @@
                 </div>
                 <div id="philosophyLensPanel" class="philosophy-lens-panel" data-lens-boundary="philosophy_lens" hidden>
                   思想透镜只作为退朝后的解释视角，不是会议事实证据。
+                </div>
+                <div id="materialGuidePanel" class="material-guide-panel" data-material-boundary="post_court_only" hidden>
+                  A2 材料导览只在退朝后开放，不进入首次主体验。
                 </div>
               </details>
             </div>
@@ -4753,6 +4829,57 @@
       }
 ];
 
+    const materialGuideEntries = [
+      {
+        "id": "chronicle",
+        "label": "会议纪事",
+        "source": "《资治通鉴》卷023",
+        "status": "已入包 4 条",
+        "defaultEntry": "退朝后全文争点；可候选为主线关键证据",
+        "boundary": "后出编年史，用于校验会议轮廓，不等同会议原始记录。"
+      },
+      {
+        "id": "institutional_background",
+        "label": "制度背景",
+        "source": "《汉书·食货志》《史记·平准书》",
+        "status": "已入包 20 条",
+        "defaultEntry": "退朝后深度探索；少量可作为主线轻提示",
+        "boundary": "解释盐铁、均输、平准、算缗和边费，不把压力值伪装成真实统计。"
+      },
+      {
+        "id": "textual_reception",
+        "label": "文本与后世评价",
+        "source": "《四库全书总目提要》",
+        "status": "已入包 8 条",
+        "defaultEntry": "退朝后深度探索",
+        "boundary": "说明《盐铁论》的文本整理和目录学评价，不改写会议事实。"
+      },
+      {
+        "id": "huang_lao_lens",
+        "label": "黄老思想",
+        "source": "《黄帝四经》",
+        "status": "已入包 6 条",
+        "defaultEntry": "思想透镜：黄老",
+        "boundary": "只作汉初治理语言的解释透镜，不声称会议人物直接引用。"
+      },
+      {
+        "id": "classics_context",
+        "label": "经学语境",
+        "source": "《汉书》《春秋繁露》",
+        "status": "已入包 6 条",
+        "defaultEntry": "思想透镜：经学语境",
+        "boundary": "只解释武帝以后经学正当性语言，不作为会议现场事实。"
+      },
+      {
+        "id": "modern_research",
+        "label": "现代研究",
+        "source": "书目卡与观点定位",
+        "status": "已建 7 张书目卡",
+        "defaultEntry": "退朝后延伸阅读",
+        "boundary": "只交付原创摘要、链接和版权边界，不交付论文或专著全文。"
+      }
+    ];
+
     const philosophyLensGroups = [
       {
         "id": "confucian",
@@ -6136,8 +6263,43 @@
     function hidePostCourtExplorationPanels(except = null) {
       const lensPanel = document.getElementById("philosophyLensPanel");
       const externalPanel = document.getElementById("externalEchoPanel");
+      const materialPanel = document.getElementById("materialGuidePanel");
       if (lensPanel && except !== "philosophy") lensPanel.hidden = true;
       if (externalPanel && except !== "external") externalPanel.hidden = true;
+      if (materialPanel && except !== "material") materialPanel.hidden = true;
+    }
+
+    function renderMaterialGuidePanel() {
+      const panel = document.getElementById("materialGuidePanel");
+      if (!panel) return;
+      panel.hidden = false;
+      panel.innerHTML = `
+        <strong>退朝后材料导览</strong>
+        <span>A2 补强材料按用途分层展示；它们不会自动进入你的退朝案牍，也不会改写会议事实。</span>
+        <div class="material-guide-grid" aria-label="A2 材料分层">
+          ${materialGuideEntries.map(entry => `
+            <section class="material-guide-card" data-material-guide-id="${escapeHtml(entry.id)}">
+              <h4>${escapeHtml(entry.label)}</h4>
+              <p>${escapeHtml(entry.source)}</p>
+              <div class="material-guide-meta">
+                <span>${escapeHtml(entry.status)}</span>
+                <span>${escapeHtml(entry.defaultEntry)}</span>
+              </div>
+              <small>${escapeHtml(entry.boundary)}</small>
+            </section>
+          `).join("")}
+        </div>
+        <small>material_boundary=post_court_only · writes_to_evidence_pack=false · can_support_claims=by_material_type</small>
+      `;
+    }
+
+    function openMaterialGuide() {
+      const details = document.querySelector("#postCourtExplorer details");
+      if (details) details.open = true;
+      hidePostCourtExplorationPanels("material");
+      renderMaterialGuidePanel();
+      document.getElementById("historyBoundary").textContent = "材料导览只在退朝后说明来源层级与进入边界；不会把解释材料变成会议事实。";
+      pulseSound("evidence");
     }
 
     function renderPhilosophyLensPanel(activeGroupId = "confucian") {
@@ -6439,6 +6601,10 @@
       }
       if (action === "philosophy-lens") {
         openPhilosophyLensExplorer();
+        return;
+      }
+      if (action === "material-guide") {
+        openMaterialGuide();
         return;
       }
       if (action === "external-echo") {

@@ -295,6 +295,7 @@ class YantieWebUiTests(unittest.TestCase):
         for action in [
             "chapter-map",
             "philosophy-lens",
+            "material-guide",
             "power-network",
             "second-perspective",
             "external-echo",
@@ -303,11 +304,17 @@ class YantieWebUiTests(unittest.TestCase):
         for explore_type in [
             "historical_evidence",
             "philosophy_lens",
+            "material_guide",
             "power_relation",
             "user_judgment",
             "external_echo",
         ]:
             self.assertIn(f'data-explore-type="{explore_type}"', html)
+        self.assertIn('id="materialGuidePanel"', html)
+        self.assertIn('data-material-boundary="post_court_only"', html)
+        self.assertIn("function renderMaterialGuidePanel", html)
+        self.assertIn("function openMaterialGuide", html)
+        self.assertIn('if (action === "material-guide")', html)
         self.assertIn('id="externalEchoPanel"', html)
         self.assertIn("function isExternalEchoEnabled()", html)
         self.assertIn("function syncExternalEchoEntry(postCourtUnlocked)", html)
@@ -321,6 +328,45 @@ class YantieWebUiTests(unittest.TestCase):
         self.assertIn("external_echo 暂不可用，不进入史证链。", html)
         self.assertIn("退朝后开放全文争点；这里只读证据与解释边界，不改写案牍。", html)
         self.assertIn("正在回看权力遮蔽一幕；这不抹除你的退朝案牍。", html)
+        self.assertIn("材料导览只在退朝后说明来源层级与进入边界", html)
+
+    def test_yantie_a2_post_court_material_guide_is_bounded(self) -> None:
+        html = self.client.get("/yantie").text
+        guide_match = re.search(
+            r"const materialGuideEntries = (\[.*?\]);\n\n    const philosophyLensGroups =",
+            html,
+            re.S,
+        )
+        self.assertIsNotNone(guide_match)
+        entries = json.loads(guide_match.group(1))
+        entries_by_id = {entry["id"]: entry for entry in entries}
+
+        self.assertEqual(
+            set(entries_by_id),
+            {
+                "chronicle",
+                "institutional_background",
+                "textual_reception",
+                "huang_lao_lens",
+                "classics_context",
+                "modern_research",
+            },
+        )
+        self.assertEqual(entries_by_id["chronicle"]["source"], "《资治通鉴》卷023")
+        self.assertEqual(entries_by_id["institutional_background"]["status"], "已入包 20 条")
+        self.assertEqual(entries_by_id["huang_lao_lens"]["defaultEntry"], "思想透镜：黄老")
+        self.assertEqual(entries_by_id["classics_context"]["defaultEntry"], "思想透镜：经学语境")
+        self.assertIn("不交付论文或专著全文", entries_by_id["modern_research"]["boundary"])
+        for entry in entries:
+            self.assertTrue(entry["label"])
+            self.assertTrue(entry["source"])
+            self.assertTrue(entry["status"])
+            self.assertTrue(entry["defaultEntry"])
+            self.assertTrue(entry["boundary"])
+
+        self.assertIn("material_boundary=post_court_only", html)
+        self.assertIn("writes_to_evidence_pack=false", html)
+        self.assertIn("can_support_claims=by_material_type", html)
 
     def test_yantie_a2_post_court_philosophy_lenses_are_grouped(self) -> None:
         html = self.client.get("/yantie").text
