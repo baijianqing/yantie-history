@@ -45,6 +45,7 @@ flowchart TB
     A2000 --> A2MAT005["YT-A2-MAT-005<br/>黄老思想史补强"]
     A2MAT005 --> A2MAT005A["YT-A2-MAT-005A<br/>四经短摘核验"]
     A2MAT005A --> A2MAT005B["YT-A2-MAT-005B<br/>黄老透镜入包"]
+    A2MAT005B --> A2MAT005C["YT-A2-MAT-005C<br/>退朝透镜分组"]
     A002 --> V3017A["YT-V3-017A<br/>冻结主体验路径"]
     V3017A --> V3017B["YT-V3-017B<br/>定义体验业务对象"]
     V3017B --> V3017C["YT-V3-017C<br/>冻结历史边界规则"]
@@ -1045,3 +1046,18 @@ A1 首批允许任务表：
 - 测试命令：`git diff --check -- metaos/yantie/data/evidence_pack.json docs/yantie/data/evidence_pack.json test/test_yantie_pack.py docs/YANTIE_A2_HUANGDI_SIJING_VERIFICATION.md docs/YANTIE_A2_HUANG_LAO_MATERIAL_PLAN.md docs/YANTIE_A2_MATERIAL_GAP.md docs/YANTIE_TASK_BREAKDOWN.md`；`python -m pytest test -k yantie_pack`；必要时执行 `python -m pytest test -k yantie`。
 - 回滚方式：移除 `src_huangdi_sijing` source、manifest、EvidenceUnit、测试和文档状态更新，恢复双份 evidence pack 到任务前状态。
 - 文档更新：更新黄老计划、核验文档和 A2 材料缺口状态。
+
+### YT-A2-MAT-005C：退朝后思想透镜分组入口
+
+- 任务 ID：`YT-A2-MAT-005C`
+- 价值：`YT-A2-MAT-005B` 已将《黄帝四经》黄老透镜写入 evidence pack，但用户退朝后仍只能通过六十篇图谱间接看见透镜。本任务将退朝后“换个角度看”整理为儒家、法家、黄老、制度国家四组入口，让新增黄老材料成为可见的解释路径，同时继续避免它进入首次主体验或冒充会议事实。
+- 依赖：`YT-A2-MAT-005B`、现有退朝后深度探索入口、`philosophyLensMeta`、证据抽屉和 UI 测试。
+- 允许修改范围：`metaos/yantie/web.py`、`docs/yantie/index.html`、`test/test_yantie_ui.py`、`docs/YANTIE_TASK_BREAKDOWN.md`。
+- 禁止修改范围：evidence pack、API、公共 Schema、搜索逻辑、后端运行时代码、迁移、根配置、运行态 `library/` 数据、外部当代回声接口。
+- 输入：现有 philosophy lens EvidenceUnit、`src_huangdi_sijing` 六条黄老透镜、退朝后深度探索交互边界。
+- 输出：退朝后思想透镜分组面板、四组 lens 配置、可打开证据抽屉的透镜按钮、UI 测试和本任务卡。
+- 接口：`philosophyLensGroups` 只读前端配置；分组入口仅在退朝后开放；点击透镜仍复用现有 `openEvidence(evidenceId)`；面板必须标明“思想透镜，不是会议事实”。
+- 验收标准：退朝后“换个角度看”不再直接打开六十篇图谱，而是显示四组透镜；黄老组包含 6 条《黄帝四经》 EvidenceUnit；每组有说明、边界提示和透镜按钮；按钮能打开现有证据抽屉；首次主体验仍不暴露完整透镜面板。
+- 测试命令：`git diff --check -- docs/yantie/index.html test/test_yantie_ui.py docs/YANTIE_TASK_BREAKDOWN.md`；`python -m pytest test/test_yantie_ui.py`；必要时执行 `python -m pytest test -k yantie`。
+- 回滚方式：移除 `philosophyLensGroups`、透镜分组面板、相关事件处理和 UI 测试，恢复“换个角度看”直接打开章节图谱的行为。
+- 文档更新：本任务卡即本轮文档交付物。

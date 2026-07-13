@@ -322,6 +322,44 @@ class YantieWebUiTests(unittest.TestCase):
         self.assertIn("退朝后开放全文争点；这里只读证据与解释边界，不改写案牍。", html)
         self.assertIn("正在回看权力遮蔽一幕；这不抹除你的退朝案牍。", html)
 
+    def test_yantie_a2_post_court_philosophy_lenses_are_grouped(self) -> None:
+        html = self.client.get("/yantie").text
+        group_match = re.search(
+            r"const philosophyLensGroups = (\[.*?\]);\n\n    const judgmentScene =",
+            html,
+            re.S,
+        )
+        self.assertIsNotNone(group_match)
+        groups = json.loads(group_match.group(1))
+        groups_by_id = {group["id"]: group for group in groups}
+
+        self.assertEqual(set(groups_by_id), {"confucian", "legalist", "huang_lao", "institutional_state"})
+        self.assertEqual([group["label"] for group in groups], ["儒家", "法家", "黄老", "制度国家"])
+        self.assertEqual(
+            groups_by_id["huang_lao"]["evidenceIds"],
+            [
+                "ev:src_huangdi_sijing:jingfa:dao_generates_law:a2d50001",
+                "ev:src_huangdi_sijing:jingfa:law_standard_rectification:a2d50002",
+                "ev:src_huangdi_sijing:shiliujing:reduce_harsh_affairs:a2d50003",
+                "ev:src_huangdi_sijing:shiliujing:do_not_seize_people_time:a2d50004",
+                "ev:src_huangdi_sijing:cheng:name_reality_alignment:a2d50005",
+                "ev:src_huangdi_sijing:shiliujing:utmost_stillness_sage:a2d50006",
+            ],
+        )
+        for group in groups:
+            self.assertIn("思想透镜，不是会议事实", group["boundary"])
+            self.assertTrue(group["summary"])
+            self.assertTrue(group["evidenceIds"])
+
+        self.assertIn('id="philosophyLensPanel"', html)
+        self.assertIn('data-lens-boundary="philosophy_lens"', html)
+        self.assertIn("function renderPhilosophyLensPanel", html)
+        self.assertIn("function openPhilosophyLensExplorer", html)
+        self.assertIn("data-lens-evidence-id", html)
+        self.assertIn('if (action === "philosophy-lens")', html)
+        self.assertIn("openPhilosophyLensExplorer()", html)
+        self.assertIn("黄老、儒家、法家和制度国家只在退朝后开放", html)
+
     def test_yantie_runtime_external_echo_mock_path_is_post_court_only(self) -> None:
         pack = load_default_evidence_pack()
         claim_count_before = len(pack.claims)

@@ -1681,6 +1681,79 @@ YANTIE_HTML = """<!doctype html>
       color: rgba(255,244,214,0.5);
     }
 
+    .philosophy-lens-panel {
+      display: grid;
+      gap: 10px;
+      margin: 0 10px 10px;
+      padding: 12px;
+      border: 1px solid rgba(104,166,188,0.42);
+      border-radius: 8px;
+      background: rgba(9,13,19,0.5);
+      color: rgba(255,244,214,0.72);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .philosophy-lens-panel[hidden] {
+      display: none;
+    }
+
+    .philosophy-lens-panel > strong {
+      color: #d8f4ff;
+      font-size: 13px;
+    }
+
+    .lens-group-tabs,
+    .lens-group-grid {
+      display: grid;
+      gap: 8px;
+    }
+
+    .lens-group-tabs {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .lens-group-tab,
+    .lens-group-card {
+      text-align: left;
+      border-color: rgba(104,166,188,0.32);
+      background: rgba(255,244,214,0.05);
+    }
+
+    .lens-group-tab {
+      min-height: 44px;
+      padding: 8px;
+      color: rgba(255,244,214,0.72);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .lens-group-tab.is-active {
+      border-color: rgba(243,196,109,0.68);
+      color: #fff4d6;
+      background: rgba(31,79,82,0.52);
+    }
+
+    .lens-group-card {
+      display: grid;
+      gap: 8px;
+      padding: 10px;
+    }
+
+    .lens-group-card h4,
+    .lens-group-card p {
+      margin: 0;
+    }
+
+    .lens-group-card h4 {
+      color: #fff4d6;
+      font-size: 14px;
+    }
+
+    .lens-group-card small {
+      color: rgba(255,244,214,0.5);
+    }
+
     .stance-trajectory-panel {
       max-height: 174px;
       margin-bottom: 10px;
@@ -2091,6 +2164,16 @@ YANTIE_HTML = """<!doctype html>
         overflow: auto;
       }
 
+      .lens-group-tabs,
+      .lens-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .philosophy-lens-panel {
+        max-height: 220px;
+        overflow: auto;
+      }
+
       .post-court-entry {
         min-height: auto;
       }
@@ -2213,6 +2296,9 @@ YANTIE_HTML = """<!doctype html>
                 </div>
                 <div id="externalEchoPanel" class="external-echo-panel" data-external-echo-status="idle" hidden>
                   external_echo 仅属于退朝后的延伸讨论，不进入史证链。
+                </div>
+                <div id="philosophyLensPanel" class="philosophy-lens-panel" data-lens-boundary="philosophy_lens" hidden>
+                  思想透镜只作为退朝后的解释视角，不是会议事实证据。
                 </div>
               </details>
             </div>
@@ -4556,6 +4642,36 @@ YANTIE_HTML = """<!doctype html>
             "label": "法为准绳",
             "family": "权力边界",
             "note": "制度也应约束权力本身。"
+      },
+      "ev:src_huangdi_sijing:jingfa:dao_generates_law:a2d50001": {
+            "label": "道生法",
+            "family": "黄老",
+            "note": "从道与法的连续关系看制度约束。"
+      },
+      "ev:src_huangdi_sijing:jingfa:law_standard_rectification:a2d50002": {
+            "label": "法度为正",
+            "family": "黄老",
+            "note": "把法度理解为校正政治秩序的尺度。"
+      },
+      "ev:src_huangdi_sijing:shiliujing:reduce_harsh_affairs:a2d50003": {
+            "label": "省苛事",
+            "family": "黄老",
+            "note": "以减省烦苛事务观察国家动员边界。"
+      },
+      "ev:src_huangdi_sijing:shiliujing:do_not_seize_people_time:a2d50004": {
+            "label": "毋夺民时",
+            "family": "黄老",
+            "note": "把农时和民力视为治理不可夺取的边界。"
+      },
+      "ev:src_huangdi_sijing:cheng:name_reality_alignment:a2d50005": {
+            "label": "名实相应",
+            "family": "黄老",
+            "note": "用名实是否相称检验制度责任。"
+      },
+      "ev:src_huangdi_sijing:shiliujing:utmost_stillness_sage:a2d50006": {
+            "label": "至静者圣",
+            "family": "黄老",
+            "note": "以静与节制观察权力何时应当停手。"
       }
 };
 
@@ -4677,6 +4793,61 @@ YANTIE_HTML = """<!doctype html>
             "summary": "文本保留辩论，也带有著述立场与后人解释。"
       }
 ];
+
+    const philosophyLensGroups = [
+      {
+        "id": "confucian",
+        "label": "儒家",
+        "summary": "从义利、民本、礼治和教化看盐铁争论的正当性边界。",
+        "boundary": "思想透镜，不是会议事实；用于解释贤良文学为何不断追问义与民生。",
+        "evidenceIds": [
+          "ev:src_lunyu_liren:liren04:yi_li_lens:aa110001",
+          "ev:src_mengzi_lianghuiwang:liang01:renyi_over_profit:aa110002",
+          "ev:src_mengzi_jinxinxia:jinxin14:people_first:aa220004",
+          "ev:src_xunzi_wangzhi:wangzhi:boat_water:aa220007",
+          "ev:src_liji_liyun:liyun:public_order:aa110010"
+        ]
+      },
+      {
+        "id": "legalist",
+        "label": "法家",
+        "summary": "从法度、变法、制度执行和国家动员看桑弘羊式理由的力量。",
+        "boundary": "思想透镜，不是会议事实；用于解释国家能力论证，不替人物补写引文。",
+        "evidenceIds": [
+          "ev:src_hanfeizi_wudu:wudu:adapt_law_to_age:aa110005",
+          "ev:src_shangjunshu_nongzhan:nongzhan:state_agriculture_war:aa110006",
+          "ev:src_hanfeizi_youdu:youdu:law_no_noble:aa220012",
+          "ev:src_hanfeizi_xianxue:xianxue:scholars_disorder_law:aa220013"
+        ]
+      },
+      {
+        "id": "huang_lao",
+        "label": "黄老",
+        "summary": "从道法、无为、名实、时令和权力节制补足汉初思想底色。",
+        "boundary": "思想透镜，不是会议事实；《黄帝四经》只在退朝后帮助理解治理语言。",
+        "evidenceIds": [
+          "ev:src_huangdi_sijing:jingfa:dao_generates_law:a2d50001",
+          "ev:src_huangdi_sijing:jingfa:law_standard_rectification:a2d50002",
+          "ev:src_huangdi_sijing:shiliujing:reduce_harsh_affairs:a2d50003",
+          "ev:src_huangdi_sijing:shiliujing:do_not_seize_people_time:a2d50004",
+          "ev:src_huangdi_sijing:cheng:name_reality_alignment:a2d50005",
+          "ev:src_huangdi_sijing:shiliujing:utmost_stillness_sage:a2d50006"
+        ]
+      },
+      {
+        "id": "institutional_state",
+        "label": "制度国家",
+        "summary": "从仓储、市场、财政储备和权力准绳理解国家能力如何被约束。",
+        "boundary": "思想透镜，不是会议事实；用于连接财政工具、市场秩序和权力边界。",
+        "evidenceIds": [
+          "ev:src_xunzi_fuguo:fuguo:jieyong_yumin:aa110003",
+          "ev:src_guanzi_mumin:mumin01:canglin_lijie:aa110004",
+          "ev:src_xunzi_wangzhi:wangzhi:market_tax_light:aa220008",
+          "ev:src_liji_wangzhi:wangzhi:nine_year_storage:aa220016",
+          "ev:src_huainanzi_zhushu:zhushu:law_as_measure:aa220017"
+        ]
+      }
+    ];
 
     const judgmentScene = {
       "key": "judgment",
@@ -4943,6 +5114,7 @@ YANTIE_HTML = """<!doctype html>
       if (postCourtExplorer) {
         postCourtExplorer.hidden = !postCourtUnlocked;
         postCourtExplorer.setAttribute("aria-hidden", postCourtExplorer.hidden ? "true" : "false");
+        if (!postCourtUnlocked) hidePostCourtExplorationPanels();
       }
       syncExternalEchoEntry(postCourtUnlocked);
     }
@@ -5988,7 +6160,59 @@ YANTIE_HTML = """<!doctype html>
       document.getElementById("chapterMapScrim").classList.remove("is-open");
     }
 
+    function hidePostCourtExplorationPanels(except = null) {
+      const lensPanel = document.getElementById("philosophyLensPanel");
+      const externalPanel = document.getElementById("externalEchoPanel");
+      if (lensPanel && except !== "philosophy") lensPanel.hidden = true;
+      if (externalPanel && except !== "external") externalPanel.hidden = true;
+    }
+
+    function renderPhilosophyLensPanel(activeGroupId = "confucian") {
+      const panel = document.getElementById("philosophyLensPanel");
+      if (!panel) return;
+      const active = philosophyLensGroups.find(group => group.id === activeGroupId) || philosophyLensGroups[0];
+      panel.hidden = false;
+      panel.dataset.activeLensGroup = active.id;
+      panel.innerHTML = `
+        <strong>退朝后思想透镜</strong>
+        <span>先选择一种思想路径，再打开对应短摘。这里所有内容都是解释视角，不是会议事实。</span>
+        <div class="lens-group-tabs" role="tablist" aria-label="思想透镜分组">
+          ${philosophyLensGroups.map(group => `
+            <button class="lens-group-tab ${group.id === active.id ? "is-active" : ""}" type="button" data-lens-group="${escapeHtml(group.id)}">
+              ${escapeHtml(group.label)}
+            </button>
+          `).join("")}
+        </div>
+        <section class="lens-group-card" data-active-lens-group="${escapeHtml(active.id)}">
+          <h4>${escapeHtml(active.label)}</h4>
+          <p>${escapeHtml(active.summary)}</p>
+          <div class="lens-grid">
+            ${active.evidenceIds.map(evidenceId => {
+              const meta = lensMetaFor(evidenceId);
+              return `
+                <button class="evidence-seal lens-seal" type="button" data-lens-evidence-id="${escapeHtml(evidenceId)}">
+                  <strong>${escapeHtml(meta.label)}</strong>
+                  <span>${escapeHtml(meta.note)}</span>
+                </button>
+              `;
+            }).join("")}
+          </div>
+          <small>${escapeHtml(active.boundary)}</small>
+        </section>
+      `;
+    }
+
+    function openPhilosophyLensExplorer() {
+      const details = document.querySelector("#postCourtExplorer details");
+      if (details) details.open = true;
+      hidePostCourtExplorationPanels("philosophy");
+      renderPhilosophyLensPanel("confucian");
+      document.getElementById("historyBoundary").textContent = "思想透镜是解释视角，不是会议事实；黄老、儒家、法家和制度国家只在退朝后开放。";
+      pulseSound("evidence");
+    }
+
     function renderExternalEchoPanel(message = null) {
+      hidePostCourtExplorationPanels("external");
       const panel = document.getElementById("externalEchoPanel");
       if (!panel) return;
       panel.hidden = false;
@@ -6221,17 +6445,27 @@ YANTIE_HTML = """<!doctype html>
     document.getElementById("chapterMapToggle").addEventListener("click", openChapterMap);
 
     document.getElementById("postCourtExplorer").addEventListener("click", async event => {
+      const lensEvidenceTarget = event.target.closest("[data-lens-evidence-id]");
+      if (lensEvidenceTarget) {
+        await openEvidence(lensEvidenceTarget.dataset.lensEvidenceId);
+        return;
+      }
+      const lensGroupTarget = event.target.closest("[data-lens-group]");
+      if (lensGroupTarget) {
+        renderPhilosophyLensPanel(lensGroupTarget.dataset.lensGroup);
+        return;
+      }
       const target = event.target.closest("[data-post-court-action]");
       if (!target || target.disabled) return;
       const action = target.dataset.postCourtAction;
       if (action === "chapter-map") {
+        hidePostCourtExplorationPanels();
         document.getElementById("historyBoundary").textContent = "退朝后开放全文争点；这里只读证据与解释边界，不改写案牍。";
         openChapterMap();
         return;
       }
       if (action === "philosophy-lens") {
-        document.getElementById("historyBoundary").textContent = "思想透镜是解释视角，不是会议事实；请在各篇争点中查看。";
-        openChapterMap();
+        openPhilosophyLensExplorer();
         return;
       }
       if (action === "external-echo") {
@@ -6239,6 +6473,7 @@ YANTIE_HTML = """<!doctype html>
         return;
       }
       if (action === "power-network") {
+        hidePostCourtExplorationPanels();
         const powerIndex = scenes.findIndex(scene => scene.actKey === "act-power");
         if (powerIndex >= 0) {
           closeChapterMap();
