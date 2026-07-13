@@ -1619,6 +1619,56 @@ YANTIE_HTML = """<!doctype html>
     .post-court-entry[data-explore-type="power_relation"] { border-color: rgba(154,36,28,0.58); }
     .post-court-entry[data-explore-type="user_judgment"] { border-color: rgba(255,244,214,0.34); }
     .post-court-entry[data-explore-type="external_echo"] { border-style: dashed; }
+    .post-court-entry[data-explore-type="external_echo"][data-echo-enabled="true"] { border-color: rgba(104,166,188,0.7); }
+
+    .external-echo-panel {
+      margin: 0 10px 10px;
+      padding: 12px;
+      border: 1px dashed rgba(104,166,188,0.42);
+      border-radius: 8px;
+      background: rgba(9,13,19,0.48);
+      color: rgba(255,244,214,0.72);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .external-echo-panel[hidden] {
+      display: none;
+    }
+
+    .external-echo-panel strong {
+      display: block;
+      margin-bottom: 6px;
+      color: #d8f4ff;
+      font-size: 13px;
+    }
+
+    .external-echo-panel ul {
+      display: grid;
+      gap: 8px;
+      margin: 8px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .external-echo-panel li {
+      padding: 8px;
+      border: 1px solid rgba(255,236,188,0.14);
+      border-radius: 6px;
+      background: rgba(255,244,214,0.05);
+    }
+
+    .external-echo-panel a {
+      color: #f3c46d;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .external-echo-panel small {
+      display: block;
+      margin-top: 6px;
+      color: rgba(255,244,214,0.5);
+    }
 
     .stance-trajectory-panel {
       max-height: 174px;
@@ -2144,6 +2194,9 @@ YANTIE_HTML = """<!doctype html>
                     <span>external_echo 暂不可用，不进入史证链。</span>
                   </button>
                 </div>
+                <div id="externalEchoPanel" class="external-echo-panel" data-external-echo-status="idle" hidden>
+                  external_echo 仅属于退朝后的延伸讨论，不进入史证链。
+                </div>
               </details>
             </div>
             <div id="judgmentOutput" class="judgment-output">你的退朝案牍不会写入历史证据包。</div>
@@ -2199,7 +2252,9 @@ YANTIE_HTML = """<!doctype html>
       userStandpoint: null,
       stanceTrajectory: [],
       restorationFocus: null,
-      restorationDiscoveries: new Set()
+      restorationDiscoveries: new Set(),
+      externalEchoStatus: "idle",
+      externalEchoItems: []
     };
 
     const restorationSequence = [
@@ -4834,6 +4889,24 @@ YANTIE_HTML = """<!doctype html>
       return (historicalEvidence.length ? historicalEvidence : fallbackEvidence).slice(0, mainExperienceSlice.keyEvidenceLimit);
     }
 
+    function isExternalEchoEnabled() {
+      return !isStaticRuntime && Boolean(state.manifest?.features?.external_echo_enabled);
+    }
+
+    function syncExternalEchoEntry(postCourtUnlocked) {
+      const externalButton = document.querySelector('[data-post-court-action="external-echo"]');
+      if (!externalButton) return;
+      const enabled = postCourtUnlocked && isExternalEchoEnabled();
+      externalButton.disabled = !enabled;
+      externalButton.dataset.echoEnabled = enabled ? "true" : "false";
+      const hint = externalButton.querySelector("span");
+      if (hint) {
+        hint.textContent = enabled
+          ? "查询退朝后的当代讨论；external_echo 不进入史证链。"
+          : "external_echo 暂不可用，不进入史证链。";
+      }
+    }
+
     function syncMainExperienceControls() {
       const stage = document.querySelector(".stage");
       const scene = currentScene();
@@ -4854,6 +4927,7 @@ YANTIE_HTML = """<!doctype html>
         postCourtExplorer.hidden = !postCourtUnlocked;
         postCourtExplorer.setAttribute("aria-hidden", postCourtExplorer.hidden ? "true" : "false");
       }
+      syncExternalEchoEntry(postCourtUnlocked);
     }
 
     async function boot() {
@@ -5897,6 +5971,70 @@ YANTIE_HTML = """<!doctype html>
       document.getElementById("chapterMapScrim").classList.remove("is-open");
     }
 
+    function renderExternalEchoPanel(message = null) {
+      const panel = document.getElementById("externalEchoPanel");
+      if (!panel) return;
+      panel.hidden = false;
+      panel.dataset.externalEchoStatus = state.externalEchoStatus;
+      if (state.externalEchoStatus === "loading") {
+        panel.innerHTML = `
+          <strong>正在查询当代回声</strong>
+          <span>只查询退朝后的延伸讨论，不进入史证链。</span>
+        `;
+        return;
+      }
+      if (state.externalEchoStatus === "error") {
+        panel.innerHTML = `
+          <strong>当代回声暂不可用</strong>
+          <span>${escapeHtml(message || "外部接口不可用，核心历史体验不受影响。")}</span>
+          <small>source_boundary=external_echo · can_support_claims=false</small>
+        `;
+        return;
+      }
+      const items = state.externalEchoItems || [];
+      panel.innerHTML = `
+        <strong>后世与当代讨论</strong>
+        <span>以下内容只作为退朝后的外部回声，不是会议史实证据。</span>
+        ${items.length ? `
+          <ul>
+            ${items.map(item => `
+              <li>
+                ${item.url ? `<a href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer noopener">${escapeHtml(item.title)}</a>` : `<b>${escapeHtml(item.title)}</b>`}
+                ${item.summary ? `<span>${escapeHtml(item.summary)}</span>` : ""}
+                <small>${escapeHtml(item.provider || "external")} · ${escapeHtml(item.source_boundary || "external_echo")}</small>
+              </li>
+            `).join("")}
+          </ul>
+        ` : `<span>暂未返回可展示条目。</span>`}
+        <small>source_boundary=external_echo · writes_to_evidence_pack=false · can_support_claims=false</small>
+      `;
+    }
+
+    async function openExternalEcho() {
+      const details = document.querySelector("#postCourtExplorer details");
+      if (details) details.open = true;
+      if (!isExternalEchoEnabled()) {
+        state.externalEchoStatus = "error";
+        state.externalEchoItems = [];
+        renderExternalEchoPanel("external_echo 暂不可用；静态页面或未配置密钥时保持降级。");
+        return;
+      }
+      state.externalEchoStatus = "loading";
+      state.externalEchoItems = [];
+      renderExternalEchoPanel();
+      try {
+        const result = await getData(`/external/zhihu/search?q=${encodeURIComponent("盐铁会议 国家 市场 民生")}&count=3`);
+        state.externalEchoStatus = result.status || "ok";
+        state.externalEchoItems = Array.isArray(result.items) ? result.items : [];
+        document.getElementById("historyBoundary").textContent = "当代回声只作为退朝后延伸讨论；不进入 EvidenceUnit、Claim 或退朝案牍。";
+        renderExternalEchoPanel();
+      } catch (error) {
+        state.externalEchoStatus = "error";
+        state.externalEchoItems = [];
+        renderExternalEchoPanel(error.message);
+      }
+    }
+
     async function renderScene() {
       const scene = scenes[state.sceneIndex];
       if (scene.key === "judgment") state.completionStatus = "completed";
@@ -6077,6 +6215,10 @@ YANTIE_HTML = """<!doctype html>
       if (action === "philosophy-lens") {
         document.getElementById("historyBoundary").textContent = "思想透镜是解释视角，不是会议事实；请在各篇争点中查看。";
         openChapterMap();
+        return;
+      }
+      if (action === "external-echo") {
+        await openExternalEcho();
         return;
       }
       if (action === "power-network") {
