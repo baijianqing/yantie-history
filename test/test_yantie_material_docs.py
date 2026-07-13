@@ -6,6 +6,7 @@ ROOT = Path(__file__).resolve().parents[1]
 MODERN_RESEARCH_INDEX = ROOT / "docs" / "YANTIE_A2_MODERN_RESEARCH_INDEX.md"
 HUANG_LAO_PLAN = ROOT / "docs" / "YANTIE_A2_HUANG_LAO_MATERIAL_PLAN.md"
 HUANGDI_SIJING_VERIFICATION = ROOT / "docs" / "YANTIE_A2_HUANGDI_SIJING_VERIFICATION.md"
+CLASSICS_CONTEXT_PLAN = ROOT / "docs" / "YANTIE_A2_CLASSICS_CONTEXT_PLAN.md"
 
 
 def test_yantie_modern_research_index_keeps_copyright_boundary():
@@ -116,6 +117,46 @@ def test_yantie_huangdi_sijing_candidate_quotes_are_short_and_structured():
     sections = re.split(r"^### ", text, flags=re.MULTILINE)[1:]
     for section in sections:
         if not section.startswith("HLQ-"):
+            continue
+        for field in required_fields:
+            assert field in section
+
+
+def test_yantie_classics_context_plan_keeps_lens_boundary():
+    text = CLASSICS_CONTEXT_PLAN.read_text(encoding="utf-8")
+
+    assert "YT-A2-MAT-006" in text
+    assert "董仲舒" in text
+    assert "《汉书·董仲舒传》" in text
+    assert "《汉书·武帝纪》" in text
+    assert "《汉书·儒林传》" in text
+    assert "《春秋公羊传》" in text
+    assert "《春秋繁露》" in text
+    assert "philosophy_lens" in text
+    assert "不把董仲舒或《春秋繁露》当作盐铁会议现场证据" in text
+    assert "不声称桑弘羊、贤良文学或霍光直接引用" in text
+    assert "本轮不修改 UI、API、Schema、evidence pack 或运行态数据" in text
+    assert "\n> " not in text
+
+
+def test_yantie_classics_context_candidate_lenses_have_required_fields():
+    text = CLASSICS_CONTEXT_PLAN.read_text(encoding="utf-8")
+    cards = re.findall(r"^### (CLC-LENS-\d{3})：(.+)$", text, flags=re.MULTILINE)
+
+    assert len(cards) == 6
+
+    required_fields = [
+        "- 材料方向：",
+        "- 解释目标：",
+        "- 对盐铁体验的作用：",
+        "- 推荐标签：",
+        "- 默认入口：",
+        "- 入包条件：",
+    ]
+
+    sections = re.split(r"^### ", text, flags=re.MULTILINE)[1:]
+    for section in sections:
+        if not section.startswith("CLC-LENS-"):
             continue
         for field in required_fields:
             assert field in section

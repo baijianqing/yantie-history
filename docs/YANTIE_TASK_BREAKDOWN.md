@@ -46,6 +46,7 @@ flowchart TB
     A2MAT005 --> A2MAT005A["YT-A2-MAT-005A<br/>四经短摘核验"]
     A2MAT005A --> A2MAT005B["YT-A2-MAT-005B<br/>黄老透镜入包"]
     A2MAT005B --> A2MAT005C["YT-A2-MAT-005C<br/>退朝透镜分组"]
+    A2MAT005C --> A2MAT006["YT-A2-MAT-006<br/>经学语境计划"]
     A002 --> V3017A["YT-V3-017A<br/>冻结主体验路径"]
     V3017A --> V3017B["YT-V3-017B<br/>定义体验业务对象"]
     V3017B --> V3017C["YT-V3-017C<br/>冻结历史边界规则"]
@@ -1061,3 +1062,18 @@ A1 首批允许任务表：
 - 测试命令：`git diff --check -- docs/yantie/index.html test/test_yantie_ui.py docs/YANTIE_TASK_BREAKDOWN.md`；`python -m pytest test/test_yantie_ui.py`；必要时执行 `python -m pytest test -k yantie`。
 - 回滚方式：移除 `philosophyLensGroups`、透镜分组面板、相关事件处理和 UI 测试，恢复“换个角度看”直接打开章节图谱的行为。
 - 文档更新：本任务卡即本轮文档交付物。
+
+### YT-A2-MAT-006：董仲舒、经学语境与政治正当性材料补强计划
+
+- 任务 ID：`YT-A2-MAT-006`
+- 价值：黄老材料补强后，盐铁体验的思想史仍缺少武帝以后经学语境。需要先冻结董仲舒、公羊学、五经博士、武帝文治正当性与财政国家之间的材料边界，避免把盐铁会议误写成董仲舒思想的直接延伸，或用“独尊儒术”口号替代可核验文本。
+- 依赖：`YT-A2-MAT-005C`、现有 philosophy lens 边界、`docs/YANTIE_A2_MATERIAL_GAP.md`、可公开核验的《汉书·董仲舒传》《汉书·武帝纪》《汉书·儒林传》《春秋公羊传》《春秋繁露》入口。
+- 允许修改范围：`docs/YANTIE_A2_CLASSICS_CONTEXT_PLAN.md`、`docs/YANTIE_A2_MATERIAL_GAP.md`、`docs/YANTIE_TASK_BREAKDOWN.md`、`test/test_yantie_material_docs.py`。
+- 禁止修改范围：evidence pack、UI、API、公共 Schema、搜索逻辑、后端运行时代码、迁移、根配置、运行态 `library/` 数据、现代研究全文或长段摘录。
+- 输入：当前黄老、儒法、制度国家透镜状态，A2 思想史材料缺口，公开核验入口，董仲舒与经学候选材料。
+- 输出：经学语境材料计划文档、6 个候选思想透镜、来源层与进入边界、A2 缺口状态更新、材料文档测试。
+- 接口：本任务只交付计划文档；经学材料默认进入退朝后思想透镜或深度探索，不作为盐铁会议事实；正式入 evidence pack 必须另开 `YT-A2-MAT-006A`、`YT-A2-MAT-006B` 或 `YT-A2-MAT-006C`。
+- 验收标准：计划文档列明来源层、使用边界、公开入口、6 个候选透镜和后续任务；明确不声称会议人物直接引用董仲舒、《春秋繁露》或《春秋公羊传》；明确本轮不修改 evidence pack、UI、API、Schema 或运行态数据。
+- 测试命令：`git diff --check -- docs/YANTIE_A2_CLASSICS_CONTEXT_PLAN.md docs/YANTIE_A2_MATERIAL_GAP.md docs/YANTIE_TASK_BREAKDOWN.md test/test_yantie_material_docs.py`；`python -m pytest test/test_yantie_material_docs.py`；必要时执行 `python -m pytest test -k yantie`。
+- 回滚方式：删除 `docs/YANTIE_A2_CLASSICS_CONTEXT_PLAN.md`，移除材料缺口、任务图和测试中对 `YT-A2-MAT-006` 的更新。
+- 文档更新：本任务卡、经学语境计划文档和 A2 材料缺口状态。
