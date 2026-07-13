@@ -42,6 +42,7 @@ flowchart TB
     A2000 --> A2MAT002["YT-A2-MAT-002<br/>制度背景补强"]
     A2000 --> A2MAT003["YT-A2-MAT-003<br/>文本与后世评价"]
     A2000 --> A2MAT004["YT-A2-MAT-004<br/>现代研究书目卡"]
+    A2000 --> A2MAT005["YT-A2-MAT-005<br/>黄老思想史补强"]
     A002 --> V3017A["YT-V3-017A<br/>冻结主体验路径"]
     V3017A --> V3017B["YT-V3-017B<br/>定义体验业务对象"]
     V3017B --> V3017C["YT-V3-017C<br/>冻结历史边界规则"]
@@ -933,7 +934,7 @@ A1 首批允许任务表：
 - 输入：当前 evidence pack 的来源与 EvidenceUnit 数量、A2 材料缺口判断、A1 主体验边界、现有来源审计文档。
 - 输出：A2 材料缺口文档、A2 首批任务卡、主体验与深度探索的材料进入边界。
 - 接口：本任务只输出文档契约；后续任何材料入包任务必须引用本门禁，并继续使用现有 Source、EvidenceUnit、Claim 和材料类型边界。
-- 验收标准：`docs/YANTIE_A2_MATERIAL_GAP.md` 明确五类材料缺口、优先级和交付边界；本文件登记 `YT-A2-MAT-001..004`；每个任务卡都包含必填字段；未修改代码、UI、证据包或运行态数据。
+- 验收标准：`docs/YANTIE_A2_MATERIAL_GAP.md` 明确五类材料缺口、优先级和交付边界；本文件登记 `YT-A2-MAT-001..005`；每个任务卡都包含必填字段；未修改代码、UI、证据包或运行态数据。
 - 测试命令：`git diff --check -- docs/YANTIE_A2_MATERIAL_GAP.md docs/YANTIE_TASK_BREAKDOWN.md`。
 - 回滚方式：删除 `docs/YANTIE_A2_MATERIAL_GAP.md`，移除本节和依赖图中的 A2 节点。
 - 文档更新：本任务卡和 `docs/YANTIE_A2_MATERIAL_GAP.md` 即本轮文档交付物。
@@ -997,3 +998,18 @@ A1 首批允许任务表：
 - 测试命令：`git diff --check -- docs/YANTIE_A2_MATERIAL_GAP.md docs/YANTIE_A2_MODERN_RESEARCH_INDEX.md`；如新增检查脚本，再执行对应最小测试。
 - 回滚方式：删除新增书目卡文档或本任务新增段落，不影响 evidence pack、UI 或运行代码。
 - 文档更新：更新 `docs/YANTIE_A2_MATERIAL_GAP.md` 的现代研究与版权边界状态。
+
+### YT-A2-MAT-005：汉初黄老与《黄帝四经》思想史补强
+
+- 任务 ID：`YT-A2-MAT-005`
+- 价值：当前思想透镜已有儒家、法家、管子、韩非、礼记和淮南子等材料，但汉初黄老语境不足，容易把盐铁会议简化为儒法二分；本任务先冻结黄老与《黄帝四经》的来源层、候选透镜和进入边界。
+- 依赖：`YT-A2-000`、现有 philosophy lens 边界、`docs/YANTIE_A2_MATERIAL_GAP.md`、可公开核验的《汉书·艺文志》著录、马王堆帛书出土信息和现代研究书目。
+- 允许修改范围：`docs/YANTIE_A2_MATERIAL_GAP.md`、`docs/YANTIE_TASK_BREAKDOWN.md`、可新增一份黄老材料计划文档、与材料计划校验直接相关的轻量测试。
+- 禁止修改范围：UI、API、公共 Schema、evidence pack 正式材料、迁移、根配置、运行态 `library/` 数据、未经核验的《黄帝四经》全文或现代整理本长段摘录。
+- 输入：《汉书·艺文志》“黄帝四经四篇”著录、马王堆《老子》乙本卷前古佚书出土信息、《黄帝四经》/《黄帝书》/黄老帛书命名争议、现有盐铁思想透镜缺口。
+- 输出：黄老材料计划文档，包含命名边界、来源层、候选思想透镜、推荐标签、入包条件、与现有儒法透镜的关系和后续任务拆分。
+- 接口：本任务只交付计划文档；《黄帝四经》默认属于退朝后思想透镜，不作为会议事实证据；后续如需进入 evidence pack，必须另开 `YT-A2-MAT-005B` 并完成版本、版权和短摘核验。
+- 验收标准：文档明确《黄帝四经》不支撑 `original_fact` Claim；不声称会议人物直接引用该书；至少列出 5 个候选黄老透镜；每个候选透镜都有材料方向、解释目标、体验作用、推荐标签和入包条件。
+- 测试命令：`git diff --check -- docs/YANTIE_A2_MATERIAL_GAP.md docs/YANTIE_TASK_BREAKDOWN.md docs/YANTIE_A2_HUANG_LAO_MATERIAL_PLAN.md test/test_yantie_material_docs.py`；如新增检查脚本，再执行对应最小测试。
+- 回滚方式：删除新增黄老材料计划文档，移除本任务对材料缺口、依赖图和测试的更新；不影响 evidence pack、UI 或运行代码。
+- 文档更新：更新 `docs/YANTIE_A2_MATERIAL_GAP.md` 的思想史缺口和优先级状态。
