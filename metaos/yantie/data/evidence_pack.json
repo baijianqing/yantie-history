@@ -742,6 +742,54 @@
       ]
     },
     {
+      "actor_id": "actor_kong_jin",
+      "name": "孔仅",
+      "role_title": "武帝时期盐铁官营推行者",
+      "meeting_position": "background_actor",
+      "stance_summary": "奉命与东郭咸阳推行天下盐铁官营，是理解盐铁政策形成的制度人物；不作为始元六年会议发言者。",
+      "interest_constraints": [
+        "state_monopoly_implementation",
+        "mountain_sea_resources",
+        "institutional_background"
+      ],
+      "evidence_ids": [
+        "ev:src_shiji_pingzhun:juan030:salt_iron_offices:3344bbcc",
+        "ev:src_shiji_pingzhun:juan030:salt_iron_state_assets:a2b20008"
+      ]
+    },
+    {
+      "actor_id": "actor_dongguo_xianyang",
+      "name": "东郭咸阳",
+      "role_title": "武帝时期盐铁官营推行者",
+      "meeting_position": "background_actor",
+      "stance_summary": "奉命与孔仅推行天下盐铁官营，并主张山海资源归入官府财政体系；不作为始元六年会议发言者。",
+      "interest_constraints": [
+        "state_monopoly_implementation",
+        "mountain_sea_resources",
+        "institutional_background"
+      ],
+      "evidence_ids": [
+        "ev:src_shiji_pingzhun:juan030:salt_iron_offices:3344bbcc",
+        "ev:src_shiji_pingzhun:juan030:salt_iron_state_assets:a2b20008"
+      ]
+    },
+    {
+      "actor_id": "actor_bu_shi",
+      "name": "卜式",
+      "role_title": "武帝时期盐铁官营批评者",
+      "meeting_position": "background_actor",
+      "stance_summary": "批评官营盐铁铁器恶、价格贵和强制交易，是理解盐铁制度民生反弹的背景人物；不作为始元六年会议发言者。",
+      "interest_constraints": [
+        "people_livelihood",
+        "monopoly_abuse",
+        "institutional_background"
+      ],
+      "evidence_ids": [
+        "ev:src_hanshu_shihuo:juan024:bad_iron_price_complaint:a2b20004",
+        "ev:src_shiji_pingzhun:juan030:bad_iron_complaint:a2b2000b"
+      ]
+    },
+    {
       "actor_id": "actor_literati",
       "name": "贤良文学",
       "role_title": "郡国所举贤良、文学之士",
@@ -864,6 +912,8 @@
       "summary": "孔仅、东郭咸阳领盐铁事，官府介入山海之利，桑弘羊也进入财政体系。",
       "location_id": "resource_regions",
       "actor_ids": [
+        "actor_kong_jin",
+        "actor_dongguo_xianyang",
         "actor_sang_hongyang"
       ],
       "topic_ids": [
@@ -5053,6 +5103,18 @@
         "ev:src_hanshu_shihuo:juan024:sang_background:99887766",
         "ev:src_hanshu_huoguang:juan068:sang_resentment:778899aa",
         "ev:src_shiji_pingzhun:juan030:sang_equal_transport:5e6f7081"
+      ],
+      "孔仅": [
+        "ev:src_shiji_pingzhun:juan030:salt_iron_offices:3344bbcc",
+        "ev:src_shiji_pingzhun:juan030:salt_iron_state_assets:a2b20008"
+      ],
+      "东郭咸阳": [
+        "ev:src_shiji_pingzhun:juan030:salt_iron_offices:3344bbcc",
+        "ev:src_shiji_pingzhun:juan030:salt_iron_state_assets:a2b20008"
+      ],
+      "卜式": [
+        "ev:src_hanshu_shihuo:juan024:bad_iron_price_complaint:a2b20004",
+        "ev:src_shiji_pingzhun:juan030:bad_iron_complaint:a2b2000b"
       ],
       "贤良文学": [
         "ev:src_yantielun:juan01_benyi:meeting_opening:a1b2c3d4",

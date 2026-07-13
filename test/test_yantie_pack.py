@@ -172,6 +172,57 @@ class YantieEvidencePackDataTests(unittest.TestCase):
         }
         self.assertTrue(required_tags.issubset(covered_tags))
 
+    def test_institutional_background_people_are_modeled_as_background_actors(self) -> None:
+        pack = load_pack()
+        actors_by_id = {actor.actor_id: actor for actor in pack.actors}
+        events_by_id = {event.event_id: event for event in pack.events}
+        evidence_by_id = {evidence.evidence_id: evidence for evidence in pack.evidence_units}
+
+        expected_actor_evidence = {
+            "actor_kong_jin": {
+                "ev:src_shiji_pingzhun:juan030:salt_iron_offices:3344bbcc",
+                "ev:src_shiji_pingzhun:juan030:salt_iron_state_assets:a2b20008",
+            },
+            "actor_dongguo_xianyang": {
+                "ev:src_shiji_pingzhun:juan030:salt_iron_offices:3344bbcc",
+                "ev:src_shiji_pingzhun:juan030:salt_iron_state_assets:a2b20008",
+            },
+            "actor_bu_shi": {
+                "ev:src_hanshu_shihuo:juan024:bad_iron_price_complaint:a2b20004",
+                "ev:src_shiji_pingzhun:juan030:bad_iron_complaint:a2b2000b",
+            },
+        }
+
+        for actor_id, expected_evidence_ids in expected_actor_evidence.items():
+            actor = actors_by_id[actor_id]
+            self.assertEqual(actor.meeting_position.value, "background_actor")
+            self.assertIn("不作为始元六年会议发言者", actor.stance_summary)
+            self.assertTrue(expected_evidence_ids.issubset(set(actor.evidence_ids)))
+            for evidence_id in expected_evidence_ids:
+                self.assertEqual(evidence_by_id[evidence_id].review_status, ReviewStatus.verified)
+
+        salt_iron_event = events_by_id["event_salt_iron_established"]
+        self.assertTrue(
+            {
+                "actor_kong_jin",
+                "actor_dongguo_xianyang",
+                "actor_sang_hongyang",
+            }.issubset(set(salt_iron_event.actor_ids))
+        )
+
+        self.assertEqual(
+            set(pack.lexical_index.entries["孔仅"]),
+            expected_actor_evidence["actor_kong_jin"],
+        )
+        self.assertEqual(
+            set(pack.lexical_index.entries["东郭咸阳"]),
+            expected_actor_evidence["actor_dongguo_xianyang"],
+        )
+        self.assertEqual(
+            set(pack.lexical_index.entries["卜式"]),
+            expected_actor_evidence["actor_bu_shi"],
+        )
+
     def test_siku_textual_history_marks_yantie_as_compiled_later_framed_text(self) -> None:
         pack = load_pack()
         sources_by_id = {source.source_id: source for source in pack.sources}

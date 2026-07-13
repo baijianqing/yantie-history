@@ -54,6 +54,7 @@ flowchart TB
     A2MAT006D --> A2MAT006E["YT-A2-MAT-006E<br/>退朝材料导览"]
     A2MAT006E --> A2MAT006F["YT-A2-MAT-006F<br/>材料导览验收"]
     A2MAT006F --> A2MAT006G["YT-A2-MAT-006G<br/>材料状态收口"]
+    A2MAT006G --> A2MAT007["YT-A2-MAT-007<br/>制度人物Actor补强"]
     A002 --> V3017A["YT-V3-017A<br/>冻结主体验路径"]
     V3017A --> V3017B["YT-V3-017B<br/>定义体验业务对象"]
     V3017B --> V3017C["YT-V3-017C<br/>冻结历史边界规则"]
@@ -1189,3 +1190,18 @@ A1 首批允许任务表：
 - 测试命令：`git diff --check -- docs/YANTIE_A2_MATERIAL_GAP.md docs/YANTIE_TASK_BREAKDOWN.md test/test_yantie_material_docs.py`；`python -m pytest test/test_yantie_material_docs.py`；必要时执行 `python -m pytest test -k yantie` 和 `python -m pytest test`。
 - 回滚方式：移除本任务对材料缺口文档、任务图、任务卡和材料文档测试的更新，恢复 006F 后文档状态。
 - 文档更新：本任务卡即文档交付。
+
+### YT-A2-MAT-007：制度人物 Actor 补强
+
+- 任务 ID：`YT-A2-MAT-007`
+- 价值：A2 已有孔仅、东郭咸阳、卜式相关制度证据，但它们只停留在 EvidenceUnit 文本中，尚未进入 `actors`，用户和检索层无法按制度人物理解盐铁官营的形成与批评。本任务用现有已核验证据补齐制度人物 Actor，不新增摘录。
+- 依赖：`YT-A2-MAT-002`、`YT-A2-MAT-006G`、双份 evidence pack、pack 测试。
+- 允许修改范围：`metaos/yantie/data/evidence_pack.json`、`docs/yantie/data/evidence_pack.json`、`test/test_yantie_pack.py`、`docs/YANTIE_TASK_BREAKDOWN.md`、`docs/YANTIE_A2_MATERIAL_GAP.md`。
+- 禁止修改范围：UI、API、公共 Schema、搜索代码、运行态 `library/` 数据、迁移、根配置、新增未经核验史料、现代研究全文。
+- 输入：现有孔仅、东郭咸阳、卜式 EvidenceUnit、Actor Schema、`event_salt_iron_established`、`lexical_index`。
+- 输出：`actor_kong_jin`、`actor_dongguo_xianyang`、`actor_bu_shi`，事件 actor 关联、必要 lexical index、pack 测试和材料状态文档更新。
+- 接口：新增 actors 只作为 `background_actor` 制度背景人物；不新增会议发言，不改变 `speaker_actor_id`，不把他们写成始元六年会议参与者。
+- 验收标准：双份 evidence pack 同步；3 个新 actor 均引用 verified 既有证据；盐铁官营形成事件包含孔仅和东郭咸阳；卜式可通过 actor 和 lexical_index 找到反官营盐铁证据；不新增 EvidenceUnit 或 Claim。
+- 测试命令：`git diff --check -- metaos/yantie/data/evidence_pack.json docs/yantie/data/evidence_pack.json test/test_yantie_pack.py docs/YANTIE_TASK_BREAKDOWN.md docs/YANTIE_A2_MATERIAL_GAP.md`；`python -m pytest test/test_yantie_pack.py`；必要时执行 `python -m pytest test -k yantie` 和 `python -m pytest test`。
+- 回滚方式：移除 3 个 actors、event actor 关联、lexical_index entries、pack 测试和文档状态更新，恢复到 007 前证据包。
+- 文档更新：更新本任务卡和 A2 材料缺口状态，说明制度人物背景已完成首轮 Actor 化，后续只补酒榷细节和贤良文学身份。
