@@ -65,6 +65,7 @@ flowchart TB
     A2MAT014 --> A2MAT015["YT-A2-MAT-015<br/>外部回声验收状态收口"]
     A2MAT015 --> A2REL001["YT-A2-REL-001<br/>A2 发布适用性收口"]
     A2REL001 --> A2E2E001["YT-A2-E2E-001<br/>A2 静态发布门报告"]
+    A2E2E001 --> A2DEPLOY001["YT-A2-DEPLOY-001<br/>A2 Pages 静态部署记录"]
     A002 --> V3017A["YT-V3-017A<br/>冻结主体验路径"]
     V3017A --> V3017B["YT-V3-017B<br/>定义体验业务对象"]
     V3017B --> V3017C["YT-V3-017C<br/>冻结历史边界规则"]
@@ -1365,3 +1366,18 @@ A1 首批允许任务表：
 - 测试命令：`git diff --check -- docs/reports/YT-A2-E2E-001.md docs/YANTIE_TASK_BREAKDOWN.md test/test_yantie_release_gate.py`；`python -m pytest test/test_yantie_release_gate.py`；`python -m pytest test -k yantie`；必要时执行 `python -m pytest test`。
 - 回滚方式：删除 A2 静态发布门报告、测试文件和任务图/任务卡中的 `YT-A2-E2E-001` 节点。
 - 文档更新：新增 `docs/reports/YT-A2-E2E-001.md`，记录本轮发布门结论、线上阻断项和下一步部署/复核路径。
+
+### YT-A2-DEPLOY-001：A2 Pages 静态部署记录
+
+- 任务 ID：`YT-A2-DEPLOY-001`
+- 价值：`YT-A2-E2E-001` 记录了线上 Pages 仍是旧版本的阻断项。本任务将当前分支快进发布到 `yantie-static-github-pages`，并记录线上 URL 复验结果，确认“本地候选”已经变成“线上可访问的静态预览”。
+- 依赖：`YT-A2-E2E-001`、远端 `origin`、`yantie-static-github-pages` 分支、静态验收脚本。
+- 允许修改范围：`docs/reports/YT-A2-DEPLOY-001.md`、`docs/YANTIE_TASK_BREAKDOWN.md`、`test/test_yantie_deploy_report.py`。
+- 禁止修改范围：UI、evidence pack、API、外部 adapter、公共 Schema、搜索逻辑、验收 runner、运行态 `library/` 数据、迁移、根配置、依赖清单。
+- 输入：当前提交 `a637871`、线上 Pages URL、本地与线上静态验收输出、当前分支和发布分支推送结果。
+- 输出：A2 Pages 部署记录，明确当前线上静态预览已部署并通过自动验收，同时保留 `power-silence` 人工复核项和最终版限制。
+- 接口：本任务只记录部署结果和文档测试；不改变页面行为、数据结构、部署配置或外部接口。
+- 验收标准：报告包含 `deployed_static_preview` 状态；记录 `codex/yantie-main-experience-slice` 与 `yantie-static-github-pages` 已推送到 `a637871`；记录线上 `36/36 checks passed`；保留 `power-silence` 人工复核要求；明确仍不是最终产品版或生产级公开发布。
+- 测试命令：`git diff --check -- docs/reports/YT-A2-DEPLOY-001.md docs/YANTIE_TASK_BREAKDOWN.md test/test_yantie_deploy_report.py`；`python -m pytest test/test_yantie_deploy_report.py`；`python -m pytest test -k yantie`；必要时执行 `python -m pytest test`。
+- 回滚方式：删除 A2 Pages 部署记录、测试文件和任务图/任务卡中的 `YT-A2-DEPLOY-001` 节点；如需回滚线上发布，另行将 `yantie-static-github-pages` 快进或回退到指定安全提交。
+- 文档更新：新增 `docs/reports/YT-A2-DEPLOY-001.md`，记录本轮 GitHub Pages 发布和线上复验结果。
