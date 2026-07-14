@@ -63,6 +63,7 @@ flowchart TB
     A2MAT012 --> A2MAT013["YT-A2-MAT-013<br/>思想透镜验收状态收口"]
     A2MAT013 --> A2MAT014["YT-A2-MAT-014<br/>外部回声边界验收"]
     A2MAT014 --> A2MAT015["YT-A2-MAT-015<br/>外部回声验收状态收口"]
+    A2MAT015 --> A2REL001["YT-A2-REL-001<br/>A2 发布适用性收口"]
     A002 --> V3017A["YT-V3-017A<br/>冻结主体验路径"]
     V3017A --> V3017B["YT-V3-017B<br/>定义体验业务对象"]
     V3017B --> V3017C["YT-V3-017C<br/>冻结历史边界规则"]
@@ -1333,3 +1334,18 @@ A1 首批允许任务表：
 - 测试命令：`git diff --check -- docs/YANTIE_A2_MATERIAL_GAP.md docs/YANTIE_TASK_BREAKDOWN.md test/test_yantie_material_docs.py`；`python -m pytest test/test_yantie_material_docs.py`；必要时执行 `python -m pytest test -k yantie` 和 `python -m pytest test`。
 - 回滚方式：移除 015 任务图节点、任务卡、A2 材料门禁文档中的 014/015 状态补登和材料文档测试断言。
 - 文档更新：更新本任务卡和 A2 材料门禁文档，说明外部回声边界验收场景已完成状态收口。
+
+### YT-A2-REL-001：A2 发布适用性收口
+
+- 任务 ID：`YT-A2-REL-001`
+- 价值：A1 静态核心体验与 A2 材料补强已经连续通过多轮测试，但当前缺少一份面向发布决策的统一结论。本任务把“适合发布到什么程度”“哪些条件仍需满足”“下一步该推进什么”写成报告，避免把 A2 材料补强误判为最终版发布完成。
+- 依赖：`YT-A2-MAT-015`、`docs/reports/YT-A1-E2E-001.md`、当前静态验收脚本、盐铁相关测试。
+- 允许修改范围：`docs/reports/YT-A2-RELEASE-READINESS.md`、`docs/YANTIE_TASK_BREAKDOWN.md`、`test/test_yantie_release_readiness.py`。
+- 禁止修改范围：UI、evidence pack、API、外部 adapter、公共 Schema、搜索逻辑、验收 runner、运行态 `library/` 数据、迁移、根配置、依赖清单、GitHub Pages 部署配置。
+- 输入：A1 静态验收报告、A2 材料门禁状态、当前 Playwright 静态验收结果、盐铁相关测试结果、当前分支发布状态。
+- 输出：一份 A2 发布适用性报告，明确当前适合作为 GitHub Pages 静态预览发布，但不适合作为最终产品或生产级公开发布；同时列出发布前条件和下一步推进任务。
+- 接口：本任务只输出发布判断文档和文档测试；不改变页面运行行为、数据结构、验收脚本或发布配置。
+- 验收标准：报告包含状态、范围、已通过项、发布结论、发布前条件、不适合最终发布的原因和下一步任务；测试覆盖报告中的 `preview_ready_with_conditions`、`external_echo`、`power-silence`、Playwright 依赖提示和静态预览发布判断。
+- 测试命令：`git diff --check -- docs/reports/YT-A2-RELEASE-READINESS.md docs/YANTIE_TASK_BREAKDOWN.md test/test_yantie_release_readiness.py`；`python -m pytest test/test_yantie_release_readiness.py`；`python -m pytest test -k yantie`；必要时执行 `python -m pytest test`。
+- 回滚方式：删除 A2 发布适用性报告、测试文件和任务图/任务卡中的 `YT-A2-REL-001` 节点。
+- 文档更新：新增 `docs/reports/YT-A2-RELEASE-READINESS.md`，记录当前项目状态、发布适用级别、风险和下一步推进建议。
