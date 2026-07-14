@@ -62,6 +62,7 @@ flowchart TB
     A2MAT011 --> A2MAT012["YT-A2-MAT-012<br/>思想透镜验收场景"]
     A2MAT012 --> A2MAT013["YT-A2-MAT-013<br/>思想透镜验收状态收口"]
     A2MAT013 --> A2MAT014["YT-A2-MAT-014<br/>外部回声边界验收"]
+    A2MAT014 --> A2MAT015["YT-A2-MAT-015<br/>外部回声验收状态收口"]
     A002 --> V3017A["YT-V3-017A<br/>冻结主体验路径"]
     V3017A --> V3017B["YT-V3-017B<br/>定义体验业务对象"]
     V3017B --> V3017C["YT-V3-017C<br/>冻结历史边界规则"]
@@ -1317,3 +1318,18 @@ A1 首批允许任务表：
 - 测试命令：`git diff --check -- scripts/check-yantie-acceptance.mjs test/test_yantie_ui.py test/test_yantie_e2e.py docs/YANTIE_TASK_BREAKDOWN.md`；`python -m pytest test/test_yantie_ui.py test/test_yantie_e2e.py`；`node scripts/check-yantie-acceptance.mjs`；必要时执行 `python -m pytest test -k yantie` 和 `python -m pytest test`。
 - 回滚方式：移除 `external-echo-boundary` runner 场景、外部回声边界检查、测试断言和任务卡，恢复 014 前验收矩阵。
 - 文档更新：本任务卡即本轮文档交付物；A2 材料门禁状态可由后续独立收口任务同步。
+
+### YT-A2-MAT-015：外部回声验收状态收口
+
+- 任务 ID：`YT-A2-MAT-015`
+- 价值：`YT-A2-MAT-014` 已把退朝后外部回声边界纳入 Playwright 静态验收，但 A2 材料门禁文档仍只记录到 `YT-A2-MAT-013`。本任务同步材料门禁状态，避免后续误判当代回声边界仍未验收。
+- 依赖：`YT-A2-MAT-014`、A2 材料门禁文档、材料文档测试。
+- 允许修改范围：`docs/YANTIE_A2_MATERIAL_GAP.md`、`docs/YANTIE_TASK_BREAKDOWN.md`、`test/test_yantie_material_docs.py`。
+- 禁止修改范围：evidence pack、UI、验收脚本、API、外部搜索 adapter、公共 Schema、搜索代码、运行态 `library/` 数据、迁移、根配置、新增史料、现代研究全文。
+- 输入：`YT-A2-MAT-014` 任务卡、当前静态验收矩阵、A2 材料门禁文档。
+- 输出：A2 材料门禁文档中的 014/015 完成状态、015 收口任务卡和材料文档测试。
+- 接口：本任务只校准文档状态；不新增 acceptance 场景、不修改 `scripts/check-yantie-acceptance.mjs`、不改变页面行为、API 或 evidence pack。
+- 验收标准：A2 材料门禁文档列出 `YT-A2-MAT-014` 与 `YT-A2-MAT-015`；文档说明外部回声边界验收覆盖 desktop、mobile、reduced-motion；材料文档测试覆盖 014 和 015 的状态行；不修改 evidence pack、UI、验收 runner 或外部 adapter。
+- 测试命令：`git diff --check -- docs/YANTIE_A2_MATERIAL_GAP.md docs/YANTIE_TASK_BREAKDOWN.md test/test_yantie_material_docs.py`；`python -m pytest test/test_yantie_material_docs.py`；必要时执行 `python -m pytest test -k yantie` 和 `python -m pytest test`。
+- 回滚方式：移除 015 任务图节点、任务卡、A2 材料门禁文档中的 014/015 状态补登和材料文档测试断言。
+- 文档更新：更新本任务卡和 A2 材料门禁文档，说明外部回声边界验收场景已完成状态收口。

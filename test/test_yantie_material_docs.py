@@ -49,6 +49,8 @@ def test_yantie_material_gap_tracks_post_court_ui_status():
         "YT-A2-MAT-011",
         "YT-A2-MAT-012",
         "YT-A2-MAT-013",
+        "YT-A2-MAT-014",
+        "YT-A2-MAT-015",
     ]:
         assert task_id in text
 
@@ -65,6 +67,10 @@ def test_yantie_material_gap_tracks_post_court_ui_status():
     assert "`YT-A2-MAT-012` | 退朝后思想透镜验收场景覆盖" in text
     assert "`YT-A2-MAT-013` | 思想透镜验收状态收口" in text
     assert "`philosophy-lens` Playwright 验收场景" in text
+    assert "`YT-A2-MAT-014` | 退朝后外部回声边界验收场景" in text
+    assert "`YT-A2-MAT-015` | 外部回声验收状态收口" in text
+    assert "`external-echo-boundary` Playwright 验收场景" in text
+    assert "当代回声入口默认禁用" in text
     assert "《汉书·武帝纪》“初榷酒酤”" in text
     assert "贤良文学身份材料已归并到 `actor_literati`" in text
     assert "酒榷细节仍需后续任务补足" not in text
