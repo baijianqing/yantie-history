@@ -227,8 +227,10 @@ class YantieWebUiTests(unittest.TestCase):
     def test_yantie_a1_main_experience_slice_contract_is_declared(self) -> None:
         html = self.client.get("/yantie").text
 
-        self.assertIn('data-main-experience-slice="YT-A1-UI-001A"', html)
-        self.assertIn('id: "YT-A1-UI-001A"', html)
+        self.assertIn('data-experience-track="main-path"', html)
+        self.assertIn('id: "main-experience-path"', html)
+        self.assertNotIn('data-main-experience-slice="YT-A1-UI-001A"', html)
+        self.assertNotIn('id: "YT-A1-UI-001A"', html)
         self.assertIn("keyEvidenceLimit: 1", html)
         self.assertIn("allowFullChapterMapBeforeDossier: false", html)
         for phase in [
@@ -297,19 +299,19 @@ class YantieWebUiTests(unittest.TestCase):
             "philosophy-lens",
             "material-guide",
             "power-network",
-            "second-perspective",
             "external-echo",
         ]:
             self.assertIn(f'data-post-court-action="{action}"', html)
+        self.assertNotIn('data-post-court-action="second-perspective"', html)
         for explore_type in [
             "historical_evidence",
             "philosophy_lens",
             "material_guide",
             "power_relation",
-            "user_judgment",
             "external_echo",
         ]:
             self.assertIn(f'data-explore-type="{explore_type}"', html)
+        self.assertNotIn('data-explore-type="user_judgment"', html)
         self.assertIn('id="materialGuidePanel"', html)
         self.assertIn('data-material-boundary="post_court_only"', html)
         self.assertIn("function renderMaterialGuidePanel", html)
@@ -321,14 +323,17 @@ class YantieWebUiTests(unittest.TestCase):
         self.assertIn("function renderExternalEchoPanel(message = null)", html)
         self.assertIn("async function openExternalEcho()", html)
         self.assertIn("externalButton.disabled = !enabled", html)
-        self.assertIn("!isStaticRuntime && Boolean(state.manifest?.features?.external_echo_enabled)", html)
+        self.assertIn('externalButton.dataset.echoEnabled = isExternalEchoEnabled() ? "live" : "curated"', html)
+        self.assertIn("curatedExternalEchoItems", html)
         self.assertIn("/external/zhihu/search", html)
-        self.assertIn("writes_to_evidence_pack=false", html)
-        self.assertIn("can_support_claims=false", html)
-        self.assertIn("external_echo 暂不可用，不进入史证链。", html)
+        self.assertIn("不进入证据包", html)
+        self.assertIn("不支持历史事实判断", html)
+        self.assertIn("查看后世评说与当代问题的摘要；只作延伸思考。", html)
         self.assertIn("退朝后开放全文争点；这里只读证据与解释边界，不改写案牍。", html)
         self.assertIn("正在回看权力遮蔽一幕；这不抹除你的退朝案牍。", html)
         self.assertIn("材料导览只在退朝后说明来源层级与进入边界", html)
+        self.assertNotIn("查看 A2 补强材料", html)
+        self.assertNotIn("A2 材料导览只在退朝后开放", html)
 
     def test_yantie_a2_post_court_material_guide_is_bounded(self) -> None:
         html = self.client.get("/yantie").text
@@ -357,16 +362,30 @@ class YantieWebUiTests(unittest.TestCase):
         self.assertEqual(entries_by_id["huang_lao_lens"]["defaultEntry"], "思想透镜：黄老")
         self.assertEqual(entries_by_id["classics_context"]["defaultEntry"], "思想透镜：经学语境")
         self.assertIn("不交付论文或专著全文", entries_by_id["modern_research"]["boundary"])
+        self.assertIn("始元六年诏问贤良文学", entries_by_id["chronicle"]["details"][0])
+        self.assertIn("盐铁、均输、平准、酒榷", entries_by_id["institutional_background"]["details"][0])
+        self.assertIn("道生法", entries_by_id["huang_lao_lens"]["details"][0])
+        self.assertIn("不复制论文", entries_by_id["modern_research"]["details"][1])
         for entry in entries:
             self.assertTrue(entry["label"])
             self.assertTrue(entry["source"])
             self.assertTrue(entry["status"])
             self.assertTrue(entry["defaultEntry"])
             self.assertTrue(entry["boundary"])
+            self.assertGreaterEqual(len(entry["details"]), 3)
 
-        self.assertIn("material_boundary=post_court_only", html)
-        self.assertIn("writes_to_evidence_pack=false", html)
-        self.assertIn("can_support_claims=by_material_type", html)
+        self.assertIn("补充材料按用途分层展示", html)
+        self.assertIn("退朝后开放 · 不自动写入案牍", html)
+        self.assertNotIn("A2 补强材料按用途分层展示", html)
+        self.assertNotIn('aria-label="A2 材料分层"', html)
+
+    def test_yantie_user_facing_page_hides_internal_task_labels(self) -> None:
+        html = self.client.get("/yantie").text
+
+        self.assertNotIn("YT-A1", html)
+        self.assertNotIn("YT-A2", html)
+        self.assertNotIn("A1 ", html)
+        self.assertNotIn("A2 ", html)
 
     def test_yantie_a2_post_court_philosophy_lenses_are_grouped(self) -> None:
         html = self.client.get("/yantie").text
@@ -458,6 +477,7 @@ class YantieWebUiTests(unittest.TestCase):
         self.assertIn("function syncExternalEchoEntry(postCourtUnlocked)", html)
         self.assertIn('data-post-court-action="external-echo"', html)
         self.assertIn("externalButton.disabled = !enabled", html)
+        self.assertIn("externalBoundaryLabel(item.source_boundary)", html)
 
         response = client.get(
             "/api/yantie/external/zhihu/search",
@@ -531,7 +551,8 @@ class YantieWebUiTests(unittest.TestCase):
         self.assertIn("material guide has no cards", script)
         self.assertIn("philosophy lens boundary missing", script)
         self.assertIn("philosophy lens has no evidence buttons", script)
-        self.assertIn("external echo enabled in static runtime", script)
+        self.assertIn("external echo entry disabled", script)
+        self.assertIn("external echo panel hidden after action", script)
         self.assertIn("external echo boundary hint missing", script)
         self.assertIn("Manual review recommended", script)
         for scenario in [

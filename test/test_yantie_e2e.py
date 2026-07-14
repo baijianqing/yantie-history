@@ -138,6 +138,7 @@ def test_yantie_e2e_acceptance_runner_covers_delivery_gate() -> None:
     assert "material guide has no cards" in script
     assert "philosophy lens boundary missing" in script
     assert "philosophy lens has no evidence buttons" in script
-    assert "external echo enabled in static runtime" in script
+    assert "external echo entry disabled" in script
+    assert "external echo panel hidden after action" in script
     assert "external echo boundary hint missing" in script
     assert 'scenarioId === "power-silence"' in script

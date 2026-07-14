@@ -257,7 +257,7 @@
     },
     {
       "source_id": "src_huangdi_sijing",
-      "title": "????/?????",
+      "title": "黄帝四经/黄帝书",
       "license_status": "public_domain_text",
       "delivery_policy": "excerpt_allowed",
       "excerpt_count": 6,
@@ -678,12 +678,12 @@
     },
     {
       "source_id": "src_huangdi_sijing",
-      "title": "????/??????????????",
+      "title": "黄帝四经/马王堆《老子》乙本卷前古佚书",
       "source_type": "primary_text",
       "authority_level": "comparison",
       "license_status": "public_domain_text",
       "canonical_url": "https://ctext.org/wiki.pl?if=en&res=580017",
-      "citation_style": "??????",
+      "citation_style": "《黄帝四经》",
       "delivery_policy": "excerpt_allowed",
       "human_verified": true
     },
@@ -4216,9 +4216,9 @@
     {
       "evidence_id": "ev:src_huangdi_sijing:jingfa:dao_generates_law:a2d50001",
       "source_id": "src_huangdi_sijing",
-      "canonical_location": "??",
-      "excerpt_original": "???",
-      "paraphrase_zh": "??????????????????????????????????????",
+      "canonical_location": "经法",
+      "excerpt_original": "道生法",
+      "paraphrase_zh": "黄老语境中，法度可以被理解为从道的秩序中生成，而不只是强制工具。",
       "evidence_kind": "speech_argument",
       "speaker_actor_id": null,
       "topic_ids": [
@@ -4234,14 +4234,14 @@
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, very short excerpt used as Huang-Lao philosophy lens.",
       "review_status": "verified",
-      "adjacent_context_note": "This is a philosophy lens (????), not evidence that the source discussed the Yantie meeting. ???????????????"
+      "adjacent_context_note": "This is a philosophy lens / 思想透镜 (道生法), not evidence that the source discussed the Yantie meeting. 用于解释制度约束的思想来源。"
     },
     {
       "evidence_id": "ev:src_huangdi_sijing:jingfa:law_standard_rectification:a2d50002",
       "source_id": "src_huangdi_sijing",
-      "canonical_location": "??",
-      "excerpt_original": "???????",
-      "paraphrase_zh": "?????????????????????????????????????",
+      "canonical_location": "经法",
+      "excerpt_original": "法度者正之至也",
+      "paraphrase_zh": "法度在黄老文本中具有校正政治秩序的意义，可用于理解制度何以需要准绳。",
       "evidence_kind": "speech_argument",
       "speaker_actor_id": null,
       "topic_ids": [
@@ -4257,14 +4257,14 @@
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, very short excerpt used as Huang-Lao philosophy lens.",
       "review_status": "verified",
-      "adjacent_context_note": "This is a philosophy lens (????), not evidence that the source discussed the Yantie meeting. ??????????????"
+      "adjacent_context_note": "This is a philosophy lens / 思想透镜 (法度者正之至也), not evidence that the source discussed the Yantie meeting. 用于解释法度正当性。"
     },
     {
       "evidence_id": "ev:src_huangdi_sijing:shiliujing:reduce_harsh_affairs:a2d50003",
       "source_id": "src_huangdi_sijing",
-      "canonical_location": "???",
-      "excerpt_original": "???",
-      "paraphrase_zh": "???????????????????????????????????????",
+      "canonical_location": "十六经",
+      "excerpt_original": "省苛事",
+      "paraphrase_zh": "减少烦苛事务可作为黄老式节制治理的透镜，用来反观国家动员的边界。",
       "evidence_kind": "speech_argument",
       "speaker_actor_id": null,
       "topic_ids": [
@@ -4280,14 +4280,14 @@
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, very short excerpt used as Huang-Lao philosophy lens.",
       "review_status": "verified",
-      "adjacent_context_note": "This is a philosophy lens (????), not evidence that the source discussed the Yantie meeting. ????????????????"
+      "adjacent_context_note": "This is a philosophy lens / 思想透镜 (省苛事), not evidence that the source discussed the Yantie meeting. 用于解释减省苛政与民生承受力。"
     },
     {
       "evidence_id": "ev:src_huangdi_sijing:shiliujing:do_not_seize_people_time:a2d50004",
       "source_id": "src_huangdi_sijing",
-      "canonical_location": "???",
-      "excerpt_original": "????",
-      "paraphrase_zh": "???????????????????????????????????????????",
+      "canonical_location": "十六经",
+      "excerpt_original": "毋夺民时",
+      "paraphrase_zh": "不夺取百姓农时，提示治理需要顾及民力、时令和生活节奏。",
       "evidence_kind": "speech_argument",
       "speaker_actor_id": null,
       "topic_ids": [
@@ -4303,14 +4303,14 @@
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, very short excerpt used as Huang-Lao philosophy lens.",
       "review_status": "verified",
-      "adjacent_context_note": "This is a philosophy lens (????), not evidence that the source discussed the Yantie meeting. ??????????????"
+      "adjacent_context_note": "This is a philosophy lens / 思想透镜 (毋夺民时), not evidence that the source discussed the Yantie meeting. 用于连接时令、赋役和民生负担。"
     },
     {
       "evidence_id": "ev:src_huangdi_sijing:cheng:name_reality_alignment:a2d50005",
       "source_id": "src_huangdi_sijing",
-      "canonical_location": "?",
-      "excerpt_original": "??????",
-      "paraphrase_zh": "??????????????????????????????????????????",
+      "canonical_location": "称",
+      "excerpt_original": "名实相应则定",
+      "paraphrase_zh": "名义与实际相符，制度责任才有稳定依据，可用于检验政策名目和实际效果。",
       "evidence_kind": "speech_argument",
       "speaker_actor_id": null,
       "topic_ids": [
@@ -4326,14 +4326,14 @@
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, very short excerpt used as Huang-Lao philosophy lens.",
       "review_status": "verified",
-      "adjacent_context_note": "This is a philosophy lens (????), not evidence that the source discussed the Yantie meeting. ???????????????"
+      "adjacent_context_note": "This is a philosophy lens / 思想透镜 (名实相应则定), not evidence that the source discussed the Yantie meeting. 用于解释名实校准与制度问责。"
     },
     {
       "evidence_id": "ev:src_huangdi_sijing:shiliujing:utmost_stillness_sage:a2d50006",
       "source_id": "src_huangdi_sijing",
-      "canonical_location": "???",
-      "excerpt_original": "????",
-      "paraphrase_zh": "?????????????????????????????????????????",
+      "canonical_location": "十六经",
+      "excerpt_original": "至静者圣",
+      "paraphrase_zh": "至静可被理解为主上节制和不扰动治理，用来观察权力何时应当停手。",
       "evidence_kind": "speech_argument",
       "speaker_actor_id": null,
       "topic_ids": [
@@ -4350,7 +4350,7 @@
       "certainty": "direct_text",
       "copyright_note": "Public-domain classical text, very short excerpt used as Huang-Lao philosophy lens.",
       "review_status": "verified",
-      "adjacent_context_note": "This is a philosophy lens (????), not evidence that the source discussed the Yantie meeting. ?????????????????"
+      "adjacent_context_note": "This is a philosophy lens / 思想透镜 (至静者圣), not evidence that the source discussed the Yantie meeting. 用于解释主上节制与权力边界。"
     },
     {
       "evidence_id": "ev:src_hanshu_dong_zhongshu:zhuan:school_officials:a2d60001",
@@ -5676,7 +5676,7 @@
         "ev:src_lunyu_yanyuan:yanyuan07:food_army_trust:aa220001",
         "ev:src_xunzi_tianlun:tianlun:nature_constant:aa110008"
       ],
-      "????": [
+      "法度": [
         "ev:src_huainanzi_zhushu:zhushu:law_as_measure:aa220017",
         "ev:src_hanfeizi_youdu:youdu:law_no_noble:aa220012"
       ],

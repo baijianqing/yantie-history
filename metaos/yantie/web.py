@@ -371,15 +371,15 @@ YANTIE_HTML = """<!doctype html>
       display: none;
     }
 
-    .stage[data-main-experience-slice="YT-A1-UI-001A"] [hidden] {
+    .stage[data-experience-track="main-path"] [hidden] {
       display: none !important;
     }
 
-    .stage[data-main-experience-slice="YT-A1-UI-001A"] .issue-strip[data-mainline-hidden="true"] {
+    .stage[data-experience-track="main-path"] .issue-strip[data-mainline-hidden="true"] {
       display: none;
     }
 
-    .stage[data-main-experience-slice="YT-A1-UI-001A"] .evidence-seals[data-mainline-mode="key-evidence"] {
+    .stage[data-experience-track="main-path"] .evidence-seals[data-mainline-mode="key-evidence"] {
       margin-top: 14px;
     }
 
@@ -1629,9 +1629,9 @@ YANTIE_HTML = """<!doctype html>
     .post-court-entry[data-explore-type="philosophy_lens"] { border-color: rgba(104,166,188,0.56); }
     .post-court-entry[data-explore-type="material_guide"] { border-color: rgba(183,205,133,0.56); }
     .post-court-entry[data-explore-type="power_relation"] { border-color: rgba(154,36,28,0.58); }
-    .post-court-entry[data-explore-type="user_judgment"] { border-color: rgba(255,244,214,0.34); }
     .post-court-entry[data-explore-type="external_echo"] { border-style: dashed; }
-    .post-court-entry[data-explore-type="external_echo"][data-echo-enabled="true"] { border-color: rgba(104,166,188,0.7); }
+    .post-court-entry[data-explore-type="external_echo"][data-echo-enabled="curated"],
+    .post-court-entry[data-explore-type="external_echo"][data-echo-enabled="live"] { border-color: rgba(104,166,188,0.7); }
 
     .external-echo-panel {
       margin: 0 10px 10px;
@@ -1757,6 +1757,16 @@ YANTIE_HTML = """<!doctype html>
       gap: 6px;
       color: rgba(255,244,214,0.58);
       font-size: 11px;
+    }
+
+    .material-guide-card ul {
+      display: grid;
+      gap: 5px;
+      margin: 0;
+      padding-left: 18px;
+      color: rgba(255,244,214,0.78);
+      font-size: 12px;
+      line-height: 1.55;
     }
 
     .material-guide-card small {
@@ -2267,7 +2277,7 @@ YANTIE_HTML = """<!doctype html>
   </style>
 </head>
 <body>
-  <main class="stage" data-testid="immersive-yantie-scene" data-main-experience-slice="YT-A1-UI-001A" data-completion-status="active">
+  <main class="stage" data-testid="immersive-yantie-scene" data-experience-track="main-path" data-completion-status="active">
     <canvas id="sceneCanvas" class="scene-canvas" aria-hidden="true"></canvas>
     <div class="grain" aria-hidden="true"></div>
     <div class="vignette" aria-hidden="true"></div>
@@ -2352,29 +2362,25 @@ YANTIE_HTML = """<!doctype html>
                   </button>
                   <button class="post-court-entry" type="button" data-post-court-action="material-guide" data-explore-type="material_guide">
                     <strong>材料导览</strong>
-                    <span>查看 A2 补强材料的层级、入口和边界。</span>
+                    <span>查看补充材料的来源、具体线索和使用边界。</span>
                   </button>
                   <button class="post-court-entry" type="button" data-post-court-action="power-network" data-explore-type="power_relation">
                     <strong>朝堂权力结构</strong>
                     <span>回到霍光沉默与权力边界一幕。</span>
                   </button>
-                  <button class="post-court-entry" type="button" data-post-court-action="second-perspective" data-explore-type="user_judgment" disabled>
-                    <strong>从另一席位再入朝</strong>
-                    <span>保留第一次轨迹；下一轮开放。</span>
-                  </button>
-                  <button class="post-court-entry" type="button" data-post-court-action="external-echo" data-explore-type="external_echo" disabled>
+                  <button class="post-court-entry" type="button" data-post-court-action="external-echo" data-explore-type="external_echo" data-echo-enabled="curated">
                     <strong>后世与当代讨论</strong>
-                    <span>external_echo 暂不可用，不进入史证链。</span>
+                    <span>查看后世评说与当代问题的摘要；只作延伸思考。</span>
                   </button>
                 </div>
                 <div id="externalEchoPanel" class="external-echo-panel" data-external-echo-status="idle" hidden>
-                  external_echo 仅属于退朝后的延伸讨论，不进入史证链。
+                  后世与当代讨论只属于退朝后的延伸思考，不进入史证链。
                 </div>
                 <div id="philosophyLensPanel" class="philosophy-lens-panel" data-lens-boundary="philosophy_lens" hidden>
                   思想透镜只作为退朝后的解释视角，不是会议事实证据。
                 </div>
                 <div id="materialGuidePanel" class="material-guide-panel" data-material-boundary="post_court_only" hidden>
-                  A2 材料导览只在退朝后开放，不进入首次主体验。
+                  材料导览只在退朝后开放，不进入首次主体验。
                 </div>
               </details>
             </div>
@@ -2576,8 +2582,29 @@ YANTIE_HTML = """<!doctype html>
       }
     ];
 
+    const curatedExternalEchoItems = [
+      {
+        title: "后世目录学如何看《盐铁论》",
+        provider: "退朝后导览",
+        summary: "后世评价通常把它读作政论文献和思想争辩文本，而不是简单的会议实录。这个角度能帮助用户理解文本为何既有史料价值，也有编排和议论色彩。",
+        source_boundary: "延伸讨论"
+      },
+      {
+        title: "国家财政与市场边界",
+        provider: "观点摘要",
+        summary: "现代研究常把盐铁之议放在国家财政、市场秩序和边防开支之间理解。这里展示的是问题定位，不引用论文或专著全文。",
+        source_boundary: "延伸讨论"
+      },
+      {
+        title: "民生负担与公共决策",
+        provider: "当代问题",
+        summary: "盐铁会议留下的不是一个可直接套用的答案，而是一组仍会反复出现的判断：公共支出从哪里来，民众承受多少，权力如何被约束。",
+        source_boundary: "延伸讨论"
+      }
+    ];
+
     const mainExperienceSlice = {
-      id: "YT-A1-UI-001A",
+      id: "main-experience-path",
       path: [
         "pressure_entry",
         "first_choice",
@@ -4907,6 +4934,11 @@ YANTIE_HTML = """<!doctype html>
         "source": "《资治通鉴》卷023",
         "status": "已入包 4 条",
         "defaultEntry": "退朝后全文争点；可候选为主线关键证据",
+        "details": [
+          "始元六年诏问贤良文学，补足会议发生的编年线索。",
+          "七月罢榷酤，而盐铁未废，用来校准退朝后的有限结果。",
+          "适合在退朝后回看，不替代《盐铁论》的会议文本。"
+        ],
         "boundary": "后出编年史，用于校验会议轮廓，不等同会议原始记录。"
       },
       {
@@ -4915,6 +4947,11 @@ YANTIE_HTML = """<!doctype html>
         "source": "《汉书·食货志》《史记·平准书》",
         "status": "已入包 20 条",
         "defaultEntry": "退朝后深度探索；少量可作为主线轻提示",
+        "details": [
+          "盐铁、均输、平准、酒榷解释国家如何筹措财政资源。",
+          "算缗、告缗、边费材料说明财政压力并不只是朝堂口号。",
+          "只说明制度背景，不把页面中的压力条当成真实统计。"
+        ],
         "boundary": "解释盐铁、均输、平准、算缗和边费，不把压力值伪装成真实统计。"
       },
       {
@@ -4923,6 +4960,11 @@ YANTIE_HTML = """<!doctype html>
         "source": "《四库全书总目提要》",
         "status": "已入包 8 条",
         "defaultEntry": "退朝后深度探索",
+        "details": [
+          "桓宽和《盐铁论》成书性质用于说明文本并非会议速记。",
+          "目录学评价帮助理解后世如何阅读这部政论文本。",
+          "可用于退朝后反思，不改写公元前 81 年的会议事实。"
+        ],
         "boundary": "说明《盐铁论》的文本整理和目录学评价，不改写会议事实。"
       },
       {
@@ -4931,6 +4973,11 @@ YANTIE_HTML = """<!doctype html>
         "source": "《黄帝四经》",
         "status": "已入包 6 条",
         "defaultEntry": "思想透镜：黄老",
+        "details": [
+          "道生法、法度、名实、毋夺民时等短摘用于补足汉初黄老语境。",
+          "帮助用户理解无为并不等于无制度，也包含节制和校准。",
+          "只作思想透镜，不声称桑弘羊或贤良文学直接引用。"
+        ],
         "boundary": "只作汉初治理语言的解释透镜，不声称会议人物直接引用。"
       },
       {
@@ -4939,6 +4986,11 @@ YANTIE_HTML = """<!doctype html>
         "source": "《汉书》《春秋繁露》",
         "status": "已入包 6 条",
         "defaultEntry": "思想透镜：经学语境",
+        "details": [
+          "官学、六经、德刑、天人和王道正当性解释武帝以后话语环境。",
+          "帮助理解贤良文学的道德批判为何有制度化表达。",
+          "只作退朝后思想背景，不替会议人物补写发言。"
+        ],
         "boundary": "只解释武帝以后经学正当性语言，不作为会议现场事实。"
       },
       {
@@ -4947,6 +4999,11 @@ YANTIE_HTML = """<!doctype html>
         "source": "书目卡与观点定位",
         "status": "已建 7 张书目卡",
         "defaultEntry": "退朝后延伸阅读",
+        "details": [
+          "只展示书目、主题标签和原创观点摘要，方便继续研究。",
+          "不复制论文、专著或现代译注的长段内容。",
+          "可以帮助定位问题，不进入史证链或退朝案牍。"
+        ],
         "boundary": "只交付原创摘要、链接和版权边界，不交付论文或专著全文。"
       }
     ];
@@ -5249,20 +5306,20 @@ YANTIE_HTML = """<!doctype html>
     }
 
     function isExternalEchoEnabled() {
-      return !isStaticRuntime && Boolean(state.manifest?.features?.external_echo_enabled);
+      return Boolean(state.manifest?.features?.external_echo_enabled);
     }
 
     function syncExternalEchoEntry(postCourtUnlocked) {
       const externalButton = document.querySelector('[data-post-court-action="external-echo"]');
       if (!externalButton) return;
-      const enabled = postCourtUnlocked && isExternalEchoEnabled();
+      const enabled = postCourtUnlocked;
       externalButton.disabled = !enabled;
-      externalButton.dataset.echoEnabled = enabled ? "true" : "false";
+      externalButton.dataset.echoEnabled = isExternalEchoEnabled() ? "live" : "curated";
       const hint = externalButton.querySelector("span");
       if (hint) {
-        hint.textContent = enabled
-          ? "查询退朝后的当代讨论；external_echo 不进入史证链。"
-          : "external_echo 暂不可用，不进入史证链。";
+        hint.textContent = isExternalEchoEnabled()
+          ? "查询退朝后的当代讨论；不进入史证链。"
+          : "查看后世评说与当代问题的摘要；只作延伸思考。";
       }
     }
 
@@ -6346,8 +6403,8 @@ YANTIE_HTML = """<!doctype html>
       panel.hidden = false;
       panel.innerHTML = `
         <strong>退朝后材料导览</strong>
-        <span>A2 补强材料按用途分层展示；它们不会自动进入你的退朝案牍，也不会改写会议事实。</span>
-        <div class="material-guide-grid" aria-label="A2 材料分层">
+        <span>补充材料按用途分层展示；它们不会自动进入你的退朝案牍，也不会改写会议事实。</span>
+        <div class="material-guide-grid" aria-label="补充材料分层">
           ${materialGuideEntries.map(entry => `
             <section class="material-guide-card" data-material-guide-id="${escapeHtml(entry.id)}">
               <h4>${escapeHtml(entry.label)}</h4>
@@ -6356,11 +6413,14 @@ YANTIE_HTML = """<!doctype html>
                 <span>${escapeHtml(entry.status)}</span>
                 <span>${escapeHtml(entry.defaultEntry)}</span>
               </div>
+              <ul>
+                ${(entry.details || []).map(detail => `<li>${escapeHtml(detail)}</li>`).join("")}
+              </ul>
               <small>${escapeHtml(entry.boundary)}</small>
             </section>
           `).join("")}
         </div>
-        <small>material_boundary=post_court_only · writes_to_evidence_pack=false · can_support_claims=by_material_type</small>
+        <small>退朝后开放 · 不自动写入案牍 · 是否支持历史判断取决于材料类型</small>
       `;
     }
 
@@ -6434,26 +6494,26 @@ YANTIE_HTML = """<!doctype html>
         panel.innerHTML = `
           <strong>当代回声暂不可用</strong>
           <span>${escapeHtml(message || "外部接口不可用，核心历史体验不受影响。")}</span>
-          <small>source_boundary=external_echo · can_support_claims=false</small>
+          <small>延伸讨论 · 不支持历史事实判断</small>
         `;
         return;
       }
       const items = state.externalEchoItems || [];
       panel.innerHTML = `
         <strong>后世与当代讨论</strong>
-        <span>以下内容只作为退朝后的外部回声，不是会议史实证据。</span>
+        <span>以下内容只作为退朝后的延伸思考，不是会议史实证据，也不会写入你的案牍。</span>
         ${items.length ? `
           <ul>
             ${items.map(item => `
               <li>
                 ${item.url ? `<a href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer noopener">${escapeHtml(item.title)}</a>` : `<b>${escapeHtml(item.title)}</b>`}
                 ${item.summary ? `<span>${escapeHtml(item.summary)}</span>` : ""}
-                <small>${escapeHtml(item.provider || "external")} · ${escapeHtml(item.source_boundary || "external_echo")}</small>
+                <small>${escapeHtml(item.provider || "延伸讨论")} · ${escapeHtml(externalBoundaryLabel(item.source_boundary))}</small>
               </li>
             `).join("")}
           </ul>
         ` : `<span>暂未返回可展示条目。</span>`}
-        <small>source_boundary=external_echo · writes_to_evidence_pack=false · can_support_claims=false</small>
+        <small>不进入史证链 · 不写入证据包 · 不支持历史事实判断</small>
       `;
     }
 
@@ -6461,9 +6521,10 @@ YANTIE_HTML = """<!doctype html>
       const details = document.querySelector("#postCourtExplorer details");
       if (details) details.open = true;
       if (!isExternalEchoEnabled()) {
-        state.externalEchoStatus = "error";
-        state.externalEchoItems = [];
-        renderExternalEchoPanel("external_echo 暂不可用；静态页面或未配置密钥时保持降级。");
+        state.externalEchoStatus = "curated";
+        state.externalEchoItems = curatedExternalEchoItems;
+        document.getElementById("historyBoundary").textContent = "后世与当代讨论只作退朝后的延伸思考；不进入史证链、证据包或退朝案牍。";
+        renderExternalEchoPanel();
         return;
       }
       state.externalEchoStatus = "loading";
@@ -6473,7 +6534,7 @@ YANTIE_HTML = """<!doctype html>
         const result = await getData(`/external/zhihu/search?q=${encodeURIComponent("盐铁会议 国家 市场 民生")}&count=3`);
         state.externalEchoStatus = result.status || "ok";
         state.externalEchoItems = Array.isArray(result.items) ? result.items : [];
-        document.getElementById("historyBoundary").textContent = "当代回声只作为退朝后延伸讨论；不进入 EvidenceUnit、Claim 或退朝案牍。";
+        document.getElementById("historyBoundary").textContent = "当代回声只作为退朝后延伸讨论；不进入证据包、历史判断或退朝案牍。";
         renderExternalEchoPanel();
       } catch (error) {
         state.externalEchoStatus = "error";
@@ -7107,6 +7168,11 @@ YANTIE_HTML = """<!doctype html>
         '"': "&quot;",
         "'": "&#39;"
       }[char]));
+    }
+
+    function externalBoundaryLabel(boundary) {
+      if (!boundary || boundary === "external_echo") return "不进入史证链";
+      return boundary;
     }
 
     boot().catch(error => {

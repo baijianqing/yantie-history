@@ -207,6 +207,20 @@ async function inspectScenario(page, scenario, viewport) {
       { timeout: 10000 },
     );
   }
+  if (scenario === "external-echo-boundary") {
+    await page.locator('[data-post-court-action="external-echo"]').click();
+    await page.waitForFunction(
+      () => {
+        const panel = document.querySelector("#externalEchoPanel");
+        if (!panel || panel.hidden) return false;
+        const style = window.getComputedStyle(panel);
+        const rect = panel.getBoundingClientRect();
+        return style.display !== "none" && style.visibility !== "hidden" && rect.width > 0 && rect.height > 0;
+      },
+      null,
+      { timeout: 10000 },
+    );
+  }
 
   return page.evaluate(({ scenario: scenarioId, pageScenario: pageScenarioId, viewport: viewportSpec }) => {
     function metrics(selector) {
@@ -309,12 +323,14 @@ async function inspectScenario(page, scenario, viewport) {
 
     if (scenarioId === "external-echo-boundary") {
       if (!externalButton) failures.push("external echo entry missing");
-      if (externalButton && !externalButton.disabled) failures.push("external echo enabled in static runtime");
-      if (externalButton?.dataset.echoEnabled !== "false") failures.push("external echo enabled flag is not false");
-      if (!externalHint.includes("external_echo") || !externalHint.includes("不进入史证链")) {
+      if (externalButton?.disabled) failures.push("external echo entry disabled");
+      if (externalButton?.dataset.echoEnabled !== "curated" && externalButton?.dataset.echoEnabled !== "live") {
+        failures.push("external echo mode flag missing");
+      }
+      if (!externalHint.includes("后世") || !externalHint.includes("延伸思考")) {
         failures.push("external echo boundary hint missing");
       }
-      if (externalEcho.visible) failures.push("external echo panel visible before enabled action");
+      if (!externalEcho.visible) failures.push("external echo panel hidden after action");
     }
 
     return {

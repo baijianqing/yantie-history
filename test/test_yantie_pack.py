@@ -436,6 +436,8 @@ class YantieEvidencePackDataTests(unittest.TestCase):
         self.assertEqual(source.source_type, SourceType.primary_text)
         self.assertEqual(source.delivery_policy.value, "excerpt_allowed")
         self.assertTrue(source.human_verified)
+        self.assertIn("黄帝四经", source.title)
+        self.assertNotIn("?", source.title)
 
         huang_lao_evidence = [
             evidence for evidence in pack.evidence_units if evidence.source_id == "src_huangdi_sijing"
@@ -452,6 +454,20 @@ class YantieEvidencePackDataTests(unittest.TestCase):
             "ev:src_huangdi_sijing:shiliujing:utmost_stillness_sage:a2d50006",
         }
         self.assertEqual({evidence.evidence_id for evidence in huang_lao_evidence}, expected_ids)
+        self.assertEqual(
+            {
+                evidence.excerpt_original
+                for evidence in huang_lao_evidence
+            },
+            {
+                "道生法",
+                "法度者正之至也",
+                "省苛事",
+                "毋夺民时",
+                "名实相应则定",
+                "至静者圣",
+            },
+        )
 
         for evidence in huang_lao_evidence:
             self.assertEqual(evidence.review_status, ReviewStatus.verified)
@@ -460,6 +476,10 @@ class YantieEvidencePackDataTests(unittest.TestCase):
             self.assertIn("philosophy_lens", evidence.value_tags)
             self.assertIn("huang_lao", evidence.value_tags)
             self.assertLessEqual(len(evidence.excerpt_original or ""), 12)
+            self.assertNotIn("?", evidence.canonical_location)
+            self.assertNotIn("?", evidence.excerpt_original or "")
+            self.assertNotIn("?", evidence.paraphrase_zh)
+            self.assertIn("思想透镜", evidence.adjacent_context_note or "")
             self.assertIn("Huang-Lao philosophy lens", evidence.copyright_note)
             self.assertIn("not evidence", evidence.adjacent_context_note or "")
             self.assertIn("Yantie meeting", evidence.adjacent_context_note or "")
