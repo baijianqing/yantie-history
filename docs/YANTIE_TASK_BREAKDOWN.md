@@ -64,6 +64,7 @@ flowchart TB
     A2MAT013 --> A2MAT014["YT-A2-MAT-014<br/>外部回声边界验收"]
     A2MAT014 --> A2MAT015["YT-A2-MAT-015<br/>外部回声验收状态收口"]
     A2MAT015 --> A2REL001["YT-A2-REL-001<br/>A2 发布适用性收口"]
+    A2REL001 --> A2E2E001["YT-A2-E2E-001<br/>A2 静态发布门报告"]
     A002 --> V3017A["YT-V3-017A<br/>冻结主体验路径"]
     V3017A --> V3017B["YT-V3-017B<br/>定义体验业务对象"]
     V3017B --> V3017C["YT-V3-017C<br/>冻结历史边界规则"]
@@ -1349,3 +1350,18 @@ A1 首批允许任务表：
 - 测试命令：`git diff --check -- docs/reports/YT-A2-RELEASE-READINESS.md docs/YANTIE_TASK_BREAKDOWN.md test/test_yantie_release_readiness.py`；`python -m pytest test/test_yantie_release_readiness.py`；`python -m pytest test -k yantie`；必要时执行 `python -m pytest test`。
 - 回滚方式：删除 A2 发布适用性报告、测试文件和任务图/任务卡中的 `YT-A2-REL-001` 节点。
 - 文档更新：新增 `docs/reports/YT-A2-RELEASE-READINESS.md`，记录当前项目状态、发布适用级别、风险和下一步推进建议。
+
+### YT-A2-E2E-001：A2 静态发布门报告
+
+- 任务 ID：`YT-A2-E2E-001`
+- 价值：`YT-A2-REL-001` 已判断当前适合有条件静态预览，但还没有记录本地包、线上 Pages、人工复核项和发布授权之间的差异。本任务形成 A2 静态发布门报告，避免把“本地可发布候选”误说成“线上已经发布通过”。
+- 依赖：`YT-A2-REL-001`、当前 GitHub Pages 地址、静态验收脚本、盐铁相关测试。
+- 允许修改范围：`docs/reports/YT-A2-E2E-001.md`、`docs/YANTIE_TASK_BREAKDOWN.md`、`test/test_yantie_release_gate.py`。
+- 禁止修改范围：UI、evidence pack、API、外部 adapter、公共 Schema、搜索逻辑、验收 runner、运行态 `library/` 数据、迁移、根配置、依赖清单、GitHub Pages 部署配置。
+- 输入：本地静态验收结果、线上 Pages 验收结果、当前分支状态、A2 发布适用性报告。
+- 输出：A2 静态发布门报告，明确本地静态包通过、当前线上 Pages 未通过最新验收、正式发布授权暂不通过，以及解除阻断的下一步。
+- 接口：本任务只输出报告和文档测试；不改变页面、数据、部署配置、验收脚本或外部接口。
+- 验收标准：报告包含 `blocked_deploy_pending` 状态；记录本地 `36/36 checks passed`；记录线上 Pages 在 `material-guide` 场景未通过；记录 `power-silence` 人工复核仍未完成；明确当前不应宣布最新线上发布通过；测试覆盖这些关键结论。
+- 测试命令：`git diff --check -- docs/reports/YT-A2-E2E-001.md docs/YANTIE_TASK_BREAKDOWN.md test/test_yantie_release_gate.py`；`python -m pytest test/test_yantie_release_gate.py`；`python -m pytest test -k yantie`；必要时执行 `python -m pytest test`。
+- 回滚方式：删除 A2 静态发布门报告、测试文件和任务图/任务卡中的 `YT-A2-E2E-001` 节点。
+- 文档更新：新增 `docs/reports/YT-A2-E2E-001.md`，记录本轮发布门结论、线上阻断项和下一步部署/复核路径。
