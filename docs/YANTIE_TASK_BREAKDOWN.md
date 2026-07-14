@@ -1396,3 +1396,18 @@ A1 首批允许任务表：
 - 测试命令：`git diff --check -- metaos/yantie/web.py docs/yantie/index.html scripts/check-yantie-acceptance.mjs test/test_yantie_ui.py test/test_yantie_e2e.py docs/YANTIE_TASK_BREAKDOWN.md docs/YANTIE_PRODUCT_EXPERIENCE.md`；`python -m pytest test/test_yantie_ui.py test/test_yantie_e2e.py`；`node scripts/check-yantie-acceptance.mjs`；必要时执行 `python -m pytest test -k yantie` 和 `python -m pytest test`。
 - 回滚方式：移除 `materialGuideEntries` 新增字段、材料导览分区渲染、现代研究观点卡渲染、验收脚本新增检查、相关测试和本任务卡，恢复 002 前退朝后导览展示。
 - 文档更新：本任务卡和 `docs/YANTIE_PRODUCT_EXPERIENCE.md` 记录材料导览与后世讨论的新分工。
+
+### YT-A2-UI-003：后世与当代讨论东方学界观点补强
+
+- 任务 ID：`YT-A2-UI-003`
+- 价值：退朝后“后世与当代讨论”已经能展示现代研究观点卡，但内容偏向欧美汉学和英语研究，缺少中国、日本等东方学界的阅读传统。用户进入退朝后延伸探索时，应能看到中国校注、思想史、经济史，以及日本汉代史和译注传统如何改变对盐铁会议的理解。
+- 依赖：`YT-A2-UI-002`、`curatedExternalEchoItems`、`materialGuideEntries`、现有现代研究版权边界、用户反馈“尤其是中国学者的声音不足”。
+- 允许修改范围：`metaos/yantie/web.py`、`docs/yantie/index.html`、`test/test_yantie_ui.py`、`docs/YANTIE_TASK_BREAKDOWN.md`、`docs/YANTIE_PRODUCT_EXPERIENCE.md`。
+- 禁止修改范围：evidence pack、API、公共 Schema、搜索逻辑、外部搜索 adapter、迁移、根配置、运行态 `library/` 数据、现代研究全文、未经核验的新史料、把现代研究观点写入史证链。
+- 输入：现有后世与当代讨论观点卡、现代研究书目卡边界、中国校注传统、中国思想史/经济史研究线索、日本汉代史与译注传统线索。
+- 输出：后世与当代讨论新增东方学界观点卡；材料导览“现代研究”字段改为中西日书目卡与观点定位；测试覆盖王利器、侯外庐、徐复观、吴慧、西嶋定生、佐藤武敏等线索。
+- 接口：东方学界观点只在退朝后“后世与当代讨论”和“材料导览”中作为延伸阅读路径出现；不写入退朝案牍，不新增 EvidenceUnit，不支撑会议事实 Claim。
+- 验收标准：界面至少展示中国校注、中国思想史/经济史、日本汉代史/译注三类东方学界观点；观点卡标明 `中国学者研究摘要` 或 `日本学者研究摘要`；现代研究导览不再只列欧美作者；不复制现代校注、译注、论文或专著正文。
+- 测试命令：`git diff --check -- metaos/yantie/web.py docs/yantie/index.html test/test_yantie_ui.py docs/YANTIE_TASK_BREAKDOWN.md docs/YANTIE_PRODUCT_EXPERIENCE.md`；`python -m pytest test/test_yantie_ui.py`；必要时执行 `python -m pytest test -k yantie` 和 `python -m pytest test`。
+- 回滚方式：移除东方学界观点卡、现代研究导览新增线索、相关测试断言和本任务卡，恢复 `YT-A2-UI-002` 后的观点卡结构。
+- 文档更新：本任务卡和 `docs/YANTIE_PRODUCT_EXPERIENCE.md` 记录东方学界观点补强范围、进入位置和版权边界。
