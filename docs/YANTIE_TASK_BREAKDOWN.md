@@ -61,6 +61,7 @@ flowchart TB
     A2MAT010 --> A2MAT011["YT-A2-MAT-011<br/>黄老分组状态收口"]
     A2MAT011 --> A2MAT012["YT-A2-MAT-012<br/>思想透镜验收场景"]
     A2MAT012 --> A2MAT013["YT-A2-MAT-013<br/>思想透镜验收状态收口"]
+    A2MAT013 --> A2MAT014["YT-A2-MAT-014<br/>外部回声边界验收"]
     A002 --> V3017A["YT-V3-017A<br/>冻结主体验路径"]
     V3017A --> V3017B["YT-V3-017B<br/>定义体验业务对象"]
     V3017B --> V3017C["YT-V3-017C<br/>冻结历史边界规则"]
@@ -1301,3 +1302,18 @@ A1 首批允许任务表：
 - 测试命令：`git diff --check -- docs/YANTIE_A2_MATERIAL_GAP.md docs/YANTIE_TASK_BREAKDOWN.md test/test_yantie_material_docs.py`；`python -m pytest test/test_yantie_material_docs.py`；必要时执行 `python -m pytest test -k yantie` 和 `python -m pytest test`。
 - 回滚方式：移除 013 任务图节点、任务卡、A2 材料门禁文档中的 012/013 状态补登和材料文档测试断言。
 - 文档更新：更新本任务卡和 A2 材料门禁文档，说明思想透镜验收场景已完成状态收口。
+
+### YT-A2-MAT-014：退朝后外部回声边界验收场景
+
+- 任务 ID：`YT-A2-MAT-014`
+- 价值：当代回声必须只作为退朝后延伸讨论，静态版默认不可用且不能进入史证链。当前 UI/API 测试已约束 `external_echo` 边界，但 Playwright 静态验收尚未检查退朝后入口的禁用与边界提示。本任务补齐静态验收，防止后续 UI 调整把外部回声误开放到主体验或弱化边界说明。
+- 依赖：`YT-A2-MAT-013`、退朝后深度探索入口、`scripts/check-yantie-acceptance.mjs`、现有 UI/E2E 测试。
+- 允许修改范围：`scripts/check-yantie-acceptance.mjs`、`test/test_yantie_ui.py`、`test/test_yantie_e2e.py`、`docs/YANTIE_TASK_BREAKDOWN.md`。
+- 禁止修改范围：evidence pack、UI 内容、API、外部搜索 adapter、公共 Schema、搜索代码、运行态 `library/` 数据、迁移、根配置、新增史料、现代研究全文。
+- 输入：退朝后 `external-echo` 入口、`#externalEchoPanel`、静态 runtime manifest、现有 acceptance query 场景。
+- 输出：`external-echo-boundary` acceptance runner 场景、静态版外部回声禁用检查、边界提示检查、测试覆盖和本任务卡。
+- 接口：验收 runner 通过 `?acceptance=post-court-explorer` 进入退朝后状态；不点击外部服务，不请求 API；只检查 `[data-post-court-action="external-echo"]` 存在、默认禁用、`data-echo-enabled="false"`、提示包含 `external_echo` 与“不进入史证链”，且 `#externalEchoPanel` 未提前可见。
+- 验收标准：Playwright runner 总检查数从 33 增至 36；`external-echo-boundary` 覆盖 desktop、mobile、reduced-motion；UI/E2E 测试声明该场景；不改变用户主体验、证据包、API 或外部 adapter。
+- 测试命令：`git diff --check -- scripts/check-yantie-acceptance.mjs test/test_yantie_ui.py test/test_yantie_e2e.py docs/YANTIE_TASK_BREAKDOWN.md`；`python -m pytest test/test_yantie_ui.py test/test_yantie_e2e.py`；`node scripts/check-yantie-acceptance.mjs`；必要时执行 `python -m pytest test -k yantie` 和 `python -m pytest test`。
+- 回滚方式：移除 `external-echo-boundary` runner 场景、外部回声边界检查、测试断言和任务卡，恢复 014 前验收矩阵。
+- 文档更新：本任务卡即本轮文档交付物；A2 材料门禁状态可由后续独立收口任务同步。

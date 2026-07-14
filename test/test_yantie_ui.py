@@ -510,7 +510,7 @@ class YantieWebUiTests(unittest.TestCase):
         self.assertIn("inspectScenario(page, scenario, viewport)", script)
         self.assertIn("function pageScenarioFor(scenario)", script)
         self.assertIn(
-            'if (scenario === "material-guide" || scenario === "philosophy-lens") return "post-court-explorer"',
+            'scenario === "external-echo-boundary"',
             script,
         )
         self.assertIn("page.waitForFunction", script)
@@ -519,8 +519,10 @@ class YantieWebUiTests(unittest.TestCase):
         self.assertIn('Number(window.getComputedStyle(document.querySelector(".judgment-form")).opacity', script)
         self.assertIn('[data-post-court-action="material-guide"]', script)
         self.assertIn('[data-post-court-action="philosophy-lens"]', script)
+        self.assertIn('[data-post-court-action="external-echo"]', script)
         self.assertIn("#materialGuidePanel", script)
         self.assertIn("#philosophyLensPanel", script)
+        self.assertIn("#externalEchoPanel", script)
         self.assertIn("reducedMotion: \"reduce\"", script)
         self.assertIn("dossier overlaps debate HUD", script)
         self.assertIn("judgment backdrop too prominent", script)
@@ -529,6 +531,8 @@ class YantieWebUiTests(unittest.TestCase):
         self.assertIn("material guide has no cards", script)
         self.assertIn("philosophy lens boundary missing", script)
         self.assertIn("philosophy lens has no evidence buttons", script)
+        self.assertIn("external echo enabled in static runtime", script)
+        self.assertIn("external echo boundary hint missing", script)
         self.assertIn("Manual review recommended", script)
         for scenario in [
             "opening-map",
@@ -542,6 +546,7 @@ class YantieWebUiTests(unittest.TestCase):
             "post-court-explorer",
             "material-guide",
             "philosophy-lens",
+            "external-echo-boundary",
         ]:
             self.assertIn(f'"{scenario}"', script)
 

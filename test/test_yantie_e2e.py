@@ -116,6 +116,7 @@ def test_yantie_e2e_acceptance_runner_covers_delivery_gate() -> None:
         "post-court-explorer",
         "material-guide",
         "philosophy-lens",
+        "external-echo-boundary",
     ]:
         assert f'"{scenario}"' in script
 
@@ -129,10 +130,14 @@ def test_yantie_e2e_acceptance_runner_covers_delivery_gate() -> None:
     assert "pageScenarioFor(scenario)" in script
     assert '[data-post-court-action="material-guide"]' in script
     assert '[data-post-court-action="philosophy-lens"]' in script
+    assert '[data-post-court-action="external-echo"]' in script
     assert "#materialGuidePanel" in script
     assert "#philosophyLensPanel" in script
+    assert "#externalEchoPanel" in script
     assert "material guide boundary missing" in script
     assert "material guide has no cards" in script
     assert "philosophy lens boundary missing" in script
     assert "philosophy lens has no evidence buttons" in script
+    assert "external echo enabled in static runtime" in script
+    assert "external echo boundary hint missing" in script
     assert 'scenarioId === "power-silence"' in script

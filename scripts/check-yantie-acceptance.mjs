@@ -20,6 +20,7 @@ const scenarios = [
   "post-court-explorer",
   "material-guide",
   "philosophy-lens",
+  "external-echo-boundary",
 ];
 
 const viewports = [
@@ -147,7 +148,13 @@ function screenshotPath(options, viewport, scenario) {
 }
 
 function pageScenarioFor(scenario) {
-  if (scenario === "material-guide" || scenario === "philosophy-lens") return "post-court-explorer";
+  if (
+    scenario === "material-guide" ||
+    scenario === "philosophy-lens" ||
+    scenario === "external-echo-boundary"
+  ) {
+    return "post-court-explorer";
+  }
   return scenario;
 }
 
@@ -163,7 +170,8 @@ async function inspectScenario(page, scenario, viewport) {
     scenario === "retirement-dossier" ||
     scenario === "post-court-explorer" ||
     scenario === "material-guide" ||
-    scenario === "philosophy-lens"
+    scenario === "philosophy-lens" ||
+    scenario === "external-echo-boundary"
   ) {
     await page.waitForFunction(
       () => Number(window.getComputedStyle(document.querySelector(".judgment-form")).opacity || "0") > 0.98,
@@ -237,12 +245,15 @@ async function inspectScenario(page, scenario, viewport) {
     const postCourt = metrics("#postCourtExplorer");
     const materialGuide = metrics("#materialGuidePanel");
     const philosophyLens = metrics("#philosophyLensPanel");
+    const externalEcho = metrics("#externalEchoPanel");
     const details = document.querySelector("#postCourtExplorer details");
     const materialGuidePanel = document.querySelector("#materialGuidePanel");
     const materialCards = document.querySelectorAll("[data-material-guide-id]");
     const philosophyLensPanel = document.querySelector("#philosophyLensPanel");
     const lensTabs = document.querySelectorAll("[data-lens-group]");
     const lensButtons = document.querySelectorAll("[data-lens-evidence-id]");
+    const externalButton = document.querySelector('[data-post-court-action="external-echo"]');
+    const externalHint = (externalButton?.textContent || "").trim();
     const failures = [];
 
     if (stage?.dataset.acceptanceScenario !== pageScenarioId) failures.push("wrong acceptance scenario");
@@ -265,7 +276,12 @@ async function inspectScenario(page, scenario, viewport) {
       }
     }
 
-    if (scenarioId === "post-court-explorer" || scenarioId === "material-guide" || scenarioId === "philosophy-lens") {
+    if (
+      scenarioId === "post-court-explorer" ||
+      scenarioId === "material-guide" ||
+      scenarioId === "philosophy-lens" ||
+      scenarioId === "external-echo-boundary"
+    ) {
       if (!postCourt.visible) failures.push("post-court explorer hidden");
       if (!details?.open) failures.push("post-court details not expanded");
     }
@@ -291,6 +307,16 @@ async function inspectScenario(page, scenario, viewport) {
       if (lensButtons.length < 1) failures.push("philosophy lens has no evidence buttons");
     }
 
+    if (scenarioId === "external-echo-boundary") {
+      if (!externalButton) failures.push("external echo entry missing");
+      if (externalButton && !externalButton.disabled) failures.push("external echo enabled in static runtime");
+      if (externalButton?.dataset.echoEnabled !== "false") failures.push("external echo enabled flag is not false");
+      if (!externalHint.includes("external_echo") || !externalHint.includes("不进入史证链")) {
+        failures.push("external echo boundary hint missing");
+      }
+      if (externalEcho.visible) failures.push("external echo panel visible before enabled action");
+    }
+
     return {
       viewport: viewportSpec.name,
       scenario: scenarioId,
@@ -301,6 +327,7 @@ async function inspectScenario(page, scenario, viewport) {
       postCourtVisible: postCourt.visible,
       materialGuideVisible: materialGuide.visible,
       philosophyLensVisible: philosophyLens.visible,
+      externalEchoVisible: externalEcho.visible,
       manualReview: scenarioId === "power-silence",
       failures,
     };
