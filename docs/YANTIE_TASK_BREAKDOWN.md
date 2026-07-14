@@ -1181,7 +1181,7 @@ A1 首批允许任务表：
 - 禁止修改范围：evidence pack、UI 业务行为、API、公共 Schema、搜索逻辑、迁移、根配置、运行态 `library/` 数据、外部当代回声接口。
 - 输入：`material-guide` 退朝后入口、`materialGuidePanel`、`materialGuideEntries`、现有 Playwright 验收场景。
 - 输出：`material-guide` acceptance runner 场景、材料导览可见性检查、测试覆盖和本任务卡。
-- 接口：验收 runner 通过 `?acceptance=post-court-explorer` 进入退朝后状态，再触发 `[data-post-court-action="material-guide"]`；必须检查 `#materialGuidePanel` 可见、`data-material-boundary="post_court_only"`、至少一个 `data-material-guide-id` 卡片存在，且 `#postCourtExplorer details` 已展开。
+- 接口：验收 runner 通过 `?acceptance=post-court-explorer` 进入退朝后状态，再触发 `[data-post-court-action="material-guide"]`；必须检查 `#postCourtExplorer` 以争点图谱风格面板打开，`#materialGuidePanel` 可见、`data-material-boundary="post_court_only"`、至少一个 `data-material-guide-id` 卡片存在。
 - 验收标准：Playwright runner 总检查数从 27 增至 30；`material-guide` 覆盖 desktop、mobile、reduced-motion；UI/E2E 测试声明该场景；不改变用户主体验和证据包。
 - 测试命令：`git diff --check -- scripts/check-yantie-acceptance.mjs test/test_yantie_ui.py test/test_yantie_e2e.py docs/YANTIE_TASK_BREAKDOWN.md`；`python -m pytest test/test_yantie_ui.py test/test_yantie_e2e.py`；`node scripts/check-yantie-acceptance.mjs`；必要时执行 `python -m pytest test -k yantie` 和 `python -m pytest test`。
 - 回滚方式：移除 `material-guide` runner 场景、材料导览检查、测试断言和任务卡，恢复 006F 前验收矩阵。

@@ -126,7 +126,7 @@ def test_yantie_e2e_acceptance_runner_covers_delivery_gate() -> None:
     assert '--base-url <url>' in script
     assert '--screenshot-dir <path>' in script
     assert "dossier overlaps debate HUD" in script
-    assert "post-court details not expanded" in script
+    assert "post-court explorer panel not open" in script
     assert "pageScenarioFor(scenario)" in script
     assert '[data-post-court-action="material-guide"]' in script
     assert '[data-post-court-action="philosophy-lens"]' in script

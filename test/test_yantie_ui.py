@@ -261,7 +261,7 @@ class YantieWebUiTests(unittest.TestCase):
         self.assertIn("function syncMainExperienceControls()", html)
         self.assertIn("chapterButton.hidden = !postCourtUnlocked", html)
         self.assertIn("chapterButton.disabled = !postCourtUnlocked", html)
-        self.assertIn('chapterButton.textContent = postCourtUnlocked ? "退朝后争点" : "退朝后开放"', html)
+        self.assertIn('chapterButton.textContent = postCourtUnlocked ? "退朝后探索" : "退朝后开放"', html)
         self.assertIn("诸篇争锋将在退朝案牍后开放；当前主线只保留关键证据。", html)
         self.assertIn("primaryEvidenceIdsForScene(scene).map", html)
         self.assertIn('data-mainline-hidden="true"', html)
@@ -293,7 +293,10 @@ class YantieWebUiTests(unittest.TestCase):
 
         self.assertIn('id="postCourtExplorer"', html)
         self.assertIn('aria-label="退朝后深度探索"', html)
-        self.assertIn("postCourtExplorer.hidden = !postCourtUnlocked", html)
+        self.assertIn('class="chapter-map-panel post-court-explorer"', html)
+        self.assertIn("function openPostCourtExplorer", html)
+        self.assertIn("openPostCourtExplorer()", html)
+        self.assertIn("closePostCourtExplorer()", html)
         for action in [
             "chapter-map",
             "philosophy-lens",
@@ -301,7 +304,8 @@ class YantieWebUiTests(unittest.TestCase):
             "power-network",
             "external-echo",
         ]:
-            self.assertIn(f'data-post-court-action="{action}"', html)
+            self.assertIn(f'id: "{action}"', html)
+        self.assertIn('data-post-court-action="${escapeHtml(action.id)}"', html)
         self.assertNotIn('data-post-court-action="second-perspective"', html)
         for explore_type in [
             "historical_evidence",
@@ -332,13 +336,15 @@ class YantieWebUiTests(unittest.TestCase):
         self.assertIn("退朝后开放全文争点；这里只读证据与解释边界，不改写案牍。", html)
         self.assertIn("正在回看权力遮蔽一幕；这不抹除你的退朝案牍。", html)
         self.assertIn("材料导览只在退朝后说明来源层级与进入边界", html)
+        self.assertIn("退朝后探索从全文争点进入", html)
+        self.assertNotIn("<summary>退朝后继续探索</summary>", html)
         self.assertNotIn("查看 A2 补强材料", html)
         self.assertNotIn("A2 材料导览只在退朝后开放", html)
 
     def test_yantie_a2_post_court_material_guide_is_bounded(self) -> None:
         html = self.client.get("/yantie").text
         guide_match = re.search(
-            r"const materialGuideEntries = (\[.*?\]);\n\n    const philosophyLensGroups =",
+            r"const materialGuideEntries = (\[.*?\]);\n\n    const postCourtActions =",
             html,
             re.S,
         )
@@ -546,7 +552,7 @@ class YantieWebUiTests(unittest.TestCase):
         self.assertIn("reducedMotion: \"reduce\"", script)
         self.assertIn("dossier overlaps debate HUD", script)
         self.assertIn("judgment backdrop too prominent", script)
-        self.assertIn("post-court details not expanded", script)
+        self.assertIn("post-court explorer panel not open", script)
         self.assertIn("material guide boundary missing", script)
         self.assertIn("material guide has no cards", script)
         self.assertIn("philosophy lens boundary missing", script)

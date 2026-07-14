@@ -260,7 +260,6 @@ async function inspectScenario(page, scenario, viewport) {
     const materialGuide = metrics("#materialGuidePanel");
     const philosophyLens = metrics("#philosophyLensPanel");
     const externalEcho = metrics("#externalEchoPanel");
-    const details = document.querySelector("#postCourtExplorer details");
     const materialGuidePanel = document.querySelector("#materialGuidePanel");
     const materialCards = document.querySelectorAll("[data-material-guide-id]");
     const philosophyLensPanel = document.querySelector("#philosophyLensPanel");
@@ -268,6 +267,7 @@ async function inspectScenario(page, scenario, viewport) {
     const lensButtons = document.querySelectorAll("[data-lens-evidence-id]");
     const externalButton = document.querySelector('[data-post-court-action="external-echo"]');
     const externalHint = (externalButton?.textContent || "").trim();
+    const postCourtOpen = document.querySelector("#postCourtExplorer")?.classList.contains("is-open") || false;
     const failures = [];
 
     if (stage?.dataset.acceptanceScenario !== pageScenarioId) failures.push("wrong acceptance scenario");
@@ -297,7 +297,7 @@ async function inspectScenario(page, scenario, viewport) {
       scenarioId === "external-echo-boundary"
     ) {
       if (!postCourt.visible) failures.push("post-court explorer hidden");
-      if (!details?.open) failures.push("post-court details not expanded");
+      if (!postCourtOpen) failures.push("post-court explorer panel not open");
     }
 
     if (scenarioId === "material-guide") {
