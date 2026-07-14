@@ -1635,6 +1635,8 @@
     }
 
     .external-echo-panel li {
+      display: grid;
+      gap: 6px;
       padding: 8px;
       border: 1px solid rgba(255,236,188,0.14);
       border-radius: 6px;
@@ -1651,6 +1653,22 @@
       display: block;
       margin-top: 6px;
       color: rgba(255,244,214,0.5);
+    }
+
+    .external-echo-panel b {
+      color: #f3c46d;
+    }
+
+    .external-echo-viewpoint {
+      border-left: 3px solid rgba(104,166,188,0.56);
+      padding-left: 9px;
+      color: rgba(216,244,255,0.82);
+      line-height: 1.58;
+    }
+
+    .external-echo-note {
+      color: rgba(255,244,214,0.58);
+      font-size: 11px;
     }
 
     .philosophy-lens-panel {
@@ -1705,7 +1723,7 @@
 
     .material-guide-card {
       display: grid;
-      gap: 6px;
+      gap: 8px;
       padding: 10px;
       border: 1px solid rgba(183,205,133,0.26);
       border-radius: 8px;
@@ -1720,6 +1738,12 @@
     .material-guide-card h4 {
       color: #fff4d6;
       font-size: 13px;
+    }
+
+    .material-guide-question {
+      color: #e6f5b8;
+      font-weight: 800;
+      line-height: 1.45;
     }
 
     .material-guide-meta {
@@ -1742,6 +1766,24 @@
 
     .material-guide-card small {
       color: rgba(255,244,214,0.52);
+    }
+
+    .material-guide-section {
+      display: grid;
+      gap: 5px;
+      border-top: 1px solid rgba(255,244,214,0.1);
+      padding-top: 7px;
+    }
+
+    .material-guide-section b {
+      color: rgba(255,244,214,0.9);
+      font-size: 11px;
+    }
+
+    .material-guide-section p {
+      color: rgba(255,244,214,0.72);
+      font-size: 12px;
+      line-height: 1.55;
     }
 
     .lens-group-tabs,
@@ -2520,22 +2562,52 @@
 
     const curatedExternalEchoItems = [
       {
+        title: "《盐铁论》作为辩论文献",
+        provider: "Esson M. Gale, The Discourses on Salt and Iron",
+        summary: "Gale 的英译和导言使《盐铁论》更容易被英语世界作为一部围绕国家财政、产业控制和士人批评展开的辩论文献来阅读。",
+        viewpoint: "可借用的观点不是某一句译文，而是阅读方法：把文本当作经过整理的朝廷论辩材料，既看政策争点，也看发言立场如何被组织。",
+        copyright_note: "只展示书目与观点定位，不复制现代译文或导言原文。",
+        source_boundary: "现代研究摘要"
+      },
+      {
+        title: "昭宣时期的政策分歧",
+        provider: "Michael Loewe, Crisis and Conflict in Han China",
+        summary: "Loewe 对武帝以后至王莽以前政治危机和政策分歧的研究，可帮助用户把盐铁会议放入昭宣之际的财政压力、政治调整与士人意见之中。",
+        viewpoint: "可借用的观点是：盐铁之议不只是道德和财政的二分，也关系到武帝遗产如何被继承、修正或约束。",
+        copyright_note: "只作研究史定位，不引用专著正文。",
+        source_boundary: "现代研究摘要"
+      },
+      {
+        title: "铁业、官营与技术财政",
+        provider: "Donald B. Wagner, The State and the Iron Industry in Han China",
+        summary: "Wagner 从汉代铁业、官营组织和技术材料出发，帮助用户理解“铁官”并不只是抽象财政名词，而是资源、生产、技术和国家组织能力的结合。",
+        viewpoint: "可借用的观点是：讨论盐铁官营时，需要同时看财政收入、生产组织和技术管理，而不仅是市场自由或国家垄断的口号。",
+        copyright_note: "只展示研究方向和原创摘要，不复制现代研究原文。",
+        source_boundary: "现代研究摘要"
+      },
+      {
+        title: "帝国资源动员与制度化统治",
+        provider: "Mark Edward Lewis, The Early Chinese Empires: Qin and Han",
+        summary: "Lewis 对秦汉帝国形成和制度化统治的综述，有助于把盐铁、均输和平准理解为帝国资源动员的一部分，而不是孤立政策。",
+        viewpoint: "可借用的观点是：国家能力、边防、交通和行政组织共同塑造了盐铁会议的制度背景。",
+        copyright_note: "只展示书目卡和观点概括，不交付现代著作全文。",
+        source_boundary: "现代研究摘要"
+      },
+      {
         title: "后世目录学如何看《盐铁论》",
-        provider: "退朝后导览",
+        provider: "《四库全书总目提要》等目录传统",
         summary: "后世评价通常把它读作政论文献和思想争辩文本，而不是简单的会议实录。这个角度能帮助用户理解文本为何既有史料价值，也有编排和议论色彩。",
-        source_boundary: "延伸讨论"
+        viewpoint: "可借用的观点是：退朝后读《盐铁论》，应同时区分会议事实、文本整理和后世评价。",
+        copyright_note: "目录学材料只作后世阅读线索，不改写会议事实。",
+        source_boundary: "后世评说摘要"
       },
       {
-        title: "国家财政与市场边界",
-        provider: "观点摘要",
-        summary: "现代研究常把盐铁之议放在国家财政、市场秩序和边防开支之间理解。这里展示的是问题定位，不引用论文或专著全文。",
-        source_boundary: "延伸讨论"
-      },
-      {
-        title: "民生负担与公共决策",
-        provider: "当代问题",
+        title: "国家、市场、民生的当代回声",
+        provider: "退朝后问题定位",
         summary: "盐铁会议留下的不是一个可直接套用的答案，而是一组仍会反复出现的判断：公共支出从哪里来，民众承受多少，权力如何被约束。",
-        source_boundary: "延伸讨论"
+        viewpoint: "可借用的观点是：当代讨论只能作为反思入口，不能倒推古代会议事实，也不进入史证链。",
+        copyright_note: "只展示原创问题摘要，不抓取或复制平台内容。",
+        source_boundary: "当代讨论边界"
       }
     ];
 
@@ -4870,6 +4942,14 @@
         "source": "《资治通鉴》卷023",
         "status": "已入包 4 条",
         "defaultEntry": "退朝后全文争点；可候选为主线关键证据",
+        "question": "这场会议在编年史中如何留下轮廓？",
+        "whatToRead": [
+          "始元六年，诏问贤良文学，说明会议是在昭帝政治调整中发生。",
+          "罢榷酤而盐铁如旧，说明退朝结果是有限调整，不是制度总废。",
+          "编年材料可用来校准时间线、参与者和政策结果。"
+        ],
+        "howItHelps": "帮助用户把退朝案牍放回真实历史结果：争论被记录下来，但盐铁制度并未因此完全取消。",
+        "entryNote": "适合从“全文争点”或退朝案牍回看，不替代《盐铁论》本身。",
         "details": [
           "始元六年诏问贤良文学，补足会议发生的编年线索。",
           "七月罢榷酤，而盐铁未废，用来校准退朝后的有限结果。",
@@ -4883,6 +4963,14 @@
         "source": "《汉书·食货志》《史记·平准书》",
         "status": "已入包 20 条",
         "defaultEntry": "退朝后深度探索；少量可作为主线轻提示",
+        "question": "盐铁、均输、平准和酒榷为什么会成为朝议焦点？",
+        "whatToRead": [
+          "盐铁官营：国家直接控制关键资源收益。",
+          "均输、平准：通过调运和平抑市场服务财政与供给。",
+          "酒榷、算缗、告缗、边费：补足武帝以来财政动员和民间负担背景。"
+        ],
+        "howItHelps": "把“国家要钱”和“与民争利”都放进制度背景中看，避免把桑弘羊写成单纯聚敛，也避免把贤良文学写成空泛道德批评。",
+        "entryNote": "材料导览展示制度地图；具体争论仍回到史证抽屉和全文争点。",
         "details": [
           "盐铁、均输、平准、酒榷解释国家如何筹措财政资源。",
           "算缗、告缗、边费材料说明财政压力并不只是朝堂口号。",
@@ -4896,6 +4984,14 @@
         "source": "《四库全书总目提要》",
         "status": "已入包 8 条",
         "defaultEntry": "退朝后深度探索",
+        "question": "《盐铁论》到底是会议实录、政论文本，还是后世整理？",
+        "whatToRead": [
+          "桓宽和《盐铁论》成书性质：文本保留会议争论，也带有整理和著述立场。",
+          "目录学评价：帮助理解后世如何把它归入政论和思想争辩传统。",
+          "文本性质材料：提醒用户区分会议事实、文本编排和后世阅读。"
+        ],
+        "howItHelps": "让用户知道自己看到的不是现场录音，而是一部经过保留、整理和解释的政治辩论文本。",
+        "entryNote": "适合在退朝后阅读，用来校准证据可信度和文本边界。",
         "details": [
           "桓宽和《盐铁论》成书性质用于说明文本并非会议速记。",
           "目录学评价帮助理解后世如何阅读这部政论文本。",
@@ -4909,6 +5005,14 @@
         "source": "《黄帝四经》",
         "status": "已入包 6 条",
         "defaultEntry": "思想透镜：黄老",
+        "question": "为什么《黄帝四经》能帮助理解汉初黄老，而不能当作会议事实？",
+        "whatToRead": [
+          "道生法、法度、名实：显示黄老并非不要制度，而是强调制度应合乎秩序和名实。",
+          "省苛事、毋夺民时：帮助理解国家动员何时越过民力边界。",
+          "至静者圣：为权力节制和不轻动提供思想语言。"
+        ],
+        "howItHelps": "材料导览说明黄老材料从哪里来；哲学透镜再把这些材料用于解释制度、民力和权力节制。",
+        "entryNote": "如需具体体验，进入“思想透镜：黄老”；本处只说明材料地图和边界。",
         "details": [
           "道生法、法度、名实、毋夺民时等短摘用于补足汉初黄老语境。",
           "帮助用户理解无为并不等于无制度，也包含节制和校准。",
@@ -4922,6 +5026,14 @@
         "source": "《汉书》《春秋繁露》",
         "status": "已入包 6 条",
         "defaultEntry": "思想透镜：经学语境",
+        "question": "贤良文学的道德批判为什么不是孤立的个人意见？",
+        "whatToRead": [
+          "《汉书》中的董仲舒、武帝文治和官学材料：说明经学逐步成为国家正当性语言。",
+          "《春秋繁露》候选短摘：用于德刑、天人、王道和政治名分透镜。",
+          "经学语境材料：解释道义批评如何进入制度化表达。"
+        ],
+        "howItHelps": "帮助用户理解贤良文学为什么能以义、利、德、刑等语言质疑财政政策，而不只是表达民间不满。",
+        "entryNote": "如需具体体验，进入“思想透镜：经学语境”；材料导览只说明来源和用途。",
         "details": [
           "官学、六经、德刑、天人和王道正当性解释武帝以后话语环境。",
           "帮助理解贤良文学的道德批判为何有制度化表达。",
@@ -4935,6 +5047,15 @@
         "source": "书目卡与观点定位",
         "status": "已建 7 张书目卡",
         "defaultEntry": "退朝后延伸阅读",
+        "question": "现代研究能帮助用户继续问什么，而不是替用户给结论？",
+        "whatToRead": [
+          "Esson M. Gale：把《盐铁论》作为可比较的辩论文献来读。",
+          "Michael Loewe：从昭宣时期政治危机和政策分歧理解盐铁会议。",
+          "Donald B. Wagner：从汉代铁业、技术和国家工业控制理解铁官背景。",
+          "Mark Edward Lewis：从秦汉帝国资源动员和制度化统治理解财政国家。"
+        ],
+        "howItHelps": "现代研究不进入史证链，但能帮助用户把盐铁会议放进研究史、制度史和思想史问题中继续阅读。",
+        "entryNote": "具体作者和观点摘要集中放在“后世与当代讨论”；这里仅说明材料范围。",
         "details": [
           "只展示书目、主题标签和原创观点摘要，方便继续研究。",
           "不复制论文、专著或现代译注的长段内容。",
@@ -6453,7 +6574,7 @@
       panel.hidden = false;
       panel.innerHTML = `
         <strong>退朝后材料导览</strong>
-        <span>补充材料按用途分层展示；它们不会自动进入你的退朝案牍，也不会改写会议事实。</span>
+        <span>这里不是只标边界，而是告诉你每类材料具体看什么、能解释什么、下一步从哪里进入。它们不会自动进入你的退朝案牍，也不会改写会议事实。</span>
         <div class="material-guide-grid" aria-label="补充材料分层">
           ${materialGuideEntries.map(entry => `
             <section class="material-guide-card" data-material-guide-id="${escapeHtml(entry.id)}">
@@ -6463,10 +6584,22 @@
                 <span>${escapeHtml(entry.status)}</span>
                 <span>${escapeHtml(entry.defaultEntry)}</span>
               </div>
-              <ul>
-                ${(entry.details || []).map(detail => `<li>${escapeHtml(detail)}</li>`).join("")}
-              </ul>
-              <small>${escapeHtml(entry.boundary)}</small>
+              <p class="material-guide-question">${escapeHtml(entry.question)}</p>
+              <div class="material-guide-section">
+                <b>具体看什么</b>
+                <ul>
+                  ${(entry.whatToRead || entry.details || []).map(detail => `<li>${escapeHtml(detail)}</li>`).join("")}
+                </ul>
+              </div>
+              <div class="material-guide-section">
+                <b>能解释什么</b>
+                <p>${escapeHtml(entry.howItHelps || "")}</p>
+              </div>
+              <div class="material-guide-section">
+                <b>下一步</b>
+                <p>${escapeHtml(entry.entryNote || entry.defaultEntry)}</p>
+              </div>
+              <small>边界：${escapeHtml(entry.boundary)}</small>
             </section>
           `).join("")}
         </div>
@@ -6477,7 +6610,7 @@
     function openMaterialGuide() {
       hidePostCourtExplorationPanels("material");
       renderMaterialGuidePanel();
-      document.getElementById("historyBoundary").textContent = "材料导览只在退朝后说明来源层级与进入边界；不会把解释材料变成会议事实。";
+      document.getElementById("historyBoundary").textContent = "材料导览展示具体材料、对应问题和进入路径；仍不把解释材料变成会议事实。";
       pulseSound("evidence");
     }
 
@@ -6547,14 +6680,17 @@
       const items = state.externalEchoItems || [];
       panel.innerHTML = `
         <strong>后世与当代讨论</strong>
-        <span>以下内容只作为退朝后的延伸思考，不是会议史实证据，也不会写入你的案牍。</span>
+        <span>这里展示后世评说、现代研究和当代问题的观点摘要。可以列作者和观点，但不复制现代论文或专著全文；这些内容也不会写入你的案牍。</span>
         ${items.length ? `
           <ul>
             ${items.map(item => `
               <li>
                 ${item.url ? `<a href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer noopener">${escapeHtml(item.title)}</a>` : `<b>${escapeHtml(item.title)}</b>`}
+                ${item.provider ? `<small class="external-echo-source">${escapeHtml(item.provider)}</small>` : ""}
                 ${item.summary ? `<span>${escapeHtml(item.summary)}</span>` : ""}
-                <small>${escapeHtml(item.provider || "延伸讨论")} · ${escapeHtml(externalBoundaryLabel(item.source_boundary))}</small>
+                ${item.viewpoint ? `<div class="external-echo-viewpoint">${escapeHtml(item.viewpoint)}</div>` : ""}
+                ${item.copyright_note ? `<span class="external-echo-note">${escapeHtml(item.copyright_note)}</span>` : ""}
+                <small>${escapeHtml(externalBoundaryLabel(item.source_boundary))}</small>
               </li>
             `).join("")}
           </ul>
@@ -6567,7 +6703,7 @@
       if (!isExternalEchoEnabled()) {
         state.externalEchoStatus = "curated";
         state.externalEchoItems = curatedExternalEchoItems;
-        document.getElementById("historyBoundary").textContent = "后世与当代讨论只作退朝后的延伸思考；不进入史证链、证据包或退朝案牍。";
+        document.getElementById("historyBoundary").textContent = "后世与当代讨论展示作者、书目和观点摘要；不复制现代研究全文，也不进入史证链。";
         renderExternalEchoPanel();
         return;
       }

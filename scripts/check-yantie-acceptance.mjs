@@ -262,11 +262,13 @@ async function inspectScenario(page, scenario, viewport) {
     const externalEcho = metrics("#externalEchoPanel");
     const materialGuidePanel = document.querySelector("#materialGuidePanel");
     const materialCards = document.querySelectorAll("[data-material-guide-id]");
+    const materialSubsections = document.querySelectorAll(".material-guide-section");
     const philosophyLensPanel = document.querySelector("#philosophyLensPanel");
     const lensTabs = document.querySelectorAll("[data-lens-group]");
     const lensButtons = document.querySelectorAll("[data-lens-evidence-id]");
     const externalButton = document.querySelector('[data-post-court-action="external-echo"]');
     const externalHint = (externalButton?.textContent || "").trim();
+    const externalViewpoints = document.querySelectorAll(".external-echo-viewpoint");
     const postCourtOpen = document.querySelector("#postCourtExplorer")?.classList.contains("is-open") || false;
     const failures = [];
 
@@ -306,6 +308,7 @@ async function inspectScenario(page, scenario, viewport) {
         failures.push("material guide boundary missing");
       }
       if (materialCards.length < 1) failures.push("material guide has no cards");
+      if (materialSubsections.length < materialCards.length * 3) failures.push("material guide lacks concrete sections");
     }
 
     if (scenarioId === "philosophy-lens") {
@@ -331,6 +334,7 @@ async function inspectScenario(page, scenario, viewport) {
         failures.push("external echo boundary hint missing");
       }
       if (!externalEcho.visible) failures.push("external echo panel hidden after action");
+      if (externalViewpoints.length < 3) failures.push("external echo lacks viewpoint cards");
     }
 
     return {

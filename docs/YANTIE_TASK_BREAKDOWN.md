@@ -1381,3 +1381,18 @@ A1 首批允许任务表：
 - 测试命令：`git diff --check -- docs/reports/YT-A2-DEPLOY-001.md docs/YANTIE_TASK_BREAKDOWN.md test/test_yantie_deploy_report.py`；`python -m pytest test/test_yantie_deploy_report.py`；`python -m pytest test -k yantie`；必要时执行 `python -m pytest test`。
 - 回滚方式：删除 A2 Pages 部署记录、测试文件和任务图/任务卡中的 `YT-A2-DEPLOY-001` 节点；如需回滚线上发布，另行将 `yantie-static-github-pages` 快进或回退到指定安全提交。
 - 文档更新：新增 `docs/reports/YT-A2-DEPLOY-001.md`，记录本轮 GitHub Pages 发布和线上复验结果。
+
+### YT-A2-UI-002：退朝后材料导览与现代研究观点卡补强
+
+- 任务 ID：`YT-A2-UI-002`
+- 价值：退朝后“材料导览”此前更像材料边界说明，用户看到来源、状态和限制，却难以理解每类材料具体看什么、为什么重要、下一步应该进入哪里。本任务把材料导览升级为“材料地图”，并把现代研究集中放入“后世与当代讨论”的观点卡中，解决“有导无览”的体验问题。
+- 依赖：`YT-A2-MAT-006E`、`YT-A2-MAT-014`、现有退朝后探索面板、`materialGuideEntries`、`curatedExternalEchoItems`、Playwright 静态验收脚本。
+- 允许修改范围：`metaos/yantie/web.py`、`docs/yantie/index.html`、`scripts/check-yantie-acceptance.mjs`、`test/test_yantie_ui.py`、`test/test_yantie_e2e.py`、`docs/YANTIE_TASK_BREAKDOWN.md`、`docs/YANTIE_PRODUCT_EXPERIENCE.md`。
+- 禁止修改范围：evidence pack、API、公共 Schema、搜索逻辑、外部搜索 adapter、迁移、根配置、运行态 `library/` 数据、现代研究全文、未经核验的新史料。
+- 输入：现有 A2 材料导览六类材料、退朝后思想透镜分组、现代研究书目卡边界、用户反馈“材料导览有导无览”。
+- 输出：材料导览卡新增 `question`、`whatToRead`、`howItHelps`、`entryNote` 字段；UI 展示“具体看什么 / 能解释什么 / 下一步”；后世与当代讨论新增现代研究观点卡；验收脚本检查材料导览具体分区和现代研究观点卡。
+- 接口：材料导览仍只在退朝后开放，不写入退朝案牍，不新增 EvidenceUnit，不支撑会议事实 Claim；现代研究只展示作者、书目和原创观点摘要，不复制论文、译文、导言或专著正文。
+- 验收标准：材料导览六类卡片均包含具体问题、至少三条具体材料线索、解释作用和下一步入口；黄老、经学、制度思想在材料导览中说明来源和用途，在哲学透镜中继续承担解释；现代研究在“后世与当代讨论”中以观点卡呈现，至少包含 Gale、Loewe、Wagner、Lewis 等书目/作者线索；Playwright 验收检查材料导览具体分区和观点卡存在。
+- 测试命令：`git diff --check -- metaos/yantie/web.py docs/yantie/index.html scripts/check-yantie-acceptance.mjs test/test_yantie_ui.py test/test_yantie_e2e.py docs/YANTIE_TASK_BREAKDOWN.md docs/YANTIE_PRODUCT_EXPERIENCE.md`；`python -m pytest test/test_yantie_ui.py test/test_yantie_e2e.py`；`node scripts/check-yantie-acceptance.mjs`；必要时执行 `python -m pytest test -k yantie` 和 `python -m pytest test`。
+- 回滚方式：移除 `materialGuideEntries` 新增字段、材料导览分区渲染、现代研究观点卡渲染、验收脚本新增检查、相关测试和本任务卡，恢复 002 前退朝后导览展示。
+- 文档更新：本任务卡和 `docs/YANTIE_PRODUCT_EXPERIENCE.md` 记录材料导览与后世讨论的新分工。
